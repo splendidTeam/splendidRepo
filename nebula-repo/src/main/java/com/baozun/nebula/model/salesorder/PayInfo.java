@@ -27,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_payinfo")
+@Table(name = "T_SO_PAYINFO")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PayInfo extends BaseModel{
 
@@ -136,6 +137,7 @@ public class PayInfo extends BaseModel{
      * @return the 订单id
      */
     @Column(name = "ORDER_ID")
+    @Index(name = "IDX_PAYINFO_ORDER_ID")
     public Long getOrderId(){
         return orderId;
     }
@@ -196,6 +198,7 @@ public class PayInfo extends BaseModel{
      * @return the 支付类型
      */
     @Column(name = "PAY_TYPE")
+    @Index(name = "IDX_PAYINFO_PAY_TYPE")
     public Integer getPayType(){
         return payType;
     }
@@ -316,6 +319,7 @@ public class PayInfo extends BaseModel{
      * @return the 是否支付成功状态 *
      */
     @Column(name = "PAY_SUCCESS_STATUS")
+    @Index(name = "IDX_PAYINFO_PAY_SUCCESS_STATUS")
     public Boolean getPaySuccessStatus(){
         return paySuccessStatus;
     }

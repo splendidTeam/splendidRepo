@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.command.Command;
@@ -82,6 +83,7 @@ public class EmailSubscribe extends BaseModel implements Command {
 	}
 
 	@Column(name = "TEMPLATE_CODE",length = 50)
+    @Index(name = "IDX_EMAIL_SUBSCRIBE_TEMPLATE_CODE")
 	public String getTemplateCode() {
 		return templateCode;
 	}
@@ -109,6 +111,7 @@ public class EmailSubscribe extends BaseModel implements Command {
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_EMAIL_SUBSCRIBE_TYPE")
 	public Integer getType() {
 		return type;
 	}

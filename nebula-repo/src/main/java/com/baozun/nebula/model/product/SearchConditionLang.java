@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -61,6 +62,7 @@ public class SearchConditionLang extends BaseModel {
 	}
 	
 	@Column(name = "SEARCH_CONDITION_ID")
+    @Index(name = "IDX_SEARCH_CON_LANG_SEARCH_CONDITION_ID")
 	public Long getSearchConditionId() {
 		return searchConditionId;
 	}

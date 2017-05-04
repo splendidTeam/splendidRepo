@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * 
  */
 @Entity
-@Table(name = "t_pd_sku_inventory")
+@Table(name = "T_PD_SKU_INVENTORY")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class SkuInventory extends BaseModel {
 
@@ -104,6 +105,7 @@ public class SkuInventory extends BaseModel {
 	 * @return the extentionCode
 	 */
 	@Column(name="EXTENTION_CODE")
+    @Index(name = "IDX_SKU_INVENTORY_EXTENTION_CODE")
 	public String getExtentionCode() {
 		return extentionCode;
 	}

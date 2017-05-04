@@ -39,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_industry")
+@Table(name = "T_PD_INDUSTRY")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class Industry extends BaseModel{
 
@@ -101,6 +101,7 @@ public class Industry extends BaseModel{
 	 * @return the 名称
 	 */
 	@Column(name = "NAME",length = 100)
+    @Index(name = "IDX_INDUSTRY_NAME")
 	public String getName(){
 		return name;
 	}
@@ -209,6 +210,7 @@ public class Industry extends BaseModel{
 		this.lifecycle = lifecycle;
 	}
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_INDUSTRY_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}

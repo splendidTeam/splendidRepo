@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * 活动调整详情 
  */
 @Entity
-@Table(name = "t_prm_priorityadjustdetail")
+@Table(name = "T_PRM_PRIORITYADJUSTDETAIL")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionPriorityAdjustDetail extends BaseModel {  
 	
@@ -84,6 +85,7 @@ public class PromotionPriorityAdjustDetail extends BaseModel {
 		this.id = id;
 	}
 	@Column(name = "ADJUSTID")
+    @Index(name = "IDX_PRIORITYADJUSTDETAIL_ADJUSTID")
 	public Long getAdjustId() {
 		return adjustId;
 	}
@@ -92,6 +94,7 @@ public class PromotionPriorityAdjustDetail extends BaseModel {
 		this.adjustId = adjustId;
 	}
 	@Column(name = "PROMOTIONID")
+    @Index(name = "IDX_PRIORITYADJUSTDETAIL_PROMOTIONID")
 	public Long getPromotionId() {
 		return promotionId;
 	}

@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.command.Command;
@@ -80,6 +81,7 @@ public class EmailIntercepter extends BaseModel implements Command{
 	}
 
 	@Column(name = "CODE")
+    @Index(name = "IDX_EMAIL_INTERCEPTER_CODE")
 	public String getCode() {
 		return code;
 	}

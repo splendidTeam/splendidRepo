@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -128,6 +129,7 @@ public class Contact extends BaseModel {
 	}
 
 	@Column(name = "NAME", length = 100)
+    @Index(name = "IDX_CONTACT_NAME")
 	public String getName() {
 		return name;
 	}
@@ -176,6 +178,7 @@ public class Contact extends BaseModel {
 	}
 
 	@Column(name = "IS_DEFAULT")
+    @Index(name = "IDX_CONTACT_IS_DEFAULT")
 	public Boolean getIsDefault() {
 		return isDefault;
 	}
@@ -184,16 +187,11 @@ public class Contact extends BaseModel {
 		this.isDefault = isDefault;
 	}
 
-	
-	
-
 	@Column(name = "MEMBER_ID")
+    @Index(name = "IDX_CONTACT_MEMBER_ID")
 	public Long getMemberId() {
 		return memberId;
 	}
-
-
-
 
 	public void setMemberId(Long memberId) {
 		this.memberId = memberId;
@@ -208,8 +206,6 @@ public class Contact extends BaseModel {
 		this.email = email;
 	}
 
-
-	
 	@Version
 	@Column(name = "VERSION")
 	public Date getVersion() {
@@ -230,6 +226,7 @@ public class Contact extends BaseModel {
 	}
 
 	@Column(name = "COUNTRY_ID")
+    @Index(name = "IDX_CONTACT_COUNTRY_ID")
 	public Long getCountryId() {
 		return countryId;
 	}
@@ -239,6 +236,7 @@ public class Contact extends BaseModel {
 	}
 
 	@Column(name = "PROVINCE_ID")
+    @Index(name = "IDX_CONTACT_PROVINCE_ID")
 	public Long getProvinceId() {
 		return provinceId;
 	}
@@ -248,6 +246,7 @@ public class Contact extends BaseModel {
 	}
 
 	@Column(name = "CITY_ID")
+    @Index(name = "IDX_CONTACT_CITY_ID")
 	public Long getCityId() {
 		return cityId;
 	}
@@ -257,6 +256,7 @@ public class Contact extends BaseModel {
 	}
 
 	@Column(name = "AREA_ID")
+    @Index(name = "IDX_CONTACT_AREA_ID")
 	public Long getAreaId() {
 		return areaId;
 	}
@@ -266,6 +266,7 @@ public class Contact extends BaseModel {
 	}
 
 	@Column(name = "TOWN_ID")
+    @Index(name = "IDX_CONTACT_TOWN_ID")
 	public Long getTownId() {
 		return townId;
 	}
@@ -320,6 +321,7 @@ public class Contact extends BaseModel {
 	}
 
 	@Column(name = "CONTACT_TYPE")
+    @Index(name = "IDX_CONTACT_CONTACT_TYPE")
 	public String getContactType() {
 		return contactType;
 	}
@@ -327,7 +329,5 @@ public class Contact extends BaseModel {
 	public void setContactType(String contactType) {
 		this.contactType = contactType;
 	}
-	
-	
 	
 }

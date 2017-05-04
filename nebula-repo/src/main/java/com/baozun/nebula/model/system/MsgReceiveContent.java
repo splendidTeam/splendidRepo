@@ -12,6 +12,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -79,6 +80,7 @@ public class MsgReceiveContent extends BaseModel {
 	
 
 	@Column(name = "IF_IDENTIFY",length = 50)
+    @Index(name = "IDX_MSG_RECEIVE_CONTENT_IF_IDENTIFY")
 	public String getIfIdentify() {
 		return ifIdentify;
 	}
@@ -110,6 +112,7 @@ public class MsgReceiveContent extends BaseModel {
 		
 
 	@Column(name = "MSG_ID",length = 50)
+    @Index(name = "IDX_MSG_RECEIVE_CONTENT_MSG_ID")
 	public String getMsgId() {
 		return msgId;
 	}
@@ -129,6 +132,7 @@ public class MsgReceiveContent extends BaseModel {
 	}
 
 	@Column(name = "IS_PROCCESSED")
+    @Index(name = "IDX_MSG_RECEIVE_CONTENT_IS_PROCCESSED")
 	public Boolean getIsProccessed() {
 		return isProccessed;
 	}

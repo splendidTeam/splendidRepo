@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -81,23 +82,28 @@ public class MemberBindingLog extends BaseModel {
 		this.ip = ip;
 	}
 	
-
 	@Column(name = "USER_ID_1")
+    @Index(name = "IDX_USER_BINDING_LOG_USER_ID_1")
 	public Long getUserId1() {
 		return userId1;
 	}
+
 	public void setUserId1(Long userId1) {
 		this.userId1 = userId1;
 	}
+
 	@Column(name = "USER_ID_2")
+    @Index(name = "IDX_USER_BINDING_LOG_USER_ID_2")
 	public Long getUserId2() {
 		return userId2;
 	}
+
 	public void setUserId2(Long userId2) {
 		this.userId2 = userId2;
 	}
 	
 	@Column(name = "BINDING_TYPE")
+    @Index(name = "IDX_USER_BINDING_LOG_BINDING_TYPE")
 	public Integer getBindingType() {
 		return bindingType;
 	}

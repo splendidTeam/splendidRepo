@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -128,6 +129,7 @@ public class SearchConditionItem extends BaseModel {
 	}
 
 	@Column(name = "CODITION_ID")
+    @Index(name = "IDX_SEARCH_CON_ITEM_CODITION_ID")
 	public Long getCoditionId() {
 		return coditionId;
 	}
@@ -166,6 +168,7 @@ public class SearchConditionItem extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_SEARCH_CON_ITEM_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}
@@ -193,6 +196,7 @@ public class SearchConditionItem extends BaseModel {
 	}
 
 	@Column(name = "PROPERTY_VALUE_ID")
+    @Index(name = "IDX_SEARCH_CON_ITEM_PROPERTY_VALUE_ID")
 	public Long getPropertyValueId() {
 		return propertyValueId;
 	}
@@ -220,6 +224,7 @@ public class SearchConditionItem extends BaseModel {
 	}
 	
 	@Column(name = "PROPERTY_ID")
+    @Index(name = "IDX_SEARCH_CON_ITEM_PROPERTY_ID")
 	public Long getPropertyId() {
 		return propertyId;
 	}

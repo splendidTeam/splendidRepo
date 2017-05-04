@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_sc_limit_head")
+@Table(name = "T_SC_LIMIT_HEAD")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class LimitHead extends BaseModel {
 
@@ -134,6 +135,7 @@ public class LimitHead extends BaseModel {
 	}
 
 	@Column(name = "SHOP_ID")
+    @Index(name = "IDX_LIMIT_HEAD_SHOP_ID")
 	public Long getShopId() {
 		return shopId;
 	}
@@ -161,6 +163,7 @@ public class LimitHead extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_LIMIT_HEAD_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}
@@ -197,6 +200,7 @@ public class LimitHead extends BaseModel {
 	}
 
 	@Column(name = "CREATE_ID")
+    @Index(name = "IDX_LIMIT_HEAD_CREATE_ID")
 	public Long getCreateId() {
 		return createId;
 	}
@@ -215,6 +219,7 @@ public class LimitHead extends BaseModel {
 	}
 
 	@Column(name = "UPDATE_ID")
+    @Index(name = "IDX_LIMIT_HEAD_UPDATE_ID")
 	public Long getUpdateId() {
 		return updateId;
 	}
@@ -233,6 +238,7 @@ public class LimitHead extends BaseModel {
 	}
 
 	@Column(name = "PUBLISH_ID")
+    @Index(name = "IDX_LIMIT_HEAD_PUBLISH_ID")
 	public Long getPublishId() {
 		return publishId;
 	}
@@ -251,6 +257,7 @@ public class LimitHead extends BaseModel {
 	}
 
 	@Column(name = "CANCEL_ID")
+	@Index(name = "IDX_LIMIT_HEAD_CANCEL_ID")
 	public Long getCancelId() {
 		return cancelId;
 	}

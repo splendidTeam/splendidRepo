@@ -27,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -37,7 +38,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_sto_presell_item_price_Info")
+@Table(name = "T_STO_PRESELL_ITEM_PRICE_INFO")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PresellItemPriceInfo extends BaseModel{
 
@@ -86,6 +87,7 @@ public class PresellItemPriceInfo extends BaseModel{
 	}
 
 	@Column(name = "ITEMCODE")
+    @Index(name = "IDX_PRESELL_ITEM_PRICE_INFO_ITEMCODE")
 	public String getItemCode(){
 		return itemCode;
 	}
@@ -95,6 +97,7 @@ public class PresellItemPriceInfo extends BaseModel{
 	}
 
 	@Column(name = "EXTENTIONCODE")
+    @Index(name = "IDX_PRESELL_ITEM_PRICE_INFO_EXTENTIONCODE")
 	public String getExtentionCode(){
 		return extentionCode;
 	}
@@ -149,6 +152,7 @@ public class PresellItemPriceInfo extends BaseModel{
 	}
 
 	@Column(name = "ITEMID")
+    @Index(name = "IDX_PRESELL_ITEM_PRICE_INFO_ITEMID")
 	public Long getItemId(){
 		return itemId;
 	}

@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -114,6 +115,7 @@ public class ShippingTemeplate extends BaseModel {
 	 * @return the name
 	 */
 	@Column(name = "NAME",length=255)
+    @Index(name = "IDX_SHIPPING_TEMEPALTE_NAME")
 	public String getName() {
 		return name;
 	}
@@ -129,6 +131,7 @@ public class ShippingTemeplate extends BaseModel {
 	 * @return the type
 	 */
 	@Column(name = "CALCULATION_TYPE",length=20)
+    @Index(name = "IDX_SHIPPING_TEMEPALTE_CALCULATION_TYPE")
 	public String getCalculationType() {
 		return calculationType;
 	}
@@ -180,6 +183,7 @@ public class ShippingTemeplate extends BaseModel {
 	}
 
 	@Column(name = "SHOP_ID")
+    @Index(name = "IDX_SHIPPING_TEMEPALTE_SHOP_ID")
 	public Long getShopId() {
 		return shopId;
 	}

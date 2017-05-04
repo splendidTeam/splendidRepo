@@ -38,7 +38,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_item")
+@Table(name = "T_PD_ITEM")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class Item extends BaseModel {
 	
@@ -208,6 +208,7 @@ public class Item extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_ITEM_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}
@@ -224,12 +225,13 @@ public class Item extends BaseModel {
 	 * @return the shop
 	 */
 	@Column(name = "SHOP_ID")
-	@Index(name = "IDX_SHOP_ID")
+	@Index(name = "IDX_ITEM_SHOP_ID")
 	public Long getShopId() {
 		return shopId;
 	}
 
 	@Column(name = "CODE")
+	@Index(name = "IDX_ITEM_CODE")
 	public String getCode() {
 		return code;
 	}
@@ -257,6 +259,7 @@ public class Item extends BaseModel {
 	}
 
 	@Column(name = "TEMPLATE_ID")
+    @Index(name = "IDX_ITEM_TEMPLATE_ID")
 	public Long getTemplateId() {
 		return templateId;
 	}
@@ -286,11 +289,13 @@ public class Item extends BaseModel {
 	 * @return the industryId
 	 */
 	@Column(name = "INDUSTRY_ID")
+    @Index(name = "IDX_ITEM_INDUSTRY_ID")
 	public Long getIndustryId() {
 		return industryId;
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_ITEM_TYPE")
 	public Integer getType() {
 		return type;
 	}

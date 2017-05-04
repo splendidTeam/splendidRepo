@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -102,6 +103,7 @@ public class SupportedArea  extends BaseModel{
 	 * @return the distributionModeId
 	 */
 	@Column(name="DISTRIBUTION_MODE_ID")
+    @Index(name = "IDX_SUPPORTED_AREA_DISTRIBUTION_MODE_ID")
 	public Long getDistributionModeId() {
 		return distributionModeId;
 	}
@@ -117,6 +119,7 @@ public class SupportedArea  extends BaseModel{
 	 * @return the type
 	 */
 	@Column(name="TYPE",length=20)
+    @Index(name = "IDX_SUPPORTED_AREA_DISTRIBUTION_TYPE")
 	public String getType() {
 		return type;
 	}
@@ -132,6 +135,7 @@ public class SupportedArea  extends BaseModel{
 	 * @return the groupNo
 	 */
 	@Column(name="GROUP_NO")
+    @Index(name = "IDX_SUPPORTED_AREA_DISTRIBUTION_GROUP_NO")
 	public Long getGroupNo() {
 		return groupNo;
 	}
@@ -147,6 +151,7 @@ public class SupportedArea  extends BaseModel{
 	 * @return the areaId
 	 */
 	@Column(name="AREA_ID")
+    @Index(name = "IDX_SUPPORTED_AREA_DISTRIBUTION_AREA_ID")
 	public String getAreaId() {
 		return areaId;
 	}

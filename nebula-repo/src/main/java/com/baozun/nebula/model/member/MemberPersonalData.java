@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -352,6 +353,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "COUNTRY_ID")
+    @Index(name = "IDX_PERSONAL_DATA_COUNTRY_ID")
 	public Long getCountryId(){
 		return countryId;
 	}
@@ -361,6 +363,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "PROVINCE_ID")
+    @Index(name = "IDX_PERSONAL_DATA_PROVINCE_ID")
 	public Long getProvinceId(){
 		return provinceId;
 	}
@@ -370,6 +373,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "CITY_ID")
+    @Index(name = "IDX_PERSONAL_DATA_CITY_ID")
 	public Long getCityId(){
 		return cityId;
 	}
@@ -379,6 +383,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "AREA_ID")
+    @Index(name = "IDX_PERSONAL_DATA_AREA_ID")
 	public Long getAreaId(){
 		return areaId;
 	}
@@ -388,6 +393,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "TOWN_ID")
+    @Index(name = "IDX_PERSONAL_DATA_TOWN_ID")
 	public Long getTownId(){
 		return townId;
 	}
@@ -469,6 +475,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "EMAIL")
+    @Index(name = "IDX_PERSONAL_DATA_EMAIL")
 	public String getEmail(){
 		return email;
 	}
@@ -478,6 +485,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "MOBILE")
+    @Index(name = "IDX_PERSONAL_DATA_MOBILE")
 	public String getMobile(){
 		return mobile;
 	}

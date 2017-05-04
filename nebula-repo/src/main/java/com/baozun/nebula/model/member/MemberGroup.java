@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -131,6 +132,7 @@ public class MemberGroup extends BaseModel {
 	}
 
 	@Column(name = "CODE")
+    @Index(name = "IDX_MEM_GROUP_CODE")
 	public String getCode() {
 		return code;
 	}
@@ -140,6 +142,7 @@ public class MemberGroup extends BaseModel {
 	}
 
 	@Column(name = "NAME")
+    @Index(name = "IDX_MEM_GROUP_NAME")
 	public String getName() {
 		return name;
 	}
@@ -167,6 +170,7 @@ public class MemberGroup extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_MEM_GROUP_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}
@@ -185,6 +189,7 @@ public class MemberGroup extends BaseModel {
 		this.version = version;
 	}
 
+	@Column(name = "DESCRIPTION")
 	public String getDescription() {
 		return description;
 	}
@@ -193,6 +198,7 @@ public class MemberGroup extends BaseModel {
 		this.description = description;
 	}
 
+	@Column(name = "CREATOR")
 	public String getCreator() {
 		return creator;
 	}
@@ -201,6 +207,7 @@ public class MemberGroup extends BaseModel {
 		this.creator = creator;
 	}
 
+    @Column(name = "MODIFIER")
 	public String getModifier() {
 		return modifier;
 	}

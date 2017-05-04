@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_consignee")
+@Table(name = "T_SO_CONSIGNEE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class Consignee extends BaseModel{
 
@@ -147,6 +148,7 @@ public class Consignee extends BaseModel{
     }
 
     @Column(name = "ORDER_ID")
+    @Index(name = "IDX_CONSIGNEE_ORDER_ID")
     public Long getOrderId(){
         return orderId;
     }
@@ -165,6 +167,7 @@ public class Consignee extends BaseModel{
     }
 
     @Column(name = "COUNTRY_ID")
+    @Index(name = "IDX_CONSIGNEE_COUNTRY_ID")
     public Long getCountryId(){
         return countryId;
     }
@@ -174,6 +177,7 @@ public class Consignee extends BaseModel{
     }
 
     @Column(name = "PROVINCE_ID")
+    @Index(name = "IDX_CONSIGNEE_PROVINCE_ID")
     public Long getProvinceId(){
         return provinceId;
     }
@@ -183,6 +187,7 @@ public class Consignee extends BaseModel{
     }
 
     @Column(name = "CITY_ID")
+    @Index(name = "IDX_CONSIGNEE_CITY_ID")
     public Long getCityId(){
         return cityId;
     }
@@ -192,6 +197,7 @@ public class Consignee extends BaseModel{
     }
 
     @Column(name = "AREA_ID")
+    @Index(name = "IDX_CONSIGNEE_AREA_ID")
     public Long getAreaId(){
         return areaId;
     }
@@ -201,6 +207,7 @@ public class Consignee extends BaseModel{
     }
 
     @Column(name = "TOWN_ID")
+    @Index(name = "IDX_CONSIGNEE_TOWN_ID")
     public Long getTownId(){
         return townId;
     }

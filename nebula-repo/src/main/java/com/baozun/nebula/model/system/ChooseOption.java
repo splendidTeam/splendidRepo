@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.command.Command;
@@ -165,6 +166,7 @@ public class ChooseOption extends BaseModel implements Command  {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_CHOOSE_OPTION_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}
@@ -175,6 +177,7 @@ public class ChooseOption extends BaseModel implements Command  {
 	
 	
 	@Column(name = "IS_SYSTEM")
+    @Index(name = "IDX_CHOOSE_OPTION_IS_SYSTEM")
 	public Boolean getIsSystem() {
 		return isSystem;
 	}

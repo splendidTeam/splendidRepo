@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.command.Command;
@@ -133,6 +134,7 @@ public class CacheConfig extends BaseModel implements Command{
     }
 
     @Column(name = "KEY",length = 50)
+    @Index(name = "IDX_CACHE_CONFIG_KEY")
     public String getKey(){
         return key;
     }
@@ -142,6 +144,7 @@ public class CacheConfig extends BaseModel implements Command{
     }
 
     @Column(name = "LIFECYCLE",length = 50)
+    @Index(name = "IDX_CACHE_CONFIG_LIFECYCLE")
     public Integer getLifecycle(){
         return lifecycle;
     }

@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_cancelorderapp")
+@Table(name = "T_SO_CANCELORDERAPP")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class CancelOrderApp extends BaseModel{
 
@@ -105,6 +106,7 @@ public class CancelOrderApp extends BaseModel{
 	}
 
 	@Column(name = "ORDER_CODE")
+    @Index(name = "IDX_CANCELORDERAPP_ORDER_CODE")
 	public String getOrderCode() {
 		return orderCode;
 	}
@@ -116,6 +118,7 @@ public class CancelOrderApp extends BaseModel{
 
 
 	@Column(name = "MEMBER_ID")
+    @Index(name = "IDX_CANCELORDERAPP_MEMBER_ID")
 	public Long getMemberId() {
 		return memberId;
 	}
@@ -188,6 +191,7 @@ public class CancelOrderApp extends BaseModel{
 	}
 
 	@Column(name = "HANDLE_ID")
+    @Index(name = "IDX_CANCELORDERAPP_HANDLE_ID")
 	public Long getHandleId() {
 		return handleId;
 	}
@@ -239,8 +243,4 @@ public class CancelOrderApp extends BaseModel{
 		this.version = version;
 	}
 
-	
-
-
-	
 }

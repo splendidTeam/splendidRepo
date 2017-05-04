@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -37,7 +38,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_property_image")
+@Table(name = "T_PD_PROPERTY_IMAGE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PropertyImage extends BaseModel {
 	/** The Constant serialVersionUID. */
@@ -144,6 +145,7 @@ public class PropertyImage extends BaseModel {
 		return modifyTime;
 	}
 	@Column(name = "ITEM_ID")
+    @Index(name = "IDX_PROPERTY_IMAGE_ITEM_ID")
 	public Long getItemId() {
 		return itemId;
 	}
@@ -172,6 +174,7 @@ public class PropertyImage extends BaseModel {
 	 * @param properties the properties to set
 	 */
 	@Column(name = "PROPERTIES")
+    @Index(name = "IDX_PROPERTY_IMAGE_PROPERTIES")
 	public void setProperties(String properties) {
 		this.properties = properties;
 	}

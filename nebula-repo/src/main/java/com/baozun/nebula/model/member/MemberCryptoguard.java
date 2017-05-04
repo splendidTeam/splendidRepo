@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -97,6 +98,7 @@ public class MemberCryptoguard extends BaseModel {
 	}
 
 	@Column(name = "MEMBER_ID",length = 255)
+    @Index(name = "IDX_CRYPTOGUARD_MEMBER_ID")
 	public Long getMemberId() {
 		return memberId;
 	}
@@ -133,6 +135,7 @@ public class MemberCryptoguard extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_CRYPTOGUARD_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}

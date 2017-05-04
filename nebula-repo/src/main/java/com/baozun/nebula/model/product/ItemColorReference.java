@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -18,11 +19,16 @@ import com.baozun.nebula.model.BaseModel;
  *
  */
 @Entity
-@Table(name = "t_pd_item_color_reference")
+@Table(name = "T_PD_ITEM_COLOR_REFERENCE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemColorReference extends BaseModel {
 
 	/**
+     * 
+     */
+    private static final long serialVersionUID = 7423444650616469472L;
+
+    /**
 	 * 
 	 */
 	private Long id;
@@ -51,6 +57,7 @@ public class ItemColorReference extends BaseModel {
 	}
 
 	@Column(name = "SYS_COLOR_ID")
+	@Index(name = "IDX_ITEM_COLOR_REFERENCE_SYS_COLOR_ID")
 	public Long getColorId() {
 		return colorId;
 	}
@@ -60,6 +67,7 @@ public class ItemColorReference extends BaseModel {
 	}
 
 	@Column(name = "ITEM_COLOR_ID")
+    @Index(name = "IDX_ITEM_COLOR_REFERENCE_ITEM_COLOR_ID")
 	public Long getItemColorId() {
 		return itemColorId;
 	}
