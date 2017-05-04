@@ -325,6 +325,29 @@ public class ItemForSolrI18nCommand implements Serializable {
 	@Field
 	private List<String> channels;
 	
+	
+	/**
+	 * 商品折扣
+	 */
+	@Field
+	private Double discount;
+	
+	
+	/**
+	 * 手机专享价格
+	 */
+	@Field
+	private Double mobileExclusivePrice;
+	
+	
+	/**
+	 * 商品默认排序
+	 */
+	@Field
+    private Double itemDefaultSort;
+	
+
+
 
 	public Long getId() {
 		return id;
@@ -786,4 +809,32 @@ public class ItemForSolrI18nCommand implements Serializable {
 	public void setNavigationTree(List<String> navigationTree) {
 		this.navigationTree = navigationTree;
 	}
+	
+    public Double getDiscount(){
+        return discount;
+    }
+
+    
+    public void setDiscount(Double discount){
+        this.discount = discount;
+    }
+
+    
+    public Double getMobileExclusivePrice(){
+        return mobileExclusivePrice;
+    }
+
+    
+    public void setMobileExclusivePrice(Double mobileExclusivePrice){
+        this.mobileExclusivePrice = mobileExclusivePrice;
+    }
+    
+    public Double getItemDefaultSort(){
+        return itemDefaultSort;
+    }
+
+    
+    public void setItemDefaultSort(Double itemDefaultSort){
+        this.itemDefaultSort = itemDefaultSort;
+    }
 }

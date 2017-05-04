@@ -367,6 +367,28 @@ public class ItemForSolrCommand implements Serializable {
 	private List<String> channels;
 	
 	
+	   
+    /**
+     * 商品折扣
+     */
+    @Field
+    private Double discount;
+    
+    
+    /**
+     * 手机专享价格
+     */
+    @Field
+    private Double mobileExclusivePrice;
+    
+    
+    /**
+     * 商品默认排序
+     */
+    @Field
+    private Double itemDefaultSort;
+	
+	
 //	/**
 //	 * 活跃结束时间
 //	 */
@@ -391,6 +413,36 @@ public class ItemForSolrCommand implements Serializable {
 	@Field("dynamic_colorref_*")
 	private Map<String, List<String>> dynamicColorRefMap;
 
+
+	
+    public Double getDiscount(){
+        return discount;
+    }
+
+    
+    public void setDiscount(Double discount){
+        this.discount = discount;
+    }
+
+    
+    public Double getMobileExclusivePrice(){
+        return mobileExclusivePrice;
+    }
+
+    
+    public void setMobileExclusivePrice(Double mobileExclusivePrice){
+        this.mobileExclusivePrice = mobileExclusivePrice;
+    }
+
+    
+    public Double getItemDefaultSort(){
+        return itemDefaultSort;
+    }
+
+    
+    public void setItemDefaultSort(Double itemDefaultSort){
+        this.itemDefaultSort = itemDefaultSort;
+    }
 
 	public Long getId() {
 		return id;
