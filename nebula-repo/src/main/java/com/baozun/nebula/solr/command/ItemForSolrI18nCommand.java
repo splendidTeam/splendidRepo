@@ -319,12 +319,17 @@ public class ItemForSolrI18nCommand implements Serializable {
 	private List<String>	navigationTree;
 	
 	
+	
 	/**
 	 * 渠道
 	 */
 	@Field
 	private List<String> channels;
+
 	
+    @Field("dynamic_sort_*")
+    private Map<String, Long> dynamicSort;
+    
 
 	public Long getId() {
 		return id;
@@ -786,4 +791,16 @@ public class ItemForSolrI18nCommand implements Serializable {
 	public void setNavigationTree(List<String> navigationTree) {
 		this.navigationTree = navigationTree;
 	}
+
+    
+    public Map<String, Long> getDynamicSort(){
+        return dynamicSort;
+    }
+
+    
+    public void setDynamicSort(Map<String, Long> dynamicSort){
+        this.dynamicSort = dynamicSort;
+    }
+	
+	
 }

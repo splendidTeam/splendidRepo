@@ -391,7 +391,11 @@ public class ItemForSolrCommand implements Serializable {
 	@Field("dynamic_colorref_*")
 	private Map<String, List<String>> dynamicColorRefMap;
 
-
+	
+    @Field("dynamic_sort_*")
+    private Map<String, Long> dynamicSort;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -938,6 +942,16 @@ public class ItemForSolrCommand implements Serializable {
 	public void setNavigationTree(List<String> navigationTree) {
 		this.navigationTree = navigationTree;
 	}
+
+    
+    public Map<String, Long> getDynamicSort(){
+        return dynamicSort;
+    }
+
+    
+    public void setDynamicSort(Map<String, Long> dynamicSort){
+        this.dynamicSort = dynamicSort;
+    }
 
 
 //	public void setPosition(List<Integer> position) {
