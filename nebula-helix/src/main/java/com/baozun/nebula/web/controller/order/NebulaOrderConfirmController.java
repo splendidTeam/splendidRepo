@@ -21,42 +21,22 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ContactCommand;
-import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
-import com.baozun.nebula.web.controller.BaseController;
-import com.baozun.nebula.web.controller.DefaultReturnResult;
-import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.order.builder.CalcFreightCommandBuilder;
 import com.baozun.nebula.web.controller.order.builder.ContactCommandListBuilder;
 import com.baozun.nebula.web.controller.order.builder.OrderConfirmViewCommandBuilder;
-import com.baozun.nebula.web.controller.order.builder.ShoppingCartCommandShowBuilder;
-import com.baozun.nebula.web.controller.order.form.CouponInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.handler.OrderConfirmBeforeHandler;
-import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
-import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewCommand;
-import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
-import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
-import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
-
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-import static com.feilong.core.bean.ConvertUtil.toList;
 
 /**
  * 订单确认控制器.
@@ -127,29 +107,7 @@ import static com.feilong.core.bean.ConvertUtil.toList;
  * @version 5.3.1 2016年4月28日 上午11:42:30
  * @since 5.3.1
  */
-public class NebulaOrderConfirmController extends BaseController{
-
-    /** 订单提交的form 校验，需要在商城 spring 相关xml 里面进行配置. */
-    @Autowired
-    @Qualifier("orderFormValidator")
-    private OrderFormValidator orderFormValidator;
-
-    /** The shoppingcart view command converter. */
-    @Autowired
-    @Qualifier("shoppingcartViewCommandConverter")
-    private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
-
-    /** The shoppingcart factory. */
-    @Autowired
-    private ShoppingcartFactory shoppingcartFactory;
-
-    /** The order manager. */
-    @Autowired
-    private OrderManager orderManager;
-
-    /** The shopping cart command builder. */
-    @Autowired
-    private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
+public class NebulaOrderConfirmController extends NebulaAbstractTransactionController{
 
     /** The confirm before handler. */
     @Autowired(required = false)
@@ -157,9 +115,6 @@ public class NebulaOrderConfirmController extends BaseController{
 
     @Autowired
     private OrderConfirmViewCommandBuilder orderConfirmViewCommandBuilder;
-
-    @Autowired
-    private ShoppingCartCommandShowBuilder shoppingCartCommandShowBuilder;
 
     @Autowired
     private CalcFreightCommandBuilder calcFreightCommandBuilder;
@@ -184,7 +139,7 @@ public class NebulaOrderConfirmController extends BaseController{
      * @NeedLogin (guest=true)
      * @RequestMapping(value = "/transaction/check", method = RequestMethod.GET)
      */
-    public String showTransactionCheck(@LoginMember MemberDetails memberDetails,@RequestParam(value = "key",required = false) String key,HttpServletRequest request,HttpServletResponse response,Model model){
+    public String showTransactionCheck(@LoginMember MemberDetails memberDetails,@RequestParam(value = "key",required = false) String key,HttpServletRequest request,@SuppressWarnings("unused") HttpServletResponse response,Model model){
         List<ContactCommand> contactCommandList = contactCommandListBuilder.build(memberDetails);
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
 
@@ -193,142 +148,14 @@ public class NebulaOrderConfirmController extends BaseController{
         }
 
         OrderConfirmViewCommand orderConfirmViewCommand = orderConfirmViewCommandBuilder.build(contactCommandList, shoppingCartCommand);
-
         model.addAttribute("orderConfirmViewCommand", orderConfirmViewCommand);
+
         return "transaction.check";
     }
 
-    //--------------------------------------------------------------------------------------------
-
-    /**
-     * Builds the shopping cart command.
-     *
-     * @param memberDetails
-     *            the member details
-     * @param key
-     *            the key
-     * @param contactCommandList
-     *            the contact command list
-     * @param couponList
-     *            the coupon list
-     * @param request
-     *            the request
-     * @return the shopping cart command
-     */
     private ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,String key,List<ContactCommand> contactCommandList,List<String> couponList,HttpServletRequest request){
         CalcFreightCommand calcFreightCommand = calcFreightCommandBuilder.build(contactCommandList);
-        return buildShoppingCartCommand(memberDetails, key, calcFreightCommand, couponList, request);
+        return shoppingCartCommandBuilder.buildShoppingCartCommandWithCheckStatus(memberDetails, key, calcFreightCommand, couponList, request);
     }
 
-    /**
-     * 再次计算金额 使用情景：使用优惠券,取消使用优惠券，切换地址(本方法并不对入参进行有效性校验，请在各商城端对其校验).
-     *
-     * @param memberDetails
-     *            the member details
-     * @param key
-     *            the key
-     * @param orderForm
-     *            the order form
-     * @param bindingResult
-     *            the binding result
-     * @param request
-     *            the request
-     * @param response
-     *            the response
-     * @param model
-     *            the model
-     * @return the string
-     * @NeedLogin (guest=true)
-     * @RequestMapping(value = "/transaction/recalc", method = RequestMethod.POST)
-     */
-    public NebulaReturnResult recalc(
-                    @LoginMember MemberDetails memberDetails,
-                    @RequestParam(value = "key",required = false) String key, // 隐藏域中传递
-                    @ModelAttribute("orderForm") OrderForm orderForm,
-                    BindingResult bindingResult,
-                    HttpServletRequest request,
-                    HttpServletResponse response,
-                    Model model){
-        CouponInfoSubForm couponInfoSubForm = orderForm.getCouponInfoSubForm();
-
-        // 优惠券   
-        String couponCode = null;
-        if (couponInfoSubForm != null && isNotNullOrEmpty(couponInfoSubForm.getCouponCode())){
-            couponCode = couponInfoSubForm.getCouponCode();
-            //非用户绑定优惠券
-            if (couponInfoSubForm.getId() == null){
-                PromotionCouponCode promotionCouponCode = orderManager.validCoupon(couponCode);
-                if (promotionCouponCode == null){
-                    return toNebulaReturnResult(SalesOrderResult.ORDER_COUPON_NOT_AVALIBLE.toString());
-                }
-            }
-        }
-
-        //地址
-        CalcFreightCommand calcFreightCommand = calcFreightCommandBuilder.build(orderForm.getShippingInfoSubForm());
-
-        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, calcFreightCommand, toList(couponCode), request);
-        shoppingCartCommand = shoppingCartCommandShowBuilder.build(shoppingCartCommand);
-        return toNebulaReturnResult(shoppingCartCommand);
-
-    }
-
-    /**
-     * Builds the shopping cart command.
-     *
-     * @param memberDetails
-     *            the member details
-     * @param key
-     *            the key
-     * @param calcFreightCommand
-     *            the calc freight command
-     * @param couponList
-     *            the coupon list
-     * @param request
-     *            the request
-     * @return the shopping cart command
-     * @since 5.3.2.3
-     */
-    private ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,String key,CalcFreightCommand calcFreightCommand,List<String> couponList,HttpServletRequest request){
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, key, request);
-        shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
-
-        //购物行为空，抛出异常
-        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
-
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
-
-        //购物车为空，抛出异常
-        Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null");
-        return shoppingCartCommand;
-    }
-
-    //**************************************************************
-    /**
-     * To nebula return result.
-     *
-     * @param key
-     *            the key
-     * @return the nebula return result
-     */
-    private NebulaReturnResult toNebulaReturnResult(String key){
-        DefaultReturnResult result = new DefaultReturnResult();
-        result.setResult(false);
-        result.setReturnObject(getMessage(key));
-        return result;
-    }
-
-    /**
-     * To nebula return result.
-     *
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @return the nebula return result
-     */
-    private NebulaReturnResult toNebulaReturnResult(ShoppingCartCommand shoppingCartCommand){
-        DefaultReturnResult result = new DefaultReturnResult();
-        result.setResult(true);
-        result.setReturnObject(shoppingCartCommand);
-        return result;
-    }
 }

@@ -19,7 +19,11 @@ package com.baozun.nebula.web.controller.order.builder;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 
 /**
- * 很多时候 订单确认页面的 购买明细 需要重新加工一下
+ * 很多时候,订单确认页面的购买明细,需要重新加工一下.
+ * 
+ * <p>
+ * 尤其是bundle类的商品信息
+ * </p>
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.13

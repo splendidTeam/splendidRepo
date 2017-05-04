@@ -553,15 +553,18 @@ public class ItemManagerImpl implements ItemManager{
 		return item;
 	}
 
+	@Override
 	public Integer updateItemIsAddCategory(List<Long> ids,Integer state){
 		return itemDao.updateItemIsAddCategory(ids, state);
 	}
 
+	@Override
 	public Integer updateItemIsAddTag(List<Long> ids,Integer state){
 		return itemDao.updateItemIsAddTag(ids, state);
 	}
 
 	// 获取店铺所有的商品信息
+	@Override
 	@Transactional(readOnly = true)
 	public Pagination<ItemCommand> findItemListByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId, String imageType){
 
@@ -2367,7 +2370,7 @@ public class ItemManagerImpl implements ItemManager{
 
 					String key = it.next().toString();
 					Long propId = Long.valueOf(key.substring(1, key.length()));
-					Property property = (Property) propMap.get(propId);
+					Property property = propMap.get(propId);
 
 					/** 编辑类型 ：1 单行输入2可输入单选3单选4多选 */
 					ItemProperties itemProperties = new ItemProperties();
@@ -2597,7 +2600,7 @@ public class ItemManagerImpl implements ItemManager{
 						skuCosIndex1++;
 						String key = it.next().toString();
 						Long propId = Long.valueOf(key.substring(1, key.length()));
-						Property property = (Property) propMap.get(propId);
+						Property property = propMap.get(propId);
 						ItemProperties itemProperties = new ItemProperties();
 						// 何波 sheet2 添加多选检查 editType == 4
 						if (property.getEditingType() == 4){
@@ -2951,7 +2954,7 @@ public class ItemManagerImpl implements ItemManager{
 
 					String key = it.next().toString();
 					Long propId = Long.valueOf(key.substring(1, key.length()));
-					Property property = (Property) propMap.get(propId);
+					Property property = propMap.get(propId);
 
 					/** 编辑类型 ：1 单行输入2可输入单选3单选4多选 */
 					ItemProperties itemProperties = new ItemProperties();
@@ -3164,7 +3167,7 @@ public class ItemManagerImpl implements ItemManager{
 						skuCosIndex1++;
 						String key = it.next().toString();
 						Long propId = Long.valueOf(key.substring(1, key.length()));
-						Property property = (Property) propMap.get(propId);
+						Property property = propMap.get(propId);
 						ItemProperties itemProperties = new ItemProperties();
 						// 何波 sheet2 添加多选检查 editType == 4
 						if (property.getEditingType() == 4){
@@ -4321,6 +4324,7 @@ public class ItemManagerImpl implements ItemManager{
 	 * @param industryId
 	 *            行业
 	 */
+	@Override
 	public void downloadFile(HttpServletRequest request,HttpServletResponse response,Long shopId,Long industryId){
 		String path = DEFAULT_PATH + "/tplt_sku_import.xls";
 		File file = new File(Thread.currentThread().getContextClassLoader().getResource(path).getPath());

@@ -33,6 +33,7 @@
 					<option value="unit">计件</option>
 					<option value="weight">计重</option>
 					<option value="base">基础</option> 
+					<option value="custom">自定义</option> 
                 </select> 
              </td>
 

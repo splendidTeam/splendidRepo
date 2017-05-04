@@ -63,6 +63,13 @@ var categoryzNodes  = [
               </c:forEach>
          ];
           var baseUrl='${base}'; 
+          
+          
+          var skuList=<c:out value="${skuList}" default="[]" escapeXml="false" ></c:out>;
+var dynamicPropertyCommandListJsonStr=<c:out value="${dynamicPropertyCommandListJsonStr}" default="[]" escapeXml="false"></c:out>;
+var lastSelectPropertyId=<c:out value="${lastSelectPropertyId}" default="[]" escapeXml="false"></c:out>;
+var lastSelectPropertyValueId=<c:out value="${lastSelectPropertyValueId}" default="[]" escapeXml="false"></c:out>;
+var itemPropertiesStr = <c:out value="${itemPropertiesStr}" default = "[]" escapeXml="false"></c:out>;
 </SCRIPT>
 <script type="text/javascript">
 		

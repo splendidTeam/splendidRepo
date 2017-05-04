@@ -31,7 +31,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.Validate;
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,11 +74,8 @@ import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;
-
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
 
 /**
  * The Class LogisticsManagerImpl.
@@ -81,6 +83,8 @@ import loxia.dao.Sort;
 @Transactional
 @Service("logisticsManager")
 public class LogisticsManagerImpl implements LogisticsManager{
+    
+    private static final Logger LOGGER  = LoggerFactory.getLogger(LogisticsManagerImpl.class);
 
     /** The freigth memory manager. */
     @Autowired
@@ -260,7 +264,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
         if (shippingTemeplateCmd.isDefault()){// 设置其他为非默认
             shippingTemeplateDao.updateShippingTemeplateByShopId(shippingTemeplateCmd.getShopId(), ShippingTemeplate.NOTDEFAULT);
         }
-        int effectedRows = shippingTemeplateDao.updateShippingTemeplate(shippingTemeplateCmd.getId(), shippingTemeplateCmd.getName(), shippingTemeplateCmd.getCalculationType(), shippingTemeplateCmd.isDefault(), shippingTemeplateCmd.getDefaultFee());
+        int effectedRows = shippingTemeplateDao.updateShippingTemeplate(shippingTemeplateCmd.getId(), shippingTemeplateCmd.getName(), shippingTemeplateCmd.getCalculationType(), shippingTemeplateCmd.getBeanName(), shippingTemeplateCmd.isDefault(), shippingTemeplateCmd.getDefaultFee());
         if (effectedRows != 1){
             throw new BusinessException(Constants.SHIPPING_TEMEPLATE_UPDATE_FAILURE);
         }
@@ -514,9 +518,17 @@ public class LogisticsManagerImpl implements LogisticsManager{
         }
 
         String calculationType = shippingTemeplateCommand.getCalculationType();
+        String beanName = shippingTemeplateCommand.getBeanName();
 
-        FreightStrategy freightStrategy = buildFreightStrategy(calculationType);
-        return freightStrategy.cal(shippingFeeConfigCommand, itemList);
+        FreightStrategy freightStrategy = buildFreightStrategy(calculationType,beanName);
+        //定义最终运费
+        BigDecimal freight = BigDecimal.ZERO;
+        try{
+            freight = freightStrategy.cal(shippingFeeConfigCommand, itemList);
+        }catch (Exception e){
+            LOGGER.warn("计算运费异常。",e);
+        }
+        return freight;
     }
 
     /**
@@ -524,10 +536,11 @@ public class LogisticsManagerImpl implements LogisticsManager{
      *
      * @param calculationType
      *            the calculation type
+     * @param beanName 
      * @return the freight strategy
      * @since 5.3.2.4
      */
-    private FreightStrategy buildFreightStrategy(String calculationType){
+    private FreightStrategy buildFreightStrategy(String calculationType, String beanName){
         // 根据不同的type 选择不同的算法
         if (ShippingTemeplate.CAL_TYPE_BY_UNIT.equals(calculationType)){
             return new UnitFreightStrategy();
@@ -535,6 +548,13 @@ public class LogisticsManagerImpl implements LogisticsManager{
             return new WeightFreightStrategy();
         }else if (ShippingTemeplate.CAL_TYPE_BY_BASE.equals(calculationType)){
             return new BaseFreightStrategy();
+        }else if(ShippingTemeplate.CAL_TYPE_BY_CUSTOM.equals(calculationType) && Validator.isNotNullOrEmpty(beanName)){
+            try{
+                Class<?> classType = Class.forName(beanName);
+                return (FreightStrategy) classType.newInstance();
+            }catch (Exception e){
+                throw new UnsupportedOperationException("calculationType:[" + calculationType + "] not support!");
+            }
         }
         throw new UnsupportedOperationException("calculationType:[" + calculationType + "] not support!");
     }

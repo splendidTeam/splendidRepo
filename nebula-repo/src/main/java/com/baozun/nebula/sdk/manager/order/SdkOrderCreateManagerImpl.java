@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
+import static org.apache.commons.collections4.CollectionUtils.addIgnoreNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -247,13 +247,18 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
             ShopCartCommandByShop shopCartCommandByShop = shopIdAndShopCartCommandByShopMap.get(shopId);
             List<PromotionSKUDiscAMTBySetting> shopPromotionSKUDiscAMTBySettingList = shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId);
+
+            //------------------------------------------------------------------------------------------------
+
             SalesOrder salesOrder = orderCreateByShopManager.doWithPerShopCreateOrder(shopId, subOrdinate, shoppingCartLineCommandList, salesOrderCommand, shopCartCommandByShop, shopPromotionSKUDiscAMTBySettingList);
+
+            //------------------------------------------------------------------------------------------------
 
             // 封装发送邮件数据
             if (isSendEmail){
                 Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMapForCreateOrder(subOrdinate, salesOrder, salesOrderCommand, shoppingCartLineCommandList, shopCartCommandByShop, shopPromotionSKUDiscAMTBySettingList, salesOrderCreateOptions);
 
-                CollectionUtils.addIgnoreNull(emailDataMapList, dataMap);
+                addIgnoreNull(emailDataMapList, dataMap);
             }
         }
 

@@ -43,7 +43,7 @@ public class DefaultShoppingcartOrderCreateSuccessHandler implements Shoppingcar
 
     /** The shoppingcart factory. */
     @Autowired
-    private ShoppingcartFactory        shoppingcartFactory;
+    private ShoppingcartFactory shoppingcartFactory;
 
     /** The guest shoppingcart persister. */
     @Autowired
@@ -62,14 +62,12 @@ public class DefaultShoppingcartOrderCreateSuccessHandler implements Shoppingcar
      */
     @Override
     public void onOrderCreateSuccess(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory
-                        .getShoppingCartLineCommandList(memberDetails, request);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, request);
 
         // 游客需要更新cookie中的购物车信息
         if (null == memberDetails){
             // 取出没有被选中的 的商品
-            shoppingCartLineCommandList = ShoppingCartUtil
-                            .getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, false);
+            shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, false);
 
             guestShoppingcartPersister.save(shoppingCartLineCommandList, request, response);
         }

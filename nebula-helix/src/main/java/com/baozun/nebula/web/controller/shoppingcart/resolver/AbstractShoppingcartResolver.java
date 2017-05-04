@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -39,6 +40,7 @@ import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameL
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartAddDetermineSameLineElementsBuilder;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ToggleCheckStatusShoppingCartLinePredicateBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
@@ -52,6 +54,7 @@ import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toArray;
 import static com.feilong.core.bean.ConvertUtil.toList;
 import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.find;
 import static com.feilong.core.util.CollectionsUtil.select;
 
 /**
@@ -94,6 +97,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
     @Autowired
     private ShoppingcartAddDetermineSameLineElementsBuilder shoppingcartAddDetermineSameLineElementsBuilder;
+
+    @Autowired
+    private ToggleCheckStatusShoppingCartLinePredicateBuilder toggleCheckStatusShoppingCartLinePredicateBuilder;
 
     /*
      * (non-Javadoc)
@@ -354,6 +360,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      */
     protected abstract ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId,HttpServletRequest request,HttpServletResponse response);
 
+    //--------------------------------------------------------------------------------------------------------
     /*
      * (non-Javadoc)
      * 
@@ -363,17 +370,56 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      */
     @Override
     public ShoppingcartResult toggleShoppingCartLineCheckStatus(MemberDetails memberDetails,Long shoppingcartLineId,boolean checkStatus,HttpServletRequest request,HttpServletResponse response){
-        return toggleShoppingCartLinesCheckStatus(memberDetails, toList(shoppingcartLineId), checkStatus, request, response);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
+        List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        if (isNullOrEmpty(mainlines)){
+            return SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+        }
+
+        //--------------------------------------------------------------------------
+
+        // 找到实际需要操作的行
+        ShoppingCartLineCommand needChangeCheckedCommand = find(mainlines, "id", shoppingcartLineId);
+
+        // 如果已经是期望的状态,那么直接返回操作成功 (比如他在新窗口中已经操作过了)
+        if (isSameCheckStatus(needChangeCheckedCommand.getSettlementState(), checkStatus)){
+            return SUCCESS;
+        }
+
+        //--------------商品验证----------------------------------------------------------------------------
+
+        if (checkStatus){ //如果是选中
+
+            Long skuId = needChangeCheckedCommand.getSkuId();
+            Sku sku = sdkSkuManager.findSkuById(skuId);
+
+            //公共校验
+            ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
+
+            if (null != commonValidateShoppingcartResult){
+                return commonValidateShoppingcartResult;
+            }
+
+            //校验库存
+            if (shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, skuId)){
+                return MAX_THAN_INVENTORY;
+            }
+        }
+
+        needChangeCheckedCommand.setSettlementState(checkStatus ? 1 : 0);
+
+        //---------------改变选中状态------------------------------------------------------------------------------
+
+        ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, toList(needChangeCheckedCommand), checkStatus, request, response);
+
+        if (null != toggleShoppingcartResult){
+            return toggleShoppingcartResult;
+        }
+        return SUCCESS;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#toggleShoppingCartLinesCheckStatus(com.baozun.nebula.web.MemberDetails, java.util.List, boolean, javax.servlet.http.HttpServletRequest,
-     * javax.servlet.http.HttpServletResponse)
-     */
     @Override
-    public ShoppingcartResult toggleShoppingCartLinesCheckStatus(MemberDetails memberDetails,List<Long> shoppingcartLineIdList,boolean checkStatus,HttpServletRequest request,HttpServletResponse response){
+    public ShoppingcartResult uncheckShoppingCartLines(MemberDetails memberDetails,List<Long> shoppingcartLineIdList,HttpServletRequest request,HttpServletResponse response){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
         List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         if (isNullOrEmpty(mainlines)){
@@ -382,7 +428,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         // 找到实际需要操作的行
         List<ShoppingCartLineCommand> needChangeCheckedCommandList = select(mainlines, "id", shoppingcartLineIdList);
-        return toggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, needChangeCheckedCommandList, checkStatus, request, response);
+        return toggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, needChangeCheckedCommandList, false, request, response);
     }
 
     /*
@@ -507,11 +553,11 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * @param memberDetails
      *            the member details
      * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
+     *            该用户的所有的购物车行数据
      * @param needChangeCheckedCommandList
-     *            the need change checked command list
+     *            需要被修改状态的购物车行数据
      * @param checkStatus
-     *            the check status
+     *            需要被改成什么状态呢?如果是true,表示选中状态;false,表示是不选中状态
      * @param request
      *            the request
      * @param response
@@ -529,44 +575,16 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             return SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
-        //XXX feilong 这个目前会员购物车更新状态 需要这个参数
-        List<String> extentionCodeList = new ArrayList<>();
-
-        for (ShoppingCartLineCommand needChangeCheckedCommand : needChangeCheckedCommandList){
-            // 跳过已经是该状态的购物车行
-            if (isSameCheckStatus(needChangeCheckedCommand.getSettlementState(), checkStatus)){
-                continue;
-            }
-
-            // ********* 商品验证***********
-            Long skuId = needChangeCheckedCommand.getSkuId();
-            Sku sku = sdkSkuManager.findSkuById(skuId);
-
-            if (checkStatus){
-                //公共校验
-                ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
-
-                if (null != commonValidateShoppingcartResult){
-                    return commonValidateShoppingcartResult;
-                }
-
-                //校验库存
-                if (shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, skuId)){
-                    return MAX_THAN_INVENTORY;
-                }
-            }
-
-            extentionCodeList.add(needChangeCheckedCommand.getExtentionCode());
-            needChangeCheckedCommand.setSettlementState(checkStatus ? 1 : 0);
-
-        }
-
-        if (isNullOrEmpty(extentionCodeList)){
+        //--------------------------------------------------------------------------------------------
+        List<ShoppingCartLineCommand> toDoNeedChangeCheckedCommandList = select(needChangeCheckedCommandList, toggleCheckStatusShoppingCartLinePredicateBuilder.build(shoppingCartLineCommandList, checkStatus));
+        if (isNullOrEmpty(toDoNeedChangeCheckedCommandList)){
             return SUCCESS;
         }
 
-        // ********* 改变选中状态***********
-        ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, needChangeCheckedCommandList, checkStatus, request, response);
+        IterableUtils.forEach(toDoNeedChangeCheckedCommandList, new BeanPropertyValueChangeClosure<ShoppingCartLineCommand>("settlementState", checkStatus ? 1 : 0));
+
+        //---------------改变选中状态------------------------------------------------------------------------------
+        ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, toDoNeedChangeCheckedCommandList, checkStatus, request, response);
 
         if (null != toggleShoppingcartResult){
             return toggleShoppingcartResult;
@@ -575,7 +593,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
-     * 是不是相同的状态.
+     * 是不是相同的状态(可能这家伙已经在其他窗口中操作过了).
      *
      * @param settlementState
      *            the settlement state
@@ -583,7 +601,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the check status
      * @return true, if checks if is same check status
      */
-    private boolean isSameCheckStatus(Integer settlementState,boolean checkStatus){
+    private static boolean isSameCheckStatus(Integer settlementState,boolean checkStatus){
         return checkStatus ? settlementState.equals(1) : settlementState.equals(0);
     }
 

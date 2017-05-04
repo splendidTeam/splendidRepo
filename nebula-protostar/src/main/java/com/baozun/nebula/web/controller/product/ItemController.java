@@ -112,7 +112,6 @@ import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemSortScore;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.Sku;
-import com.baozun.nebula.model.system.ChooseOption;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
@@ -466,7 +465,7 @@ public class ItemController extends BaseController {
 	}
 
 	private SkuPropertyMUtlLangCommand[] getCmdArrrayFromRequestI18n(HttpServletRequest request, Long[] propertyIds,
-			String[] propertyValueInputs, String[] propertyValueInputIds) {
+			String[] propertyValueInputs, String[] propertyValueInputIds) throws Exception {
 		List<SkuPropertyMUtlLangCommand> cmdList = new ArrayList<SkuPropertyMUtlLangCommand>();
 		// 说明是没有销售属性的 只有一个sku
 		if (Validator.isNullOrEmpty(propertyValueInputs) && Validator.isNullOrEmpty(propertyValueInputIds)) {
@@ -476,8 +475,10 @@ public class ItemController extends BaseController {
 			String codeKey = "skuCode";
 			String spKey = "skuSalePrice";
 			String lpKey = "skuListPrice";
+			String groupCodeKey = "groupCode";
 
 			String code = request.getParameter(codeKey);
+			String groupCode = request.getParameter(groupCodeKey);
 			BigDecimal salePrice = getPriceFromStr(request.getParameter(spKey));
 			String listPriceStr = request.getParameter(lpKey);
 			BigDecimal listPrice = getPriceFromStr(listPriceStr);
@@ -485,6 +486,7 @@ public class ItemController extends BaseController {
 
 			spc.setId(skuId);
 			spc.setCode(code);
+			spc.setGroupCode(groupCode);
 			spc.setListPrice(listPrice);
 			spc.setSalePrice(salePrice);
 			spc.setPropertyList(new ArrayList<ItemPropertyMutlLangCommand>());
@@ -539,9 +541,11 @@ public class ItemController extends BaseController {
 				String spKey = input + "_salePrice";
 				String lpKey = input + "_listPrice";
 				String idKey = input + "_id";
+				String groupCodeKey = input + "_groupCode";
 				Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 				String code = request.getParameter(codeKey);
+				String groupCode = request.getParameter(groupCodeKey);
 
 				// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
 				if (code == null || "".equals(code.trim())) {
@@ -563,6 +567,7 @@ public class ItemController extends BaseController {
 				BigDecimal listPrice = getPriceFromStr(listPriceStr);
 
 				spc.setCode(code);
+				spc.setGroupCode(groupCode);
 				spc.setListPrice(listPrice);
 				spc.setSalePrice(salePrice);
 				spc.setPropertyList(ipcList);
@@ -727,9 +732,11 @@ public class ItemController extends BaseController {
 					String spKey = prefix + "salePrice";
 					String lpKey = prefix + "listPrice";
 					String idKey = prefix + "id";
+					String groupCodeKey = prefix + "groupCode";
 					Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 					String code = request.getParameter(codeKey);
+					String groupCode = request.getParameter(groupCodeKey);
 
 					if (code == null || "".equals(code.trim())) {// 如果没有填写skuCode
 																	// ,那么就认为
@@ -737,7 +744,6 @@ public class ItemController extends BaseController {
 																	// 不进行保存或者修改
 						continue;
 					}
-
 					SkuPropertyMUtlLangCommand spc = new SkuPropertyMUtlLangCommand();
 
 					BigDecimal salePrice = getPriceFromStr(request.getParameter(spKey));
@@ -749,6 +755,7 @@ public class ItemController extends BaseController {
 
 					spc.setId(skuId);
 					spc.setCode(code);
+					spc.setGroupCode(groupCode);
 					spc.setListPrice(listPrice);
 					spc.setSalePrice(salePrice);
 					spc.setPropertyList(ipcList);
@@ -875,9 +882,11 @@ public class ItemController extends BaseController {
 				String spKey = input + "_salePrice";
 				String lpKey = input + "_listPrice";
 				String idKey = input + "_id";
+				String groupCodeKey = input + "_groupCode";
 				Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 				String code = request.getParameter(codeKey);
+				String groupCode = request.getParameter(groupCodeKey);
 
 				// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
 				if (code == null || "".equals(code.trim())) {
@@ -899,6 +908,7 @@ public class ItemController extends BaseController {
 				BigDecimal listPrice = getPriceFromStr(listPriceStr);
 
 				spc.setCode(code);
+				spc.setGroupCode(groupCode);
 				spc.setListPrice(listPrice);
 				spc.setSalePrice(salePrice);
 				spc.setPropertyList(ipcList);
@@ -1250,6 +1260,34 @@ public class ItemController extends BaseController {
 			}
 		}
 		return ipc;
+	}
+	@RequestMapping("/item/validateGroupCodes.json")
+	@ResponseBody
+	public Object validateGroupCodes(@ArrayCommand(dataBind = true) String[] gpCodes) {
+		// 对groupCode做校验开始
+		boolean flag = true;
+		BackWarnEntity backWarnEntity = new BackWarnEntity(flag, null);
+		for (int i = 0; i < gpCodes.length; i++) {
+			if (StringUtils.isNotBlank(gpCodes[i])) {
+				if (gpCodes[i].indexOf(":") > 0) {
+					String[] codes = gpCodes[i].split(":");
+					for (int j = 0; j < codes.length; j++) {
+						Sku sku = sdkSkuManager.findSkuByOutId(codes[j]);
+					if (sku == null) {
+							flag = false;
+							backWarnEntity = new BackWarnEntity(flag, null);
+							backWarnEntity.setDescription(codes[j].concat("该商品编码不存在！"));
+							return backWarnEntity;
+					}
+				}
+			} else {
+					flag = false;
+					backWarnEntity.setDescription("组合商品编码必须以:分割！");
+					return backWarnEntity;
+			}
+			}
+		}
+		return backWarnEntity;
 	}
 
 	@RequestMapping("/item/validateUpdateSkuCodes.json")
@@ -2229,6 +2267,9 @@ public class ItemController extends BaseController {
 		
 		Industry industry = industryManager.findIndustryById(industryId);
 		getIndustryInfoForCreateOrUpdateItem(model, industry);
+		
+		String 	salesOfPropertyIsNotRequired = sdkMataInfoManager.findValue(MataInfo.SALES_OF_PROPERTY_IS_NOT_REQUIRED);
+		model.addAttribute("salesOfPropertyIsNotRequired",salesOfPropertyIsNotRequired);
 
 		return "/product/item/add-item-simple";
 	}
@@ -2251,7 +2292,7 @@ public class ItemController extends BaseController {
 		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
 		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
 		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
-
+		
 		return "/product/item/add-item-bundle";
 	}
 	
@@ -2336,6 +2377,7 @@ public class ItemController extends BaseController {
 		List<BigDecimal> salePrices = new ArrayList<BigDecimal>();
 		// sku销售价
 		List<BigDecimal> listPrices = new ArrayList<BigDecimal>();
+		List<String> groupCodes = new ArrayList<String>();
 
 		for (Sku sku : skuList) {
 
@@ -2348,6 +2390,9 @@ public class ItemController extends BaseController {
 				if (sku.getListPrice() != null) {
 					listPrices.add(sku.getListPrice());
 				}
+				if (sku.getGroupCode() != null) {
+					groupCodes.add(sku.getGroupCode());
+				}
 			}
 
 		}
@@ -2357,10 +2402,14 @@ public class ItemController extends BaseController {
 
 		model.addAttribute("skuList", skuJaStr);
 		model.addAttribute("salePrices", salePrices);
+		model.addAttribute("groupCode", groupCodes);
 		model.addAttribute("listPrices", listPrices);
 
 		model.addAttribute("isStyleEnable", isEnableStyle());
-
+		
+		String salesOfPropertyIsNotRequired = sdkMataInfoManager.findValue(MataInfo.SALES_OF_PROPERTY_IS_NOT_REQUIRED);
+		model.addAttribute("salesOfPropertyIsNotRequired",salesOfPropertyIsNotRequired);
+		
 		return "/product/item/update-item-simple";
 	}
 	
@@ -2524,6 +2573,7 @@ public class ItemController extends BaseController {
 		itemInfo.setDescription(addDefinedDomainInDesc(itemInfo.getDescription(), UPLOAD_IMG_DOMAIN));
 		model.addAttribute("salePrice", itemInfo.getSalePrice());
 		model.addAttribute("listPrice", itemInfo.getListPrice());
+		model.addAttribute("groupCode", itemInfo.getGroupCode());
 
 		model.addAttribute("title", itemInfo.getTitle());
 		model.addAttribute("subTilte", itemInfo.getSubTitle());
@@ -2627,6 +2677,7 @@ public class ItemController extends BaseController {
 
 	/**
 	 * 保存普通商品
+	 * @throws Exception
 	 */
 	@RequestMapping("/i18n/item/saveSimpleItem.json")
 	@ResponseBody
@@ -2654,10 +2705,10 @@ public class ItemController extends BaseController {
 		itemCommand.setShopId(shopId);
 		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
 		dealDescImgUrl(itemCommand);
-		SkuPropertyMUtlLangCommand[] skuPropertyCommandArray = getCmdArrrayFromRequestI18n(request, propertyIds,
-				propertyValueInputs, propertyValueInputIds);
-		// List<ItemProValGroupRelation> groupRelation =
-		// getItemProValueGroupRelation(request,propertyIds);
+		SkuPropertyMUtlLangCommand[]
+			skuPropertyCommandArray = getCmdArrrayFromRequestI18n(request, propertyIds, propertyValueInputs,
+					propertyValueInputIds);
+
 		// 保存商品
 		Item item = itemLangManager.createOrUpdateSimpleItem(itemCommand, propertyValueIds, categoriesIds, defaultCategoryId, 
 				iProperties, skuPropertyCommandArray);

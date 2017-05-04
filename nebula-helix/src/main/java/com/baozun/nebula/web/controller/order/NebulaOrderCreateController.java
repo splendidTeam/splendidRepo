@@ -17,7 +17,6 @@
 package com.baozun.nebula.web.controller.order;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,14 +33,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
-import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager;
-import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
-import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
@@ -51,14 +46,11 @@ import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderReturnObject;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
 import com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidator;
-import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
-import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
-import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartOrderCreateSuccessHandler;
 import com.feilong.accessor.AutoKeyAccessor;
-import com.feilong.core.Validator;
-import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 /**
  * 订单确认控制器.
@@ -129,7 +121,7 @@ import com.feilong.core.util.CollectionsUtil;
  * @version 5.3.1 2016年4月28日 上午11:42:30
  * @since 5.3.1
  */
-public class NebulaOrderCreateController extends BaseController{
+public class NebulaOrderCreateController extends NebulaAbstractTransactionController{
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaOrderCreateController.class);
@@ -140,24 +132,14 @@ public class NebulaOrderCreateController extends BaseController{
     private OrderFormValidator orderFormValidator;
 
     @Autowired
-    @Qualifier("shoppingcartViewCommandConverter")
-    private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
-
-    @Autowired
     @Qualifier("immediatelyBuyAutoKeyAccessor")
     private AutoKeyAccessor autoKeyAccessor;
-
-    @Autowired
-    private ShoppingcartFactory shoppingcartFactory;
 
     @Autowired
     private SalesOrderResolver salesOrderResolver;
 
     @Autowired
     private SdkOrderCreateManager sdkOrderCreateManager;
-
-    @Autowired
-    private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
 
     @Autowired
     private ShoppingcartOrderCreateSuccessHandler shoppingcartOrderCreateSuccessHandler;
@@ -200,7 +182,7 @@ public class NebulaOrderCreateController extends BaseController{
                     BindingResult bindingResult,
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    Model model){
+                    @SuppressWarnings("unused") Model model){
         // 校验表单数据
         orderFormValidator.validate(orderForm, bindingResult);
         // 如果校验失败，返回错误
@@ -209,20 +191,9 @@ public class NebulaOrderCreateController extends BaseController{
             return getResultFromBindingResult(bindingResult);
         }
 
-        // 获取购物车信息
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, key, request);
-
-        shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
-
-        // 封装订单信息
-        SalesOrderCommand salesOrderCommand = salesOrderResolver.toSalesOrderCommand(memberDetails, orderForm, request);
-        List<String> couponList = CollectionsUtil.getPropertyValueList(salesOrderCommand.getCouponCodes(), "couponCode");
-
-        CalcFreightCommand calcFreightCommand = salesOrderCommand.getCalcFreightCommand();
-
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
-
-        //********************************************************************************************************
+        //---------------------------------------------------------------------------------
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommandWithCheckStatus(memberDetails, key, orderForm, request);
+        //---------------------------------------------------------------------------------
         // 校验购物车信息和促销
         //TODO feilong 多张优惠券
         String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
@@ -230,27 +201,35 @@ public class NebulaOrderCreateController extends BaseController{
 
         // 如果校验失败，返回错误
         if (salesorderResult != SalesOrderResult.SUCCESS){
-            LOGGER.error("[ORDER_CREATEORDER] {} [{}] orderForm coupon [{}] validation error. \"\"", memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(), new Date(), couponCode);
+            LOGGER.error("[ORDER_CREATEORDER] {} [{}] orderForm coupon [{}] validation error. \"\"", memberDetails == null ? "Guest" : memberDetails.getGroupId().toString(), new Date(), couponCode);
             return toNebulaReturnResult(salesorderResult);
         }
+
+        //---------------------------------------------------------------------------------
 
         if (null != shoppingCartOrderCreateBeforeHandler){
             shoppingCartOrderCreateBeforeHandler.beforeCreateSalesOrder(shoppingCartCommand, orderForm, memberDetails, request, key);
         }
 
-        //********************************************************************************************************
+        //---------------------------------------------------------------------------------
         SalesOrderCreateOptions salesOrderCreateOptions = buildSalesOrderCreateOptions(key);
-        // 新建订单
         Set<String> memCombos = null == memberDetails ? null : memberDetails.getMemComboList();
+
+        //----------------------新建订单-----------------------------------------------------
+        // 封装订单信息
+        SalesOrderCommand salesOrderCommand = salesOrderResolver.toSalesOrderCommand(memberDetails, orderForm, request);
         String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memCombos, salesOrderCreateOptions);
 
+        //---------------------------------------------------------------------------------
         //购物车信息重置
-        if (Validator.isNotNullOrEmpty(key)){
+        if (isNotNullOrEmpty(key)){
             //  清空立即购买信息
             autoKeyAccessor.remove(key, request);
         }else{
             shoppingcartOrderCreateSuccessHandler.onOrderCreateSuccess(memberDetails, request, response);
         }
+
+        //---------------------------------------------------------------------------------
         return toNebulaReturnResult(subOrdinate);
     }
 
@@ -258,11 +237,11 @@ public class NebulaOrderCreateController extends BaseController{
      * @param key
      * @return
      */
-    private SalesOrderCreateOptions buildSalesOrderCreateOptions(String key){
+    private static SalesOrderCreateOptions buildSalesOrderCreateOptions(String key){
         SalesOrderCreateOptions salesOrderCreateOptions = new SalesOrderCreateOptions();
 
         //设置立即购买标志
-        if (Validator.isNotNullOrEmpty(key)){
+        if (isNotNullOrEmpty(key)){
             salesOrderCreateOptions.setIsImmediatelyBuy(true);
         }
         return salesOrderCreateOptions;

@@ -19,6 +19,9 @@ package com.baozun.nebula.web.controller.shoppingcart.builder;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +29,17 @@ import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilder;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
-import com.feilong.core.Validator;
+import com.baozun.nebula.web.controller.order.builder.CalcFreightCommandBuilder;
+import com.baozun.nebula.web.controller.order.form.CouponInfoSubForm;
+import com.baozun.nebula.web.controller.order.form.OrderForm;
+import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
+import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartCommandCheckedBuilderHandler;
+
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toList;
 
 /**
  *
@@ -38,8 +50,71 @@ import com.feilong.core.Validator;
 @Component("shoppingCartCommandBuilder")
 public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilder{
 
+    /** The shoppingcart factory. */
+    @Autowired
+    private ShoppingcartFactory shoppingcartFactory;
+
+    /**  */
+    @Autowired
+    private CalcFreightCommandBuilder calcFreightCommandBuilder;
+
+    /**  */
     @Autowired
     private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
+
+    /**
+     * 
+     */
+    @Autowired(required = false)
+    private ShoppingCartCommandCheckedBuilderHandler shoppingCartCommandCheckedBuilderHandler;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder#buildShoppingCartCommandWithCheckStatus(com.baozun.nebula.web.MemberDetails, java.lang.String, com.baozun.nebula.web.controller.order.form.OrderForm,
+     * javax.servlet.http.HttpServletRequest)
+     */
+    @Override
+    public ShoppingCartCommand buildShoppingCartCommandWithCheckStatus(MemberDetails memberDetails,String key,OrderForm orderForm,HttpServletRequest request){
+        CouponInfoSubForm couponInfoSubForm = orderForm.getCouponInfoSubForm();
+        List<String> couponList = toList(couponInfoSubForm.getCouponCode());
+
+        //地址
+        ShippingInfoSubForm shippingInfoSubForm = orderForm.getShippingInfoSubForm();
+        CalcFreightCommand calcFreightCommand = calcFreightCommandBuilder.build(shippingInfoSubForm);
+        return buildShoppingCartCommandWithCheckStatus(memberDetails, key, calcFreightCommand, couponList, request);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder#buildShoppingCartCommandWithCheckStatus(com.baozun.nebula.web.MemberDetails, java.lang.String, com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand,
+     * java.util.List, javax.servlet.http.HttpServletRequest)
+     */
+    @Override
+    public ShoppingCartCommand buildShoppingCartCommandWithCheckStatus(MemberDetails memberDetails,String key,CalcFreightCommand calcFreightCommand,List<String> couponList,HttpServletRequest request){
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, key, request);
+        shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
+
+        //购物行为空，抛出异常
+        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
+
+        if (null != shoppingCartCommandCheckedBuilderHandler){
+            shoppingCartCommandCheckedBuilderHandler.preHandle(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList, request);
+        }
+
+        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
+
+        //购物车为空，抛出异常
+        Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null");
+
+        if (null != shoppingCartCommandCheckedBuilderHandler){
+            shoppingCartCommandCheckedBuilderHandler.postHandle(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList, request);
+        }
+        return shoppingCartCommand;
+    }
+
+    //------------------------------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -59,19 +134,13 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
      * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand, java.util.List)
      */
     @Override
-    public ShoppingCartCommand buildShoppingCartCommand(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    CalcFreightCommand calcFreightCommand,
-                    List<String> coupons){
-        if (Validator.isNullOrEmpty(shoppingCartLines)){
+    public ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLines,CalcFreightCommand calcFreightCommand,List<String> coupons){
+        if (isNullOrEmpty(shoppingCartLines)){
             return null;
         }
 
         Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-        return sdkShoppingCartCommandBuilder
-                        .buildShoppingCartCommand(groupId, shoppingCartLines, calcFreightCommand, coupons, memComboList);
+        return sdkShoppingCartCommandBuilder.buildShoppingCartCommand(groupId, shoppingCartLines, calcFreightCommand, coupons, memComboList);
     }
-
 }
