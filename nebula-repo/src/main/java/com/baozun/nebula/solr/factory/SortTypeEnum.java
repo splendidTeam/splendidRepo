@@ -8,6 +8,8 @@ import com.feilong.core.lang.EnumUtil;
  * @author 冯明雷
  * @version 1.0
  * @time 2016年4月22日  下午5:38:04
+ * @author zl.shi
+ * @since zl.shi: 2017.5.5
  */
 public enum SortTypeEnum{
 
@@ -56,13 +58,53 @@ public enum SortTypeEnum{
 		}
 	},
 	
-	/** 默认排序 店铺权重，上架时间 */
+	/** 默认排序 店铺权重，品类系数*/
     DEFAULT_ORDER("default_order"){
 
         public SolrOrderSort[] getSolrOrderSort(){
-            return new SolrOrderSort[] {new SolrOrderSort("activeBeginTime", SolrOrderSort.DESC) };
+            return new SolrOrderSort[] {new SolrOrderSort("default_sort", SolrOrderSort.DESC) };
         }
-    };
+    },
+    
+    /**
+     * 折扣升序
+     */
+    DISCOUNT_ASC("dynamic_sort_discount_asc"){
+
+        public SolrOrderSort[] getSolrOrderSort(){
+            return new SolrOrderSort[] {new SolrOrderSort("dynamic_sort_discount", SolrOrderSort.ASC) };
+        }
+    },
+    
+    /**
+     * 折扣降序
+     */
+    DISCOUNT_DESC("dynamic_sort_discount_desc"){
+
+        public SolrOrderSort[] getSolrOrderSort(){
+            return new SolrOrderSort[] {new SolrOrderSort("dynamic_sort_discount", SolrOrderSort.DESC) };
+        }
+    },
+    /**
+     * 手机专项价格降序
+     */
+    MOBILEPRICE_DESC("dynamic_sort__mobile_exclusive_price_desc"){
+
+        public SolrOrderSort[] getSolrOrderSort(){
+            return new SolrOrderSort[] {new SolrOrderSort("dynamic_sort__mobile_exclusive_price", SolrOrderSort.DESC) };
+        }
+    },
+    
+    /**
+     * 手机专项价格升序
+     */
+    MOBILEPRICE_ASC("dynamic_sort__mobile_exclusive_price_asc"){
+
+        public SolrOrderSort[] getSolrOrderSort(){
+            return new SolrOrderSort[] {new SolrOrderSort("dynamic_sort__mobile_exclusive_price", SolrOrderSort.ASC) };
+        }
+    }
+    ;
 
 	/**
 	 * Instantiates a new sort type enum.
