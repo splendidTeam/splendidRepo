@@ -58,7 +58,10 @@ public enum SortTypeEnum{
 		}
 	},
 	
-	/** 默认排序 店铺权重，品类系数*/
+	/** 
+	 * 默认排序 店铺权重，品类系数
+	 * @since Nebula5.3.2.14
+	 */
     DEFAULT_ORDER("default_order"){
 
         public SolrOrderSort[] getSolrOrderSort(){
@@ -68,6 +71,7 @@ public enum SortTypeEnum{
     
     /**
      * 折扣升序
+     * @since Nebula5.3.2.14
      */
     DISCOUNT_ASC("dynamic_sort_discount_asc"){
 
@@ -78,6 +82,7 @@ public enum SortTypeEnum{
     
     /**
      * 折扣降序
+     * @since Nebula5.3.2.14
      */
     DISCOUNT_DESC("dynamic_sort_discount_desc"){
 
@@ -87,6 +92,7 @@ public enum SortTypeEnum{
     },
     /**
      * 手机专项价格降序
+     * @since Nebula5.3.2.14
      */
     MOBILEPRICE_DESC("dynamic_sort__mobile_exclusive_price_desc"){
 
@@ -97,6 +103,7 @@ public enum SortTypeEnum{
     
     /**
      * 手机专项价格升序
+     * @since Nebula5.3.2.14
      */
     MOBILEPRICE_ASC("dynamic_sort__mobile_exclusive_price_asc"){
 
