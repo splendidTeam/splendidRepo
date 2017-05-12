@@ -72,6 +72,11 @@ public class ItemRate extends BaseModel {
 	private Date				replyTime;
 	/** 最后回复时间id */
 	private Date				lastReplyTime;
+	/** 添加字段--施工配送分数 */
+	private Integer				score2;
+
+	/** 添加字段---图片名称 */
+	private String				img_names;
 
 	@Id
 	@Column(name = "ID")
@@ -210,5 +215,21 @@ public class ItemRate extends BaseModel {
 	public void setOrderLineId(Long orderLineId) {
 		this.orderLineId = orderLineId;
 	}
+	@Column(name = "SCORE2")
+	public Integer getScore2(){
+		return score2;
+	}
 
+	public void setScore2(Integer score2){
+		this.score2 = score2;
+	}
+
+	@Column(name = "IMG_NAMES")
+	public String getImg_names(){
+		return img_names;
+	}
+
+	public void setImg_names(String img_names){
+		this.img_names = img_names;
+	}
 }

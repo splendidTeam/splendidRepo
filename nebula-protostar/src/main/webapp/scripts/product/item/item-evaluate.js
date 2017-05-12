@@ -45,7 +45,11 @@ $j(document).ready(function() {
 			cols : [ 
 				{label : "<input type='checkbox'/>",template : "drawCheckbox" },
 				{label:"商品",width:"15%",template:"drawItemInfo"},
-				{name:"evaluate",label:"评价",width:"60%",template:"drawEvaInfo"},
+				{name:"score",label:"商品满意度",width:"15%",template:"drawEvaInfoScore"},
+				{name:"score2",label:"配送/施工满意度",width:"15%",template:"drawEvaInfoScore2"},
+				{name:"createTime",label:"评价时间",width:"15%",template:"drawEvaInfoCreateTime"},
+   			    {name:"content",label:"评价内容",width:"15%",template:"drawEvaInfoContent"},
+//				{name:"evaluate",label:"评价",width:"60%",template:"drawEvaInfo"},
 				{name:"loginName",label:"会员",width:"10%"},
 				{label:"操作",width:"15%", align:"left", template:"drawEditTodo"}
 			  ],
@@ -70,7 +74,11 @@ $j(document).ready(function() {
 			cols : [ 
 	            {label : "<input type='checkbox'/>",template : "drawCheckbox" },
 				{label:"商品",width:"15%",template:"drawItemInfo"},
-				{name:"evaluate",label:"评价",width:"60%",template:"drawEvaInfo"},
+				{name:"score",label:"商品满意度",width:"15%",template:"drawEvaInfoScore"},
+				{name:"score2",label:"配送/施工满意度",width:"15%",template:"drawEvaInfoScore2"},
+				{name:"createTime",label:"评价时间",width:"15%",template:"drawEvaInfoCreateTime"},
+   			    {name:"content",label:"评价内容",width:"15%",template:"drawEvaInfoContent"},
+//				{name:"evaluate",label:"评价",width:"60%",template:"drawEvaInfo"},
 				{name:"loginName",label:"会员",width:"10%"},
 				{label:"操作",width:"15%", align:"left", template:"drawEditDone"}
 			],
@@ -126,6 +134,13 @@ $j(document).ready(function() {
 			for(var i=0;i<score;i++){
 				starStr+="<span class='product-star'></span>";
 			}
+			//添加--配送施工评分
+			var score2 = itemRate.score2;
+			var starStr2 ="";
+			for(var i=0;i<score2;i++){
+				starStr2+="<span class='product-star'></span>";
+			}	
+			
 			//创建时间
 			var createTime = formatDate(itemRate.createTime,"yyyy-MM-dd HH:mm:ss");
 			//回复时间
@@ -164,6 +179,18 @@ $j(document).ready(function() {
 			//某某商品
 			var itemName = itemRate.itemName;
 			
+			//添加--评论的图片
+			var itemImage = itemRate.img_names;
+			var imagename="";
+			if(itemImage != null && itemImage != undefined && itemImage.indexOf(":") > 0){		
+				var splitImagename=itemImage.split(":");
+				for(var i=0;i<splitImagename.length;i++){
+					imagename += "<img src='"+ imgbase + splitImagename +"' width=60 height=60/>";					
+				}								
+			}else if(itemImage != ""){	
+				imagename += "<img src='" + imgbase + splitImagename +"' width=60 height=60/>";
+			}
+			
 			var detailsHtml ='<div class="ui-block-line">' +
 				' <label>商品编码：</label>' +
 				' <div class="pt7">' +
@@ -185,9 +212,28 @@ $j(document).ready(function() {
 				' </div>' +
 			
 				' <div class="ui-block-line">' +
-				' <label>评价内容：</label>' +
+				' <label>商品满意度：</label>' +
 				' <div>' +
 				' <span class="product-star-content">'+starStr+'</span>' +
+				' </div>' +
+				' </div>' +
+				
+				' <div class="ui-block-line">' +
+				' <label>配送施工满意度：</label>' +
+				' <div>' +
+				' <span class="product-star-content">'+starStr2+'</span>' +
+				' </div>' +
+				' </div>' +
+				
+				' <div class="ui-block-line">' +
+				' <label>图片：</label>' +
+				' <div>' +
+				' <p class="mt5"> '+imagename+'</p>' +
+				' </div>' +
+				' </div>' +
+				' <div class="ui-block-line">' +
+				' <label>评价内容：</label>' +
+				' <div>' +
 				' <p class="mt5"> '+content+'</p>' +
 				' </div>' +
 				' </div>' +replyTip+
@@ -441,6 +487,56 @@ function drawEditDone(data, args, idx){
 	itemRates[id]=data;
 	return result;
 }
+
+
+//商品评论--添加的列
+
+
+//商品满意度评价
+function drawEvaInfoScore(data, args, idx){
+	//评分
+	var score = loxia.getObject("score", data);
+	var starStr ="";
+	for(var i=0;i<score;i++){
+		starStr+="<span class='product-star'></span>";
+	}
+	return "<span class='product-star-content'>"+starStr+"</span>"
+}
+//配送施工满意度评价
+function drawEvaInfoScore2(data, args, idx){
+	//评分
+	var score2 = loxia.getObject("score2", data);
+	var starStr2 ="";
+	for(var i=0;i<score2;i++){
+		starStr2+="<span class='product-star'></span>";
+	}
+	return "<span class='product-star-content'>"+starStr2+"</span>"
+}
+//评论的时间
+function drawEvaInfoCreateTime(data, args, idx){
+	//创建时间
+	var createTime = formatDate(loxia.getObject("createTime", data),"yyyy-MM-dd HH:mm:ss");
+	return "<span class='product-star-content'>"+createTime+"</span>"
+}
+//评论的内容
+function drawEvaInfoContent(data, args, idx){
+	//评价内容
+	var content = loxia.getObject("content", data);
+	var contentDisplay ="";
+	if(content.length>120){
+	    contentDisplay ="　　"+content.substring(0,120)+"......";
+	}else{
+		contentDisplay ="　　"+content;
+	}	
+	return	"<label class='movetitletd'>"+"<div class='movetitle'>"+contentDisplay+"</div>"+"</label>";	
+}
+
+
+
+
+
+
+
 //-----------------------------------------------------列表单条操作--------------
 //通过
 function passEva(id){

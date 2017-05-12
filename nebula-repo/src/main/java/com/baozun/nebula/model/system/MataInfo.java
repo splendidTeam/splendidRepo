@@ -119,6 +119,52 @@ public class MataInfo  implements Serializable {
 	 */
 	public static final String 	SALES_OF_PROPERTY_IS_NOT_REQUIRED = "salesOfPropertyIsNotRequired";
 	
+	/**添加--- 商品评论配置开识-----此处配置的为key value在pts中进行配置 **/
+	/**
+	 * 商品满意度名称
+	 */
+	public static final String	ITEM_RATE_SCORE_NAME1						= "item_rate_score_name1";
+
+	/**
+	 * 配送/施工满意度名称
+	 */
+	public static final String	ITEM_RATE_SCORE_NAME2						= "item_rate_score_name2";
+
+	/**
+	 * 上传图片的数量（比如允许上传5张照片）
+	 */
+	public static final String	ITEM_RATE_IMG_NUM							= "item_rate_img_num";
+
+	/**
+	 * 上传图片的类型（）
+	 */
+	public static final String	ITEM_RATE_IMG_TYPE							= "item_rate_img_type";
+
+	/**
+	 * 上传图片的大小
+	 */
+	public static final String	ITEM_RATE_IMG_SIZE							= "item_rate_img_size";
+
+	/**
+	 * 上传图片的宽度
+	 */
+	public static final String	ITEM_RATE_IMG_WIDE							= "item_rate_img_wide";
+
+	/**
+	 * 上传图片的高度
+	 */
+	public static final String	ITEM_RATE_IMG_HEIGIT						= "item_rate_img_heigit";
+
+	/**
+	 * 商品评论的开关-----当我们不需要进行评论功能的时候可以将此功能关闭，需要的时候可以开启
+	 */
+	public static final String	ITEM_RATE_ON_OFF							= "item_rate_on_off";
+
+	/** 商品评论配置结束 **/
+	
+	
+	
+	
 	/**
 	 * PK
 	 */

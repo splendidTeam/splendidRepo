@@ -486,6 +486,9 @@
 		       		select  
 		       		   a.id id,
 		       		   a.score score,
+		       		   a.score2 score2,
+		       		   a.img_names img_names,
+		       		    a.item_id as itemId,
 		       		   a.content as content,
 		       		   a.reply reply,
 		       		   a.member_id memberId,
@@ -588,6 +591,8 @@
 						 tpir.id as id,
 						 tpir.order_line_id as orderLineId,
 						 tpir.score as score,
+						 tpir.score2 score2,
+						 tpir.img_names img_names,
 						 tpir.content as content,
 						 tpir.reply as reply,
 						 tpir.member_id as memberId,

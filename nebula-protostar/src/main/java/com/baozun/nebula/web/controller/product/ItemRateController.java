@@ -49,6 +49,7 @@ import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
+import com.feilong.core.Validator;
 
 /**
  * 商品评价管理
@@ -96,6 +97,20 @@ public class ItemRateController extends BaseController{
 		Pagination<RateCommand>  rateCommandList =
 				itemRateManager.findRateListByQueryMapWithPage(queryBean.getPage(), queryBean.getSorts(), queryBean.getParaMap());
 		
+		List<RateCommand> items = rateCommandList.getItems();
+		for (RateCommand rateList : items) {
+			String imge="";
+			String imgnames = rateList.getImg_names();
+			Long itemId = rateList.getItemId();
+			if(Validator.isNotNullOrEmpty(imgnames) && Validator.isNotNullOrEmpty(itemId)){				
+				String[] splitimgname = imgnames.split(":");
+				for (String imgname : splitimgname) {		
+					String userDefinedPath = "item-rate"+"/"+itemId + "" + "/";
+					imge += userDefinedPath+imgname + ":";
+				}
+				rateList.setImg_names(imge);			
+			}
+		}	
 		return rateCommandList;
 	}
 	

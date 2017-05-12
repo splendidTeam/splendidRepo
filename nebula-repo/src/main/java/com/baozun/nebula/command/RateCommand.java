@@ -72,6 +72,28 @@ public class RateCommand implements Command {
 	private Date				lastReplyTime;
 
 	private List<ItemImage>		itemPicUrlList;
+	
+	/** 添加字段--施工配送分数 */
+	private Integer				score2;
+
+	public Integer getScore2() {
+		return score2;
+	}
+
+	public void setScore2(Integer score2) {
+		this.score2 = score2;
+	}
+
+	public String getImg_names() {
+		return img_names;
+	}
+
+	public void setImg_names(String img_names) {
+		this.img_names = img_names;
+	}
+
+	/** 添加字段---图片名称 */
+	private String				img_names;
 
 	public Long getId() {
 		return id;
