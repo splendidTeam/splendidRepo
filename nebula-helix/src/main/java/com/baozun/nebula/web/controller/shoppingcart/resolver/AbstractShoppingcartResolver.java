@@ -28,7 +28,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -581,7 +580,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             return SUCCESS;
         }
 
-        IterableUtils.forEach(toDoNeedChangeCheckedCommandList, new BeanPropertyValueChangeClosure<ShoppingCartLineCommand>("settlementState", checkStatus ? 1 : 0));
+        CollectionsUtil.forEach(toDoNeedChangeCheckedCommandList, "settlementState", checkStatus ? 1 : 0);
 
         //---------------改变选中状态------------------------------------------------------------------------------
         ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, toDoNeedChangeCheckedCommandList, checkStatus, request, response);
