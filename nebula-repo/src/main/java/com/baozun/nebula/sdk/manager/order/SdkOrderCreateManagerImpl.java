@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
-import static org.apache.commons.collections4.CollectionUtils.addIgnoreNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +113,9 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
     @Autowired
     private PayMoneyBuilder payMoneyBuilder;
+    
+    @Autowired(required = false)
+    private SdkOrderSpiltManager sdkOrderSpiltManager;
 
     /*
      * (non-Javadoc)
@@ -242,23 +245,22 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         boolean isSendEmail = isSendEmail();
         List<Map<String, Object>> emailDataMapList = new ArrayList<>();
         for (Map.Entry<Long, List<ShoppingCartLineCommand>> entry : shopIdAndShoppingCartLineCommandListMap.entrySet()){
-            Long shopId = entry.getKey();
-            List<ShoppingCartLineCommand> shoppingCartLineCommandList = entry.getValue();
-
-            ShopCartCommandByShop shopCartCommandByShop = shopIdAndShopCartCommandByShopMap.get(shopId);
-            List<PromotionSKUDiscAMTBySetting> shopPromotionSKUDiscAMTBySettingList = shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId);
-
-            //------------------------------------------------------------------------------------------------
-
-            SalesOrder salesOrder = orderCreateByShopManager.doWithPerShopCreateOrder(shopId, subOrdinate, shoppingCartLineCommandList, salesOrderCommand, shopCartCommandByShop, shopPromotionSKUDiscAMTBySettingList);
-
-            //------------------------------------------------------------------------------------------------
-
-            // 封装发送邮件数据
-            if (isSendEmail){
-                Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMapForCreateOrder(subOrdinate, salesOrder, salesOrderCommand, shoppingCartLineCommandList, shopCartCommandByShop, shopPromotionSKUDiscAMTBySettingList, salesOrderCreateOptions);
-
-                addIgnoreNull(emailDataMapList, dataMap);
+            if(null!=sdkOrderSpiltManager){
+                sdkOrderSpiltManager.splitOrderAndsaveOrderInfo(shoppingCartCommand,salesOrderCommand, salesOrderCreateOptions, subOrdinate, shopIdAndPromotionSKUDiscAMTBySettingMap, shopIdAndShopCartCommandByShopMap, isSendEmail, emailDataMapList, entry);
+            }else {
+                Long shopId = entry.getKey();
+                List<ShoppingCartLineCommand> shoppingCartLineCommandList = entry.getValue();
+                
+                ShopCartCommandByShop shopCartCommandByShop = shopIdAndShopCartCommandByShopMap.get(shopId);
+                List<PromotionSKUDiscAMTBySetting> shopPromotionSKUDiscAMTBySettingList = shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId);
+                SalesOrder salesOrder = orderCreateByShopManager.doWithPerShopCreateOrder(shopId, subOrdinate, shoppingCartLineCommandList, salesOrderCommand, shopCartCommandByShop, shopPromotionSKUDiscAMTBySettingList);
+                
+                // 封装发送邮件数据
+                if (isSendEmail){
+                    Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMapForCreateOrder(subOrdinate, salesOrder, salesOrderCommand, shoppingCartLineCommandList, shopCartCommandByShop, shopPromotionSKUDiscAMTBySettingList, salesOrderCreateOptions);
+                    
+                    CollectionUtils.addIgnoreNull(emailDataMapList, dataMap);
+                }
             }
         }
 
@@ -282,6 +284,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         sdkOrderEmailManager.sendEmailOfCreateOrder(emailDataMapList);
         return subOrdinate;
     }
+
 
     /**
      * 基于店铺的ShopCartCommandByShop.

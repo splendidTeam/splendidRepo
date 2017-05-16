@@ -112,6 +112,10 @@ public class ShoppingCartLineCommandPackCommonBehaviour extends AbstractShopping
 
         //封装销售属性
         packSalePropertys(shoppingCartLineCommand, sku);
+        
+        //封装体积与重量
+        shoppingCartLineCommand.setVolume(sku.getVolume());
+        shoppingCartLineCommand.setWeight(sku.getWeight());
     }
 
     /**

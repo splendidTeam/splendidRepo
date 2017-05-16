@@ -307,6 +307,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 
      * @deprecated 没有用到, by feilong 2016-07-13
      */
+    @Deprecated
     private String state;
 
     //***************************************************************************************************
@@ -316,6 +317,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 
      * @deprecated 没有引用, by feilong 2016-07-13
      */
+    @Deprecated
     private Long wareHoseId;
 
     /**
@@ -323,6 +325,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 
      * @deprecated 没有引用, by feilong 2016-07-13
      */
+    @Deprecated
     private String wareHoseName;
 
     /**
@@ -330,6 +333,21 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @return the promotion ids
      */
+    
+    /**
+     * hanssem扩展字段
+     * @return
+     */
+    
+    /*** 单个商品重量(如果是按照重量计费)*/
+    private Double            weight;
+    
+    /*** 单个商品体积*/
+    private Double volume;
+    
+    /**物流方式id*/
+    private Long distributionModeId;
+    
     public String getPromotionIds(){
         String tmp = "";
         if (this.promotionList != null){
@@ -749,6 +767,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      * @return the state
      * @deprecated 没有用到, by feilong 2016-07-13
      */
+    @Deprecated
     public String getState(){
         return state;
     }
@@ -760,6 +779,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      *            the state
      * @deprecated 没有用到, by feilong 2016-07-13
      */
+    @Deprecated
     public void setState(String state){
         this.state = state;
     }
@@ -829,6 +849,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      * @return the 库房id
      * @deprecated 没有引用, by feilong 2016-07-13
      */
+    @Deprecated
     public Long getWareHoseId(){
         return wareHoseId;
     }
@@ -840,6 +861,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      *            the new 库房id
      * @deprecated 没有引用, by feilong 2016-07-13
      */
+    @Deprecated
     public void setWareHoseId(Long wareHoseId){
         this.wareHoseId = wareHoseId;
     }
@@ -850,6 +872,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      * @return the 库房名称
      * @deprecated 没有引用, by feilong 2016-07-13
      */
+    @Deprecated
     public String getWareHoseName(){
         return wareHoseName;
     }
@@ -861,6 +884,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      *            the new 库房名称
      * @deprecated 没有引用, by feilong 2016-07-13
      */
+    @Deprecated
     public void setWareHoseName(String wareHoseName){
         this.wareHoseName = wareHoseName;
     }
@@ -1433,4 +1457,35 @@ public class ShoppingCartLineCommand extends BaseModel{
     public void setShoppingCartLinePackageInfoCommandList(List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList){
         this.shoppingCartLinePackageInfoCommandList = shoppingCartLinePackageInfoCommandList;
     }
+
+    
+    public Double getWeight(){
+        return weight;
+    }
+
+    
+    public void setWeight(Double weight){
+        this.weight = weight;
+    }
+
+    
+    public Double getVolume(){
+        return volume;
+    }
+
+    
+    public void setVolume(Double volume){
+        this.volume = volume;
+    }
+
+    
+    public Long getDistributionModeId(){
+        return distributionModeId;
+    }
+
+    
+    public void setDistributionModeId(Long distributionModeId){
+        this.distributionModeId = distributionModeId;
+    }
+    
 }

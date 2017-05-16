@@ -7,6 +7,8 @@ $j.extend(loxia.regional['zh-CN'], {
 	"MERCHANT_SALEPRICE" : "销售价",
 	"MERCHANT_LISTPRICE" : "吊牌价",
 	"MERCHANT_GROUPCODE" : "组合商品编码",
+	"MERCHANT_WEIGHT" : "商品重量",
+	"MERCHANT_VOLUME" : "商品体积",
 	"CODING_TIPS" : "您需要选择所有的属性，才能组合成完整的规格信息!",
 	"DELETE_THIS_CATEGORY" : "删除此分类",
 	"SET_THIS_DEFCATEGORY" : "设为默认",

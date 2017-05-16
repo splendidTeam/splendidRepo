@@ -11,6 +11,8 @@ $j.extend(loxia.regional['zh-CN'], {
 	"MERCHANT_SALEPRICE" : "销售价",
 	"MERCHANT_LISTPRICE" : "吊牌价",
 	"MERCHANT_GROUPCODE" : "组合商品编码",
+	"MERCHANT_WEIGHT" : "商品重量",
+	"MERCHANT_VOLUME" : "商品体积",
 	"OTHERS" : "其他",
 	"MUST_SELECT" : "为必选项",
 	"SELECT_COLOR_PROPERTY" : "请选择颜色属性",

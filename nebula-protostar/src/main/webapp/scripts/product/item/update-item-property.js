@@ -168,7 +168,8 @@ function showSkuTable(isLoadInit, saleInfo) {
 			saleInfo = $j(".saleInfo");
 		}
 	}
-	saleInfo.find(".exten").css("display", "block");
+	var min_width=$j(window).width()-20;
+	saleInfo.find(".exten").css({'display': 'block', 'overflow-x':'auto', 'width':min_width});
 	saleInfo.find(".extensionTable").html("");
 
 	// 拿到 销售属性, 根据销售属性 确定 列
@@ -409,13 +410,16 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 	var skuInfoListIndex = 0;
 	var tableHeader = "<tr>";
 	for (var j = 0; j < propertyNameArray.length; j++) {// 动态生成 销售属性的列
-		tableHeader += "<td style='width:150px'>" + propertyNameArray[j] + "</td>";
+		tableHeader += "<td style='width:120px'>" + propertyNameArray[j] + "</td>";
 	}
 
-	tableHeader += ("<td style='width:150px'>" + nps.i18n("MERCHANT_CODING") + "</td>" + "<td style='width:150px'>"
-			+ nps.i18n("MERCHANT_SALEPRICE") + "</td>" + "<td style='width:150px'>" + nps.i18n("MERCHANT_LISTPRICE")
-			+ "</td>" + "<td style='width:150px'>" + nps.i18n("MERCHANT_GROUPCODE") + "</td>" + "</tr>");
-
+	tableHeader += "<td style='width:120px'>" + nps.i18n("MERCHANT_CODING") + "</td>" + "<td style='width:120px'>"
+			+ nps.i18n("MERCHANT_SALEPRICE") + "</td>" + "<td style='width:120px'>" + nps.i18n("MERCHANT_LISTPRICE")
+			+ "</td>" + "<td style='width:120px'>" + nps.i18n("MERCHANT_GROUPCODE") + "</td>";
+	if (shippingPropertyIsNotRequired != "" && "1" == shippingPropertyIsNotRequired) {
+		tableHeader +="<td style='width:120px'>"+ nps.i18n("MERCHANT_WEIGHT") + "</td>"+"<td style='width:120px'>" + nps.i18n("MERCHANT_VOLUME") + "</td>"
+	}
+	tableHeader+="</tr>";
 	var tableContent = "";
 	if (propertyValueArray.length > 0) {
 
@@ -428,39 +432,53 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 		 */
 		if (propertyValueArray.length == 1) {// 销售属性只有1个
 			for (var i = 0; i < propertyValueArray[0].length; i++) {
-				var dynamicStr = "<td style='width:150px'>" + propertyValueArray[0][i][0] + "</td>";
+				var dynamicStr = "<td style='width:120px'>" + propertyValueArray[0][i][0] + "</td>";
 				var codesName = getDynamicInputName("code", propertyValueArray[0][i], null);
 				var salePriceName = getDynamicInputName("salePrice", propertyValueArray[0][i], null);
 				var listPriceName = getDynamicInputName("listPrice", propertyValueArray[0][i], null);
 				var idName = getDynamicInputName("id", propertyValueArray[0][i], null);
 				var groupCode = getDynamicInputName("groupCode", propertyValueArray[0][i], null);
+				
+				var weight = getDynamicInputName("weight", propertyValueArray[0][i], null);
+				var volue = getDynamicInputName("volue", propertyValueArray[0][i], null);
 
 				var tmpArray = new Array();
 				tmpArray[0] = propertyValueArray[0][i];
 				var sku = getSkuInfoByProperyValueArray(tmpArray);
 
 				var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"
-						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSkuCode'  name='codesNameToReplace' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
-						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
-						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
-						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
-
+						+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameSkuCode'  name='codesNameToReplace' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
+						+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
+						+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
+						+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
+				
+				if (shippingPropertyIsNotRequired != "" && "1" == shippingPropertyIsNotRequired) {
+					proHtml+="<td style='width:120px'><input type='text' class = 'dynamicInputNameWeight'  name='weightNameToReplace' decimal='2' loxiaType='number'  value='weight_value'/></td>"
+						+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameVolue'  name='volueNameToReplace' decimal='2' loxiaType='number'  value='volue_value'/></td>";
+					proHtml = proHtml.replace('weightNameToReplace', weight);
+					proHtml = proHtml.replace('volueNameToReplace', volue);
+				}
 				proHtml = proHtml.replace('codesNameToReplace', codesName);
 				proHtml = proHtml.replace('salePriceNameToReplace', salePriceName);
 				proHtml = proHtml.replace('listPriceToReplace', listPriceName);
 				proHtml = proHtml.replace('idNameToReplace', idName);
 				proHtml = proHtml.replace('groupCodeNameToReplace', groupCode);
+				
 
 				var salePrice = $j("#salePrice").val();
 				var listPrice = $j("#listPrice").val();
 				var code = "";
 				var groupCode = "";
+				var volue ="";
+				var weight = "";
 				var skuId = null;
 				if (sku != null) {
 					salePrice = ((sku.salePrice == null || sku.salePrice == "") ? salePrice : sku.salePrice);
 					listPrice = ((sku.listPrice == null || sku.listPrice == "") ? listPrice : sku.listPrice);
 					code = (sku.outid == null || sku.outid == "") ? code : sku.outid;
-					groupCode = (sku.groupCode == null || sku.groupCode == "") ? groupCode : sku.groupCode;
+					groupCode = (sku.groupCode == null || sku.groupCode == ""||sku.groupCode==undefined) ? groupCode : sku.groupCode;
+					weight = (sku.weight == null || sku.weight == ""||sku.weight ==undefined) ? weight : sku.weight;
+					volue = (sku.volume == null || sku.volume == ""||sku.volume ==undefined) ? volue : sku.volume;
 					skuId = (sku.id == null || sku.id == "") ? skuId : sku.id;
 				}
 
@@ -475,6 +493,10 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 				proHtml = proHtml.replace('salePrices_value', salePrice);
 				proHtml = proHtml.replace('listPrices_value', listPrice);
 				proHtml = proHtml.replace('groupCode_value', groupCode);
+				if (shippingPropertyIsNotRequired != "" && "1" == shippingPropertyIsNotRequired) {
+					proHtml = proHtml.replace('weight_value', weight);
+					proHtml = proHtml.replace('volue_value', volue);
+				}
 
 				tableContent += ("<tr>" + dynamicStr + proHtml + "</tr>");
 			}
@@ -488,22 +510,31 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 		$j("#jsonSku").val(JSON.stringify(skuInfoList));
 	} else {
 		var sku = skuList[0];
-		var proHtml = "<input type='hidden' name='skuId' value = 'idValueTOReplace' />"
-				+ "<td style='width:150px'><input type='text' mandatory='true' class = 'dynamicInputNameSkuCode' name='skuCode' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
-				+ "<td style='width:150px'><input type='text' id='salePrices' class = 'dynamicInputNameSalePrices' mandatory='true' name='skuSalePrice' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
-				+ "<td style='width:150px'><input type='text' id='listPrices' class = 'dynamicInputNameListPrices' name='skuListPrice' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
-				+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCode' loxiaType='input'  value='groupCode_value'/></td>";
 
+		var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"
+			+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameSkuCode'  name='codesNameToReplace' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
+			+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
+			+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
+			+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
+	
+		if (shippingPropertyIsNotRequired != "" && "1" == shippingPropertyIsNotRequired) {
+			proHtml+="<td style='width:120px'><input type='text' class = 'dynamicInputNameWeight'  name='weightNameToReplace' decimal='2' loxiaType='number'  value='weight_value'/></td>"
+				+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameVolue'  name='volueNameToReplace' decimal='2' loxiaType='number'  value='volue_value'/></td>";
+		}
 		var salePrice = $j("#salePrice").val();
 		var listPrice = $j("#listPrice").val();
 		var groupCode = "";
-		var code = "";
+		var weight = "";
+		var volue ="";
+		var weight = "";
 		var skuId = null;
 		if (sku != null) {
 			salePrice = ((sku.salePrice == null || sku.salePrice == "") ? salePrice : sku.salePrice);
 			listPrice = ((sku.listPrice == null || sku.listPrice == "") ? listPrice : sku.listPrice);
 			code = (sku.outid == null || sku.outid == "") ? code : sku.outid;
 			groupCode = (sku.groupCode == null || sku.groupCode == "") ? groupCode : sku.groupCode;
+			weight = (sku.weight == null || sku.weight == ""||sku.weight ==undefined) ? weight : sku.weight;
+			volue = (sku.volume == null || sku.volume == ""||sku.volume ==undefined) ? volue : sku.volume;
 			skuId = (sku.id == null || sku.id == "") ? skuId : sku.id;
 		}
 
@@ -512,6 +543,10 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 		proHtml = proHtml.replace('listPrices_value', listPrice);
 		proHtml = proHtml.replace(/idValueTOReplace/g, skuId);
 		proHtml = proHtml.replace('groupCode_value', groupCode);
+		if (shippingPropertyIsNotRequired != "" && "1" == shippingPropertyIsNotRequired) {
+			proHtml = proHtml.replace('weight_value', weight);
+			proHtml = proHtml.replace('volue_value', volue);
+		}
 
 		tableContent += ("<tr>" + proHtml + "</tr>");
 		list = "[ {'itemId': '','properties': '[]','propertiesName': '[]','outid': ''}]";
@@ -537,7 +572,7 @@ function bulidTable(table, data, dataRowIndex, isLoadInit) {
 			var htmlLine = "";
 			var arrays = new Array();// 所有属性的数组
 			for (var j = 0; j < table[i].length; j++) {
-				htmlLine += "<td style='width:150px'>" + table[i][j][0] + "</td> ";
+				htmlLine += "<td style='width:120px'>" + table[i][j][0] + "</td> ";
 				arrays.push(table[i][j]);
 			}
 
@@ -546,31 +581,46 @@ function bulidTable(table, data, dataRowIndex, isLoadInit) {
 			var salePriceName = getMoreDynamicInputName("salePrice", arrays);
 			var listPriceName = getMoreDynamicInputName("listPrice", arrays);
 			var groupCodeName = getMoreDynamicInputName("groupCode", arrays);
+			var weightName = getMoreDynamicInputName("weight", arrays);
+			var volueName = getMoreDynamicInputName("volue", arrays);
+			
+			
 			var tmpArray = clone(arrays);
 			var sku = getSkuInfoByProperyValueArray(tmpArray);
 
 			var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"
-					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSkuCode'  skuId='idValueTOReplace' name='codesNameToReplace' loxiaType='input'  value='CODE_VALUE'/></td>"
-					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
-					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
-					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
-
+					+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameSkuCode'  skuId='idValueTOReplace' name='codesNameToReplace' loxiaType='input'  value='CODE_VALUE'/></td>"
+					+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
+					+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
+					+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
+			
+			if (shippingPropertyIsNotRequired != "" && "1" == shippingPropertyIsNotRequired) {
+				proHtml+="<td style='width:120px'><input type='text' class = 'dynamicInputNameWeight'  name='weightNameToReplace' decimal='2' loxiaType='number'  value='weight_value'/></td>"
+					+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameVolue'  name='volueNameToReplace' decimal='2' loxiaType='number'  value='volue_value'/></td>";
+			}
 			proHtml = proHtml.replace('idNameToReplace', idName);
 			proHtml = proHtml.replace('codesNameToReplace', codesName);
 			proHtml = proHtml.replace('salePriceNameToReplace', salePriceName);
 			proHtml = proHtml.replace('listPriceToReplace', listPriceName);
 			proHtml = proHtml.replace('groupCodeNameToReplace', groupCodeName);
-
+			if (shippingPropertyIsNotRequired != "" && "1" == shippingPropertyIsNotRequired) {
+				proHtml = proHtml.replace('weightNameToReplace', weightName);
+				proHtml = proHtml.replace('volueNameToReplace', volueName);
+			}
 			var salePrice = $j("#salePrice").val();
 			var listPrice = $j("#listPrice").val();
 			var code = "";
 			var groupCode = "";
+			var volue ="";
+			var weight = "";
 			var skuId = null;
 			if (sku != null) {
 				salePrice = ((sku.salePrice == null || sku.salePrice == "") ? salePrice : sku.salePrice);
 				listPrice = ((sku.listPrice == null || sku.listPrice == "") ? listPrice : sku.listPrice);
 				code = (sku.outid == null || sku.outid == "") ? code : sku.outid;
-				groupCode = (sku.groupCode == null || sku.groupCode == "") ? groupCode : sku.groupCode;
+				groupCode = (sku.groupCode == null || sku.groupCode == ""||sku.groupCode ==undefined) ? groupCode : sku.groupCode;
+				weight = (sku.weight == null || sku.weight == ""||sku.weight ==undefined) ? weight : sku.weight;
+				volue = (sku.volume == null || sku.volume == ""||sku.volume ==undefined) ? volue : sku.volume;
 				skuId = (sku.id == null || sku.id == "") ? skuId : sku.id;
 			}
 
@@ -585,7 +635,11 @@ function bulidTable(table, data, dataRowIndex, isLoadInit) {
 			proHtml = proHtml.replace('listPrices_value', listPrice);
 			proHtml = proHtml.replace(/idValueTOReplace/g, skuId);
 			proHtml = proHtml.replace('groupCode_value', groupCode);
-
+			if (shippingPropertyIsNotRequired != "" && "1" == shippingPropertyIsNotRequired) {
+				proHtml = proHtml.replace('weight_value', weight);
+				proHtml = proHtml.replace('volue_value', volue);
+			}
+			
 			if (htmlLine.length != 0) {
 				htmlStr += "<tr>" + htmlLine + proHtml + "</tr>";
 			}

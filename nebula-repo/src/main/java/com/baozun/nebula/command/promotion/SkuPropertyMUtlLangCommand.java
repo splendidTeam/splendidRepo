@@ -40,6 +40,12 @@ public class SkuPropertyMUtlLangCommand  implements Command{
 	// upcCode
 	private String groupCode;
 	
+    /*** 单个商品重量（如果是按照重量计费）*/
+    private Double            weight;
+    
+    /*** 单个商品体积*/
+    private Double volume;
+    
 	//表征 sku 的property 和 propertyValue
 	private List<ItemPropertyMutlLangCommand> propertyList = null;
 	
@@ -144,5 +150,20 @@ public class SkuPropertyMUtlLangCommand  implements Command{
 	public void setSalePrice(BigDecimal salePrice) {
 		this.salePrice = salePrice;
 	}
-	
+    
+    public Double getWeight(){
+        return weight;
+    }
+    
+    public void setWeight(Double weight){
+        this.weight = weight;
+    }
+    
+    public Double getVolume(){
+        return volume;
+    }
+    
+    public void setVolume(Double volume){
+        this.volume = volume;
+    }
 }

@@ -4,6 +4,7 @@
 <script type="text/javascript" src="${base}/scripts/product/item/add-item-property.js"></script>
 <script type="text/javascript">
 var salesOfPropertyIsNotRequired = "${salesOfPropertyIsNotRequired}";
+var shippingPropertyIsNotRequired = "${shippingPropertyIsNotRequired}";
 </script>
 <div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.add.generalProperty" />

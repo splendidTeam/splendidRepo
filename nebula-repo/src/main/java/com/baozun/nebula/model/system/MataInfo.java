@@ -162,7 +162,10 @@ public class MataInfo  implements Serializable {
 
 	/** 商品评论配置结束 **/
 	
-	
+	/**
+     * 用于标识pts物流方式配置需要sku 的体积  重量销售属性信息开关，如有需要请配置value=1
+     */
+    public static final String  SALES_SHIPPING_VALUE_IS_NOT_REQUIRED = "shippingPropertyIsNotRequired";
 	
 	
 	/**

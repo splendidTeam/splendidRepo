@@ -216,6 +216,8 @@ public class ItemLangManagerImpl implements ItemLangManager {
 						skuToBeUpdate.setListPrice(spc.getListPrice());
 						skuToBeUpdate.setOutid(spc.getCode());
 						skuToBeUpdate.setGroupCode(spc.getGroupCode());
+						skuToBeUpdate.setVolume(spc.getVolume());
+						skuToBeUpdate.setWeight(spc.getWeight());
 						skuToBeUpdate.setSalePrice(spc.getSalePrice());
 						savedSku = skuDao.save(skuToBeUpdate);
 					} else {
@@ -243,6 +245,9 @@ public class ItemLangManagerImpl implements ItemLangManager {
 							sku.setLifecycle(Sku.LIFECYCLE_ENABLE);
 							sku.setListPrice(spc.getListPrice());
 							sku.setSalePrice(spc.getSalePrice());
+							sku.setGroupCode(spc.getGroupCode());
+							sku.setVolume(spc.getVolume());
+							sku.setWeight(spc.getWeight());
 							savedSku = skuDao.save(sku);
 							break;
 						}
@@ -352,6 +357,8 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		sku.setCreateTime(new Date());
 		sku.setOutid(spc.getCode());
 		sku.setGroupCode(spc.getGroupCode());
+		sku.setVolume(spc.getVolume());
+		sku.setWeight(spc.getWeight());
 		sku.setSalePrice(spc.getSalePrice());
 		sku.setListPrice(spc.getListPrice());
 		sku.setLifecycle(Sku.LIFECYCLE_ENABLE);

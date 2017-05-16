@@ -99,7 +99,18 @@ public class Sku extends BaseModel{
 	/** 1 组合商品的组合extentionCode. 在数据库中以:分割 如[8,4,6]:[1,,4,5] */
     private String              groupCode;
     
+    /**
+     * 单个商品重量（如果是按照重量计费）
+     */
+    private Double            weight;
+    
+    /**
+     * 单个商品体积
+     */
+    private Double volume;
+    
 
+    
     @Column(name = "GROUP_CODE")
     public String getGroupCode(){
         return groupCode;
@@ -379,4 +390,25 @@ public class Sku extends BaseModel{
         this.barcode = barcode;
     }
 
+    @Column(name = "WEIGHT")
+    public Double getWeight(){
+        return weight;
+    }
+
+    
+    public void setWeight(Double weight){
+        this.weight = weight;
+    }
+
+    @Column(name = "VOLUME")
+    public Double getVolume(){
+        return volume;
+    }
+
+    
+    public void setVolume(Double volume){
+        this.volume = volume;
+    }
+
+    
 }

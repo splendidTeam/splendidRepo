@@ -39,6 +39,10 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+import loxia.support.json.JSONArray;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -138,10 +142,6 @@ import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 import com.google.gson.Gson;
-
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-import loxia.support.json.JSONArray;
 
 /**
  * 商品管理controller
@@ -476,9 +476,19 @@ public class ItemController extends BaseController {
 			String spKey = "skuSalePrice";
 			String lpKey = "skuListPrice";
 			String groupCodeKey = "groupCode";
+			String volueKey = "volue";
+			String weightKey = "weight";
 
 			String code = request.getParameter(codeKey);
 			String groupCode = request.getParameter(groupCodeKey);
+			Double weight=0.0;
+            Double volue=0.0;
+            if (Validator.isNotNullOrEmpty(request.getParameter(volueKey))){
+                volue = Double.parseDouble(request.getParameter(volueKey));
+            }
+            if (Validator.isNotNullOrEmpty(request.getParameter(weightKey))){
+                weight = Double.parseDouble(request.getParameter(weightKey));
+            }
 			BigDecimal salePrice = getPriceFromStr(request.getParameter(spKey));
 			String listPriceStr = request.getParameter(lpKey);
 			BigDecimal listPrice = getPriceFromStr(listPriceStr);
@@ -487,6 +497,8 @@ public class ItemController extends BaseController {
 			spc.setId(skuId);
 			spc.setCode(code);
 			spc.setGroupCode(groupCode);
+			spc.setWeight(weight);
+			spc.setVolume(volue);
 			spc.setListPrice(listPrice);
 			spc.setSalePrice(salePrice);
 			spc.setPropertyList(new ArrayList<ItemPropertyMutlLangCommand>());
@@ -542,11 +554,20 @@ public class ItemController extends BaseController {
 				String lpKey = input + "_listPrice";
 				String idKey = input + "_id";
 				String groupCodeKey = input + "_groupCode";
+				String volueKey = input + "_volue";
+	            String weightKey = input + "_weight";
 				Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 				String code = request.getParameter(codeKey);
 				String groupCode = request.getParameter(groupCodeKey);
-
+				Double weight=0.0;
+                Double volue=0.0;
+                if (Validator.isNotNullOrEmpty(request.getParameter(volueKey))){
+                    volue = Double.parseDouble(request.getParameter(volueKey));
+                }
+                if (Validator.isNotNullOrEmpty(request.getParameter(weightKey))){
+                    weight = Double.parseDouble(request.getParameter(weightKey));
+                }
 				// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
 				if (code == null || "".equals(code.trim())) {
 					continue;
@@ -568,6 +589,8 @@ public class ItemController extends BaseController {
 
 				spc.setCode(code);
 				spc.setGroupCode(groupCode);
+				spc.setWeight(weight);
+	            spc.setVolume(volue);
 				spc.setListPrice(listPrice);
 				spc.setSalePrice(salePrice);
 				spc.setPropertyList(ipcList);
@@ -645,7 +668,11 @@ public class ItemController extends BaseController {
 						String codeKey = prefix + "code";
 						String spKey = prefix + "salePrice";
 						String lpKey = prefix + "listPrice";
+						String groupCodeKey = prefix + "groupCode";
+						String volueKey = prefix + "volue";
+		                String weightKey = prefix + "weight";
 						String idKey = prefix + "id";
+						
 						Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 						String code = request.getParameter(codeKey);
@@ -672,15 +699,26 @@ public class ItemController extends BaseController {
 
 						BigDecimal salePrice = getPriceFromStr(request.getParameter(spKey));
 						String listPriceStr = request.getParameter(lpKey);
+						String groupCodeStr = request.getParameter(groupCodeKey);
 						if (StringUtil.isBlank(listPriceStr)) {
 							listPriceStr = null;
 						}
 						BigDecimal listPrice = this.getPriceFromStr(listPriceStr);
-
+						Double weight=0.0;
+		                Double volue=0.0;
+		                if (Validator.isNotNullOrEmpty(request.getParameter(volueKey))){
+		                    volue = Double.parseDouble(request.getParameter(volueKey));
+		                }
+		                if (Validator.isNotNullOrEmpty(request.getParameter(weightKey))){
+		                    weight = Double.parseDouble(request.getParameter(weightKey));
+		                }
 						spc.setId(skuId);
 						spc.setCode(code);
 						spc.setListPrice(listPrice);
 						spc.setSalePrice(salePrice);
+						spc.setGroupCode(groupCodeStr);
+						spc.setVolume(volue);
+						spc.setWeight(weight);
 						spc.setPropertyList(ipcList);
 						cmdList.add(spc);
 						innerNum++;
@@ -733,11 +771,20 @@ public class ItemController extends BaseController {
 					String lpKey = prefix + "listPrice";
 					String idKey = prefix + "id";
 					String groupCodeKey = prefix + "groupCode";
+					String volueKey = prefix +"volue";
+	                String weightKey = prefix +"weight";
 					Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 					String code = request.getParameter(codeKey);
 					String groupCode = request.getParameter(groupCodeKey);
-
+					Double weight=0.0;
+                    Double volue=0.0;
+                    if (Validator.isNotNullOrEmpty(request.getParameter(volueKey))){
+                        volue = Double.parseDouble(request.getParameter(volueKey));
+                    }
+                    if (Validator.isNotNullOrEmpty(request.getParameter(weightKey))){
+                        weight = Double.parseDouble(request.getParameter(weightKey));
+                    }
 					if (code == null || "".equals(code.trim())) {// 如果没有填写skuCode
 																	// ,那么就认为
 																	// 没有该属性的sku
@@ -756,6 +803,8 @@ public class ItemController extends BaseController {
 					spc.setId(skuId);
 					spc.setCode(code);
 					spc.setGroupCode(groupCode);
+					spc.setVolume(volue);
+					spc.setWeight(weight);
 					spc.setListPrice(listPrice);
 					spc.setSalePrice(salePrice);
 					spc.setPropertyList(ipcList);
@@ -811,6 +860,9 @@ public class ItemController extends BaseController {
 					String codeKey = prefix + "code";
 					String spKey = prefix + "salePrice";
 					String lpKey = prefix + "listPrice";
+					String groupCodeKey = prefix + "groupCode";
+                    String volueKey = prefix +"volue";
+                    String weightKey = prefix +"weight";
 					String idKey = prefix + "id";
 					Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
@@ -843,9 +895,20 @@ public class ItemController extends BaseController {
 						listPriceStr = null;
 					}
 					BigDecimal listPrice = this.getPriceFromStr(listPriceStr);
-
+					String groupCode = request.getParameter(groupCodeKey);
+					Double weight=0.0;
+                    Double volue=0.0;
+                    if (Validator.isNotNullOrEmpty(request.getParameter(volueKey))){
+                        volue = Double.parseDouble(request.getParameter(volueKey));
+                    }
+                    if (Validator.isNotNullOrEmpty(request.getParameter(weightKey))){
+                        weight = Double.parseDouble(request.getParameter(weightKey));
+                    }
 					spc.setId(skuId);
 					spc.setCode(code);
+					spc.setGroupCode(groupCode);
+                    spc.setVolume(volue);
+                    spc.setWeight(weight);
 					spc.setListPrice(listPrice);
 					spc.setSalePrice(salePrice);
 					spc.setPropertyList(ipcList);
@@ -883,11 +946,20 @@ public class ItemController extends BaseController {
 				String lpKey = input + "_listPrice";
 				String idKey = input + "_id";
 				String groupCodeKey = input + "_groupCode";
+				String volueKey = input + "_volue";
+                String weightKey = input + "_weight";
 				Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 				String code = request.getParameter(codeKey);
 				String groupCode = request.getParameter(groupCodeKey);
-
+				Double weight=0.0;
+                Double volue=0.0;
+                if (Validator.isNotNullOrEmpty(request.getParameter(volueKey))){
+                    volue = Double.parseDouble(request.getParameter(volueKey));
+                }
+                if (Validator.isNotNullOrEmpty(request.getParameter(weightKey))){
+                    weight = Double.parseDouble(request.getParameter(weightKey));
+                }
 				// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
 				if (code == null || "".equals(code.trim())) {
 					continue;
@@ -909,6 +981,8 @@ public class ItemController extends BaseController {
 
 				spc.setCode(code);
 				spc.setGroupCode(groupCode);
+				spc.setWeight(weight);
+                spc.setVolume(volue);
 				spc.setListPrice(listPrice);
 				spc.setSalePrice(salePrice);
 				spc.setPropertyList(ipcList);
@@ -949,6 +1023,9 @@ public class ItemController extends BaseController {
 						String spKey = prefix + "salePrice";
 						String lpKey = prefix + "listPrice";
 						String idKey = prefix + "id";
+						String groupCodeKey = prefix + "groupCode";
+		                String volueKey = prefix + "volue";
+		                String weightKey = prefix + "weight";
 						Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 						String code = request.getParameter(codeKey);
@@ -979,9 +1056,20 @@ public class ItemController extends BaseController {
 							listPriceStr = null;
 						}
 						BigDecimal listPrice = this.getPriceFromStr(listPriceStr);
-
+						String groupCode = request.getParameter(groupCodeKey);
+						Double weight=0.0;
+                        Double volue=0.0;
+                        if (Validator.isNotNullOrEmpty(request.getParameter(volueKey))){
+                            volue = Double.parseDouble(request.getParameter(volueKey));
+                        }
+                        if (Validator.isNotNullOrEmpty(request.getParameter(weightKey))){
+                            weight = Double.parseDouble(request.getParameter(weightKey));
+                        }
 						spc.setId(skuId);
 						spc.setCode(code);
+						spc.setGroupCode(groupCode);
+		                spc.setWeight(weight);
+		                spc.setVolume(volue);
 						spc.setListPrice(listPrice);
 						spc.setSalePrice(salePrice);
 						spc.setPropertyList(ipcList);
@@ -1035,6 +1123,9 @@ public class ItemController extends BaseController {
 					String spKey = prefix + "salePrice";
 					String lpKey = prefix + "listPrice";
 					String idKey = prefix + "id";
+					String groupCodeKey = prefix + "groupCode";
+                    String volueKey = prefix + "volue";
+                    String weightKey = prefix + "weight";
 					Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 					String code = request.getParameter(codeKey);
@@ -1054,9 +1145,20 @@ public class ItemController extends BaseController {
 						listPriceStr = null;
 					}
 					BigDecimal listPrice = this.getPriceFromStr(listPriceStr);
-
+					String groupCode = request.getParameter(groupCodeKey);
+					Double weight=0.0;
+                    Double volue=0.0;
+                    if (Validator.isNotNullOrEmpty(request.getParameter(volueKey))){
+                        volue = Double.parseDouble(request.getParameter(volueKey));
+                    }
+                    if (Validator.isNotNullOrEmpty(request.getParameter(weightKey))){
+                        weight = Double.parseDouble(request.getParameter(weightKey));
+                    }
 					spc.setId(skuId);
 					spc.setCode(code);
+					spc.setGroupCode(groupCode);
+	                spc.setWeight(weight);
+	                spc.setVolume(volue);
 					spc.setListPrice(listPrice);
 					spc.setSalePrice(salePrice);
 					spc.setPropertyList(ipcList);
@@ -1106,6 +1208,9 @@ public class ItemController extends BaseController {
 					String spKey = prefix + "salePrice";
 					String lpKey = prefix + "listPrice";
 					String idKey = prefix + "id";
+					String groupCodeKey = prefix + "groupCode";
+                    String volueKey = prefix + "volue";
+                    String weightKey = prefix + "weight";
 					Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 					String code = request.getParameter(codeKey);
@@ -1137,9 +1242,20 @@ public class ItemController extends BaseController {
 						listPriceStr = null;
 					}
 					BigDecimal listPrice = this.getPriceFromStr(listPriceStr);
-
+					String groupCode = request.getParameter(groupCodeKey);
+					Double weight=0.0;
+                    Double volue=0.0;
+                    if (Validator.isNotNullOrEmpty(request.getParameter(volueKey))){
+                        volue = Double.parseDouble(request.getParameter(volueKey));
+                    }
+                    if (Validator.isNotNullOrEmpty(request.getParameter(weightKey))){
+                        weight = Double.parseDouble(request.getParameter(weightKey));
+                    }
 					spc.setId(skuId);
 					spc.setCode(code);
+					spc.setGroupCode(groupCode);
+	                spc.setWeight(weight);
+	                spc.setVolume(volue);
 					spc.setListPrice(listPrice);
 					spc.setSalePrice(salePrice);
 					spc.setPropertyList(ipcList);
@@ -2271,6 +2387,9 @@ public class ItemController extends BaseController {
 		String 	salesOfPropertyIsNotRequired = sdkMataInfoManager.findValue(MataInfo.SALES_OF_PROPERTY_IS_NOT_REQUIRED);
 		model.addAttribute("salesOfPropertyIsNotRequired",salesOfPropertyIsNotRequired);
 
+		String shippingPropertyIsNotRequired = sdkMataInfoManager.findValue(MataInfo.SALES_SHIPPING_VALUE_IS_NOT_REQUIRED);
+        model.addAttribute("shippingPropertyIsNotRequired",shippingPropertyIsNotRequired);
+        
 		return "/product/item/add-item-simple";
 	}
 	
@@ -2378,6 +2497,10 @@ public class ItemController extends BaseController {
 		// sku销售价
 		List<BigDecimal> listPrices = new ArrayList<BigDecimal>();
 		List<String> groupCodes = new ArrayList<String>();
+		//体积
+		List<Double> volueList = new ArrayList<Double>();
+		//重量
+		List<Double> weightList = new ArrayList<Double>();
 
 		for (Sku sku : skuList) {
 
@@ -2393,6 +2516,12 @@ public class ItemController extends BaseController {
 				if (sku.getGroupCode() != null) {
 					groupCodes.add(sku.getGroupCode());
 				}
+				if (sku.getVolume() != null) {
+				    volueList.add(sku.getVolume());
+				}
+				if (sku.getWeight() != null) {
+				    weightList.add(sku.getWeight());
+				}
 			}
 
 		}
@@ -2404,11 +2533,15 @@ public class ItemController extends BaseController {
 		model.addAttribute("salePrices", salePrices);
 		model.addAttribute("groupCode", groupCodes);
 		model.addAttribute("listPrices", listPrices);
+		model.addAttribute("volueList", volueList);
+		model.addAttribute("weightList", weightList);
 
 		model.addAttribute("isStyleEnable", isEnableStyle());
 		
 		String salesOfPropertyIsNotRequired = sdkMataInfoManager.findValue(MataInfo.SALES_OF_PROPERTY_IS_NOT_REQUIRED);
 		model.addAttribute("salesOfPropertyIsNotRequired",salesOfPropertyIsNotRequired);
+		String shippingPropertyIsNotRequired = sdkMataInfoManager.findValue(MataInfo.SALES_SHIPPING_VALUE_IS_NOT_REQUIRED);
+		model.addAttribute("shippingPropertyIsNotRequired",shippingPropertyIsNotRequired);
 		
 		return "/product/item/update-item-simple";
 	}
