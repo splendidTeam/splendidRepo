@@ -321,6 +321,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		/** 数据校验 */
 		Device device = getDevice(request);
 		defaultReturnResult = (DefaultReturnResult) registerFormValidate(device, registerForm, bindingResult);
+		LOGGER.info("两次密码输入一致。");
 
 		if (!defaultReturnResult.isResult()){
 			defaultReturnResult.setStatusCode("reigster.validator.errors");
@@ -338,6 +339,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 			if (!defaultReturnResult.isResult()){
 				return defaultReturnResult;
 			}
+			LOGGER.info("验证码校验成功。");
 
 			/** 检查email，mobile等是否合法 */
 			defaultReturnResult = (DefaultReturnResult) memberManager.checkRegisterData(memberFrontendCommand);

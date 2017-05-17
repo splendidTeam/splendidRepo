@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Component;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartSyncManager;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.member.NebulaAbstractLoginController;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
@@ -44,6 +47,8 @@ import static com.feilong.core.Validator.isNotNullOrEmpty;
  */
 @Component("shoppingcartLoginSuccessHandler")
 public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLoginSuccessHandler{
+	
+	private static final Logger LOG = LoggerFactory.getLogger(DefaultShoppingcartLoginSuccessHandler.class);
 
     /** The guest shoppingcart persister. */
     @Autowired
@@ -79,6 +84,7 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
         if (hasGuestShoppingcart){
             //同步
             sdkShoppingCartSyncManager.syncShoppingCart(memberId, guestShoppingCartLineCommandList);
+            LOG.info("游客购物车合并成功。");
             //清空游客购物车
             guestShoppingcartPersister.clear(request, response);
         }

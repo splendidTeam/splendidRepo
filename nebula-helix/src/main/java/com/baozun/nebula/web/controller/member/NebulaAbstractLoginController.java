@@ -69,6 +69,8 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 	protected NebulaReturnResult onAuthenticationSuccess(MemberDetails memberDetails, HttpServletRequest request,
 			HttpServletResponse response) {
 		resetSession(request);
+		LOG.info("session已重置。");
+		LOG.info("保存memberDetails至session。");
 		request.getSession().setAttribute(SessionKeyConstants.MEMBER_CONTEXT, memberDetails);
 		// 触发登录成功事件，用于异步处理其他的业务
 		eventPublisher.publish(new LoginSuccessEvent(memberDetails, getClientContext(request, response)));

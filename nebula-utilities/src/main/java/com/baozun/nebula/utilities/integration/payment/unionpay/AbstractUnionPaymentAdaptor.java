@@ -516,6 +516,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		logger.warn("</br>请求报文:<br/>" + reqMessage + "<br/>" + "应答报文:</br>"+ rspMessage + "");
 		PaymentServiceReturnCommand paymentServiceReturnCommand = new PaymentServiceReturnCommand();
 		paymentServiceReturnCommand.setOrderNo(rspData.get("orderId"));
+		paymentServiceReturnCommand.setTotalFee(rspData.get("txnAmt"));
 		result.setPaymentStatusInformation(paymentServiceReturnCommand);
 		return result;
 	}

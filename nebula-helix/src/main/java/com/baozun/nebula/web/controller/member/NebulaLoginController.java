@@ -602,6 +602,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 
 		// 是否记住了密码，如果记住密码默认记住用户名
 		if (loginForm.getIsRemberMePwd()) {
+			LOG.info("用户登录，请求自动登录，用户名保存至cookie.");
 			// 是否支持记住密码
 			if (isSupportAutoLogin()) {
 				LOG.debug("Need update Both RemeberMe & AutoLogin information");

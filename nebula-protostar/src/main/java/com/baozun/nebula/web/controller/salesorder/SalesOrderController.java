@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -70,6 +72,7 @@ import com.baozun.nebula.web.command.OrderCommand;
 import com.baozun.nebula.web.command.OrderRefreshDataCommand;
 import com.baozun.nebula.web.command.PtsSalesOrderCommand;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.promotion.PromotionController;
 import com.feilong.core.Validator;
 import com.google.gson.Gson;
 
@@ -78,6 +81,8 @@ import loxia.dao.Sort;
 
 @Controller
 public class SalesOrderController extends BaseController{
+    
+    private final static Log LOGGER = LogFactory.getLog(SalesOrderController.class);
 
     @Autowired
     private SalesOrderManager                        salesOrderManager;
@@ -1106,4 +1111,36 @@ public class SalesOrderController extends BaseController{
         resultMap.put("resultCode", Constants.SUCCESS);
         return resultMap;
     }
+    
+    /**
+     * 订单状态更新
+     * @param ids
+     * @param state
+     * @return
+     */
+    @RequestMapping("/order/updateOrderFinancialStatus.json")
+    @ResponseBody
+    public Object updateOrderFinancialStatus(
+            @RequestParam("id") String id,
+            Model model,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
+
+        if (Validator.isNullOrEmpty(id)){
+            return FAILTRUE;
+        }
+        
+        boolean isSuccess = false;
+        try{
+            isSuccess = salesOrderManager.updateOrderFinancialStatus(id);
+        }catch (Exception e){
+            LOGGER.warn("更新订单财务状态出现异常。",e);
+            return FAILTRUE;
+        }
+        
+        if(isSuccess){
+            return SUCCESS;
+        }
+        return FAILTRUE;
+    } 
 }

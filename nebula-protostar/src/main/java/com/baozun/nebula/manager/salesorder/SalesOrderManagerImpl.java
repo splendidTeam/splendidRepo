@@ -1,24 +1,31 @@
 package com.baozun.nebula.manager.salesorder;
 
-import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
-import com.baozun.nebula.calculateEngine.common.EngineManager;
 import com.baozun.nebula.command.ItemPropertiesCommand;
+import com.baozun.nebula.command.OnLinePaymentCancelCommand;
+import com.baozun.nebula.command.OnLinePaymentCommand;
 import com.baozun.nebula.dao.member.MemberDao;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.ItemInfoDao;
@@ -31,6 +38,7 @@ import com.baozun.nebula.dao.system.ChooseOptionDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.model.member.Member;
+import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemProperties;
@@ -40,33 +48,38 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.model.salesorder.OrderLog;
 import com.baozun.nebula.model.salesorder.OrderStatusLog;
+import com.baozun.nebula.model.salesorder.PayInfo;
+import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.system.ChooseOption;
+import com.baozun.nebula.payment.manager.PayManager;
+import com.baozun.nebula.payment.manager.PaymentManager;
+import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
-import com.baozun.nebula.sdk.command.EngineMemberCommand;
 import com.baozun.nebula.sdk.command.ExCodeProp;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.ItemSkuCommand;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
+import com.baozun.nebula.sdk.command.PayInfoCommand;
 import com.baozun.nebula.sdk.command.PayNoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
+import com.baozun.nebula.utilities.integration.payment.PaymentResult;
+import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
+import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
 import com.baozun.nebula.web.command.OrderCommand;
 import com.baozun.nebula.web.command.PtsSalesOrderCommand;
+import com.feilong.core.Validator;
+import com.feilong.servlet.http.RequestUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
 
 /**
  * @author qiang.yang
@@ -76,6 +89,8 @@ import loxia.dao.Sort;
 @Transactional
 @Service
 public class SalesOrderManagerImpl implements SalesOrderManager{
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(SalesOrderManagerImpl.class);
 
 	@Autowired
 	private OrderManager			sdkOrderService;
@@ -115,12 +130,25 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 
 	@Autowired
 	private SdkItemManager			sdkItemManager;
+	
+	@Autowired
+    private PayManager          payManager;
+	
+	@Autowired
+	private SdkPaymentManager sdkPaymentManager;
+	
+	@Autowired
+    private PaymentManager              paymentManager;
 
 	private static final String		BACK_ITEM_LIST_CART_TRIGGER	= Constants.BACK_ITEM_LIST_CART_TRIGGER;
 
 	private static final String		ACTIVITY_RES				= Constants.ACTIVITY_RES;
+	
+	private static final String            USERPAYING                  = "USERPAYING";
 
-	private static final Integer	SUCCESS						= 1;
+	private static final String	SUCCESS						= "SUCCESS";
+	
+    private static final String         TRADE_SUCCESS               = "TRADE_SUCCESS";
 
 	/** 存物流状态 */
 	private Map<Integer, String>	logisticsStatusMap			= new HashMap<Integer, String>();
@@ -954,4 +982,99 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 		}
 		return false;
 	}
+
+    @Override
+    public boolean updateOrderFinancialStatus(String id){
+        SalesOrderCommand salesOrderCommand = sdkOrderService.findOrderById(Long.parseLong(id), 1);
+        if(Validator.isNullOrEmpty(salesOrderCommand)){
+            LOGGER.warn("订单不存在，订单ID：{}",id);
+            return false;
+        }
+        List<PayInfoCommand> payInfoList = salesOrderCommand.getPayInfo();
+        if(Validator.isNullOrEmpty(payInfoList)){
+            LOGGER.warn("订单无支付信息，订单编号：{}",salesOrderCommand.getCode());
+            return false;
+        }
+        //获取第一条支付信息，获取支付类型
+        PayInfoCommand payInfoCommand = payInfoList.get(0);
+        Integer payType = payInfoCommand.getPayType();
+        //重新封装salesOrderCommand查询支付状态
+        Map<String,Object> paraMap = new HashMap<>();
+        paraMap.put("orderId", salesOrderCommand.getId());
+        paraMap.put("payType", payType);
+        List<PayInfoLog> payInfoLogList = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+        if(Validator.isNullOrEmpty(payInfoLogList)){
+            LOGGER.warn("订单无支付日志，订单编号：{}",salesOrderCommand.getCode());
+            return false;
+        }
+        //获取订单第三方支付流水号与商城流水号（一个订单中的多个payinfo中的第三方支付流水号相同 故取以一个）
+        PayInfoLog payInfoLog = payInfoLogList.get(0);
+        String subOrdinate = payInfoLog.getSubOrdinate();
+        String thirdPayNo = payInfoLog.getThirdPayNo();
+        PayCode payCode = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
+        if(Validator.isNullOrEmpty(payCode)){
+            LOGGER.warn("订单无paycode，订单编号：{}",salesOrderCommand.getCode());
+            return false;
+        }else if(Validator.isNullOrEmpty(payCode.getPayType())){
+            LOGGER.info("订单未支付，直接返回，不进行更新财务状态。");
+            return true;
+        }
+        //以paycode中的支付方式为准
+        payType = payCode.getPayType();
+        if(payType.equals(ReservedPaymentType.WECHAT)){
+            salesOrderCommand.setCode(thirdPayNo);
+        }else{
+            salesOrderCommand.setCode(subOrdinate);
+        }
+        OnLinePaymentCancelCommand onLinePaymentCancelCommand = new OnLinePaymentCancelCommand(payType, null, "seller");
+        salesOrderCommand.setOnLinePaymentCancelCommand(onLinePaymentCancelCommand);
+        salesOrderCommand.setOnLinePaymentCommand(getOnLinePaymentCommand(salesOrderCommand));
+        // 调用第三方接口查询订单支付状态
+        PaymentResult paymentResult = paymentManager.getOrderInfo(salesOrderCommand);
+        if (payType.equals(ReservedPaymentType.WECHAT)){
+            /**
+             * 微信支付
+             */
+            // 去掉交易流水号前缀
+            if (subOrdinate.contains(WechatResponseKeyConstants.TRADE_TYPE_JSAPI)){
+                subOrdinate = subOrdinate.replaceFirst(WechatResponseKeyConstants.TRADE_TYPE_JSAPI, "");
+            }else{
+                subOrdinate = subOrdinate.replaceFirst(WechatResponseKeyConstants.TRADE_TYPE_NATIVE, "");
+            }
+            paymentResult.getPaymentStatusInformation().setOrderNo(subOrdinate);
+            if (!(SUCCESS.equals(paymentResult.getMessage()) || USERPAYING.equals(paymentResult.getMessage()))){
+                LOGGER.info("订单未支付，直接返回，不进行更新财务状态。");
+                return true;
+            }
+
+        }else if (payType.equals(ReservedPaymentType.ALIPAY)){
+            /**
+             * 支付宝支付
+             */
+            paymentResult.getPaymentStatusInformation().setOrderNo(subOrdinate);
+            if (!TRADE_SUCCESS.equals(paymentResult.getMessage())){
+                LOGGER.info("订单未支付，直接返回，不进行更新财务状态。");
+                return false;
+            }
+        }else if(payType.equals(ReservedPaymentType.UNIONPAY)){
+            /**
+             * 银联支付
+             */
+            if(!PaymentServiceStatus.SUCCESS.equals(paymentResult.getPaymentServiceSatus()) || !SUCCESS.equals(paymentResult.getMessage())){
+                LOGGER.info("订单未支付，直接返回，不进行更新财务状态。");
+                return false;
+            }
+        }
+        paymentResult.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
+        payManager.updatePayInfos(paymentResult, salesOrderCommand.getMemberName(), salesOrderCommand.getPayType(), false, null);
+        LOGGER.info("订单已支付，更新财务状态，返回true。");
+        return true;
+    }
+    
+    private OnLinePaymentCommand getOnLinePaymentCommand(SalesOrderCommand salesOrderCommand){
+        OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
+        onLinePaymentCommand.setCustomerIp(salesOrderCommand.getIp());
+        onLinePaymentCommand.setPayType(salesOrderCommand.getPayType());
+        return onLinePaymentCommand;
+    }
 }

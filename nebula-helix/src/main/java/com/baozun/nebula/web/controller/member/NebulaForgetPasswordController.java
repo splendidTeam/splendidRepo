@@ -222,9 +222,11 @@ public class NebulaForgetPasswordController extends BaseController{
 		if (StringUtils.isNotBlank(password) && StringUtils.isNotBlank(confirmPassword) && password.equals(confirmPassword)){
 			// 调用manager层的方法，重置密码
 			LOG.info("[The member try to reset password] {} [{}]", new Date());
+			LOG.info("重置密码，两次密码输入一致。");
 			boolean flag = memberPasswordManager.resetPassword(forgetPasswordForm, password);
 			if (flag){
 				LOG.info("[The member reset password success] {} [{}]", new Date());
+				LOG.info("重置密码，新密码保存成功。");
 				request.getSession().removeAttribute(TOKEN);
 				defaultReturnResult.setResult(true);
 			}

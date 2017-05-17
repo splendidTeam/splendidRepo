@@ -121,4 +121,11 @@ public interface SalesOrderManager extends BaseManager{
 	public Map<String, Object> findDynamicProperty(Long itemId);
 
 	public List<SkuCommand> findInventoryByItemId(Long itemId);
+
+	/**
+	 * 更新订单财务状态
+	 * @param id
+	 * @return
+	 */
+    public boolean updateOrderFinancialStatus(String id);
 }

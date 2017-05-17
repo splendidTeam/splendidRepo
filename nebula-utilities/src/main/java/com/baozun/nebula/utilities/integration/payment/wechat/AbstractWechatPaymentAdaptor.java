@@ -253,6 +253,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor {
 				if(responseMap.get(WechatResponseKeyConstants.SIGN).equals(resSign)){
 					result.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
 					result.setMessage(responseMap.get(WechatResponseKeyConstants.TRADE_STATE));
+					paymentServiceReturnCommand.setTotalFee(responseMap.get(WechatResponseKeyConstants.TOTAL_FEE));
 				}else{
 					result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
 					result.setMessage("sign not match");

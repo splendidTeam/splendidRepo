@@ -29,6 +29,9 @@ public class WechatResponseKeyConstants {
 
 	/** 交易状态 */
 	public static final String	TRADE_STATE		= "trade_state";
+	
+	/** 交易状态 */
+    public static final String  TOTAL_FEE     = "total_fee";
 
 	/** 商户交易号 */
 	public static final String	OUT_TRADE_NO	= "out_trade_no";

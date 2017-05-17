@@ -8,15 +8,24 @@ $j.extend(loxia.regional['zh-CN'],{
 	"LABEL_ORDER_LOGISTICS":"物流状态",
 	"LABEL_ORDER_FINANCIAL":"财务状态",
 	"LABEL_ORDER_QUANTITY":"总数量",
+	"LABEL_MEMBER_OPERATE":"操作",
 	"LABEL_ORDER_DISCOUNT":"折扣",
 	"LABEL_ORDER_TOTAL":"订单总金额",
 	"LABEL_ORDER_CREATETIME":"创建时间",
-	"LABEL_ORDER_REMARK":"备注"
+	"USER_CONFIRM_UPDATE_ORDERTYPE":"确认更新订单状态",
+    "USER_INFO_CONFIRM":"确认信息",
+	"LABEL_ORDER_REMARK":"备注",
+	"LABEL_ORDER_FINANCIAL_UPDATE":"订单状态更新",
+	"INFO_TITLE_DATA":"提示信息",
+    "INFO_UPDATE_SUCCESS":"更新成功",
+    "INFO_UPDATE_FAILURE":"更新失败"
 });
 
 var orderListUrl = base +'/order/orderList.json';
 
 var orderDetailUrl = base +'/order/orderDetail.htm';
+
+var updateOrderTypeUrl = base + '/order/updateOrderFinancialStatus.json';
 
 var guestCreateSalesOrderUrl = base +'/order/createOrder/guest.htm';
 var memberCreateSalesOrderUrl = base +'/order/createOrder/member.htm';
@@ -269,7 +278,11 @@ $j(document).ready(function() {
 		},	{
 			name:"remark",
 			label:nps.i18n("LABEL_ORDER_REMARK"),
-			width:"16%"
+			width:"10%"
+		},	{
+			label:nps.i18n("LABEL_ORDER_FINANCIAL_UPDATE"),
+			width:"16%",
+			template:"updateOrderFinancialStatus"
 		} ],
 		dataurl : orderListUrl
 	});
@@ -297,4 +310,29 @@ $j(document).ready(function() {
 		 window.location.href =manualCreateSalesOrderUrl;
 	 }); 
 	 
+	 //更新订单状态
+	 $j("#table1").on("click",".func-button.updateOrderType",function(){
+	        var curObject=$j(this);
+	        nps.confirm(nps.i18n("USER_INFO_CONFIRM"),nps.i18n("USER_CONFIRM_UPDATE_ORDERTYPE"), function(){
+
+	            var json={"id":curObject.attr("val")};
+
+	        	var _d = nps.syncXhr(updateOrderTypeUrl, json,{type: "GET"});
+	        	if(_d.isSuccess){
+	        		nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("INFO_UPDATE_SUCCESS"));
+	        		refreshData();
+	        	}
+	        	else{
+	        		nps.info(nps.i18n("INFO_UPDATE_FAILURE"),_d.message);
+	        	}
+	            	
+	        });
+	    });
+
+	    refreshData();
+	 
 });
+
+function updateOrderFinancialStatus(data, args, idx){  
+	return "<a href='javascript:void(0);' val='"+loxia.getObject("id", data)+"' class='func-button updateOrderType'>"+nps.i18n("LABEL_ORDER_FINANCIAL_UPDATE")+"</a>";
+}
