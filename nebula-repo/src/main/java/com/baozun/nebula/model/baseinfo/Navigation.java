@@ -132,6 +132,7 @@ public class Navigation extends BaseModel {
 	}
 
 	@Column(name = "NAME")
+    @Index(name = "IDX_NAVIGATION_NAME")
 	public String getName() {
 		return name;
 	}
@@ -150,6 +151,7 @@ public class Navigation extends BaseModel {
 	}
 
 	@Column(name = "PARAM")
+	@Index(name = "IDX_NAVIGATION_PARAM")
 	public Long getParam() {
 		return param;
 	}
@@ -196,6 +198,7 @@ public class Navigation extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+	@Index(name = "IDX_NAVIGATION_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}
@@ -214,6 +217,7 @@ public class Navigation extends BaseModel {
 	}
 
 	@Column(name = "OPEARTOR_ID")
+	@Index(name = "IDX_NAVIGATION_OPEARTOR_ID")
 	public Long getOpeartorId() {
 		return opeartorId;
 	}
@@ -231,8 +235,8 @@ public class Navigation extends BaseModel {
 		this.isNewWin = isNewWin;
 	}
 
-	@Index(name = "IDX_NAVIGATION_PARENT_ID")
 	@Column(name = "PARENT_ID")
+	@Index(name = "IDX_NAVIGATION_PARENT_ID")
 	public Long getParentId() {
 		return parentId;
 	}
@@ -242,6 +246,7 @@ public class Navigation extends BaseModel {
 	}
 
 	@Column(name="COLLECTION_ID")
+	@Index(name = "IDX_NAVIGATION_COLLECTION_ID")
 	public Long getCollectionId() {
 		return collectionId;
 	}

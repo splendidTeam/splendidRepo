@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_orderstatuslog")
+@Table(name = "T_SO_ORDERSTATUSLOG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class OrderStatusLog extends BaseModel{
 
@@ -100,6 +101,7 @@ public class OrderStatusLog extends BaseModel{
 	}
 
 	@Column(name = "OPERATOR_ID", length = 100)
+    @Index(name = "IDX_ORDERSTATUSLOG_OPERATOR_ID")
 	public String getOperatorId() {
 		return operatorId;
 	}
@@ -142,6 +144,7 @@ public class OrderStatusLog extends BaseModel{
 	}
 
 	@Column(name = "ORDER_ID")
+    @Index(name = "IDX_ORDERSTATUSLOG_ORDER_ID")
 	public Long getOrderId() {
 		return orderId;
 	}

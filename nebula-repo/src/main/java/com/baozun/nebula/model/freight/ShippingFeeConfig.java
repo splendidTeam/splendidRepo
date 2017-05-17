@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -114,6 +115,7 @@ public class ShippingFeeConfig extends BaseModel {
 	 * @return the shippingTemeplateId
 	 */
 	@Column(name="SHIPPING_TEMEPLATE_ID")
+    @Index(name = "IDX_SHIPPING_CONFIG_SHIPPING_TEMEPLATE_ID")
 	public Long getShippingTemeplateId() {
 		return shippingTemeplateId;
 	}
@@ -261,6 +263,7 @@ public class ShippingFeeConfig extends BaseModel {
 	}
 
 	@Column(name="DISTRIBUTION_MODE_ID")
+    @Index(name = "IDX_SHIPPING_CONFIG_DISTRIBUTION_MODE_ID")
 	public Long getDistributionModeId() {
 		return distributionModeId;
 	}
@@ -270,6 +273,7 @@ public class ShippingFeeConfig extends BaseModel {
 	}
 
 	@Column(name = "DEST_AREA_ID")
+    @Index(name = "IDX_SHIPPING_CONFIG_DEST_AREA_ID")
 	public String getDestAreaId() {
 		return destAreaId;
 	}

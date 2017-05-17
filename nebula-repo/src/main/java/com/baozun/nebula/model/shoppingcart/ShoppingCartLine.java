@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-26
  */
 @Entity
-@Table(name = "t_sc_shoppingcartline")
+@Table(name = "T_SC_SHOPPINGCARTLINE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ShoppingCartLine extends BaseModel{
 
@@ -134,6 +135,7 @@ public class ShoppingCartLine extends BaseModel{
      * @return the 商品id 其实是sku表中的id
      */
     @Column(name = "SKU_ID")
+    @Index(name = "IDX_SHOPPINGCARTLINE_SKU_ID")
     public Long getSkuId(){
         return skuId;
     }
@@ -174,6 +176,7 @@ public class ShoppingCartLine extends BaseModel{
      * @return the 商品条形码sku
      */
     @Column(name = "EXTENTION_CODE",length = 200)
+    @Index(name = "IDX_SHOPPINGCARTLINE_EXTENTION_CODE")
     public String getExtentionCode(){
         return extentionCode;
     }
@@ -194,6 +197,7 @@ public class ShoppingCartLine extends BaseModel{
      * @return the 会员id
      */
     @Column(name = "MEMBER_ID")
+    @Index(name = "IDX_SHOPPINGCARTLINE_MEMBER_ID")
     public Long getMemberId(){
         return memberId;
     }
@@ -254,6 +258,7 @@ public class ShoppingCartLine extends BaseModel{
      * @return the 店铺id *
      */
     @Column(name = "SHOP_ID")
+    @Index(name = "IDX_SHOPPINGCARTLINE_SHOP_ID")
     public Long getShopId(){
         return shopId;
     }
@@ -334,6 +339,8 @@ public class ShoppingCartLine extends BaseModel{
      * @return the itemId
      * @since 5.3.1
      */
+    @Column(name = "ITEMID")
+    @Index(name = "IDX_SHOPPINGCARTLINE_ITEMID")
     public Long getItemId(){
         return itemId;
     }
@@ -362,6 +369,7 @@ public class ShoppingCartLine extends BaseModel{
      * @since 5.3.1
      */
     @Column(name = "RELATED_ITEM_ID")
+    @Index(name = "IDX_SHOPPINGCARTLINE_RELATED_ITEM_ID")
     public Long getRelatedItemId(){
         return relatedItemId;
     }

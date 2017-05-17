@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -39,7 +40,7 @@ import com.baozun.nebula.model.BaseModel;
  * @date 2014年10月11日 下午2:50:22
  */
 @Entity
-@Table(name = "t_prm_priorityadjustgroup")
+@Table(name = "T_PRM_PRIORITYADJUSTGROUP")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionPriorityAdjustGroup extends BaseModel {
 
@@ -76,6 +77,7 @@ public class PromotionPriorityAdjustGroup extends BaseModel {
 	}
 
 	@Column(name = "ADJUSTID")
+    @Index(name = "IDX_PRIORITYADJUSTGROUP_ADJUSTID")
 	public Long getAdjustId() {
 		return adjustId;
 	}
@@ -85,6 +87,7 @@ public class PromotionPriorityAdjustGroup extends BaseModel {
 	}
 
 	@Column(name = "PROMOTIONID")
+	@Index(name = "IDX_PRIORITYADJUSTGROUP_PROMOTIONID")
 	public Long getPromotionId() {
 		return promotionId;
 	}

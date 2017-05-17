@@ -26,6 +26,8 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
+
 import com.baozun.nebula.model.BaseModel;
 
 /**   
@@ -35,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @version   
  */
 @Entity
-@Table(name = "t_pd_sku_inventory_change_log")
+@Table(name = "T_PD_SKU_INVENTORY_CHANGE_LOG")
 public class SkuInventoryChangeLog extends BaseModel {
 	
 	private static final long serialVersionUID = -6021721136859477051L;
@@ -110,6 +112,7 @@ public class SkuInventoryChangeLog extends BaseModel {
 	 * @return the extentionCode
 	 */
 	@Column(name = "EXTENTION_CODE")
+    @Index(name = "IDX_SKU_INVENTORY_CHANGE_LOG_EXTENTION_CODE")
 	public String getExtentionCode() {
 		return extentionCode;
 	}
@@ -140,6 +143,7 @@ public class SkuInventoryChangeLog extends BaseModel {
 	 * @return the type
 	 */
 	@Column(name = "TYPE")
+    @Index(name = "IDX_SKU_INVENTORY_CHANGE_LOG_TYPE")
 	public Integer getType() {
 		return type;
 	}

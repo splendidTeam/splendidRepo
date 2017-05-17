@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
+
 import com.baozun.nebula.model.BaseModel;
 
 @Entity
@@ -70,6 +72,7 @@ public class I18nLang extends BaseModel {
 	}
 
 	@Column(name = "DEFAULT_LANG")
+    @Index(name = "IDX_I18N_LANG_DEFAULT_LANG")
 	public Integer getDefaultlang() {
 		return defaultlang;
 	}
@@ -88,6 +91,7 @@ public class I18nLang extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_I18N_LANG_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}

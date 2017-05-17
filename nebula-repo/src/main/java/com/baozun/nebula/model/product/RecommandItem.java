@@ -132,6 +132,7 @@ public class RecommandItem extends BaseModel {
 	}
 
 	@Column(name = "TYPE")
+	@Index(name = "IDX_REC_ITEM_TYPE")
 	public Integer getType() {
 		return type;
 	}
@@ -141,6 +142,7 @@ public class RecommandItem extends BaseModel {
 	}
 
 	@Column(name = "PARAM")
+	@Index(name = "IDX_REC_ITEM_PARAM")
 	public Long getParam() {
 		return param;
 	}
@@ -206,6 +208,7 @@ public class RecommandItem extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_REC_ITEM_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}

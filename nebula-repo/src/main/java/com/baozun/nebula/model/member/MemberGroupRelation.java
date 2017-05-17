@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.model.member;
 
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,9 +24,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
-import org.hibernate.annotations.OptimisticLockType;
+import org.hibernate.annotations.Index;
 
 import com.baozun.nebula.model.BaseModel;
 
@@ -75,6 +73,7 @@ public class MemberGroupRelation extends BaseModel {
 	}
 	
 	@Column(name = "MEMBER_ID")
+    @Index(name = "IDX_MEMBER_GROUP_RELATION_MEMBER_ID")
 	public Long getMemberId() {
 		return memberId;
 	}
@@ -84,6 +83,7 @@ public class MemberGroupRelation extends BaseModel {
 	}
 
 	@Column(name = "GROUP_ID")
+    @Index(name = "IDX_MEMBER_GROUP_RELATION_GROUP_ID")
 	public Long getGroupId() {
 		return groupId;
 	}

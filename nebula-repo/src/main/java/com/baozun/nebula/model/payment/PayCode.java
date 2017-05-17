@@ -27,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -39,7 +40,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_paycode")
+@Table(name = "T_SO_PAYCODE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PayCode extends BaseModel{
 
@@ -107,6 +108,7 @@ public class PayCode extends BaseModel{
 	}
 
 	@Column(name = "PAY_TYPE")
+    @Index(name = "IDX_PAYCODE_PAY_TYPE")
 	public Integer getPayType() {
 		return payType;
 	}
@@ -121,23 +123,21 @@ public class PayCode extends BaseModel{
 		return modifyTime;
 	}
 
-
 	public void setModifyTime(Date modifyTime) {
 		this.modifyTime = modifyTime;
 	}
-
 
 	@Column(name = "VERSION")
 	public Date getVersion() {
 		return version;
 	}
 
-
 	public void setVersion(Date version) {
 		this.version = version;
 	}
 
 	@Column(name = "PAY_SUCCESS_STATUS")
+    @Index(name = "IDX_PAYCODE_PAY_SUCCESS_STATUS")
 	public Boolean getPaySuccessStatus() {
 		return paySuccessStatus;
 	}
@@ -147,6 +147,7 @@ public class PayCode extends BaseModel{
 	}
 
 	@Column(name = "SUB_ORDINATE")
+    @Index(name = "IDX_PAYCODE_SUB_ORDINATE")
 	public String getSubOrdinate() {
 		return subOrdinate;
 	}

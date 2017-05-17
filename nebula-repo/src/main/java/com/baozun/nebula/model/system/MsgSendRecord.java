@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -88,6 +89,7 @@ public class MsgSendRecord extends BaseModel {
 	}
 
 	@Column(name = "IF_IDENTIFY",length = 50)
+    @Index(name = "IDX_MSG_SEND_RECORD_IF_IDENTIFY")
 	public String getIfIdentify() {
 		return ifIdentify;
 	}
@@ -97,6 +99,7 @@ public class MsgSendRecord extends BaseModel {
 	}
 
 	@Column(name = "TARGET_ID")
+    @Index(name = "IDX_MSG_SEND_RECORD_TARGET_ID")
 	public Long getTargetId() {
 		return targetId;
 	}

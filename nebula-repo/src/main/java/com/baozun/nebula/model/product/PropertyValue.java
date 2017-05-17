@@ -39,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_property_value")
+@Table(name = "T_PD_PROPERTY_VALUE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PropertyValue extends BaseModel implements Command{
 
@@ -149,7 +149,7 @@ public class PropertyValue extends BaseModel implements Command{
 	 * 
 	 * @return the parent
 	 */
-	@Index(name = "IDX_PROPERTY_ID")
+	@Index(name = "IDX_PROPERTY_VALUE_PROPERTY_ID")
 	@Column(name = "PROPERTY_ID")
 	public Long getPropertyId(){
 		return propertyId;

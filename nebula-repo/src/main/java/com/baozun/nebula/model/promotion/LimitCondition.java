@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_sc_limit_condition")
+@Table(name = "T_SC_LIMIT_CONDITION")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class LimitCondition extends BaseModel {
 
@@ -73,6 +74,7 @@ public class LimitCondition extends BaseModel {
 	}
 
 	@Column(name = "LIMIT_ID")
+    @Index(name = "IDX_LIMIT_CONDITION_LIMIT_ID")
 	public Long getLimitId() {
 		return limitId;
 	}

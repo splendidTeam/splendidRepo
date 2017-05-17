@@ -1,6 +1,5 @@
 package com.baozun.nebula.model.coupon;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -11,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -86,6 +86,7 @@ public class CouponType extends BaseModel{
 	}
 	
 	@Column(name="NAME")
+    @Index(name = "IDX_ACT_CARD_TYPE_NAME")
 	public String getName() {
 		return name;
 	}

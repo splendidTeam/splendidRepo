@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_prm_promotionhead")
+@Table(name = "T_PRM_PROMOTIONHEAD")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionHead extends BaseModel {
 
@@ -177,6 +178,7 @@ public class PromotionHead extends BaseModel {
 	}
 
 	@Column(name = "CREATE_ID")
+    @Index(name = "IDX_PROMOTIONHEAD_CREATE_ID")
 	public Long getCreateId() {
 		return createId;
 	}
@@ -195,6 +197,7 @@ public class PromotionHead extends BaseModel {
 	}
 
 	@Column(name = "LAST_UPDATE_ID")
+    @Index(name = "IDX_PROMOTIONHEAD_LAST_UPDATE_ID")
 	public Long getLastUpdateId() {
 		return lastUpdateId;
 	}
@@ -213,6 +216,7 @@ public class PromotionHead extends BaseModel {
 	}
 
 	@Column(name = "PUBLISH_ID")
+    @Index(name = "IDX_PROMOTIONHEAD_PUBLISH_ID")
 	public Long getPublishId() {
 		return publishId;
 	}
@@ -231,6 +235,7 @@ public class PromotionHead extends BaseModel {
 	}
 
 	@Column(name = "CANCEL_ID")
+    @Index(name = "IDX_PROMOTIONHEAD_CANCEL_ID")
 	public Long getCancelId() {
 		return cancelId;
 	}
@@ -240,6 +245,7 @@ public class PromotionHead extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_PROMOTIONHEAD_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}
@@ -268,6 +274,7 @@ public class PromotionHead extends BaseModel {
 	}
 
 	@Column(name = "SHOP_ID")
+    @Index(name = "IDX_PROMOTIONHEAD_SHOP_ID")
 	public Long getShopId() {
 		return shopId;
 	}

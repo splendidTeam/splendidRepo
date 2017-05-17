@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -55,6 +56,7 @@ public class CustomizeFilterClass extends BaseModel{
 	}
 
 	@Column(name = "SCOPE_TYPE")
+    @Index(name = "IDX_CUSTOMIZEFILTERCLASSES_SCOPE_TYPE")
 	public Integer getScopeType(){
 		return scopeType;
 	}
@@ -95,6 +97,7 @@ public class CustomizeFilterClass extends BaseModel{
 	}
 	
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_CUSTOMIZEFILTERCLASSES_LIFECYCLE")
 	public Integer getLifecycle(){
 		return lifecycle;
 	}
@@ -105,6 +108,7 @@ public class CustomizeFilterClass extends BaseModel{
 	}
 
 	@Column(name = "SHOP_ID")
+    @Index(name = "IDX_CUSTOMIZEFILTERCLASSES_SHOP_ID")
 	public Long getShopId(){
 		return shopId;
 	}

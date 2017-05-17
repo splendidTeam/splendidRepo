@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -107,6 +108,7 @@ public class InstationMessageTemplate extends BaseModel {
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_INSTATION_MESSAGE_TEMPLATE_TYPE")
 	public Integer getType() {
 		return type;
 	}

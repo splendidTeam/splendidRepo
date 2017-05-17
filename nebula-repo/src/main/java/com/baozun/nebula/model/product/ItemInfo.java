@@ -41,7 +41,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_iteminfo",uniqueConstraints = { @UniqueConstraint(columnNames = { "ITEM_ID" }) })
+@Table(name = "T_PD_ITEMINFO",uniqueConstraints = { @UniqueConstraint(columnNames = { "ITEM_ID" }) })
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemInfo extends BaseModel{
 
@@ -272,6 +272,7 @@ public class ItemInfo extends BaseModel{
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_ITEMINFO_TYPE")
 	public Integer getType(){
 		return type;
 	}
@@ -350,6 +351,7 @@ public class ItemInfo extends BaseModel{
 	}
 
 	@Column(name = "STYLE")
+    @Index(name = "IDX_ITEMINFO_STYLE")
 	public String getStyle() {
 		return style;
 	}

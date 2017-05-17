@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -79,6 +80,7 @@ public class TemeplateDistributionMode  extends BaseModel{
 	 * @return the shippingTemeplateId
 	 */
 	@Column(name="SHIPPING_TMP_ID")
+    @Index(name = "IDX_TEMEPLATE_DISTRIBUTION_MODE_SHIPPING_TMP_ID")
 	public Long getShippingTemeplateId() {
 		return shippingTemeplateId;
 	}
@@ -94,6 +96,7 @@ public class TemeplateDistributionMode  extends BaseModel{
 	 * @return the distributionModeId
 	 */
 	@Column(name="DISTRIBUTION_MODE_ID")
+    @Index(name = "IDX_TEMEPLATE_DISTRIBUTION_MODE_DISTRIBUTION_MODE_ID")
 	public Long getDistributionModeId() {
 		return distributionModeId;
 	}

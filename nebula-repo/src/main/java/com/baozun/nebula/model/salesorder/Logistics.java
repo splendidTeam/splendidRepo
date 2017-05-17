@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_logistics")
+@Table(name = "T_SO_LOGISTICS")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class Logistics extends BaseModel{
 
@@ -47,7 +48,7 @@ public class Logistics extends BaseModel{
 	private Long				id;
 	
 	/** 订单id */
-	private Long                         orderId;
+	private Long                orderId;
 	
 	/** 订单是否完成 */
 	private Boolean				isFinish;
@@ -76,6 +77,7 @@ public class Logistics extends BaseModel{
 	}
 	
 	@Column(name = "ORDER_ID")
+    @Index(name = "IDX_LOGISTICS_ORDER_ID")
 	public Long getOrderId() {
 		return orderId;
 	}
@@ -126,8 +128,4 @@ public class Logistics extends BaseModel{
 		this.version = version;
 	}
 
-	
-
-
-	
 }
