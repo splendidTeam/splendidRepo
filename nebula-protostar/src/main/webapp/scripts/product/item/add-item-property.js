@@ -516,11 +516,11 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 		$j("#jsonSku").val(JSON.stringify(skuInfoList));
 	} else {
 		var sku = skuList[0];
-		var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"
-			+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameSkuCode'  name='codesNameToReplace' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
-			+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
-			+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
-			+ "<td style='width:120px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
+		var proHtml = "<input type='hidden' name='skuId' value = 'idValueTOReplace' />"
+			+ "<td style='width:150px'><input type='text' mandatory='true' class = 'dynamicInputNameSkuCode' name='skuCode' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
+			+ "<td style='width:150px'><input type='text' id='salePrices' class = 'dynamicInputNameSalePrices' mandatory='true' name='skuSalePrice' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
+			+ "<td style='width:150px'><input type='text' id='listPrices' class = 'dynamicInputNameListPrices' name='skuListPrice' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
+			+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCode' loxiaType='input'  value='groupCode_value'/></td>";
 	
 		if (shippingPropertyIsNotRequired != "" && "1" == shippingPropertyIsNotRequired) {
 			proHtml+="<td style='width:120px'><input type='text' class = 'dynamicInputNameWeight'  name='weightNameToReplace' decimal='2' loxiaType='number'  value='weight_value'/></td>"
