@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.order.builder;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -131,7 +133,8 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
         orderBaseInfoSubViewCommand.setOrderId(salesOrderCommand.getId());
         orderBaseInfoSubViewCommand.setOrderCode(salesOrderCommand.getCode());
 
-        OrderViewStatus orderViewStatus = orderViewStatusBuilder.build(new OrderViewStatusParam(//
+        OrderViewStatusBuilder useOrderViewStatusBuilder = defaultIfNull(orderViewStatusBuilder, DefaultOrderViewStatusBuilder.INSTANCE);
+        OrderViewStatus orderViewStatus = useOrderViewStatusBuilder.build(new OrderViewStatusParam(//
                         salesOrderCommand.getLogisticsStatus(),
                         salesOrderCommand.getFinancialStatus(),
                         salesOrderCommand.getPayment(),
