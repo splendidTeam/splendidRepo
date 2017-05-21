@@ -21,13 +21,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.manager.salesorder.OrderLineManager;
+import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.OrderPromotionCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
@@ -42,6 +41,7 @@ import com.baozun.nebula.web.controller.order.viewcommand.LogisticsInfoSubViewCo
 import com.baozun.nebula.web.controller.order.viewcommand.OrderBaseInfoSubViewCommand;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderLineSubViewCommand;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.OrderViewStatus;
 import com.baozun.nebula.web.controller.order.viewcommand.PaymentInfoSubViewCommand;
 import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderLineSubViewCommand;
 import com.feilong.core.DatePattern;
@@ -50,6 +50,8 @@ import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.date.DateUtil;
 import com.feilong.core.util.CollectionsUtil;
 
+import static com.feilong.core.util.CollectionsUtil.find;
+
 /**
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
@@ -57,8 +59,6 @@ import com.feilong.core.util.CollectionsUtil;
  */
 @Component("orderViewCommandBuilder")
 public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOrderViewCommandBuilder.class);
 
     /** The logistics manager. */
     @Autowired
@@ -70,6 +70,10 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
     @Qualifier("OrderLineManager")
     private OrderLineManager orderLineManager;
 
+    /** 用来构造 OrderViewStatus */
+    @Autowired(required = false)
+    private OrderViewStatusBuilder orderViewStatusBuilder;
+
     /*
      * (non-Javadoc)
      * 
@@ -77,16 +81,14 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
      */
     @Override
     public OrderViewCommand build(SalesOrderCommand salesOrderCommand){
-        OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = buildOrderBaseInfoSubViewCommand(salesOrderCommand);
-
         OrderViewCommand orderViewCommand = new OrderViewCommand();
+        orderViewCommand.setOrderBaseInfoSubViewCommand(buildOrderBaseInfoSubViewCommand(salesOrderCommand));
         orderViewCommand.setConsigneeSubViewCommand(buildConsigneeSubViewCommand(salesOrderCommand));
         orderViewCommand.setCouponInfoSubViewCommand(buildCouponInfoSubViewCommand(salesOrderCommand));
         orderViewCommand.setInvoiceInfoSubViewCommand(buildInvoiceInfoSubViewCommand(salesOrderCommand));
         orderViewCommand.setLogisticsInfoSubViewCommand(buildLogisticsInfoSubViewCommand(salesOrderCommand));
-        orderViewCommand.setOrderBaseInfoSubViewCommand(orderBaseInfoSubViewCommand);
-        orderViewCommand.setPaymentInfoSubViewCommand(buildPaymentInfoSubViewCommand(salesOrderCommand, orderBaseInfoSubViewCommand));
         orderViewCommand.setOrderLineSubViewCommandList(buildOrderLineSubViewCommandlist(salesOrderCommand));
+        orderViewCommand.setPaymentInfoSubViewCommand(buildPaymentInfoSubViewCommand(salesOrderCommand));
         return orderViewCommand;
     }
 
@@ -128,7 +130,23 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
 
         orderBaseInfoSubViewCommand.setOrderId(salesOrderCommand.getId());
         orderBaseInfoSubViewCommand.setOrderCode(salesOrderCommand.getCode());
+
+        OrderViewStatus orderViewStatus = orderViewStatusBuilder.build(new OrderViewStatusParam(//
+                        salesOrderCommand.getLogisticsStatus(),
+                        salesOrderCommand.getFinancialStatus(),
+                        salesOrderCommand.getPayment(),
+                        isFullRated(salesOrderCommand)));
+
+        orderBaseInfoSubViewCommand.setOrderViewStatus(orderViewStatus);
+
         return orderBaseInfoSubViewCommand;
+    }
+
+    private boolean isFullRated(SalesOrderCommand salesOrderCommand){
+        List<OrderLineCommand> orderLines = salesOrderCommand.getOrderLines();
+        //评价状态是null 表示没有评价
+        //如果 找不到 null的,那么表示全部否评价了 
+        return null == find(orderLines, "evaluationStatus", null);//FIXME 这里看底层的实现是否正确
     }
 
     /**
@@ -165,11 +183,11 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
      * @param orderBaseInfoSubViewCommand
      * @return
      */
-    protected PaymentInfoSubViewCommand buildPaymentInfoSubViewCommand(SalesOrderCommand salesOrderCommand,OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand){
+    protected PaymentInfoSubViewCommand buildPaymentInfoSubViewCommand(SalesOrderCommand salesOrderCommand){
         // 支付信息
         PaymentInfoSubViewCommand paymentInfoSubViewCommand = new PaymentInfoSubViewCommand();
         PropertyUtil.copyProperties(paymentInfoSubViewCommand, salesOrderCommand, "payment");
-        if (orderBaseInfoSubViewCommand.getFinancialStatus() == 1){
+        if (salesOrderCommand.getFinancialStatus() == 1){
             paymentInfoSubViewCommand.setSubOrdinate(salesOrderCommand.getPayInfo().get(0).getSubOrdinate());
         }
         return paymentInfoSubViewCommand;
