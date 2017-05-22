@@ -214,6 +214,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                         "name",
                         "appointType",
                         "buyerName",
+                        "contactId",
                         "buyerTel");
 
         //地址名称
@@ -264,7 +265,6 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         calcFreightCommand.setCityId(salesOrderCommand.getCityId());
         calcFreightCommand.setCountyId(salesOrderCommand.getAreaId());
         calcFreightCommand.setTownId(salesOrderCommand.getTownId());
-
         calcFreightCommand.setDistributionModeId(buildDistributionModeId(salesOrderCommand));
 
         LOGGER.debug("calcFreightCommand is {}", JsonUtil.format(calcFreightCommand));

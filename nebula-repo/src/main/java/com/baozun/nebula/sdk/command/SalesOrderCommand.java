@@ -106,6 +106,9 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 镇id. */
     private Long                        townId;
+    
+    /** 收获地址id. */
+    private Long                        contactId;
 
     /** 地址. */
     private String                      address;
@@ -263,6 +266,7 @@ public class SalesOrderCommand extends BaseModel{
      * 
      * @deprecated 没有用到
      */
+    @Deprecated
     private String                      emailTemplete;
 
     /** 物流方式 *. */
@@ -377,6 +381,7 @@ public class SalesOrderCommand extends BaseModel{
      * @return the 邮件模板 *
      * @deprecated 没有用到
      */
+    @Deprecated
     public String getEmailTemplete(){
         return emailTemplete;
     }
@@ -388,6 +393,7 @@ public class SalesOrderCommand extends BaseModel{
      *            the new 邮件模板 *
      * @deprecated 没有用到
      */
+    @Deprecated
     public void setEmailTemplete(String emailTemplete){
         this.emailTemplete = emailTemplete;
     }
@@ -1682,6 +1688,16 @@ public class SalesOrderCommand extends BaseModel{
      */
     public void setLang(String lang){
         this.lang = lang;
+    }
+
+    
+    public Long getContactId(){
+        return contactId;
+    }
+
+    
+    public void setContactId(Long contactId){
+        this.contactId = contactId;
     }
 
 }

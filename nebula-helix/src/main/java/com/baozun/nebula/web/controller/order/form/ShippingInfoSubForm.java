@@ -60,6 +60,9 @@ public class ShippingInfoSubForm implements Serializable{
 
     /** 镇id. */
     private Long              townId;
+    
+    /** 物流方式id. */
+    private Long              contactId;
 
     //***************************************************************************
 
@@ -396,6 +399,16 @@ public class ShippingInfoSubForm implements Serializable{
      */
     public void setBuyerTel(String buyerTel){
         this.buyerTel = buyerTel;
+    }
+
+    
+    public Long getContactId(){
+        return contactId;
+    }
+
+    
+    public void setContactId(Long contactId){
+        this.contactId = contactId;
     }
 
 }

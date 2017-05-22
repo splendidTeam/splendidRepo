@@ -20,11 +20,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import com.baozun.nebula.command.MemberCommand;
-import com.baozun.nebula.command.MemberGroupRelationCommand;
-import com.baozun.nebula.command.member.SimpleMemberCombo;
-import com.baozun.nebula.model.member.Member;
-
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
@@ -32,6 +27,11 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
+
+import com.baozun.nebula.command.MemberCommand;
+import com.baozun.nebula.command.MemberGroupRelationCommand;
+import com.baozun.nebula.command.member.SimpleMemberCombo;
+import com.baozun.nebula.model.member.Member;
 
 /**
  * MemberDao
@@ -251,5 +251,7 @@ public interface MemberDao extends GenericEntityDao<Member, Long>{
 	 */
 	@NativeQuery(model = Member.class)
 	List<Member> findMembersByGroupId(@QueryParam("groupId") Long groupId);
+
+	
 }
 
