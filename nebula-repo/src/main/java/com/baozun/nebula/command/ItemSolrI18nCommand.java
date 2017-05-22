@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.command;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -81,6 +82,9 @@ public class ItemSolrI18nCommand extends BaseItemForSolrCommand {
 	private Integer salesCount;
 
 	private Integer favoredCount;
+	
+	/** 销售额 */
+	private Double salesVolume;
 
 	/**
 	 * 分组标记
@@ -302,4 +306,12 @@ public class ItemSolrI18nCommand extends BaseItemForSolrCommand {
 		this.dynamicSeoDescription = dynamicSeoDescription;
 	}
 
+	public Double getSalesVolume(){
+		return salesVolume;
+	}
+
+	public void setSalesVolume(Double salesVolume){
+		this.salesVolume = salesVolume;
+	}
+	
 }
