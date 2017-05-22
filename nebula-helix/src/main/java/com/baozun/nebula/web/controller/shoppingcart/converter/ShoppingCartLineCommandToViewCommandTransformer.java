@@ -32,6 +32,7 @@ import com.feilong.core.util.CollectionsUtil;
 import com.feilong.tools.slf4j.Slf4jUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toInteger;
 import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
@@ -58,6 +59,8 @@ public class ShoppingCartLineCommandToViewCommandTransformer implements Transfor
         shoppingCartLineSubViewCommand.setChecked(checked);
 
         shoppingCartLineSubViewCommand.setIsGift(shoppingCartLineCommand.isGift());
+        //since 5.3.2.16
+        shoppingCartLineSubViewCommand.setGroup(toInteger(shoppingCartLineCommand.getLineGroup()));
         shoppingCartLineSubViewCommand.setItemCode(shoppingCartLineCommand.getProductCode());
         shoppingCartLineSubViewCommand.setAddTime(shoppingCartLineCommand.getCreateTime());
         PropertyUtil.copyProperties(
