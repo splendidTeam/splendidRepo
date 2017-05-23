@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_returnorderapp")
+@Table(name = "T_SO_RETURNORDERAPP")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ReturnOrderApp extends BaseModel{
 
@@ -131,6 +132,7 @@ public class ReturnOrderApp extends BaseModel{
 
 
 	@Column(name = "ORDER_CODE")
+    @Index(name = "IDX_RETURNORDERAPP_ORDER_CODE")
 	public String getOrderCode() {
 		return orderCode;
 	}
@@ -142,6 +144,7 @@ public class ReturnOrderApp extends BaseModel{
 
 
 	@Column(name = "ORDER_LINE_ID")
+    @Index(name = "IDX_RETURNORDERAPP_ORDER_LINE_ID")
 	public Long getOrderLineId() {
 		return orderLineId;
 	}
@@ -152,6 +155,7 @@ public class ReturnOrderApp extends BaseModel{
 	}
 
 	@Column(name = "MEMBER_ID")
+    @Index(name = "IDX_RETURNORDERAPP_MEMBER_ID")
 	public Long getMemberId() {
 		return memberId;
 	}
@@ -262,6 +266,7 @@ public class ReturnOrderApp extends BaseModel{
 	}
 
 	@Column(name = "STATUS")
+    @Index(name = "IDX_RETURNORDERAPP_STATUS")
 	public Integer getStatus() {
 		return status;
 	}
@@ -272,6 +277,7 @@ public class ReturnOrderApp extends BaseModel{
 	}
 
 	@Column(name = "HANDLE_ID")
+    @Index(name = "IDX_RETURNORDERAPP_HANDLE_ID")
 	public Long getHandleId() {
 		return handleId;
 	}

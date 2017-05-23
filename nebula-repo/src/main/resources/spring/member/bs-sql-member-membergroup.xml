@@ -10,11 +10,6 @@
 				<![CDATA[  
 		       		select a.id as id,a.name as name from T_MEM_GROUP a
 		       			 where lifecycle =1
-		       			 
-		       			
-                   
-		       			
-		       		
                  ]]>
 			</value>
 		</constructor-arg>

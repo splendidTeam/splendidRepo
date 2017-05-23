@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -186,6 +187,7 @@ public class ItemProperties extends BaseModel{
 //	}
 
 	@Column(name = "ITEM_ID")
+    @Index(name = "IDX_ITEM_PROPERTIES_ITEM_ID")
 	public Long getItemId(){
 		return itemId;
 	}
@@ -195,6 +197,7 @@ public class ItemProperties extends BaseModel{
 	}
 
 	@Column(name = "PROPERTY_ID")
+    @Index(name = "IDX_ITEM_PROPERTIES_PROPERTY_ID")
 	public Long getPropertyId(){
 		return propertyId;
 	}
@@ -204,6 +207,7 @@ public class ItemProperties extends BaseModel{
 	}
 
 	@Column(name = "PROPERTYVALUE_ID")
+    @Index(name = "IDX_ITEM_PROPERTIES_PROPERTYVALUE_ID")
 	public Long getPropertyValueId(){
 		return propertyValueId;
 	}

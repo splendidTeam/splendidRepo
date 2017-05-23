@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * 
  */
 @Entity
-@Table(name = "t_sns_consultants_operationlog")
+@Table(name = "T_SNS_CONSULTANTS_OPERATIONLOG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ConsultantsOperationLog extends BaseModel {
 
@@ -74,6 +75,7 @@ public class ConsultantsOperationLog extends BaseModel {
 	 * @return the consultId
 	 */
 	@Column(name = "CONSULTID")
+    @Index(name = "IDX_SNS_CONSULTANTS_OPERATIONLOG_CONSULTID")
 	public Long getConsultId() {
 		return consultId;
 	}
@@ -122,6 +124,7 @@ public class ConsultantsOperationLog extends BaseModel {
 	 * @return the operatorId
 	 */
 	@Column(name = "OPERATORID")
+    @Index(name = "IDX_SNS_CONSULTANTS_OPERATIONLOG_OPERATORID")
 	public Long getOperatorId() {
 		return operatorId;
 	}

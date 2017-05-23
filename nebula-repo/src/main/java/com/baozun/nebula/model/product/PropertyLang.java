@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -34,7 +35,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author 何波
  */
 @Entity
-@Table(name = "t_pd_property_lang")
+@Table(name = "T_PD_PROPERTY_LANG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PropertyLang extends BaseModel {
 
@@ -121,6 +122,7 @@ public class PropertyLang extends BaseModel {
 		this.groupName = groupName;
 	}
 	@Column(name = "PROPERTY_ID")
+    @Index(name = "IDX_PROPERTY_LANG_PROPERTY_ID")
 	public Long getPropertyId() {
 		return propertyId;
 	}

@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -34,7 +35,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author 何波
  */
 @Entity
-@Table(name = "t_pd_item_image_lang")
+@Table(name = "T_PD_ITEM_IMAGE_LANG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemImageLang extends BaseModel {
 
@@ -62,6 +63,7 @@ public class ItemImageLang extends BaseModel {
 	private String lang;
 
 	@Column(name = "LANG")
+    @Index(name = "IDX_ITEM_IMAGE_LANG")
 	public String getLang() {
 		return lang;
 	}
@@ -92,6 +94,7 @@ public class ItemImageLang extends BaseModel {
 	}
 
 	@Column(name = "ITEM_IMAGE_ID")
+    @Index(name = "IDX_ITEM_IMAGE_ITEM_IMAGE_ID")
 	public Long getItemImageId() {
 		return itemImageId;
 	}

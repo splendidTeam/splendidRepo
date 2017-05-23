@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -73,6 +74,7 @@ public class DistributionMode  extends BaseModel{
 	 * @return the name
 	 */
 	@Column(name = "NAME",length=255)
+    @Index(name = "IDX_DISTRIBUTION_MODE_NAME")
 	public String getName() {
 		return name;
 	}

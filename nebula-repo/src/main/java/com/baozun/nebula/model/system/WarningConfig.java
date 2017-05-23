@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.command.Command;
@@ -134,6 +135,7 @@ public class WarningConfig extends BaseModel implements Command  {
 
 	
 	@Column(name = "CODE")
+    @Index(name = "IDX_WARNING_CONFIG_CODE")
 	public String getCode() {
 		return code;
 	}
@@ -150,8 +152,6 @@ public class WarningConfig extends BaseModel implements Command  {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	
 
 	@Column(name = "COUNT")
 	public Integer getCount() {
@@ -191,6 +191,7 @@ public class WarningConfig extends BaseModel implements Command  {
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_WARNING_CONFIG_TYPE")
 	public Integer getType() {
 		return type;
 	}
@@ -200,6 +201,7 @@ public class WarningConfig extends BaseModel implements Command  {
 	}
 
 	@Column(name = "TEMPLATE_CODE")
+    @Index(name = "IDX_WARNING_CONFIG_TEMPLATE_CODE")
 	public String getTemplateCode() {
 		return templateCode;
 	}
@@ -218,6 +220,7 @@ public class WarningConfig extends BaseModel implements Command  {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_WARNING_CONFIG_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}

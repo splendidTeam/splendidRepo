@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 /**
@@ -75,9 +76,8 @@ public class ShopProperty implements Serializable {
 		this.id = id;
 	}
 
-
-	
 	@Column(name = "SHOP_ID")
+    @Index(name = "IDX_SHOPPROPERTY_SHOP_ID")
 	public Long getShopId() {
 		return shopId;
 	}
@@ -87,6 +87,7 @@ public class ShopProperty implements Serializable {
 	}
 
 	@Column(name = "INDUSTRY_ID")
+    @Index(name = "IDX_SHOPPROPERTY_INDUSTRY_ID")
 	public Long getIndustryId() {
 		return industryId;
 	}
@@ -96,6 +97,7 @@ public class ShopProperty implements Serializable {
 	}
 
 	@Column(name = "PROPERTY_ID")
+    @Index(name = "IDX_SHOPPROPERTY_PROPERTY_ID")
 	public Long getPropertyId() {
 		return propertyId;
 	}
@@ -103,7 +105,5 @@ public class ShopProperty implements Serializable {
 	public void setPropertyId(Long propertyId) {
 		this.propertyId = propertyId;
 	}
-	
-	
 	
 }

@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -118,6 +119,7 @@ public class ItemRate extends BaseModel {
 	}
 
 	@Column(name = "MEMBER_ID")
+    @Index(name = "IDX_ITEM_RATE_MEMBER_ID")
 	public Long getMemberId() {
 		return memberId;
 	}
@@ -127,6 +129,7 @@ public class ItemRate extends BaseModel {
 	}
 
 	@Column(name = "ITEM_ID")
+    @Index(name = "IDX_ITEM_RATE_ITEM_ID")
 	public Long getItemId() {
 		return itemId;
 	}
@@ -136,6 +139,7 @@ public class ItemRate extends BaseModel {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_ITEM_RATE_LIFECYCLE")
 	public Long getLifecycle() {
 		return lifecycle;
 	}
@@ -145,6 +149,7 @@ public class ItemRate extends BaseModel {
 	}
 
 	@Column(name = "OPERATOR_ID")
+    @Index(name = "IDX_ITEM_RATE_OPERATOR_ID")
 	public Long getOperatorId() {
 		return operatorId;
 	}
@@ -154,6 +159,7 @@ public class ItemRate extends BaseModel {
 	}
 
 	@Column(name = "REPLIER_ID")
+    @Index(name = "IDX_ITEM_RATE_REPLIER_ID")
 	public Long getReplierId() {
 		return replierId;
 	}
@@ -208,6 +214,7 @@ public class ItemRate extends BaseModel {
 	}
 
 	@Column(name = "ORDER_LINE_ID")
+    @Index(name = "IDX_ITEM_RATE_ORDER_LINE_ID")
 	public Long getOrderLineId() {
 		return orderLineId;
 	}

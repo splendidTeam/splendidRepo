@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_sku")
+@Table(name = "T_PD_SKU")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class Sku extends BaseModel{
 
@@ -221,6 +222,7 @@ public class Sku extends BaseModel{
      * @return the 生命周期
      */
     @Column(name = "LIFECYCLE")
+    @Index(name = "IDX_SKU_LIFECYCLE")
     public Integer getLifecycle(){
         return lifecycle;
     }
@@ -231,6 +233,7 @@ public class Sku extends BaseModel{
      * @return the 所属商品
      */
     @Column(name = "ITEM_ID")
+    @Index(name = "IDX_SKU_ITEM_ID")
     public Long getItemId(){
         return itemId;
     }
@@ -291,6 +294,7 @@ public class Sku extends BaseModel{
      * @return the 外部编码
      */
     @Column(name = "OUT_ID")
+    @Index(name = "IDX_SKU_OUT_ID")
     public String getOutid(){
         return outid;
     }
@@ -356,6 +360,7 @@ public class Sku extends BaseModel{
      * @return the 1 商品已上架 0 商品未上架
      */
     @Column(name = "STATE")
+    @Index(name = "IDX_SKU_STATE")
     public String getState(){
         return state;
     }

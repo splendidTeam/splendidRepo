@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.sdk.command.shoppingcart;
 
+import static java.math.BigDecimal.ZERO;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +36,7 @@ import com.baozun.nebula.sdk.command.UserDetails;
 public class ShoppingCartCommand extends BaseModel{
 
     /** The Constant serialVersionUID. */
-    private static final long                serialVersionUID = 7847538393318014437L;
+    private static final long serialVersionUID = 7847538393318014437L;
 
     /**
      * The id.
@@ -42,52 +44,52 @@ public class ShoppingCartCommand extends BaseModel{
      * @deprecated 感觉没有被引用啊 by feilong 2016-05-14
      */
     @Deprecated
-    private Long                             id;
+    private Long id;
 
     /** 购物车行信息 *. */
-    private List<ShoppingCartLineCommand>    shoppingCartLineCommands;
+    private List<ShoppingCartLineCommand> shoppingCartLineCommands;
 
     /** 根据店铺封装shopCart对象. */
-    private Map<Long, ShoppingCartCommand>   shoppingCartByShopIdMap;
+    private Map<Long, ShoppingCartCommand> shoppingCartByShopIdMap;
 
     /** 基于店铺统计. */
-    private List<ShopCartCommandByShop>      summaryShopCartList;
+    private List<ShopCartCommandByShop> summaryShopCartList;
 
     //*****************************************************************************************************
 
     /** 应付金额 *. */
-    private BigDecimal                       originPayAmount;
+    private BigDecimal originPayAmount = ZERO;
 
     /** 应付运费 *. */
-    private BigDecimal                       originShoppingFee;
+    private BigDecimal originShoppingFee = ZERO;
 
     /** 实付运费 *. */
-    private BigDecimal                       currentShippingFee;
+    private BigDecimal currentShippingFee = ZERO;
 
     /** 实付金额 *. */
-    private BigDecimal                       currentPayAmount;
+    private BigDecimal currentPayAmount = ZERO;
 
     //*****************************************************************************************************
 
     /** 优惠券code *. */
-    private List<String>                     coupons;
+    private List<String> coupons;
 
     /** 优惠券code *. */
     private List<PromotionCouponCodeCommand> couponCodeCommands;
 
     /** 整单商品数量. */
-    private Integer                          orderQuantity;
+    private Integer orderQuantity;
 
     /** 购物车促销简介信息. */
-    private List<PromotionBrief>             cartPromotionBriefList;
+    private List<PromotionBrief> cartPromotionBriefList;
 
     //*****************************************************************************************************
 
     /** 当前时间 *. */
-    private Date                             currentTime;
+    private Date currentTime;
 
     /** 会员信息 *. */
-    private UserDetails                      userDetails;
+    private UserDetails userDetails;
 
     //*****************************************************************************************************
     /**
@@ -96,7 +98,7 @@ public class ShoppingCartCommand extends BaseModel{
      * @deprecated 没有用到
      */
     @Deprecated
-    private Boolean                          needPersistence;
+    private Boolean needPersistence;
 
     /**
      * 来自PTS配置的展示在购物车页的促销活动描述文字.
@@ -104,7 +106,7 @@ public class ShoppingCartCommand extends BaseModel{
      * @deprecated 没有用到
      */
     @Deprecated
-    private String                           promotionMsg;
+    private String promotionMsg;
 
     /**
      * 整单合计优惠金额（优惠券 + 促销活动等）.
@@ -112,7 +114,7 @@ public class ShoppingCartCommand extends BaseModel{
      * @deprecated 没有用到
      */
     @Deprecated
-    private BigDecimal                       couponPayAmount;
+    private BigDecimal couponPayAmount;
 
     //*****************************************************************************************************
 
@@ -122,7 +124,7 @@ public class ShoppingCartCommand extends BaseModel{
      * @deprecated 没有用到
      */
     @Deprecated
-    private BigDecimal                       points;
+    private BigDecimal points;
 
     /**
      * 会员可获得的积分.
@@ -130,7 +132,7 @@ public class ShoppingCartCommand extends BaseModel{
      * @deprecated 没有用到
      */
     @Deprecated
-    private BigDecimal                       earnPoints;
+    private BigDecimal earnPoints;
 
     /**
      * 获得 基于店铺统计.

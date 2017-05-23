@@ -2,8 +2,6 @@ package com.baozun.nebula.model.promotion;
 
 import java.util.List;
 
-import com.baozun.nebula.command.promotion.PromotionCommand;
-
 public class LinePromotionSize {
 	/**
 	 * 购物车行ID

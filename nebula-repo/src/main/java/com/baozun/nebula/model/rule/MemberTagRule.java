@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_mem_tag_rule")
+@Table(name = "T_MEM_TAG_RULE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class MemberTagRule extends BaseModel implements TagRule {
 
@@ -108,6 +109,7 @@ public class MemberTagRule extends BaseModel implements TagRule {
 	}
 	
 	@Column(name = "TYPE")
+    @Index(name = "IDX_MEM_TAG_RULE_TYPE")
 	public Integer getType() {
 		return type;
 	}
@@ -144,6 +146,7 @@ public class MemberTagRule extends BaseModel implements TagRule {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_MEM_TAG_RULE_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}
@@ -153,6 +156,7 @@ public class MemberTagRule extends BaseModel implements TagRule {
 	}
 
 	@Column(name = "CREATE_ID")
+    @Index(name = "IDX_MEM_TAG_RULE_CREATE_ID")
 	public Long getCreateId() {
 		return createId;
 	}

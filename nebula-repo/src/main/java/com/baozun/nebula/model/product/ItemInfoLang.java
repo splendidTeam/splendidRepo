@@ -25,6 +25,7 @@ import javax.persistence.Lob;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -34,7 +35,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author 何波
  */
 @Entity
-@Table(name = "t_pd_iteminfo_lang")
+@Table(name = "T_PD_ITEMINFO_LANG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemInfoLang extends BaseModel {
 
@@ -86,6 +87,7 @@ public class ItemInfoLang extends BaseModel {
 	
 	
 	@Column(name = "LANG")
+    @Index(name = "IDX_ITEMINFO_LANG_LANG")
 	public String getLang() {
 		return lang;
 	}
@@ -110,6 +112,7 @@ public class ItemInfoLang extends BaseModel {
 	}
 
 	@Column(name = "ITEM_INFO_ID")
+    @Index(name = "IDX_ITEMINFO_ITEM_INFO_ID")
 	public Long getItemInfoId() {
 		return itemInfoId;
 	}

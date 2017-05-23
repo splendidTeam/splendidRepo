@@ -27,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -134,6 +135,7 @@ public class PayInfoLog extends BaseModel{
 	
 	
 	@Column(name = "PAY_INFO_ID")
+    @Index(name = "IDX_PAYINFO_LOG_PAY_INFO_ID")
 	public Long getPayInfoId() {
 		return payInfoId;
 	}
@@ -145,6 +147,7 @@ public class PayInfoLog extends BaseModel{
 
 
 	@Column(name = "ORDER_ID")
+    @Index(name = "IDX_PAYINFO_LOG_ORDER_ID")
 	public Long getOrderId() {
 		return orderId;
 	}
@@ -175,6 +178,7 @@ public class PayInfoLog extends BaseModel{
 	}
 
 	@Column(name = "PAY_TYPE")
+    @Index(name = "IDX_PAYINFO_LOG_PAY_TYPE")
 	public Integer getPayType() {
 		return payType;
 	}
@@ -236,6 +240,7 @@ public class PayInfoLog extends BaseModel{
 	}
 
 	@Column(name = "PAY_SUCCESS_STATUS")
+    @Index(name = "IDX_PAYINFO_LOG_PAY_SUCCESS_STATUS")
 	public Boolean getPaySuccessStatus() {
 		return paySuccessStatus;
 	}
@@ -245,6 +250,7 @@ public class PayInfoLog extends BaseModel{
 	}
 
 	@Column(name = "SUB_ORDINATE")
+    @Index(name = "IDX_PAYINFO_LOG_PAY_SUB_ORDINATE")
 	public String getSubOrdinate() {
 		return subOrdinate;
 	}
@@ -273,6 +279,7 @@ public class PayInfoLog extends BaseModel{
 
 
 	@Column(name="CALL_CLOSE_STATUS")
+    @Index(name = "IDX_PAYINFO_LOG_PAY_CALL_CLOSE_STATUS")
 	public Boolean getCallCloseStatus() {
 		return callCloseStatus;
 	}

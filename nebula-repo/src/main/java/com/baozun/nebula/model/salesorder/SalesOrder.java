@@ -41,7 +41,7 @@ import com.baozun.nebula.model.BaseModel;
  */
 
 @Entity
-@Table(name = "t_so_salesorder")
+@Table(name = "T_SO_SALESORDER")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class SalesOrder extends BaseModel{
 
@@ -71,6 +71,8 @@ public class SalesOrder extends BaseModel{
 
     /** 15 交易完成. */
     public static final int    SALES_ORDER_STATUS_FINISHED                  = 15;
+    
+  //---------------------------------------------------------------------------------------
 
     // so finance status
     /** 财务状态:未收款 1. */
@@ -84,6 +86,8 @@ public class SalesOrder extends BaseModel{
 
     /** 财务状态:已部分收款4. */
     public static final int    SALES_ORDER_FISTATUS_PART_PAYMENT            = 4;
+    
+    //---------------------------------------------------------------------------------------
 
     /** 1 货到付款. */
     public static final String SO_PAYMENT_TYPE_COD                          = "1";
@@ -153,6 +157,8 @@ public class SalesOrder extends BaseModel{
 	
 	/** 131 支付宝-国际卡 */
 	public static final String	SO_PAYMENT_TYPE_INTERNATIONALCARD		    = "131";
+	
+	   // -----------------------------------------------------------------
 
     /** 商城正常下单. */
     public static final int    SO_SOURCE_NORMAL                             = 1;
@@ -162,6 +168,8 @@ public class SalesOrder extends BaseModel{
 
     /** 手机端正常下单. */
     public static final int    SO_SOURCE_MOBILE_NORMAL                      = 3;
+    
+    // -----------------------------------------------------------------
 
     /** 订单类型 1-普通订单. */
     public static final int    NORMAL_ORDER                                 = 1;
@@ -174,6 +182,8 @@ public class SalesOrder extends BaseModel{
 
     /** 支付类型 2-分阶段付款. */
     public static final int    Phased_Payment                               = 2;
+    
+    // -----------------------------------------------------------------
 
     /** COD收款类型：现金. */
     public static final int    COD_TYPE_CASH                                = 1;
@@ -337,6 +347,7 @@ public class SalesOrder extends BaseModel{
      * @return the 订单号
      */
     @Column(name = "CODE",length = 50)
+    @Index(name = "IDX_SALESORDER_CODE")
     public String getCode(){
         return code;
     }
@@ -377,6 +388,7 @@ public class SalesOrder extends BaseModel{
      * @return the 会员id
      */
     @Column(name = "MEMBER_ID")
+    @Index(name = "IDX_SALESORDER_MEMBER_ID")
     public Long getMemberId(){
         return memberId;
     }
@@ -397,6 +409,7 @@ public class SalesOrder extends BaseModel{
      * @return the 店铺id
      */
     @Column(name = "SHOP_ID")
+    @Index(name = "IDX_SALESORDER_SHOP_ID")
     public Long getShopId(){
         return shopId;
     }
@@ -497,6 +510,7 @@ public class SalesOrder extends BaseModel{
      * @return the 物流状态
      */
     @Column(name = "LOGISTICS_STATUS")
+    @Index(name = "IDX_SALESORDER_LOGISTICS_STATUS")
     public Integer getLogisticsStatus(){
         return logisticsStatus;
     }
@@ -517,6 +531,7 @@ public class SalesOrder extends BaseModel{
      * @return the 财务状态
      */
     @Column(name = "FINANCIAL_STATUS")
+    @Index(name = "IDX_SALESORDER_FINANCIAL_STATUS")
     public Integer getFinancialStatus(){
         return financialStatus;
     }
@@ -537,6 +552,7 @@ public class SalesOrder extends BaseModel{
      * @return the 支付方式
      */
     @Column(name = "PAYMENT")
+    @Index(name = "IDX_SALESORDER_PAYMENT")
     public Integer getPayment(){
         return payment;
     }

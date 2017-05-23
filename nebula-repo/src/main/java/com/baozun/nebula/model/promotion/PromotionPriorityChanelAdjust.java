@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_prm_promotionprioritychaneladjust")
+@Table(name = "T_PRM_PROMOTIONPRIORITYCHANELADJUST")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionPriorityChanelAdjust extends BaseModel {
 
@@ -80,6 +81,7 @@ public class PromotionPriorityChanelAdjust extends BaseModel {
 	}
 
 	@Column(name = "CHANEL_ID")
+    @Index(name = "IDX_PROMOTIONPRIORITYCHANELADJUST_CHANEL_ID")
 	public Long getChanelId() {
 		return chanelId;
 	}
@@ -89,6 +91,7 @@ public class PromotionPriorityChanelAdjust extends BaseModel {
 	}
 
 	@Column(name = "PROMOTION_ID")
+    @Index(name = "IDX_PROMOTIONPRIORITYCHANELADJUST_PROMOTION_ID")
 	public Long getPromotionId() {
 		return promotionId;
 	}
@@ -116,6 +119,7 @@ public class PromotionPriorityChanelAdjust extends BaseModel {
 	}
 
 	@Column(name = "LAST_UPDATE_ID")
+    @Index(name = "IDX_PROMOTIONPRIORITYCHANELADJUST_LAST_UPDATE_ID")
 	public Long getLastUpdateId() {
 		return lastUpdateId;
 	}

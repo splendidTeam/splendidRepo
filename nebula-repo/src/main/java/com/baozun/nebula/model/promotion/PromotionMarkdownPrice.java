@@ -10,12 +10,13 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
 
 @Entity
-@Table(name = "t_prm_promotionmarkdownprice")
+@Table(name = "T_PRM_PROMOTIONMARKDOWNPRICE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionMarkdownPrice  extends BaseModel {
 	/**
@@ -61,6 +62,7 @@ public class PromotionMarkdownPrice  extends BaseModel {
 		this.id = id;
 	}
 	@Column(name = "SHOP_ID")
+    @Index(name = "IDX_PROMOTIONMARKDOWNPRICE_SHOP_ID")
 	public Long getShopId() {
 		return shopId;
 	}
@@ -69,6 +71,7 @@ public class PromotionMarkdownPrice  extends BaseModel {
 		this.shopId = shopId;
 	}
 	@Column(name = "ITEM_ID")
+    @Index(name = "IDX_PROMOTIONMARKDOWNPRICE_ITEM_ID")
 	public Long getItemId() {
 		return itemId;
 	}
@@ -77,6 +80,7 @@ public class PromotionMarkdownPrice  extends BaseModel {
 		this.itemId = itemId;
 	}
 	@Column(name = "SKU_ID")
+    @Index(name = "IDX_PROMOTIONMARKDOWNPRICE_SKU_ID")
 	public Long getSkuId() {
 		return skuId;
 	}
@@ -93,6 +97,7 @@ public class PromotionMarkdownPrice  extends BaseModel {
 		this.markDownPrice = markDownPrice;
 	}
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_PROMOTIONMARKDOWNPRICE_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}

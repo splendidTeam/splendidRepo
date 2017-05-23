@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -73,6 +74,7 @@ public class OfflineStore extends BaseModel{
 	}
 
 	@Column(name = "NAME")
+    @Index(name = "IDX_STORE_OFFLINESTORE_NAME")
 	public String getName() {
 		return name;
 	}

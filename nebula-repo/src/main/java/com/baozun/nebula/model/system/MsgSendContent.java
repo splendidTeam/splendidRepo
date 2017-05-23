@@ -4,11 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -77,8 +74,5 @@ public class MsgSendContent extends BaseModel {
 	public void setVersion(Date version) {
 		this.version = version;
 	}
-	
-	
-	
 
 }

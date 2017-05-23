@@ -164,15 +164,13 @@ public class ItemSortScore extends BaseModel{
 		this.param = param;
 	}
 
-
-	
-
 	/**
 	 * Gets the 生命周期.
 	 * 
 	 * @return the 生命周期
 	 */
 	@Column(name = "LIFECYCLE")
+	@Index(name = "IDX_ITEM_SORT_SCORE_LIFECYCLE")
 	public Integer getLifecycle(){
 		return lifecycle;
 	}
@@ -203,6 +201,7 @@ public class ItemSortScore extends BaseModel{
 	}
 
 	@Column(name = "CATEGORY_ID")
+    @Index(name = "IDX_ITEM_SORT_SCORE_CATEGORY_ID")
 	public Long getCategoryId() {
 		return categoryId;
 	}
@@ -212,6 +211,7 @@ public class ItemSortScore extends BaseModel{
 	}
 
 	@Column(name = "PROPERTY_ID")
+    @Index(name = "IDX_ITEM_SORT_SCORE_PROPERTY_ID")
 	public Long getPropertyId() {
 		return propertyId;
 	}

@@ -29,6 +29,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -169,6 +170,7 @@ public class Member extends BaseModel{
 	}
 
 	@Column(name = "LOGIN_NAME",length = 255)
+    @Index(name = "IDX_MEMBER_LOGIN_NAME")
 	public String getLoginName(){
 		return loginName;
 	}
@@ -178,6 +180,7 @@ public class Member extends BaseModel{
 	}
 
 	@Column(name = "LOGIN_EMAIL",length = 255)
+    @Index(name = "IDX_MEMBER_LOGIN_EMAIL")
 	public String getLoginEmail(){
 		return loginEmail;
 	}
@@ -187,6 +190,7 @@ public class Member extends BaseModel{
 	}
 
 	@Column(name = "LOGIN_MOBILE",length = 255)
+    @Index(name = "IDX_MEMBER_LOGIN_MOBILE")
 	public String getLoginMobile(){
 		return loginMobile;
 	}
@@ -205,6 +209,7 @@ public class Member extends BaseModel{
 	}
 	
 	@Column(name = "PASSWORD",length = 255)
+    @Index(name = "IDX_MEMBER_PASSWORD")
 	public String getPassword(){
 		return password;
 	}
@@ -214,6 +219,7 @@ public class Member extends BaseModel{
 	}
 
 	@Column(name = "THIRD_PARTY_IDENTIFY",length = 512)
+    @Index(name = "IDX_MEMBER_THIRD_PARTY_IDENTIFY")
 	public String getThirdPartyIdentify(){
 		return thirdPartyIdentify;
 	}
@@ -232,6 +238,7 @@ public class Member extends BaseModel{
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_MEMBER_LIFECYCLE")
 	public Integer getLifecycle(){
 		return lifecycle;
 	}
@@ -304,7 +311,9 @@ public class Member extends BaseModel{
 	public void setOldPassword(String oldPassword){
 		this.oldPassword = oldPassword;
 	}
+	
 	@Column(name = "GROUP_ID")
+    @Index(name = "IDX_MEMBER_GROUP_ID")
 	public Long getGroupId() {
 		return groupId;
 	}

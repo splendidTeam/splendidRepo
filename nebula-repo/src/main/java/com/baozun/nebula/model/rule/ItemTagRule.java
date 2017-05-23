@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_pd_tag_rule")
+@Table(name = "T_PD_TAG_RULE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemTagRule extends BaseModel implements TagRule {
 
@@ -114,6 +115,7 @@ public class ItemTagRule extends BaseModel implements TagRule {
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_PD_TAG_RULE_TYPE")
 	public Integer getType() {
 		return type;
 	}
@@ -150,6 +152,7 @@ public class ItemTagRule extends BaseModel implements TagRule {
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_PD_TAG_RULE_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}
@@ -159,6 +162,7 @@ public class ItemTagRule extends BaseModel implements TagRule {
 	}
 
 	@Column(name = "CREATE_ID")
+    @Index(name = "IDX_PD_TAG_RULE_CREATE_ID")
 	public Long getCreateId() {
 		return createId;
 	}
@@ -177,6 +181,7 @@ public class ItemTagRule extends BaseModel implements TagRule {
 	}
 
 	@Column(name = "SHOP_ID")
+    @Index(name = "IDX_PD_TAG_RULE_SHOP_ID")
 	public Long getShopId() {
 		return shopId;
 	}

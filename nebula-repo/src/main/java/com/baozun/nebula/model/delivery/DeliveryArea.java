@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 /**
@@ -110,6 +112,7 @@ public class DeliveryArea extends BaseModel {
 	 * @return the area
 	 */
 	@Column(name = "AREA")
+    @Index(name = "IDX_DELIVERY_AREA_AREA")
 	public String getArea() {
 		return area;
 	}
@@ -126,6 +129,7 @@ public class DeliveryArea extends BaseModel {
 	 * @return the code
 	 */
 	@Column(name = "CODE")
+    @Index(name = "IDX_DELIVERY_AREA_CODE")
 	public String getCode() {
 		return code;
 	}
@@ -158,6 +162,7 @@ public class DeliveryArea extends BaseModel {
 	 * @return the parentId
 	 */
 	@Column(name = "PARENT_ID")
+    @Index(name = "IDX_DELIVERY_AREA_PARENT_ID")
 	public Long getParentId() {
 		return parentId;
 	}
@@ -238,6 +243,7 @@ public class DeliveryArea extends BaseModel {
 	 * @return the status
 	 */
 	@Column(name = "STATUS")
+    @Index(name = "IDX_DELIVERY_AREA_STATUS")
 	public Integer getStatus() {
 		return status;
 	}
@@ -254,6 +260,7 @@ public class DeliveryArea extends BaseModel {
 	 * @return the lang
 	 */
 	@Column(name = "LANG")
+    @Index(name = "IDX_DELIVERY_AREA_LANG")
 	public String getLang() {
 		return lang;
 	}

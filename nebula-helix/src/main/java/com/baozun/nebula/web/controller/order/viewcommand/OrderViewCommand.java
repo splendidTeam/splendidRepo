@@ -28,30 +28,31 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * @version 5.3.1 2016年5月6日 下午5:48:06
  * @see com.baozun.nebula.model.salesorder.SalesOrder
  * @see com.baozun.nebula.web.controller.order.form.OrderForm
+ * @see SimpleOrderViewCommand
  * @since 5.3.1
  */
 public class OrderViewCommand extends BaseViewCommand{
 
     /** The Constant serialVersionUID. */
-    private static final long             serialVersionUID = -290693655189583423L;
+    private static final long serialVersionUID = -290693655189583423L;
 
     /** 基本信息. */
-    private OrderBaseInfoSubViewCommand   orderBaseInfoSubViewCommand;
+    private OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand;
 
     /** 收获地址信息. */
-    private ConsigneeSubViewCommand       consigneeSubViewCommand;
+    private ConsigneeSubViewCommand consigneeSubViewCommand;
 
     /** 支付信息. */
-    private PaymentInfoSubViewCommand     paymentInfoSubViewCommand;
+    private PaymentInfoSubViewCommand paymentInfoSubViewCommand;
 
     /** 优惠券信息. */
-    private CouponInfoSubViewCommand      couponInfoSubViewCommand;
+    private CouponInfoSubViewCommand couponInfoSubViewCommand;
 
     /** 物流信息. */
-    private LogisticsInfoSubViewCommand   logisticsInfoSubViewCommand;
+    private LogisticsInfoSubViewCommand logisticsInfoSubViewCommand;
 
     /** 发票信息. */
-    private InvoiceInfoSubViewCommand     invoiceInfoSubViewCommand;
+    private InvoiceInfoSubViewCommand invoiceInfoSubViewCommand;
 
     /** 每个订单行. */
     private List<OrderLineSubViewCommand> orderLineSubViewCommandList;

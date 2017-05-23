@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -105,6 +106,7 @@ public class ItemTag extends BaseModel{
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_ITEMTAG_TYPE")
 	public Integer getType(){
 		return type;
 	}
@@ -124,6 +126,7 @@ public class ItemTag extends BaseModel{
 	 * @return the 生命周期
 	 */
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_ITEMTAG_LIFECYCLE")
 	public Integer getLifecycle(){
 		return lifecycle;
 	}

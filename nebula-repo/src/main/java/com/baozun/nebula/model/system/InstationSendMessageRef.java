@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -80,6 +81,7 @@ public class InstationSendMessageRef extends BaseModel {
 	}
 
 	@Column(name = "MEMBERID")
+    @Index(name = "IDX_INSTATION_SEND_MESSAGE_MEMBERID")
 	public Long getMemberid() {
 		return memberid;
 	}
@@ -89,6 +91,7 @@ public class InstationSendMessageRef extends BaseModel {
 	}
 
 	@Column(name = "MESSAGETEMPLATEID")
+    @Index(name = "IDX_INSTATION_SEND_MESSAGE_MESSAGETEMPLATEID")
 	public Long getMessageTemplateid() {
 		return MessageTemplateid;
 	}

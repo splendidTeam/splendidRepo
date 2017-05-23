@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -82,6 +83,7 @@ public class UserLoginLog extends BaseModel {
 		this.ip = ip;
 	}
 	@Column(name = "USER_ID", length = 50)
+    @Index(name = "IDX_USER_LOGIN_LOG_USER_ID")
 	public Long getUserId() {
 		return userId;
 	}
@@ -107,6 +109,7 @@ public class UserLoginLog extends BaseModel {
 	}
 	
 	@Column(name = "SESSION_ID")
+    @Index(name = "IDX_USER_LOGIN_LOG_SESSION_ID")
 	public String getSessionId() {
 		return sessionId;
 	}

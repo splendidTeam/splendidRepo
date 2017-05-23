@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -18,11 +19,16 @@ import com.baozun.nebula.model.BaseModel;
  *
  */
 @Entity
-@Table(name = "t_pd_item_reference")
+@Table(name = "T_PD_ITEM_REFERENCE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemReference extends BaseModel {
 
 	/**
+     * 
+     */
+    private static final long serialVersionUID = -4709102813646682984L;
+
+    /**
 	 * 
 	 */
 	private Long id;
@@ -51,6 +57,7 @@ public class ItemReference extends BaseModel {
 	}
 
 	@Column(name = "SEARCH_CONDITION_ITEM_ID")
+    @Index(name = "IDX_ITEM_REFERENCE_SEARCH_CONDITION_ITEM_ID")
 	public Long getSearchConditionItemId() {
 		return searchConditionItemId;
 	}
@@ -60,6 +67,7 @@ public class ItemReference extends BaseModel {
 	}
 
 	@Column(name = "ITEM_PROPERTY_ID")
+    @Index(name = "IDX_ITEM_REFERENCE_ITEM_PROPERTY_ID")
 	public Long getItemPropertyId() {
 		return itemPropertyId;
 	}

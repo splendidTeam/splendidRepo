@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -92,6 +93,7 @@ public class CouponSendUserLog extends BaseModel {
 	}
 
 	@Column(name = "MEMBERID")
+    @Index(name = "IDX_COUPON_LOG_MEMBERID")
 	public Long getMemberid() {
 		return memberid;
 	}
@@ -101,6 +103,7 @@ public class CouponSendUserLog extends BaseModel {
 	}
 
 	@Column(name = "PROMOTIONCOUPONCODEID")
+    @Index(name = "IDX_COUPON_LOG_PROMOTIONCOUPONCODEID")
 	public Long getPromotioncouponcodeid() {
 		return promotioncouponcodeid;
 	}
@@ -119,6 +122,7 @@ public class CouponSendUserLog extends BaseModel {
 	}
 
 	@Column(name = "PROMOTIONCOUPONID")
+    @Index(name = "IDX_COUPON_LOG_PROMOTIONCOUPONID")
 	public Long getPromotioncouponid() {
 		return promotioncouponid;
 	}

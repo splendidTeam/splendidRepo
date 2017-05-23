@@ -20,11 +20,16 @@ import com.baozun.nebula.model.BaseModel;
  *
  */
 @Entity
-@Table(name = "t_pd_sys_item_color")
+@Table(name = "T_PD_SYS_ITEM_COLOR")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class SystemItemColor extends BaseModel {
 
 	/**
+     * 
+     */
+    private static final long serialVersionUID = -7223525588174088503L;
+
+    /**
 	 * 颜色ID
 	 */
 	private Long id;
