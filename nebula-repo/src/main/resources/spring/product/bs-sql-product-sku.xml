@@ -356,5 +356,25 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="Sku.findAllOnSalesSkuListByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取有效的sku列表 lifecycle !=2</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tps.*
+					from t_pd_sku tps , t_pd_itemInfo tpii, t_pd_item tpi
+					where tpi.id = tpii.item_id and tpi.id = tps.item_id
+					and tpi.lifecycle != 2 and tps.lifecycle != 2 and tpii.item_id in(
+						#foreach( $id in $itemIds )
+	    					$id,
+						 #end
+			       		 -1)					
+					 order by tps.id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 
 </beans>

@@ -630,4 +630,9 @@ public class SdkItemManagerImpl implements SdkItemManager {
 	public Item findItemByExtentionCode(String extentionCode) {
 		return itemDao.findItemByExtentionCode(extentionCode);
 	}
+
+	@Override
+	public List<Sku> findAllOnSalesSkuListByItemIds(List<Long> itemIds){
+		return skuDao.findAllOnSalesSkuListByItemIds(itemIds);
+	}
 }

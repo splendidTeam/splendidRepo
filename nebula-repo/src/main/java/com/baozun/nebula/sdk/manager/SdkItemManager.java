@@ -417,5 +417,11 @@ public interface SdkItemManager extends BaseManager{
 	 */
 	public Item findItemByExtentionCode(String extentionCode);
 
+	/**
+	 * 根据itemids查询有效的sku列表 lifecycle !=2
+	 * @param itemIds
+	 * @return
+	 */
+	public List<Sku> findAllOnSalesSkuListByItemIds(List<Long> itemIds);
 	
 }

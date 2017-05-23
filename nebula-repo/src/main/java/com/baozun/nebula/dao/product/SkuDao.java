@@ -271,4 +271,12 @@ public interface SkuDao extends GenericEntityDao<Sku, Long>{
      */
     @NativeQuery(model = Sku.class)
     List<Sku> findSkuWithParaMap(@QueryParam Map<String, Object> paraMap);
+    
+    /**
+	 * 根据itemids查询有效的sku列表 lifecycle !=2
+	 * @param itemIds
+	 * @return
+	 */
+    @NativeQuery(model = Sku.class)
+	List<Sku> findAllOnSalesSkuListByItemIds(@QueryParam("itemIds") List<Long> itemIds);
 }
