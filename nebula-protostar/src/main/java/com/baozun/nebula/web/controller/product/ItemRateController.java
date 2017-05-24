@@ -27,6 +27,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,6 +73,12 @@ public class ItemRateController extends BaseController{
    	private ItemColorValueRefManager  itemColorValueRefManager;
     @Autowired
    	private  EmailTemplateManager emailTemplateManager;
+    
+    /**
+	 * 上传图片的域名
+	 */
+	@Value("#{meta['upload.img.domain.base']}")
+	private String UPLOAD_IMG_DOMAIN = "";
 
 	/**
 	 * 跳转到商品评价列表
@@ -80,6 +87,7 @@ public class ItemRateController extends BaseController{
 	 */
 	@RequestMapping(value = "/product/itemEvaluateListe.htm")
 	public String itemRateList(Model model) {
+		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
 		return "/product/item/item-evaluate";
 	}	
 

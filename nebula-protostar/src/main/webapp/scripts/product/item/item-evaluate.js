@@ -182,13 +182,16 @@ $j(document).ready(function() {
 			//添加--评论的图片
 			var itemImage = itemRate.img_names;
 			var imagename="";
-			if(itemImage != null && itemImage != undefined && itemImage.indexOf(":") > 0){		
+			if(itemImage != null && itemImage != undefined){	
 				var splitImagename=itemImage.split(":");
 				for(var i=0;i<splitImagename.length;i++){
-					imagename += "<img src='"+ imgbase + splitImagename +"' width=60 height=60/>";					
+					if (splitImagename[i] == '') {
+						break;
+					}
+					imagename += "<img src='"+ baseImageUrl + splitImagename[i] +"' width=60 height=60/>";					
 				}								
 			}else if(itemImage != ""){	
-				imagename += "<img src='" + imgbase + splitImagename +"' width=60 height=60/>";
+				imagename += "<span>无</span>";
 			}
 			
 			var detailsHtml ='<div class="ui-block-line">' +
