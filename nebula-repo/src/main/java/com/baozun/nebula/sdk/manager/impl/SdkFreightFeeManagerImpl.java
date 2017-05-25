@@ -31,6 +31,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
+import com.feilong.core.Validator;
 
 /**
  *
@@ -101,7 +102,8 @@ public class SdkFreightFeeManagerImpl implements SdkFreightFeeManager{
         ItemFreightInfoCommand itemFreightInfoCommand = new ItemFreightInfoCommand();
         itemFreightInfoCommand.setItemId(shoppingCartLineCommand.getItemId());
         itemFreightInfoCommand.setCount(shoppingCartLineCommand.getQuantity());
+        itemFreightInfoCommand.setVolume((Validator.isNotNullOrEmpty(shoppingCartLineCommand.getVolume()))?shoppingCartLineCommand.getVolume():0.0);
+        itemFreightInfoCommand.setWeight((Validator.isNotNullOrEmpty(shoppingCartLineCommand.getWeight()))?shoppingCartLineCommand.getWeight():0.0);
         return itemFreightInfoCommand;
     }
-
 }
