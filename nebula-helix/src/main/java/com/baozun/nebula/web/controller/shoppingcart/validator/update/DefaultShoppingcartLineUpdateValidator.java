@@ -109,14 +109,14 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
         //---------------------------------------------------------------------------------------
 
         //--操作行最新的sku id 如果没有变更那么值是原来的sku id,如果变更了那么是新的sku id
-        Long currentSkuId = defaultIfNull(shoppingCartLineUpdateSkuForm.getNewSkuId(), currentShoppingCartLineCommand.getSkuId());
+        Long targetSkuId = defaultIfNull(shoppingCartLineUpdateSkuForm.getNewSkuId(), currentShoppingCartLineCommand.getSkuId());
 
         //2.2 CommonValidator
-        Sku currentSku = sdkSkuManager.findSkuById(currentSkuId);
+        Sku targetSku = sdkSkuManager.findSkuById(targetSkuId);
 
         //订单行最终修改的全量数量(必填).
         Integer count = shoppingCartLineUpdateSkuForm.getCount();
-        ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(currentSku, count);
+        ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(targetSku, count);
         if (null != commonValidateShoppingcartResult){
             return commonValidateShoppingcartResult;
         }
@@ -125,7 +125,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
 
         //2.3 单行最大数量 校验
         ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
-        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, currentSkuId, count)){
+        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, count)){
             return ONE_LINE_MAX_THAN_COUNT;
         }
 
@@ -140,11 +140,11 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
 
         if (null == needCombinedShoppingCartLineCommand){
             //没有找到,那么更新当前行
-            updateCurrentShoppingCartLineCommand(currentShoppingCartLineCommand, shoppingCartLineUpdateSkuForm, currentSku);
+            updateCurrentShoppingCartLineCommand(currentShoppingCartLineCommand, shoppingCartLineUpdateSkuForm, targetSku);
         }else{
             int totalQuantity = needCombinedShoppingCartLineCommand.getQuantity() + count;
             //校验单行库存
-            if (shoppingcartLineUpdateValidatorConfig.getIsCheckSingleLineSkuInventory() && useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, currentSkuId, totalQuantity)){
+            if (shoppingcartLineUpdateValidatorConfig.getIsCheckSingleLineSkuInventory() && useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, totalQuantity)){
                 return ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
             }
             needCombinedShoppingCartLineCommand.setQuantity(totalQuantity);
@@ -156,7 +156,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
         //----------------------------------------------------
 
         //2.4 相同的sku库存校验
-        if (shoppingcartLineUpdateValidatorConfig.getIsCheckTotalLineSameSkuInventory() && shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, currentSkuId)){
+        if (shoppingcartLineUpdateValidatorConfig.getIsCheckTotalLineSameSkuInventory() && shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, targetSkuId)){
             return MAX_THAN_INVENTORY;
         }
 
