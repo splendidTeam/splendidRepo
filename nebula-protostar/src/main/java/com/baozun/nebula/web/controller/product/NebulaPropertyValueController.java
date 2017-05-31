@@ -487,10 +487,13 @@ public class NebulaPropertyValueController extends BaseController{
 			HSSFRow codeRow = null;
 			for (PropertyValue propertyValue : propertyValueList){
 				codeRow = sheet.createRow(i);
-
 				codeRow.createCell(0).setCellValue(propertyValue.getId());
-				codeRow.createCell(1).setCellValue(propertyValue.getValue());
-				codeRow.createCell(2).setCellValue(propertyValue.getSortNo());
+				codeRow.createCell(1).setCellValue(propertyValue.getValue());				
+				Integer sortNo = propertyValue.getSortNo();
+				if(Validator.isNullOrEmpty(sortNo)){
+				    sortNo=0;
+				}
+                codeRow.createCell(2).setCellValue(sortNo);
 
 				if (i18nOnOff){
 					if (propertyValueLangs != null){

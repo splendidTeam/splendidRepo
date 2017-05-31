@@ -152,7 +152,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
      */
     @Override
     public ShoppingcartResult doClearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
-        // TODO Auto-generated method stub
+        sdkShoppingCartDeleteManager.clearShoppingCart(memberDetails.getGroupId());
         return null;
     }
 }

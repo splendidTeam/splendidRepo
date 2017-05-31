@@ -47,6 +47,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  */
 abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
 
+    /**  */
     private static final long serialVersionUID = -8855859594846278253L;
 
     /** orderline行的唯一标识,那么此处的id={@link OrderLine#id}. */
@@ -94,6 +95,13 @@ abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
      * @since 5.3.1.8
      */
     private Integer type;
+
+    /**
+     * 分组号.
+     * 
+     * @since 5.3.2.15
+     */
+    private Integer groupId;
 
     //***********************价格信息*****************************************************
 
@@ -421,5 +429,26 @@ abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
      */
     public void setOrderLinePackageInfoViewCommandList(List<OrderLinePackageInfoViewCommand> orderLinePackageInfoViewCommandList){
         this.orderLinePackageInfoViewCommandList = orderLinePackageInfoViewCommandList;
+    }
+
+    /**
+     * 获得 分组号.
+     *
+     * @return the groupId
+     * @since 5.3.2.15
+     */
+    public Integer getGroupId(){
+        return groupId;
+    }
+
+    /**
+     * 设置 分组号.
+     *
+     * @param groupId
+     *            the groupId to set
+     * @since 5.3.2.15
+     */
+    public void setGroupId(Integer groupId){
+        this.groupId = groupId;
     }
 }
