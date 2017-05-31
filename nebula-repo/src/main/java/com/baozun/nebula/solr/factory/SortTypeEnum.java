@@ -42,16 +42,41 @@ public enum SortTypeEnum{
 			return new SolrOrderSort[] {new SolrOrderSort("sale_price", SolrOrderSort.DESC) };
 		}
 	},
-	/** 最近上架时间升序. */
-	ONSHELVESTIME_ASC("newest_asc"){
+	/** 
+	 * 最近上架时间升序. 
+	 *	@since Nebula5.3.2.14 
+	 **/
+	ONSHELVESTIME_ASC("onshelves_asc"){
+
+		public SolrOrderSort[] getSolrOrderSort(){
+			return new SolrOrderSort[] {new SolrOrderSort("listTime", SolrOrderSort.ASC) };
+		}
+	},
+	
+	/** 最近上架时间倒序. 
+	 * @since Nebula5.3.2.14
+	 */
+	ONSHELVESTIME_DESC("onshelves_desc"){
+
+		public SolrOrderSort[] getSolrOrderSort(){
+			return new SolrOrderSort[] {new SolrOrderSort("listTime", SolrOrderSort.DESC) };
+		}
+	},
+	
+	/** 最近更新商品时间升序  
+	 * @since Nebula5.3.2.14
+	 */
+	NEWEST_ASC("newest_asc"){
 
 		public SolrOrderSort[] getSolrOrderSort(){
 			return new SolrOrderSort[] {new SolrOrderSort("activeBeginTime", SolrOrderSort.ASC) };
 		}
 	},
 	
-	/** 最近上架时间倒序. */
-	ONSHELVESTIME_DESC("newest_desc"){
+	/** 最近更新商品时间倒序. 
+	 *@since Nebula5.3.2.14 
+	 */
+	NEWEST_DESC("newest_desc"){
 
 		public SolrOrderSort[] getSolrOrderSort(){
 			return new SolrOrderSort[] {new SolrOrderSort("activeBeginTime", SolrOrderSort.DESC) };
