@@ -49,6 +49,7 @@ import com.baozun.nebula.utilities.integration.payment.exception.PaymentExceptio
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
 import com.baozun.nebula.utilities.io.http.HttpMethodType;
 import com.feilong.core.Validator;
+import com.feilong.tools.slf4j.Slf4jUtil;
 
 public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
 
@@ -114,6 +115,28 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
     public PaymentResult getPaymentResult(HttpServletRequest request){
         PaymentResult paymentResult = new PaymentResult();
 
+        //--------------------------------------------------------------------------------------------------------
+
+        RequestToCommand requestToCommand = new RequestToCommand();
+
+        PaymentServiceReturnCommand paymentServiceReturnCommand = requestToCommand.alipaySynRequestToCommand(request);
+        paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);
+
+        //--------------------------------------------------------------------------------------------------------
+
+        //卖家支 付宝账 号        String(10 0)        卖家支付宝账号，可以是 Email 或手机号码。        可空
+        String sellerEmail = request.getParameter("seller_email");
+
+        //不是我们配置的seller_email
+        String configSellerEmail = configs.getProperty("param.seller_email");
+        if (!configSellerEmail.equals(sellerEmail)){
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+            paymentResult.setMessage(Slf4jUtil.format("get seller_email:[{}], not our config:[{}]", sellerEmail, configSellerEmail));
+            return paymentResult;
+        }
+
+        //--------------------------------------------------------------------------------------------------------
+
         // 返回函数进行加密比较
         if (isNotifyVerifySuccess(request.getParameter("notify_id"))){
             Map<String, String> responseMap = new HashMap<>();
@@ -130,10 +153,10 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
 
             if (sign.equals(localSign)){
 
-                String satus = request.getParameter("is_success").toString();
+                String satus = request.getParameter("is_success");
 
                 if (satus.equals("T")){
-                    String resultStr = request.getParameter("trade_status").toString();
+                    String resultStr = request.getParameter("trade_status");
                     getResult(resultStr, paymentResult);
 
                 }else if (satus.equals("F")){
@@ -153,16 +176,31 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         }
 
         //----------------------------------------------------------------------------------------------------------------------
-        RequestToCommand requestToCommand = new RequestToCommand();
 
-        PaymentServiceReturnCommand paymentServiceReturnCommand = requestToCommand.alipaySynRequestToCommand(request);
-        paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);
         return paymentResult;
     }
 
     @Override
     public PaymentResult getPaymentResultFromNotification(HttpServletRequest request){
         PaymentResult paymentResult = new PaymentResult();
+        RequestToCommand requestToCommand = new RequestToCommand();
+        PaymentServiceReturnCommand paymentServiceReturnCommand = requestToCommand.alipayAsyRequestToCommand(request);
+        paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);
+        //--------------------------------------------------------------------------------------------------------
+
+        //卖家支 付宝账 号        String(10 0)        卖家支付宝账号，可以是 Email 或手机号码。        可空
+        String sellerEmail = request.getParameter("seller_email");
+
+        //不是我们配置的seller_email
+        String configSellerEmail = configs.getProperty("param.seller_email");
+        if (!configSellerEmail.equals(sellerEmail)){
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+            paymentResult.setMessage(Slf4jUtil.format("get seller_email:[{}], not our config:[{}]", sellerEmail, configSellerEmail));
+            return paymentResult;
+        }
+
+        //--------------------------------------------------------------------------------------------------------
+
         if (isNotifyVerifySuccess(request.getParameter("notify_id"))){
 
             Map<String, String> responseMap = new HashMap<>();
@@ -190,9 +228,6 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             paymentResult.setResponseValue(RequestParam.ALIPAYFAIL);
         }
 
-        RequestToCommand requestToCommand = new RequestToCommand();
-        PaymentServiceReturnCommand paymentServiceReturnCommand = requestToCommand.alipayAsyRequestToCommand(request);
-        paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);
         return paymentResult;
     }
 
