@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.command.ReturnApplicationViewCommand;
+import com.baozun.nebula.command.ReturnLineViewCommand;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.manager.SoReturnApplicationManager;
 import com.baozun.nebula.manager.SoReturnLineManager;
@@ -32,7 +33,6 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.order.form.ReturnOderForm;
 import com.baozun.nebula.web.controller.order.resolver.ReturnApplicationResolver;
 import com.baozun.nebula.web.controller.order.validator.ReturnApplicationValidator;
-import com.baozun.nebula.web.controller.order.viewcommand.ReturnLineViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
@@ -182,8 +182,7 @@ public class NebulaOrderReturnController extends BaseController {
 			//如果orderIdList中只有一个元素，表示订单行归属于同一订单
 			if(orderIdList.size()==1){
 				if (Validator.isNotNullOrEmpty(orderLineIds)) {
-					List<ReturnLineViewCommand> soReturnLineViews = returnApplicationResolver
-							.toReturnLineViewCommand(orderLineIds);
+					List<ReturnLineViewCommand> soReturnLineViews =soReturnApplicationManager.findReturnLineViewCommandByLineIds(orderLineIds);
 					model.addAttribute("soReturnLineVo", soReturnLineViews);
 					return "return.return-line";
 				}

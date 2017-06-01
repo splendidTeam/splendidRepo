@@ -46,10 +46,10 @@ public interface SdkReturnApplicationDao extends GenericEntityDao<SoReturnApplic
 	
 	/**
 	 * 普通商品 退货 <br/>
-	 * 根据orderlineid和退货状态 统计 普通商品 （当前订单行） 对应的退货单行商品的数量
+	 * 根据orderlineid、退货状态、以及退换货类型 统计 普通商品 （当前订单行） 对应的退货单行商品的数量
 	 */
 	@NativeQuery(alias="qty",clazzes = Integer.class)
-	Integer countItemByOrderLineIdAndStatus(@QueryParam("orderLineId") Long orderLineId,@QueryParam("statusArr") Integer[] statusArr);
+	Integer countItemByOrderLineIdAndStatus(@QueryParam("orderLineId") Long orderLineId,@QueryParam("statusArr") Integer[] statusArr,@QueryParam("type") Integer type);
 	
 	/**
 	 * 根据退单ids查询SoReturnApplication

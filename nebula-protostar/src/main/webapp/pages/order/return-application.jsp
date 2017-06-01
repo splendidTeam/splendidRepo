@@ -50,7 +50,7 @@
 						<div class="myaccountcon-right">
 							<div class="return">
 								<div class="return-title float-clearfix">
-									<h3 class="float-left">我的订单</h3>
+									<h3 class="float-left">退换货详情</h3>
 									<p class="float-right"><a href="javascript:history.go(-1);"><i class="icon order-towards-left"></i> 返回订单详情</a></p>
 								</div>
 								<div class="return-main">
@@ -81,7 +81,44 @@
 													<div class="introduce">
 														<h3><a href="${page_base}/${lines.orderLineCommand.productCode}/item.htm">${lines.orderLineCommand.itemName }</a></h3>
 														<p>颜色: ${lines.orderLineCommand.skuPropertys[1].value}</p>
-														<p>尺码: ${lines.orderLineCommand.skuPropertys[0].value}</p>
+														<p>尺码: 
+															<!-- 退换货类型为退回 -->
+														  <c:if test="${type==1}">${lines.orderLineCommand.skuPropertys[0].value}</c:if>
+														  <!-- 退换货类型为换货 -->
+														  <c:if test="${type==2}">
+														  <div class="sub-menu tinyscrollbar evetn-tinyscrollbar-select">
+																	<div class="viewport pdp-size">
+																		<div class="overview">
+																			<ul>
+																				<!-- <li><a>请选择尺码</a></li> -->
+																					<c:if test="${fn:length(lines.chgSkuCommandList) >= 1}">
+																						<c:forEach var="sku" items="${lines。chgSkuCommandList}">
+																								<li class="selected" property="${sku.properties}"
+																									qty="${sku.availableQty}" extentionCode="${sku.extentionCode}"><a>${sku。orderLines.properties}<c:if
+																											test="${sku.availableQty <= 0 || empty sku.availableQty}">（无货）</c:if></a>
+																								</li>
+																						</c:forEach>
+												
+																					</c:if>
+																				<!-- <li><a>M</a></li> -->
+																			</ul>
+																		</div>
+																	</div>
+																	<div class="scrollbar">
+																		<div class="track">
+																			<div class="thumb">
+																				<div class="end"></div>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+														  </c:if>
+														  
+														 </p>
+														
+														
+														
+														
 														<p class="display-none-1">购买数量：${lines.orderLineCommand.count }
 														<span style="display: inline-block; float: right;color:#000;margin-right:20px;" ><span class="returnMoney">
 															￥<fmt:formatNumber type="number" value="${lines.orderLineCommand.subtotal/lines.orderLineCommand.count}" pattern="#,##0.00"/>
@@ -112,6 +149,9 @@
 																			</li>
 																			<li>
 																				<a>颜色/款式与商品描述不符</a>
+																			</li>
+																			<li>
+																				<a>其它原因</a>
 																			</li>
 																		</ul>
 																    </div>

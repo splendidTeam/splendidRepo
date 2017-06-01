@@ -41,15 +41,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.command.ReturnLineCommand;
+import com.baozun.nebula.command.ReturnLineViewCommand;
 import com.baozun.nebula.constant.SoReturnConstants;
+import com.baozun.nebula.dao.product.SkuDao;
+import com.baozun.nebula.manager.SoReturnApplicationDeliveryManager;
 import com.baozun.nebula.manager.SoReturnApplicationManager;
 import com.baozun.nebula.manager.SoReturnLineManager;
+import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
+import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.salesorder.SoReturnLine;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
@@ -58,7 +64,6 @@ import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.bind.QueryBeanParam;
-import com.baozun.nebula.web.command.SoReturnLineViewCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.salesorder.form.ReturnOderForm;
 
@@ -81,10 +86,16 @@ public class OrderReturnController extends BaseController {
 	private  SdkSkuManager sdkSkuManager;
 	
 	@Autowired
+	private SkuDao skuDao;
+	
+	@Autowired
 	private SdkOrderLineManager	sdkOrderLineManager;
 	
 	@Autowired
 	private SoReturnApplicationManager soReturnApplicationManager;
+	
+	@Autowired
+	private SoReturnApplicationDeliveryManager soReturnApplicationDeliveryManager;
 	
 	
 	/*public static String[] returnBank={"中国工商银行","中国农业银行","中国银行","中国建设银行","交通银行","中信银行","中国光大银行","华夏银行","中国民生银行","广发银行股份有限公司","平安银行","招商银行","兴业银行","上海浦东发展银行"};*/
@@ -138,6 +149,11 @@ public class OrderReturnController extends BaseController {
 		ids.add(id);
 		List<ReturnLineCommand> soLine = line.findSoReturnLinesByReturnOrderIds(ids);
 		SoReturnApplication app = soReturnApplicationManager.findByApplicationId(id);
+		//如果是换货，查询换货物流
+		if(SoReturnConstants.TYPE_EXCHANGE==app.getType()){
+			SoReturnApplicationDeliveryInfo returnDeliveryInfo=soReturnApplicationDeliveryManager.findDeliveryInfoByReturnId(app.getId());
+			model.addAttribute("deliveryInfo",returnDeliveryInfo);
+		}
 		model.addAttribute("SoReturnLine", soLine);
 		model.addAttribute("SoReturnApplication", app);
 		model.addAttribute("frontendBaseUrl", frontendBaseUrl);
@@ -460,7 +476,7 @@ public class OrderReturnController extends BaseController {
 	
 	// 通过订单code查询订单
 	@RequestMapping(value = "/order/findOrder.json")
-	public String returnOrder(@RequestParam(value = "code") String code, Model model) {
+	public String returnOrder(@RequestParam(value = "code") String code,@RequestParam(value = "type") int type, Model model) {
 			// 查询订单,订单code唯一，因此只需获取第一个元素即可
 			List <SalesOrderCommand> saleOrderList = orderManager.findOrderByMobileOrCode(null, code);
 			if(saleOrderList.size()<=0||saleOrderList==null){
@@ -484,7 +500,7 @@ public class OrderReturnController extends BaseController {
 			for (OrderLineCommand line : saleOrder.getOrderLines()) {
 				// 根据订单行查询退货单数量
 				num += soReturnApplicationManager
-						.countCompletedAppsByPrimaryLineId(line.getId());
+						.countCompletedAppsByPrimaryLineId(line.getId(), SoReturnConstants.TYPE_RETURN);
 			}
 			if (num >= saleOrder.getQuantity()){
 				model.addAttribute("errorMsg", "订单中无可退商品！");
@@ -503,34 +519,41 @@ public class OrderReturnController extends BaseController {
 				}
 			}
 			
-			for (OrderLineCommand line : saleOrder.getOrderLines()) {
-				String properties = line.getSaleProperty();
-				List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-				line.setSkuPropertys(propList);
-			}
-			for (OrderLineCommand line : saleOrder.getOrderLines()) {
-				String properties = line.getSaleProperty();
-				List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-				line.setSkuPropertys(propList);
-			}
-
 			List<OrderLineCommand> saleOrderLine = saleOrder.getOrderLines();
-			List<SoReturnLineViewCommand> soReturnLineVoList = new ArrayList<SoReturnLineViewCommand>();
+			List<ReturnLineViewCommand> soReturnLineVoList = new ArrayList<ReturnLineViewCommand>();
 			for (OrderLineCommand line : saleOrderLine) {
-				SoReturnLineViewCommand lineVo = new SoReturnLineViewCommand();
+				String properties = line.getSaleProperty();
+				List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
+				line.setSkuPropertys(propList);
+				
+				String size=propList.get(0).getValue();
+				ReturnLineViewCommand lineVo = new ReturnLineViewCommand();
 				if (null != line.getType() && line.getType() != 0) {
+					Long itemId=line.getItemId();
+					//通过itemId查询同款商品的其他尺码
+					List<Sku> skuList=skuDao.findSkuByItemId(itemId);
+					List<SkuCommand> skuCommandList=new ArrayList<SkuCommand>();
+					for(Sku sku:skuList){
+						SkuCommand skuCommand=skuDao.findInventoryById(sku.getId());
+						skuCommand.setProperties(sdkSkuManager.getSkuPros(properties).get(0).getValue());
+						skuCommandList.add(skuCommand);
+					}
+					lineVo.setChgSkuCommandList(skuCommandList);
 					// 查询 当前订单行 已经退过货的商品个数（退换货状态为已完成)
 					Integer count = soReturnApplicationManager
-							.countCompletedAppsByPrimaryLineId(line.getId());
+							.countCompletedAppsByPrimaryLineId(line.getId(),SoReturnConstants.TYPE_RETURN);
 					lineVo.setCount(count);
 					lineVo.setOrderLineCommand(line);
 					soReturnLineVoList.add(lineVo);
 				}
+				
+			
 			}
 
 			model.addAttribute("soReturnLineVo", soReturnLineVoList);
 
 			model.addAttribute("salesOrder", saleOrder);
+			model.addAttribute("type",type);
 			// 银联和cod（货到付款）
 		if (saleOrder.getPayment() == 1 || saleOrder.getPayment() == 320) {
 					model.addAttribute("isCod", true);
@@ -606,7 +629,7 @@ public class OrderReturnController extends BaseController {
 		for (OrderLineCommand line : saleOrder.getOrderLines()) {
 			// 根据订单行查询退货单数量
 			count += soReturnApplicationManager
-					.countCompletedAppsByPrimaryLineId(line.getId());
+					.countCompletedAppsByPrimaryLineId(line.getId(),SoReturnConstants.TYPE_RETURN);
 		}
 		// 如果原始订单中商品数量减去已退掉的商品数量小于本次需要退的商品数量，退货失败
 		if (saleOrder.getQuantity() - count < returnTotalNum) {

@@ -18,8 +18,13 @@ $j(document).ready(function() {
 
 	
 	$j(".search").live("click", function(){
-		loadOrderData();
+		loadOrderData(1);
 	});	
+	
+	$j(".search-change").live("click", function(){
+		loadOrderData(2);
+	});	
+	
 	
 
 		
@@ -89,11 +94,12 @@ function dialogunpay(){
 }
 
 var orderListUrl = base + "/order/findOrder.json";
-function loadOrderData(){
+function loadOrderData(type){
 	var code=$j('.code').val();
 		var json = {
-			"code" : code
-		};
+			"code" : code,
+			"type" :  type
+			};
 		nps.asyncXhrGet(orderListUrl, json, {
 			successHandler : function(data, textStatus) {
 				$j(".showReturn").html(data);

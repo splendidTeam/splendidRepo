@@ -11,14 +11,15 @@ import loxia.dao.Sort;
 import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.command.ReturnApplicationViewCommand;
+import com.baozun.nebula.command.ReturnLineViewCommand;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
 public interface SoReturnApplicationManager {
 
-	/** 查询 当前订单行 已经退过货的商品个数（退换货状态为已完成) <br/>
+	/** 查询 当前订单行 已经退换过货的商品个数（退换货状态为已完成) <br/>
 	 *  primaryLineId:orderlineid 或者packageOrderLineId*/
-	public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId);
+	public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId,Integer type);
 	
 	/** 根据orderLineId  查询退换货单(时间最近的一个) */
 	public SoReturnApplication findLastApplicationByOrderLineId(Long orderLineId);
@@ -68,6 +69,8 @@ public interface SoReturnApplicationManager {
 	 * @return
 	 */
 	public List<ReturnApplicationViewCommand> findReturnApplicationViewCommand(List<ReturnApplicationCommand> returnApplications);
+	
+	public  List<ReturnLineViewCommand> findReturnLineViewCommandByLineIds(List<Long> orderLineIds);
 	
 	
 	

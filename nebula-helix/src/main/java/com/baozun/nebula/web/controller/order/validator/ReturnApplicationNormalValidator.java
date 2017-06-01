@@ -42,7 +42,7 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 			errors.rejectValue("orderStatus", "order.status.unfinish");
 		}
 		
-		//检查退货数量书否超出可退数量限制
+		//检查退货数量是否超出可退数量限制
 		List<OrderLineCommand> lineCommandList = saleOrder.getOrderLines();
 		
 		String[] selectedLineId=form.getLineIdSelected();
@@ -52,10 +52,10 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 				Long selected=Long.parseLong(selectedLineId[i]);
 				if(line.getId().longValue()==selected.longValue()){
 					//通过订单行id查询该订单行已经完成的退货数量
-					Integer returnedCount=	soReturnApplicationManager.countCompletedAppsByPrimaryLineId(Long.parseLong(selectedLineId[i]));
+					Integer returnedCount=soReturnApplicationManager.countCompletedAppsByPrimaryLineId(Long.parseLong(selectedLineId[i]),SoReturnConstants.TYPE_RETURN);
 					Integer count=line.getCount();
 					if(count-Integer.parseInt(form.getSumSelected()[i])<returnedCount){
-						// 退货数量超出限制。
+						// 退换货数量超出限制。
 						errors.rejectValue("returnCount", "return.count.outrange");
 					
 					}

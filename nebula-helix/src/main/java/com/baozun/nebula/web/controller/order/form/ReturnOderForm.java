@@ -135,6 +135,7 @@ public class ReturnOderForm  extends BaseForm{
 	private String orderId;
 	private String orderCode;
 	private String memo;
+	private String[] chg_extentionCode;
 	/** 退货单退货原因*/
 	//属性名
 	private String retrunReason;
@@ -235,6 +236,15 @@ public class ReturnOderForm  extends BaseForm{
 
 	public void setRetrunReason(String retrunReason) {
 		this.retrunReason = retrunReason;
+	}
+	
+
+	public String[] getChg_extentionCode() {
+		return chg_extentionCode;
+	}
+
+	public void setChg_extentionCode(String[] chg_extentionCode) {
+		this.chg_extentionCode = chg_extentionCode;
 	}
 
 	public ReturnOderForm() {

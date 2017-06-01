@@ -125,7 +125,7 @@ em {
 			type="hidden" name="actualFreight" id="actualFreight" value="" />
 
 			<div class="ui-title1"><img
-				src="/images/wmi/blacks/32x32/cube.png">手工退单</div>
+				src="/images/wmi/blacks/32x32/cube.png">手工退换单</div>
 			<div class="ui-block">
 
 				<div id="second" style="display: block">
@@ -136,7 +136,8 @@ em {
 							<input type="text" loxiaType="input" id="ads_name" mandatory="true"  class="code" maxlength="25" />
 						</div>
 					</div>
-	      			  <input type="button" value="查询" title="手工下单"  class="search" /> 
+	      			  <input type="button" value="退货" title="手工下单"  class="search" /> 
+	      			    <input type="button" value="换货" title="手工下单"  class="search-change" /> 
 					<div class="showReturn"></div>
 					<div style="margin-top: 20px"></div>
 

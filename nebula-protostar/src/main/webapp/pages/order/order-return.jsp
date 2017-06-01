@@ -22,7 +22,7 @@
 		</div>
 	   <div class="ui-block">
 	   	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/users.png"><spring:message code="order.list"/>
-	        <input type="button" value="手工退货" title="手工下单"  class="button orange manualCreate" /> 
+	        <input type="button" value="手工退换货" title="手工下单"  class="button orange manualCreate" /> 
     </div>
 	    <form id="searchForm" action="/saleOrder/returnOrderList.json" >
 		    <div class="ui-block-content ui-block-content-lb">
@@ -72,7 +72,7 @@
 							   <select loxiatype="select" name="q_long_status" id="status" >
 							           <option value="">不限</option>
 						               <option value=0>待审核</option>
-						               <option value=1>拒绝退货</option>
+						               <option value=1>拒绝</option>
 						               <option value=2>退回中</option>
 						               <option value=3>退回中</option>
 						               <option value=4>同意退款</option>

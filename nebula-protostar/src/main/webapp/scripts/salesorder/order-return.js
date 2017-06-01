@@ -51,6 +51,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"STARTTIME_ENDTIME_ERROR" : "导出时，开始日期不能大于结束日期！",
 	"DATA_NULL":"在所选日期范围内，没有任何VIP数据导出!",
 	"EXPORT_DATE_LIMIT" : "导出时，最多只能导出一个月的数据！",
+	"OMS_CONFIRM":"oms退货入库",
 	"NULL_RETURNADDRESS":"退货地址不能为空"
 	
 });
@@ -291,6 +292,9 @@ function status(data, args, idx){
 	}
 	if(status==5){
 		return nps.i18n("OPERATOR_FINISH");
+	}
+	if(status==7){
+		return nps.i18n("OMS_CONFIRM");
 	}
 }
 

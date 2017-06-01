@@ -19,16 +19,21 @@ import org.springframework.util.Assert;
 import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.command.ReturnApplicationViewCommand;
+import com.baozun.nebula.command.ReturnLineViewCommand;
 import com.baozun.nebula.constant.SoReturnConstants;
+import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderDao;
+import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.dao.salesorder.SdkReturnApplicationDao;
 import com.baozun.nebula.dao.salesorder.SdkSoReturnApplicationDeliveryInfoDao;
+import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
 import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.salesorder.SoReturnLine;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
@@ -43,11 +48,15 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 	private SdkReturnApplicationDao soReturnApplicationDao;
 	@Autowired
 	private SdkOrderDao sdkOrderDao;
+	private SdkOrderLineDao sdkOrderLineDao;
+	@Autowired
+	private SkuDao skuDao;
 	@Autowired
 	private SoReturnLineManager soReturnLineManager;
 	@Autowired
 	private SdkSoReturnApplicationDeliveryInfoDao sdkSoReturnApplicationDeliveryInfoDao;
-	
+	@Autowired
+	private SoReturnApplicationManager soReturnApplicationManager;
 	@Autowired
 	private SdkSkuManager sdkSkuManager;
 	
@@ -57,9 +66,9 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 	public final static Integer[] statusArr = {new Integer(SoReturnConstants.RETURN_COMPLETE) };
 
 	@Override
-	public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId) {
+	public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId,Integer type) {
 		Integer count = null;
-			count = soReturnApplicationDao.countItemByOrderLineIdAndStatus(primaryLineId, statusArr);
+			count = soReturnApplicationDao.countItemByOrderLineIdAndStatus(primaryLineId, statusArr,type);
 			if (count == null) {
 				count = new Integer(0);
 			}
@@ -247,5 +256,39 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 				}
 			}
 			return viewCommands;
+		}
+
+		@Override
+		public List<ReturnLineViewCommand> findReturnLineViewCommandByLineIds(
+				List<Long> orderLineIds) {
+			List<OrderLineCommand>  orderLineCommands=sdkOrderLineDao.findOrderDetailListByIds(orderLineIds);
+			List<ReturnLineViewCommand> soReturnLineViews = new ArrayList<ReturnLineViewCommand>();
+			for (OrderLineCommand line : orderLineCommands) {
+				ReturnLineViewCommand lineView = new ReturnLineViewCommand();
+				String properties = line.getSaleProperty();
+				List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
+				line.setSkuPropertys(propList);
+				Long itemId=line.getItemId();
+				//通过itemId查询同款商品的其他尺码
+				List<Sku> skuList=skuDao.findSkuByItemId(itemId);
+				List<SkuCommand> skuCommandList=new ArrayList<SkuCommand>();
+				for(Sku sku:skuList){
+					SkuCommand skuCommand=skuDao.findInventoryById(sku.getId());
+					skuCommandList.add(skuCommand);
+				}
+				//可供换的skuCommand集合
+				lineView.setChgSkuCommandList(skuCommandList);
+				if (null != line.getType() && line.getType() != 0) {
+					// 查询 当前订单行 已经退过货的商品个数（退换货状态为已完成)
+					Integer count = soReturnApplicationManager
+							.countCompletedAppsByPrimaryLineId(line.getId(),SoReturnConstants.TYPE_RETURN);
+					//剩余可退数量
+					lineView.setCount(line.getCount()-count);
+					lineView.setOrderLineCommand(line);
+					soReturnLineViews.add(lineView);
+				}
+			}
+			return soReturnLineViews;
+			
 		}
 }
