@@ -500,7 +500,7 @@ public class OrderReturnController extends BaseController {
 			for (OrderLineCommand line : saleOrder.getOrderLines()) {
 				// 根据订单行查询退货单数量
 				num += soReturnApplicationManager
-						.countCompletedAppsByPrimaryLineId(line.getId(), SoReturnConstants.TYPE_RETURN);
+						.countCompletedAppsByPrimaryLineId(line.getId());
 			}
 			if (num >= saleOrder.getQuantity()){
 				model.addAttribute("errorMsg", "订单中无可退商品！");
@@ -541,7 +541,7 @@ public class OrderReturnController extends BaseController {
 					lineVo.setChgSkuCommandList(skuCommandList);
 					// 查询 当前订单行 已经退过货的商品个数（退换货状态为已完成)
 					Integer count = soReturnApplicationManager
-							.countCompletedAppsByPrimaryLineId(line.getId(),SoReturnConstants.TYPE_RETURN);
+							.countCompletedAppsByPrimaryLineId(line.getId());
 					lineVo.setCount(count);
 					lineVo.setOrderLineCommand(line);
 					soReturnLineVoList.add(lineVo);
@@ -629,7 +629,7 @@ public class OrderReturnController extends BaseController {
 		for (OrderLineCommand line : saleOrder.getOrderLines()) {
 			// 根据订单行查询退货单数量
 			count += soReturnApplicationManager
-					.countCompletedAppsByPrimaryLineId(line.getId(),SoReturnConstants.TYPE_RETURN);
+					.countCompletedAppsByPrimaryLineId(line.getId());
 		}
 		// 如果原始订单中商品数量减去已退掉的商品数量小于本次需要退的商品数量，退货失败
 		if (saleOrder.getQuantity() - count < returnTotalNum) {
