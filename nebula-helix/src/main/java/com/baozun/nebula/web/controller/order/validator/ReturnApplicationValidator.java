@@ -4,13 +4,14 @@ package com.baozun.nebula.web.controller.order.validator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import com.baozun.nebula.web.controller.order.form.ReturnOderForm;
+import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
+
 
 public abstract class ReturnApplicationValidator implements Validator{
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return ReturnOderForm.class.isAssignableFrom(clazz);
+		return ReturnOrderForm.class.isAssignableFrom(clazz);
 	}
 
 	

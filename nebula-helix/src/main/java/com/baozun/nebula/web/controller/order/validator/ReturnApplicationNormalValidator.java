@@ -1,6 +1,7 @@
 package com.baozun.nebula.web.controller.order.validator;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -9,13 +10,14 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
 import com.baozun.nebula.constant.SoReturnConstants;
+import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.manager.SoReturnApplicationManager;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.web.controller.order.form.ReturnOderForm;
+import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
 
 
 public  class ReturnApplicationNormalValidator extends ReturnApplicationValidator{
@@ -24,16 +26,29 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 	private OrderManager orderManager;
 	
 	@Autowired
+    private SdkOrderLineDao sdkOrderLineDao;
+	
+	@Autowired
 	private SoReturnApplicationManager soReturnApplicationManager;
 
 	@Override
 	public void processValidate(Object target, Errors errors) {
-		ReturnOderForm form = (ReturnOderForm) target;
+		ReturnOrderForm form = (ReturnOrderForm) target;
 		//退货数量、退货理由非空
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "sumSelected","sumSelected.required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "reasonSelected","reasonSelected.required");
 		
 		SalesOrderCommand saleOrder = orderManager.findOrderById(Long.parseLong(form.getOrderId()), null);
+		
+		if (null != saleOrder) {
+            // 订单行信息
+            List<Long> orderIds = new ArrayList<Long>();
+            orderIds.add(saleOrder.getId());
+            List<OrderLineCommand> orderLines = sdkOrderLineDao
+                    .findOrderDetailListByOrderIds(orderIds);
+            saleOrder.setOrderLines(orderLines);
+        }
+
 		//订单状态未完成不能退款
 		if (null==saleOrder 
 				||null==saleOrder.getLogisticsStatus() 
@@ -42,7 +57,7 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 			errors.rejectValue("orderStatus", "order.status.unfinish");
 		}
 		
-		//检查退货数量是否超出可退数量限制
+		//检查退货数量书否超出可退数量限制
 		List<OrderLineCommand> lineCommandList = saleOrder.getOrderLines();
 		
 		String[] selectedLineId=form.getLineIdSelected();
@@ -52,10 +67,10 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 				Long selected=Long.parseLong(selectedLineId[i]);
 				if(line.getId().longValue()==selected.longValue()){
 					//通过订单行id查询该订单行已经完成的退货数量
-					Integer returnedCount=soReturnApplicationManager.countCompletedAppsByPrimaryLineId(Long.parseLong(selectedLineId[i]),SoReturnConstants.TYPE_RETURN);
+					Integer returnedCount=	soReturnApplicationManager.countCompletedAppsByPrimaryLineId(Long.parseLong(selectedLineId[i]));
 					Integer count=line.getCount();
 					if(count-Integer.parseInt(form.getSumSelected()[i])<returnedCount){
-						// 退换货数量超出限制。
+						// 退货数量超出限制。
 						errors.rejectValue("returnCount", "return.count.outrange");
 					
 					}

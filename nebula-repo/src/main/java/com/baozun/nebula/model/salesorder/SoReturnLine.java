@@ -77,7 +77,7 @@ public class SoReturnLine extends BaseModel {
 		this.returnOrderId = returnOrderId;
 	}
 
-	@Column(name = "RTN_EXTENTIONCODE", nullable = false)
+	@Column(name = "RTN_EXTENTIONCODE")
 	public String getRtnExtentionCode() {
 		return rtnExtentionCode;
 	}

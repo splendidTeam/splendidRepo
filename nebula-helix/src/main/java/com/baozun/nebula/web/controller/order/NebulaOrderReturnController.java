@@ -30,7 +30,7 @@ import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.baozun.nebula.web.controller.order.form.ReturnOderForm;
+import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
 import com.baozun.nebula.web.controller.order.resolver.ReturnApplicationResolver;
 import com.baozun.nebula.web.controller.order.validator.ReturnApplicationValidator;
 import com.feilong.core.Validator;
@@ -104,7 +104,7 @@ public class NebulaOrderReturnController extends BaseController {
 			@LoginMember MemberDetails memberDetails,
 			BindingResult bindingResult,
 			HttpServletRequest request,
-			@ModelAttribute(value = "returnOrderForm") ReturnOderForm returnOrderForm,
+			@ModelAttribute(value = "returnOrderForm") ReturnOrderForm returnOrderForm,
 			Model model) {
 		  Validate.notNull(memberDetails, "memberDetails can't be null!");
 		   // 判断是否为本人进行操作

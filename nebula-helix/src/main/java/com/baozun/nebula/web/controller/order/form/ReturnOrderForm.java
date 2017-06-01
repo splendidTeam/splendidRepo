@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 package com.baozun.nebula.web.controller.order.form;
 
 import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
@@ -116,7 +114,7 @@ import com.baozun.nebula.web.controller.BaseForm;
  * @version
  *
  */
-public class ReturnOderForm  extends BaseForm{
+public class ReturnOrderForm  extends BaseForm{
 	
 	/**
 	 * 
@@ -135,13 +133,14 @@ public class ReturnOderForm  extends BaseForm{
 	private String orderId;
 	private String orderCode;
 	private String memo;
-	private String[] chg_extentionCode;
-	/** 退货单退货原因*/
+	private String[] extentionCode;
+	
+    /** 退货单退货原因*/
 	//属性名
 	private String retrunReason;
 	
 	/**退换货类型1：退货 2：换货*/
-	private int returnType;
+	private String[] returnType;
 	
 	/**以下部分为returnDelivery信息*/
 	
@@ -155,13 +154,27 @@ public class ReturnOderForm  extends BaseForm{
 			SoReturnApplicationDeliveryInfo returnDeliveryInfo) {
 		this.returnDeliveryInfo = returnDeliveryInfo;
 	}
-	public int getReturnType() {
-		return returnType;
-	}
-	public void setReturnType(int returnType) {
-		this.returnType = returnType;
-	}
-	public String[] getLineIdSelected() {
+
+	
+    public String[] getReturnType(){
+        return returnType;
+    }
+    
+    
+    public String[] getExtentionCode(){
+        return extentionCode;
+    }
+
+    
+    public void setExtentionCode(String[] extentionCode){
+        this.extentionCode = extentionCode;
+    }
+
+    public void setReturnType(String[] returnType){
+        this.returnType = returnType;
+    }
+
+    public String[] getLineIdSelected() {
 		return lineIdSelected;
 	}
 	public void setLineIdSelected(String[] lineIdSelected) {
@@ -230,24 +243,17 @@ public class ReturnOderForm  extends BaseForm{
 		this.memo = memo;
 	}
 	
-	public String getRetrunReason() {
-		return retrunReason;
-	}
 
-	public void setRetrunReason(String retrunReason) {
-		this.retrunReason = retrunReason;
-	}
-	
+    public String getRetrunReason(){
+        return retrunReason;
+    }
 
-	public String[] getChg_extentionCode() {
-		return chg_extentionCode;
-	}
+    
+    public void setRetrunReason(String retrunReason){
+        this.retrunReason = retrunReason;
+    }
 
-	public void setChg_extentionCode(String[] chg_extentionCode) {
-		this.chg_extentionCode = chg_extentionCode;
-	}
-
-	public ReturnOderForm() {
+    public ReturnOrderForm() {
 		super();
 	}
 

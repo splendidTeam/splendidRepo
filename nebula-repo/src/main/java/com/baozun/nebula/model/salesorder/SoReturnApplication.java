@@ -285,7 +285,7 @@ public class SoReturnApplication extends BaseModel{
     /**
      * @return the createTime
      */
-    @Column(name = "CREATETIME")
+    @Column(name = "CREATE_TIME")
     public Date getCreateTime(){
         return createTime;
     }

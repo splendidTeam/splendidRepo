@@ -56,8 +56,6 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 	@Autowired
 	private SdkSoReturnApplicationDeliveryInfoDao sdkSoReturnApplicationDeliveryInfoDao;
 	@Autowired
-	private SoReturnApplicationManager soReturnApplicationManager;
-	@Autowired
 	private SdkSkuManager sdkSkuManager;
 	
 	@Autowired
@@ -65,198 +63,200 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 	
 	public final static Integer[] statusArr = {new Integer(SoReturnConstants.RETURN_COMPLETE) };
 
-	@Override
-	public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId,Integer type) {
-		Integer count = null;
-			count = soReturnApplicationDao.countItemByOrderLineIdAndStatus(primaryLineId, statusArr,type);
-			if (count == null) {
-				count = new Integer(0);
-			}
-		return count;
-	}
-	
-	@Override
-	public SoReturnApplication findLastApplicationByOrderLineId(Long orderLineId) {
-		if (orderLineId == null) {
-			log.error("===orderLineId is null ==");
-			return null;
-		}
-		List<SoReturnApplication> returnApplications=soReturnApplicationDao.findLastApplicationByOrderLineId(orderLineId);
-		//获得的returnApplication是根据创建时间倒序排列，因此取第一个就是最新的一笔退货
-		if(Validator.isNotNullOrEmpty(returnApplications)){
-			return returnApplications.get(0);
-		}
-		return null;
-		
-	}
+	   @Override
+	    public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId) {
+	        Integer count = null;
+	            count = soReturnApplicationDao.countItemByOrderLineIdAndStatus(primaryLineId, statusArr);
+	            if (count == null) {
+	                count = new Integer(0);
+	            }
+	        return count;
+	    }
+	    
+	    @Override
+	    public SoReturnApplication findLastApplicationByOrderLineId(Long orderLineId) {
+	        if (orderLineId == null) {
+	            log.error("===orderLineId is null ==");
+	            return null;
+	        }
+	        List<SoReturnApplication> returnApplications=soReturnApplicationDao.findLastApplicationByOrderLineId(orderLineId);
+	        //获得的returnApplication是根据创建时间倒序排列，因此取第一个就是最新的一笔退货
+	        if(Validator.isNotNullOrEmpty(returnApplications)){
+	            return returnApplications.get(0);
+	        }
+	        return null;
+	        
+	    }
 
-	@Override
-	public Boolean isFinishedAndOutDayOrderById(Long orderId) {
-		if (orderId == null) {
-			log.error("==orderId is null==");
-			return false;
-		}
-		SalesOrder salesOrder = sdkOrderDao.findFinishedOrderById(orderId, SalesOrder.SALES_ORDER_STATUS_FINISHED);
-		return null!=salesOrder;
-		
-	}
+	    @Override
+	    public Boolean isFinishedAndOutDayOrderById(Long orderId) {
+	        if (orderId == null) {
+	            log.error("==orderId is null==");
+	            return false;
+	        }
+	        SalesOrder salesOrder = sdkOrderDao.findFinishedOrderById(orderId, SalesOrder.SALES_ORDER_STATUS_FINISHED);
+	        return null!=salesOrder;
+	        
+	    }
 
-	@Transactional
-	@Override
-	public ReturnApplicationCommand createReturnApplication(ReturnApplicationCommand returnCommand,SalesOrderCommand orderCommand) {
-		SoReturnApplication app=returnCommand.getReturnApplication();
-		SoReturnApplication	returnApplication=this.saveSoReturnApplication(app);
-		
-		//如果是换货请求，需要保存换货物流对象
-		if(SoReturnConstants.TYPE_EXCHANGE==returnApplication.getType()){
-			SoReturnApplicationDeliveryInfo deliveryInfo=returnCommand.getSoReturnApplicationDeliveryInfo();
-				deliveryInfo.setRetrunApplicationId(returnApplication.getId());
-				deliveryInfo=sdkSoReturnApplicationDeliveryInfoDao.save(deliveryInfo);
-				returnCommand.setSoReturnApplicationDeliveryInfo(deliveryInfo);
-		}
-		List<SoReturnLine> returnLines=returnCommand.getReturnLineList();
-		for(SoReturnLine line:returnLines){
-			line.setReturnOrderId(returnApplication.getId());
-		}
-		 returnLines=soReturnLineManager.saveReturnLine(returnLines);
-		
-	    returnCommand.setReturnLineList(returnLines);
-		returnCommand.setReturnApplication(returnApplication);
-		return returnCommand;
-		
-	}
-	
-	/**
-	 * 退换货申请表 对象保存
-	 * 
-	 * @author yinglong.xu
-	 */
-	private SoReturnApplication saveSoReturnApplication(SoReturnApplication soReturnApplication) {
-		soReturnApplication = soReturnApplicationDao.save(soReturnApplication);
-		return soReturnApplication;
-	}
-	
-	@Override
-	public SoReturnApplication findLastApplicationByOrderId(Long orderId) {
-		List<SoReturnApplication> returnApplication=soReturnApplicationDao.findLastApplicationByOrderId(orderId);
-		//获得的returnApplication是根据创建时间倒序排序，因此取第一个就是最新的一笔退货
-		return returnApplication.get(0);
-	}
+	    @Transactional
+	    @Override
+	    public ReturnApplicationCommand createReturnApplication(ReturnApplicationCommand returnCommand,SalesOrderCommand orderCommand) {
+	        SoReturnApplication app=returnCommand.getReturnApplication();
+	        SoReturnApplication returnApplication=this.saveSoReturnApplication(app);
+	        
+	        //如果是换货请求，需要保存换货物流对象
+	        if(SoReturnConstants.TYPE_EXCHANGE==returnApplication.getType()){
+	            SoReturnApplicationDeliveryInfo deliveryInfo=returnCommand.getSoReturnApplicationDeliveryInfo();
+	            if(deliveryInfo != null){
+	                deliveryInfo.setRetrunApplicationId(returnApplication.getId());
+	                deliveryInfo=sdkSoReturnApplicationDeliveryInfoDao.save(deliveryInfo);
+	                returnCommand.setSoReturnApplicationDeliveryInfo(deliveryInfo);
+	            }
+	        }
+	        List<SoReturnLine> returnLines=returnCommand.getReturnLineList();
+	        for(SoReturnLine line:returnLines){
+	            line.setReturnOrderId(returnApplication.getId());
+	        }
+	         returnLines=soReturnLineManager.saveReturnLine(returnLines);
+	        
+	        returnCommand.setReturnLineList(returnLines);
+	        returnCommand.setReturnApplication(returnApplication);
+	        return returnCommand;
+	        
+	    }
+	    
+	    /**
+	     * 退换货申请表 对象保存
+	     * 
+	     * @author yinglong.xu
+	     */
+	    private SoReturnApplication saveSoReturnApplication(SoReturnApplication soReturnApplication) {
+	        soReturnApplication = soReturnApplicationDao.save(soReturnApplication);
+	        return soReturnApplication;
+	    }
+	    
+	    @Override
+	    public SoReturnApplication findLastApplicationByOrderId(Long orderId) {
+	        List<SoReturnApplication> returnApplication=soReturnApplicationDao.findLastApplicationByOrderId(orderId);
+	        //获得的returnApplication是根据创建时间倒序排序，因此取第一个就是最新的一笔退货
+	        return returnApplication.get(0);
+	    }
 
-	@Override
-	public Pagination<SoReturnApplication> findReturnByQueryMapWithPage(
-			Page page, Sort[] sorts,  Map<String, Object> paraMap) {
-		return soReturnApplicationDao.findReturnByQueryMapWithPage(page, sorts,paraMap);
-	}
+	    @Override
+	    public Pagination<SoReturnApplication> findReturnByQueryMapWithPage(
+	            Page page, Sort[] sorts,  Map<String, Object> paraMap) {
+	        return soReturnApplicationDao.findReturnByQueryMapWithPage(page, sorts,paraMap);
+	    }
 
 
-	@Override
-	public SoReturnApplication findByApplicationId(Long id) {
-		return soReturnApplicationDao.getByPrimaryKey(id);
-	}
-	
-	// 退货申请
-		@Override
-		public SoReturnApplication auditSoReturnApplication(String returnCode,Integer status, String description, String lastModifier,String omsCode,String returnAddress) throws Exception {
-			Assert.notNull(returnCode, "returnCode is null");
-			Assert.notNull(lastModifier, "lastModifier is null ");
-			Assert.notNull(status, "Status is null ");
-			Assert.notNull(description, "审核备注不能为空");
-			// 当审核通过时，允许客户退回商品，同时将退款状态改为待处理
-			Date now = new Date();
-			SoReturnApplication returnapp = soReturnApplicationDao.findApplicationByCode(returnCode);
-			if (returnapp == null) {
-				throw new Exception("对应的申请单不存在");
-			}
-			//审核通过时必须填写退货地址
-			if(status.intValue()==2&&returnAddress==""){
-				throw new Exception("退货地址为空");
-			}else{
-				returnapp.setReturnAddress(returnAddress);
-			}
-			if(omsCode!=null&&omsCode!=""){
-				returnapp.setOmsCode(omsCode);
-			}
-			returnapp.setApprovalDescription(description);
-			// 当前退货状态为待审核，并且页面操作为审核
-			if (status.intValue() == SoReturnConstants.TO_DELIVERY && returnapp.getStatus() ==SoReturnConstants.AUDITING) {// 审核通过
-				// status为2时，表示已进行审核操作，需要判断当前退货单是否已审核过
-				if (returnapp.getStatus() == SoReturnConstants.TO_DELIVERY
-						|| returnapp.getStatus() == SoReturnConstants.REFUS_RETURN) {
-					throw new Exception("对应的申请单已审核，请刷新页面 ");
-				} else {
-					returnapp.setStatus(SoReturnConstants.TO_DELIVERY);// 审核通过
-				}
-			}
-			if (status == SoReturnConstants.REFUS_RETURN && returnapp.getStatus() == SoReturnConstants.AUDITING) {// 审核退回
-				// status为1时，表示已进行审核操作，需要判断当前退货单是否已审核过
-				if (returnapp.getStatus() == SoReturnConstants.TO_DELIVERY
-						|| returnapp.getStatus() == SoReturnConstants.REFUS_RETURN) {
-					throw new Exception("对应的申请单已审核，请刷新页面 ");
-				} else {
-					returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
-				}
-			}
-				// 拒绝退款
-				if (status ==  SoReturnConstants.REFUS_RETURN) {
-					returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
-				}
-				// 同意退款
-				if (status ==SoReturnConstants.AGREE_REFUND) {
-					returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
-				}
-			// 当前状态为同意退款并且页面操作为退款完成
-			if (status == SoReturnConstants.RETURN_COMPLETE && returnapp.getStatus() == SoReturnConstants.AGREE_REFUND) {
-				returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
-			}
-			returnapp.setOmsCode(omsCode);
-			returnapp.setLastModifyUser(lastModifier);
-			returnapp.setApprover(lastModifier);
-			returnapp.setApproveTime(now);
-			returnapp.setVersion(now);
-			returnapp.setReturnReason("");
-			returnapp = soReturnApplicationDao.save(returnapp);
-			return returnapp;
-		}
-		
+	    @Override
+	    public SoReturnApplication findByApplicationId(Long id) {
+	        return soReturnApplicationDao.getByPrimaryKey(id);
+	    }
+	    
+	    // 退货申请
+	        @Override
+	        public SoReturnApplication auditSoReturnApplication(String returnCode,Integer status, String description, String lastModifier,String omsCode,String returnAddress) throws Exception {
+	            Assert.notNull(returnCode, "returnCode is null");
+	            Assert.notNull(lastModifier, "lastModifier is null ");
+	            Assert.notNull(status, "Status is null ");
+	            Assert.notNull(description, "审核备注不能为空");
+	            // 当审核通过时，允许客户退回商品，同时将退款状态改为待处理
+	            Date now = new Date();
+	            SoReturnApplication returnapp = soReturnApplicationDao.findApplicationByCode(returnCode);
+	            if (returnapp == null) {
+	                throw new Exception("对应的申请单不存在");
+	            }
+	            //审核通过时必须填写退货地址
+	            if(status.intValue()==2&&returnAddress==""){
+	                throw new Exception("退货地址为空");
+	            }else{
+	                returnapp.setReturnAddress(returnAddress);
+	            }
+	            if(omsCode!=null&&omsCode!=""){
+	                returnapp.setOmsCode(omsCode);
+	            }
+	            returnapp.setApprovalDescription(description);
+	            // 当前退货状态为待审核，并且页面操作为审核
+	            if (status.intValue() == SoReturnConstants.TO_DELIVERY && returnapp.getStatus() ==SoReturnConstants.AUDITING) {// 审核通过
+	                // status为2时，表示已进行审核操作，需要判断当前退货单是否已审核过
+	                if (returnapp.getStatus() == SoReturnConstants.TO_DELIVERY
+	                        || returnapp.getStatus() == SoReturnConstants.REFUS_RETURN) {
+	                    throw new Exception("对应的申请单已审核，请刷新页面 ");
+	                } else {
+	                    returnapp.setStatus(SoReturnConstants.TO_DELIVERY);// 审核通过
+	                }
+	            }
+	            if (status == SoReturnConstants.REFUS_RETURN && returnapp.getStatus() == SoReturnConstants.AUDITING) {// 审核退回
+	                // status为1时，表示已进行审核操作，需要判断当前退货单是否已审核过
+	                if (returnapp.getStatus() == SoReturnConstants.TO_DELIVERY
+	                        || returnapp.getStatus() == SoReturnConstants.REFUS_RETURN) {
+	                    throw new Exception("对应的申请单已审核，请刷新页面 ");
+	                } else {
+	                    returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
+	                }
+	            }
+	                // 拒绝退款
+	                if (status ==  SoReturnConstants.REFUS_RETURN) {
+	                    returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
+	                }
+	                // 同意退款
+	                if (status ==SoReturnConstants.AGREE_REFUND) {
+	                    returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
+	                }
+	            // 当前状态为同意退款并且页面操作为退款完成
+	            if (status == SoReturnConstants.RETURN_COMPLETE && returnapp.getStatus() == SoReturnConstants.AGREE_REFUND) {
+	                returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
+	            }
+	            returnapp.setOmsCode(omsCode);
+	            returnapp.setLastModifyUser(lastModifier);
+	            returnapp.setApprover(lastModifier);
+	            returnapp.setApproveTime(now);
+	            returnapp.setVersion(now);
+	            returnapp.setReturnReason("");
+	            returnapp = soReturnApplicationDao.save(returnapp);
+	            return returnapp;
+	        }
+	        
 
-		@Override
-		public List<OrderReturnCommand> findExpInfo(Sort[] sorts,Map<String, Object> paraMap) {
-			List<OrderReturnCommand> orderReturn=soReturnApplicationDao.findExpInfo(sorts,paraMap);
-			return orderReturn;
-		}
-		
+	        @Override
+	        public List<OrderReturnCommand> findExpInfo(Sort[] sorts,Map<String, Object> paraMap) {
+	            List<OrderReturnCommand> orderReturn=soReturnApplicationDao.findExpInfo(sorts,paraMap);
+	            return orderReturn;
+	        }
+	        
 
-		@Override
-		public List<ReturnApplicationCommand> findReturnApplicationCommandsByIds(
-				List<Long> ids) {
-		List<ReturnApplicationCommand>	 returnApplicationCommands=soReturnApplicationDao.findReturnApplicationCommandByIds(ids);
-			return returnApplicationCommands;
-		}
+	        @Override
+	        public List<ReturnApplicationCommand> findReturnApplicationCommandsByIds(
+	                List<Long> ids) {
+	        List<ReturnApplicationCommand>   returnApplicationCommands=soReturnApplicationDao.findReturnApplicationCommandByIds(ids);
+	            return returnApplicationCommands;
+	        }
 
-		@Override
-		public List<ReturnApplicationViewCommand> findReturnApplicationViewCommand(
-				List<ReturnApplicationCommand> returnApplications) {
-			List<ReturnApplicationViewCommand> viewCommands=new ArrayList<ReturnApplicationViewCommand>();
-			
-			for(ReturnApplicationCommand returnApp:returnApplications){
-				ReturnApplicationViewCommand viewCommand=new ReturnApplicationViewCommand();
-				SoReturnApplication returnApplication=returnApp.getReturnApplication();
-				if(Validator.isNotNullOrEmpty(returnApplication)){
-					SalesOrderCommand salesOrder = orderManager.findOrderById(Long
-							.valueOf(returnApp.getReturnApplication().getSoOrderId()), null);
-					for (OrderLineCommand line : salesOrder.getOrderLines()) {
-						String properties = line.getSaleProperty();
-						List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-						line.setSkuPropertys(propList);
-					}
-					viewCommand.setOrderLineCommands(salesOrder.getOrderLines());
-					viewCommand.setReturnApplicationCommand(returnApp);
-					viewCommands.add(viewCommand);
-				}
-			}
-			return viewCommands;
-		}
+	        @Override
+	        public List<ReturnApplicationViewCommand> findReturnApplicationViewCommand(
+	                List<ReturnApplicationCommand> returnApplications) {
+	            List<ReturnApplicationViewCommand> viewCommands=new ArrayList<ReturnApplicationViewCommand>();
+	            
+	            for(ReturnApplicationCommand returnApp:returnApplications){
+	                ReturnApplicationViewCommand viewCommand=new ReturnApplicationViewCommand();
+	                SoReturnApplication returnApplication=returnApp.getReturnApplication();
+	                if(Validator.isNotNullOrEmpty(returnApplication)){
+	                    SalesOrderCommand salesOrder = orderManager.findOrderById(Long
+	                            .valueOf(returnApp.getReturnApplication().getSoOrderId()), null);
+	                    for (OrderLineCommand line : salesOrder.getOrderLines()) {
+	                        String properties = line.getSaleProperty();
+	                        List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
+	                        line.setSkuPropertys(propList);
+	                    }
+	                    viewCommand.setOrderLineCommands(salesOrder.getOrderLines());
+	                    viewCommand.setReturnApplicationCommand(returnApp);
+	                    viewCommands.add(viewCommand);
+	                }
+	            }
+	            return viewCommands;
+	        }
 
 		@Override
 		public List<ReturnLineViewCommand> findReturnLineViewCommandByLineIds(
@@ -280,8 +280,7 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 				lineView.setChgSkuCommandList(skuCommandList);
 				if (null != line.getType() && line.getType() != 0) {
 					// 查询 当前订单行 已经退过货的商品个数（退换货状态为已完成)
-					Integer count = soReturnApplicationManager
-							.countCompletedAppsByPrimaryLineId(line.getId(),SoReturnConstants.TYPE_RETURN);
+					Integer count = countCompletedAppsByPrimaryLineId(line.getId());
 					//剩余可退数量
 					lineView.setCount(line.getCount()-count);
 					lineView.setOrderLineCommand(line);

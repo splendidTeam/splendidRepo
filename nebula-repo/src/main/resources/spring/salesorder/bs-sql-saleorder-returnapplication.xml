@@ -59,7 +59,6 @@
 				  inner join t_so_return_application app 
 				  on app.id = line.return_orderid
 				   where line.so_lineid =:orderLineId
-				         and app.type=:type
 					     and app.status in (#foreach($sta in $statusArr)$sta,#end-1999);
 			 ]]>
 			</value>
