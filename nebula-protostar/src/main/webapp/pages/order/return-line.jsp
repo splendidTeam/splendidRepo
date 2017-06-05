@@ -59,7 +59,7 @@
 					<input type="hidden" value="${SoReturnApplication.id}"
 						id="returnCode">
 					<div class="ui-block-line ui-block-line-37">
-						<label> <spring:message code="return.list.code" /></label> <label>${SoReturnApplication.platformOMSCode }</label>
+						<label> <spring:message code="return.list.code" /></label> <label>${SoReturnApplication.omsCode }</label>
 					</div>
 					<div class="ui-block-line ui-block-line-37">
 						<label><spring:message code="return.type" /></label>
@@ -126,7 +126,8 @@
 					</div>
 
 					<div class="ui-block-line ui-block-line-37">
-						<label> <spring:message code="order.refund.status" /></label> <label>
+						<label> <spring:message code="order.refund.status" /></label>
+						 <label>
 							<c:if test="${SoReturnApplication.refundStatus == 0}">
 							 			 待处理
 							 		 </c:if> <c:if test="${SoReturnApplication.refundStatus == 1}">
@@ -143,12 +144,12 @@
 					<div class="ui-block-line ui-block-line-37">
 						<label><spring:message code="order.return.price" /></label> <label
 							style="width: 600px;"><div>
-								￥${SoReturnApplication.returnPrice }</div> </label>
+								￥${SoReturnApplication.returnPrice}</div> </label>
 					</div>
 
 					<div class="ui-block-line ui-block-line-37">
 						<label> <spring:message code="order.refund.account" /></label> <label>
-							${SoReturnApplication.refundPayee }</label>
+							${SoReturnApplication.refundAccount}</label>
 					</div>
 					<div class="ui-block-line ui-block-line-37">
 						<label> <spring:message code="order.refund.bank" /></label> <label>
@@ -156,7 +157,7 @@
 					</div>
 					<div class="ui-block-line ui-block-line-37">
 						<label> <spring:message code="order.refund.bankbranch" /></label>
-						<label> ${SoReturnApplication.refundAccountBank }</label>
+						<label> ${SoReturnApplication.refundBankBranch}</label>
 					</div>
 					<div class="ui-block-line ui-block-line-37">
 						<label> <spring:message code="order.return.logisticsCode" /></label>
@@ -168,7 +169,7 @@
 					</div>
 					<div class="ui-block-line ui-block-line-37">
 						<label> <spring:message code="order.platforOmsCode" /></label> <label>
-							${SoReturnApplication.platformOMSCode }</label>
+							${SoReturnApplication.omsCode }</label>
 					</div>
 					<div class="ui-block-line ui-block-line-37">
 						<label> <spring:message code="order.returnAddress" /></label> <label>

@@ -73,7 +73,7 @@ function drawOrder(data, args, idx){
 	
 	var tempUrl =returnDetailUrl+"?id="+loxia.getObject("id", data);
 	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('" +tempUrl+
-			"');\">"+loxia.getObject("returnOrderCode", data)+"</a>";
+			"');\">"+loxia.getObject("returnApplicationCode", data)+"</a>";
 }
 
 
@@ -208,18 +208,18 @@ function updateRefund(val, state,arg) {
 
 //同意退款
 function fnAGREE(data, args, caller) {
-	updateRefund(data.returnOrderCode, 4,data.status);
+	updateRefund(data.returnApplicationCode, 4,data.status);
 }
 
 //已完成
 function fnFINISH(data, args, caller) {
-	updateRefund(data.returnOrderCode, 5,data.status);
+	updateRefund(data.returnApplicationCode, 5,data.status);
 }
 
 //同意退款
 function fnPASS(data, args, caller) {
-	var omsCode=data.platformOMSCode;
-	var orderCode=data.returnOrderCode;
+	var omsCode=data.omsCode;
+	var orderCode=data.returnApplicationCode;
 	$j("#remark").val('');
 	$j("#returnCode").val(orderCode);
 	$j("#omsCode").val(omsCode);
@@ -228,8 +228,8 @@ function fnPASS(data, args, caller) {
 
 //拒绝退款
 function fnREFUSED(data, args, caller){
-	var omsCode=data.platformOMSCode;
-	var orderCode=data.returnOrderCode;
+	var omsCode=data.omsCode;
+	var orderCode=data.returnApplicationCode;
 	$j("#orderCode").val(orderCode);
 	$j("#omsReturnCode").val(omsCode);
 	$j("#memo").val('');
@@ -320,12 +320,12 @@ $j(document).ready(function() {
 		nodatamessage:'<span>'+nps.i18n("NO_DATA")+'</span>',
 		form : "searchForm",
 		cols : [ {
-			name:"returnOrderCode",
+			name:"returnApplicationCode",
 			label:nps.i18n("LABEL_RETURN_CODE"),
 			width:"8%",
 			template:"drawOrder"
 		},{
-			name:"platformOMSCode",
+			name:"omsCode",
 			label:nps.i18n("LABEL_RETURN_OMSCODE"),
 			width:"8%",
 		},	{

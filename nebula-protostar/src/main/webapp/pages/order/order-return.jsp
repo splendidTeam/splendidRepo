@@ -22,7 +22,7 @@
 		</div>
 	   <div class="ui-block">
 	   	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/users.png"><spring:message code="order.list"/>
-	        <input type="button" value="手工退换货" title="手工下单"  class="button orange manualCreate" /> 
+	    <!--     <input type="button" value="手工退换货" title="手工下单"  class="button orange manualCreate" />  -->
     </div>
 	    <form id="searchForm" action="/saleOrder/returnOrderList.json" >
 		    <div class="ui-block-content ui-block-content-lb">

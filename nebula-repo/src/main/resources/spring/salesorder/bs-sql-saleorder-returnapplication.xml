@@ -107,10 +107,10 @@
 			    from t_so_return_application application 
 			     where 1=1 
 			        #if($code)
-					AND application.return_order_code LIKE '%$code%'
+					AND application.return_application_code LIKE '%$code%'
 					#end
 					#if($loginName)
-					AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_email LIKE '%$loginName%' AND member.id=application.memberid)
+					AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '%$loginName%' AND member.id=application.memberid)
 					#end
 					#if($soOrderCode)
 					AND application.so_order_code LIKE '%$soOrderCode%'
@@ -141,10 +141,10 @@
 			    from t_so_return_application application
 			     where 1=1 
 			     	#if($returnOrderCode)
-			     		AND application.return_order_code  LIKE '%$returnOrderCode%'
+			     		AND application.return_application_code  LIKE '%$returnOrderCode%'
 			     	#end
 			     	#if($loginName)
-					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_email LIKE '%$loginName%' AND member.id=application.memberid)
+					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '%$loginName%' AND member.id=application.memberid)
 					#end
 			        #if($returnCode)
 						AND application.platform_oms_code LIKE '%$returnCode%'
@@ -344,7 +344,7 @@
 			<value><![CDATA[
 				select a.* 
 				from t_so_return_application a 
-				where a.return_order_code = :code
+				where a.return_application_code = :code
 			 ]]>
 			</value>
 		</constructor-arg>
@@ -372,10 +372,10 @@
 			     	on sku.item_id=iteminfo.item_id
 			     where 1=1 
 			     	#if($returnOrderCode)
-			     		AND application.return_order_code  LIKE '%$returnOrderCode%'
+			     		AND application.return_application_code  LIKE '%$returnOrderCode%'
 			     	#end
 			     	#if($loginName)
-					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_email LIKE '%$loginName%' AND member.id=application.memberid)
+					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '%$loginName%' AND member.id=application.memberid)
 					#end
 			        #if($returnCode)
 						AND application.omscode LIKE '%$returnCode%'
@@ -424,7 +424,7 @@
 			    from t_so_return_application application
 			     where 1=1 
 			     	#if($returnOrderCode)
-			     		AND application.return_order_code = :returnOrderCode
+			     		AND application.return_application_code = :returnOrderCode
 			     	#end
 			        #if($returnCode)
 						AND application.omscode = :returnCode
