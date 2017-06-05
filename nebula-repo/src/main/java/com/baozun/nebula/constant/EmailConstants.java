@@ -61,4 +61,18 @@ public class EmailConstants {
 	/** 邮箱未激活*/
 	public static final String EMAIL_ACTIVE_NO = "N";
 
+	/** 订阅邮件成功发送的邮件模板 */
+	public static final String EMAIL_SUBSCIBE_TEMPLATE = "EMAIL_SUBSCIBE_TEMPLATE";
+	/** 验证合法性发送的邮件模板 */
+	public static final String EMAIL_VALIDATE_TEMPLATE = "EMAIL_VALIDATE_TEMPLATE";
+	/** 预约提醒发送的邮件模板 */
+	public static final String EMAIL_APPOINTMENT_TEMPLATE = "EMAIL_APPOINTMENT_TEMPLATE";
+	/** 预约成功发送的邮件模板 */
+	public static final String EMAIL_APMTSUCCEED_TEMPLATE = "EMAIL_APMTSUCCEED_TEMPLATE";
+	/** 待发货发送的邮件模板 */
+	public static final String EMAIL_SHIPPED_TEMPLATE = "EMAIL_SHIPPED_TEMPLATE";
+	/** 支付成功发送的邮件模板 */
+	public static final String EMAIL_SUCCEED_TEMPLATE = "EMAIL_SUCCEED_TEMPLATE";
+	/** 订单取消发送的邮件模板 */
+	public static final String EMAIL_CANCLED_TEMPLATE = "EMAIL_CANCLED_TEMPLATE";
 }
