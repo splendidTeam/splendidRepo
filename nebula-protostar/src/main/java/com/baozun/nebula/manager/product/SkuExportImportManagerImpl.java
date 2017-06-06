@@ -378,11 +378,12 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 						// 一般属性的值(颜色属性)
 						ItemPropertiesCommand itemProperties = null;
 						if(Validator.isNotNullOrEmpty(propertys)){
-							if(Validator.isNotNullOrEmpty(propertys[0])){
-								itemProperties = itemPropertiesMap.get(propertys[0]+"-"+propertyCode + "-"+ skuExportCommand.getId());
-							}
-							if(Validator.isNullOrEmpty(itemProperties) && Validator.isNotNullOrEmpty(propertys[1])){
-								itemProperties = itemPropertiesMap.get(propertys[1]+"-"+propertyCode + "-"+ skuExportCommand.getId());
+							// 修改为支持多销售属性
+							for (String property : propertys){
+								itemProperties = itemPropertiesMap.get(property+"-"+propertyCode + "-"+ skuExportCommand.getId());
+								if(Validator.isNotNullOrEmpty(itemProperties)){
+									break;
+								}
 							}
 						}
 						if (itemProperties != null) {
