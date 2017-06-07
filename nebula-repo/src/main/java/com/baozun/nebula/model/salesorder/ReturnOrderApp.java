@@ -345,6 +345,7 @@ public class ReturnOrderApp extends BaseModel{
 
 	/**
      * 获取code :退单单号
+     * @since 5.3.2.18
      * */
     @Column(name = "CODE")
     @Index(name = "IDX_RETURNORDERAPP_CODE")
@@ -353,13 +354,16 @@ public class ReturnOrderApp extends BaseModel{
     }
 
 
-    
+    /**
+     * @since 5.3.2.18
+     * */
     public void setCode(String code){
         this.code = code;
     }
 
     /**
      * 获取outId 对应sku.outId
+     * @since 5.3.2.18
      * */
     @Column(name = "OUT_ID")
     public String getOutId(){
@@ -367,13 +371,16 @@ public class ReturnOrderApp extends BaseModel{
     }
 
 
-    
+    /**
+     * @since 5.3.2.18
+     * */
     public void setOutId(String outId){
         this.outId = outId;
     }
 
     /**
      * 获取itemCode 对应Item.code
+     * @since 5.3.2.18
      * */
     @Column(name = "ITEM_CODE")
     public String getItemCode(){
@@ -381,7 +388,9 @@ public class ReturnOrderApp extends BaseModel{
     }
 
 
-    
+    /**
+     * @since 5.3.2.18
+     * */
     public void setItemCode(String itemCode){
         this.itemCode = itemCode;
     }
