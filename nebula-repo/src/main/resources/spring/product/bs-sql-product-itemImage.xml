@@ -104,7 +104,7 @@
 					#if($type)
 						and (type = :type )
 					#end
-					order by item_properties,position
+					order by item_id,item_properties,position
 				]]>
 			</value>
 		</constructor-arg>
