@@ -87,6 +87,21 @@ public class ReturnOrderCommand extends BaseModel{
 	
 	/** 会员名称 */
 	private String 				memberName;
+	
+	/** 退单单号
+	 * @since 5.3.2.18
+	 * */
+    private String              code;
+    
+    /** 外部编码 对应sku.outId
+     * @since 5.3.2.18
+     * */
+    private String              outId;
+    
+    /** 商品编码 对应item.code
+     * @since 5.3.2.18
+     * */
+    private String              itemCode;
 
 	
 	public Long getId() {
@@ -269,7 +284,43 @@ public class ReturnOrderCommand extends BaseModel{
 	public void setMemberName(String memberName) {
 		this.memberName = memberName;
 	}
-	
 
+	/**
+     * 获取code :退单单号
+     * */
+    public String getCode(){
+        return code;
+    }
+
+    
+    public void setCode(String code){
+        this.code = code;
+    }
+
+    /**
+     * 获取outId 对应sku.outId
+     * */
+    public String getOutId(){
+        return outId;
+    }
+
+    
+    public void setOutId(String outId){
+        this.outId = outId;
+    }
+
+    /**
+     * 获取itemCode 对应Item.code
+     * */
+    public String getItemCode(){
+        return itemCode;
+    }
+
+    
+    public void setItemCode(String itemCode){
+        this.itemCode = itemCode;
+    }
+	
+	
 	
 }
