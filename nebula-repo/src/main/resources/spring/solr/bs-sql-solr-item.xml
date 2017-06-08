@@ -325,7 +325,7 @@
 		       			select id, item_id as itemId,pic_url as picUrl,position from t_pd_item_image where type=:type and item_id in (#foreach($itemid in $itemIds)
 										$itemid,
 									#end
-									-1) order by position asc
+									-1) order by item_properties,position
                  ]]>
 			</value>
 		</constructor-arg>
