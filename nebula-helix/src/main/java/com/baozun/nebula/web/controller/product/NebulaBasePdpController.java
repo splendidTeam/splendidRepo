@@ -197,7 +197,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 				skuMaxListPrice =skuMinListPrice;
 				
 				skuMinSalesPrice = Validator.isNotNullOrEmpty(skuViewCommand.getSalePrice())?
-						skuViewCommand.getListPrice() : BigDecimal.ZERO;
+						skuViewCommand.getSalePrice() : BigDecimal.ZERO;
 				skuMaxSalesPrice = skuMinSalesPrice;
 			}else{
 				//>
