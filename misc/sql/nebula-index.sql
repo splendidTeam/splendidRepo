@@ -614,4 +614,4 @@ create index t_sys_sms_template_pkey on t_sys_sms_template(id);
 create index t_sys_smssendlog_pkey on t_sys_smssendlog(id);
 create index t_sys_status_pkey on t_sys_status(id);
 create index t_sys_timing_email_log_pkey on t_sys_timing_email_log(id);
-create index t_sys_warning_config_pkey on t_sys_warning_configid);
+create index t_sys_warning_config_pkey on t_sys_warning_config(id);
