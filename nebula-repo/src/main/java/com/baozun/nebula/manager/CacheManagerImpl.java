@@ -34,8 +34,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.setex(finalKey, expireSeconds, value);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.setex(finalKey, expireSeconds, value);
             }
         });
     }
@@ -45,8 +45,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.set(finalKey, value);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.set(finalKey, value);
             }
         });
     }
@@ -56,8 +56,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (Long) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.del(finalKey);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.del(finalKey);
             }
         });
     }
@@ -67,8 +67,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (String) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.get(finalKey);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.get(finalKey);
             }
         });
     }
@@ -78,8 +78,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.rpush(finalKey, value);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.rpush(finalKey, value);
             }
         });
     }
@@ -89,8 +89,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (String) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.lpop(finalKey);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.lpop(finalKey);
             }
         });
     }
@@ -100,8 +100,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (Long) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.llen(finalKey);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.llen(finalKey);
             }
         });
     }
@@ -111,8 +111,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.sadd(finalKey, values);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.sadd(finalKey, values);
             }
         });
     }
@@ -122,8 +122,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (Long) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.srem(finalKey, values);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.srem(finalKey, values);
             }
         });
     }
@@ -133,8 +133,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.hdel(finalKey, field);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.hdel(finalKey, field);
             }
         });
     }
@@ -144,13 +144,13 @@ public class CacheManagerImpl extends AbstractCacheManager{
         handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
+            public Object handler(String finalKey,Jedis jedis){
                 CacheExpiredCommand<T> cec = new CacheExpiredCommand<T>();
 
                 cec.setObject(t);
                 cec.setExpiredTime(System.currentTimeMillis() + seconds * 1000l);
                 String value = SerializableUtil.convert2String((Serializable) cec);
-                return jredis.hset(finalKey, field, value);
+                return jedis.hset(finalKey, field, value);
 
             }
         });
@@ -161,8 +161,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (T) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                String value = jredis.hget(finalKey, field);
+            public Object handler(String finalKey,Jedis jedis){
+                String value = jedis.hget(finalKey, field);
                 if (StringUtils.isBlank(value)){
                     return null;
                 }
@@ -184,8 +184,8 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (Long) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
-                return jredis.decrBy(finalKey, value);
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.decrBy(finalKey, value);
             }
         });
     }
@@ -195,10 +195,10 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (Long) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
+            public Object handler(String finalKey,Jedis jedis){
                 // reply new value
-                Long valueCurr = jredis.incr(finalKey);
-                jredis.expire(finalKey, expireSeconds);
+                Long valueCurr = jedis.incr(finalKey);
+                jedis.expire(finalKey, expireSeconds);
                 return valueCurr;
             }
         });
@@ -209,13 +209,13 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (Boolean) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
+            public Object handler(String finalKey,Jedis jedis){
                 long now = System.currentTimeMillis();
 
-                jredis.zremrangeByScore(finalKey, 0, now - window * 1000);
-                jredis.zadd(finalKey, now, String.valueOf(now));
+                jedis.zremrangeByScore(finalKey, 0, now - window * 1000);
+                jedis.zadd(finalKey, now, String.valueOf(now));
 
-                return (jredis.zcard(finalKey) <= limit);
+                return (jedis.zcard(finalKey) <= limit);
             }
         });
     }
@@ -227,12 +227,12 @@ public class CacheManagerImpl extends AbstractCacheManager{
         return (int) handler(key, new RedisHandler(){
 
             @Override
-            public Object handler(String finalKey,Jedis jredis){
+            public Object handler(String finalKey,Jedis jedis){
                 int delCount = 0;
-                Set<String> delKeys = jredis.keys(cleanKey);
+                Set<String> delKeys = jedis.keys(cleanKey);
                 if (isNotNullOrEmpty(delKeys)){
                     for (String delkey : delKeys){
-                        jredis.del(delkey);
+                        jedis.del(delkey);
                         delCount++;
                     }
                 }
@@ -243,20 +243,9 @@ public class CacheManagerImpl extends AbstractCacheManager{
 
     //---------------------------------------------------------------------------------
 
-    private Jedis getJedis(){
-        return jedisSentinelPool.getResource();
-    }
-
-    private void returnResource(Jedis redis){
-        if (redis != null){
-            jedisSentinelPool.returnResource(redis);
-        }
-    }
-
-    //---------------------------------------------------------------------------------
     public interface RedisHandler{
 
-        Object handler(String finalKey,Jedis jredis);
+        Object handler(String finalKey,Jedis jedis);
     }
 
     //---------------------------------------------------------------------
@@ -266,20 +255,26 @@ public class CacheManagerImpl extends AbstractCacheManager{
             return null;
         }
 
-        //-----------------------------------------------------
-        Jedis jredis = null;
+        String userKey = processKey(key);
+        return doHandler(userKey, redisHandler);
+    }
+
+    private Object doHandler(String userKey,RedisHandler redisHandler){
+        Jedis jedis = null;
+
         try{
+            jedis = jedisSentinelPool.getResource();
 
-            jredis = getJedis();
-
-            return redisHandler.handler(processKey(key), jredis);
+            return redisHandler.handler(userKey, jedis);
 
         }catch (Exception e){
-            jedisSentinelPool.returnBrokenResource(jredis);
+            jedisSentinelPool.returnBrokenResource(jedis);
             LOGGER.error("", e);
             throw new CacheException(e);
         }finally{
-            returnResource(jredis);
+            if (jedis != null){
+                jedisSentinelPool.returnResource(jedis);
+            }
         }
     }
 }
