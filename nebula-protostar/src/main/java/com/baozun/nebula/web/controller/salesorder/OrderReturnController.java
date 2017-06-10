@@ -169,6 +169,34 @@ public class OrderReturnController extends BaseController {
 		return "/order/create-return";
 
 	}
+	
+	
+	/**
+     * 退款状态审核
+     * 退货状态为 同意退款、拒绝退款、已完成
+     * 
+     * @param returnOrderCode
+     * @param refundStatus
+     * @author Huang
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping({ "/saleOrder/updateRefund.json" })
+    public Object updateFreundStatus(Model model,
+            @RequestParam("returnOrderCode") String returnOrderCode,
+            @RequestParam("state") Integer state, HttpServletRequest request) {
+        try {
+            UserDetails userDetails = this.getUserDetails();
+            String lastModifier = userDetails.getUsername();
+            soReturnApplicationManager.updateRefundType(returnOrderCode, lastModifier, state);
+            
+        } catch (Exception e) {
+            logger.error("==========修改退款状态失败===============");
+            FAILTRUE.setDescription("退款审核状态失败");
+            return FAILTRUE;
+        }
+        return SUCCESS;
+    }
 
 	/**
 	 * 退换货审核
@@ -386,6 +414,7 @@ public class OrderReturnController extends BaseController {
 			if(returnCommand.getReturnReason().equals(SoReturnConstants.OTHER_REASON)){
 				createCell(row, 13, "其它原因", centerStyleLeft);
 			}
+			createCell(row, 14, returnCommand.getType()==1?"退货":"换货", centerStyleLeft);
 			i++;
 		}
 

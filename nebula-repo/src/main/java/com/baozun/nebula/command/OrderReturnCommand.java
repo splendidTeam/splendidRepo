@@ -59,9 +59,23 @@ public class OrderReturnCommand {
 	 * 物流公司名称,只有当  退货单状态：已发货 时有此值
 	 */
 	private String transName;
+	
+	private Integer type;
 
 
-	public String getPlatformOMSCode() {
+	
+    public Integer getType(){
+        return type;
+    }
+
+
+    
+    public void setType(Integer type){
+        this.type = type;
+    }
+
+
+    public String getPlatformOMSCode() {
 		return platformOMSCode;
 	}
 

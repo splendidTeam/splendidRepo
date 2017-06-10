@@ -290,4 +290,43 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 			return soReturnLineViews;
 			
 		}
+		
+		@Override
+	    public SoReturnApplication findApplicationByCode(String code) {
+	        return soReturnApplicationDao.findApplicationByCode(code);
+	    }
+
+	    @Override
+	    public void updateRefundType(String returnCode, String lastModifier, Integer status) throws Exception {
+
+	        Date now = new Date();
+	        SoReturnApplication returnapp = soReturnApplicationDao
+	                .findApplicationByCode(returnCode);
+	        if (returnapp == null) {
+	            throw new Exception("对应的申请单不存在");
+	        }
+	        returnapp.setLastModifyUser(lastModifier);
+	        returnapp.setApprover(lastModifier);
+	        returnapp.setApproveTime(now);
+	        returnapp.setVersion(now);
+	        returnapp.setReturnReason("");
+
+	            // 同意
+	            if (status == 4) {
+	                returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
+	            }
+	            // 拒绝退款
+	            if (status == 1) {
+	                // 退货状态改为已拒绝
+	                returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
+	            }       
+	        if(returnapp.getStatus()==4){
+	            if (status == 5) {
+	                returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
+	            }
+	        }else{
+	            throw new Exception("物流状态异常！");
+	        }
+	        soReturnApplicationDao.save(returnapp);
+	    }
 }

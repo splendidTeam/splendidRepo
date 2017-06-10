@@ -54,7 +54,16 @@ public interface SoReturnApplicationManager {
 	 */
 	public List<OrderReturnCommand> findExpInfo(Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 	
-	
+	public SoReturnApplication  findApplicationByCode(String code);
+    
+    /**
+     * 更改退款状态
+     * @param returnCode
+     * @param refundStatus
+     * @author Huang
+     */
+    public void updateRefundType(String returnCode,String lastModifier,Integer status) throws Exception;
+    
 	
 	/**
 	 * 通过id集合查询Returnapplication 

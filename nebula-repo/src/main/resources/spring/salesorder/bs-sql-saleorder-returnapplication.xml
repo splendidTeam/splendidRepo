@@ -358,11 +358,11 @@
 		<constructor-arg>
 			<value><![CDATA[
 				select DISTINCT
-				application.OMSCODE as omsCode,application.ACCOUNT_NAME as refundPayee,
+				application.OMSCODE as platformOMSCode,application.REFUND_ACCOUNT as refundPayee,
 				application.SO_ORDER_CODE as soOrderCode,iteminfo.title as productName,line.rtn_extentioncode as code,
 				line.RETURN_PRICE as returnPrice,line.qty as qty,application.status as status ,application.approver as approver,
-				application.approve_time as approveTime,application.create_time as createTime,application.TRANSCODE as TRANSCODE,
-				application.transName as transName,application.RETURN_REASON  as returnReason
+				application.approvetime as approveTime,application.create_time as createTime,application.TRANS_CODE as TRANSCODE,
+				application.trans_Name as transName,application.RETURN_REASON  as returnReason,application.type as type
 			    from t_so_return_line line 
 			    left join  t_so_return_application application
 			   	 on line.return_orderid=application.id
