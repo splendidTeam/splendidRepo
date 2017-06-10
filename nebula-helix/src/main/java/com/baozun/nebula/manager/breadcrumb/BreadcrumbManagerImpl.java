@@ -41,7 +41,7 @@ import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.manager.navigation.NavigationHelperManager;
 import com.baozun.nebula.manager.system.AbstractCacheBuilder;
 import com.baozun.nebula.model.baseinfo.Navigation;

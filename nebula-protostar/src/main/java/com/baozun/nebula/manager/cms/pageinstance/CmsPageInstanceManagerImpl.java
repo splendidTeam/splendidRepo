@@ -39,7 +39,7 @@ import com.baozun.nebula.curator.invoke.UrlMapWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.manager.cms.pageversion.CmsPageInstanceVersionManager;
 import com.baozun.nebula.model.cms.CmsEditArea;
 import com.baozun.nebula.model.cms.CmsPageInstance;

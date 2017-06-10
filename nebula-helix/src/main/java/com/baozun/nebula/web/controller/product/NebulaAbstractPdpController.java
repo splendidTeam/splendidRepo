@@ -41,7 +41,7 @@ import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.product.ItemExtraDataCommand;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.manager.product.ItemRecommandManager;
