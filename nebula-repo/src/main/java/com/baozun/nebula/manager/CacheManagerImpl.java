@@ -167,11 +167,11 @@ public class CacheManagerImpl extends AbstractCacheManager{
                     return null;
                 }
                 CacheExpiredCommand<T> cec = (CacheExpiredCommand<T>) SerializableUtil.convert2Object(value);
-                if (System.currentTimeMillis() < cec.getExpiredTime())
+                if (System.currentTimeMillis() < cec.getExpiredTime()){
                     return (T) cec.getObject();
-                else
+                }else{
                     return null;
-
+                }
             }
         });
     }

@@ -16,8 +16,17 @@
  */
 package com.baozun.nebula.manager;
 
+import java.io.Serializable;
+
+import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.baozun.nebula.command.cache.CacheExpiredCommand;
+import com.baozun.nebula.utilities.common.SerializableUtil;
+
+import redis.clients.jedis.JedisCluster;
 
 /**
  * 为了兼容 ,此处就不适用service 标识了, 如要使用 请自行在 spring xml 中进行配置
@@ -29,6 +38,8 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClusterCacheManagerImpl.class);
 
+    private JedisCluster jedisCluster;
+
     /*
      * (non-Javadoc)
      * 
@@ -36,7 +47,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public void setValue(String key,String value,Integer expireSeconds){
-        // TODO Auto-generated method stub
+        jedisCluster.setex(key, expireSeconds, value);
 
     }
 
@@ -47,7 +58,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public void setValue(String key,String value){
-        // TODO Auto-generated method stub
+        jedisCluster.set(key, value);
 
     }
 
@@ -58,8 +69,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public Long remove(String key){
-        // TODO Auto-generated method stub
-        return null;
+        return jedisCluster.del(key);
     }
 
     /*
@@ -69,8 +79,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public String getValue(String key){
-        // TODO Auto-generated method stub
-        return null;
+        return jedisCluster.get(key);
     }
 
     /*
@@ -80,8 +89,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public void removeMapValue(String key,String field){
-        // TODO Auto-generated method stub
-
+        jedisCluster.hdel(key, field);
     }
 
     /*
@@ -91,7 +99,12 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public <T> void setMapObject(String key,String field,T t,int seconds){
-        // TODO Auto-generated method stub
+        CacheExpiredCommand<T> cec = new CacheExpiredCommand<T>();
+
+        cec.setObject(t);
+        cec.setExpiredTime(System.currentTimeMillis() + seconds * 1000l);
+        String value = SerializableUtil.convert2String((Serializable) cec);
+        jedisCluster.hset(key, field, value);
 
     }
 
@@ -102,8 +115,16 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public <T> T getMapObject(String key,String field){
-        // TODO Auto-generated method stub
-        return null;
+        String value = jedisCluster.hget(key, field);
+        if (StringUtils.isBlank(value)){
+            return null;
+        }
+        CacheExpiredCommand<T> cec = (CacheExpiredCommand<T>) SerializableUtil.convert2Object(value);
+        if (System.currentTimeMillis() < cec.getExpiredTime()){
+            return (T) cec.getObject();
+        }else{
+            return null;
+        }
     }
 
     /*
@@ -113,8 +134,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public void pushToListFooter(String key,String value){
-        // TODO Auto-generated method stub
-
+        jedisCluster.rpush(key, value);
     }
 
     /*
@@ -124,8 +144,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public String popListHead(String key){
-        // TODO Auto-generated method stub
-        return null;
+        return jedisCluster.lpop(key);
     }
 
     /*
@@ -135,8 +154,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public Long listLen(String key){
-        // TODO Auto-generated method stub
-        return 0L;
+        return jedisCluster.llen(key);
     }
 
     /*
@@ -146,8 +164,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public void addSet(String key,String[] values){
-        // TODO Auto-generated method stub
-
+        jedisCluster.sadd(key, values);
     }
 
     /*
@@ -157,8 +174,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public Long removeFromSet(String key,String[] values){
-        // TODO Auto-generated method stub
-        return null;
+        return jedisCluster.srem(key, values);
     }
 
     /*
@@ -168,8 +184,7 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public Long Decr(String key,long value){
-        // TODO Auto-generated method stub
-        return null;
+        return jedisCluster.decrBy(key, value);
     }
 
     /*
@@ -179,8 +194,10 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public Long incr(String key,int expireSeconds){
-        // TODO Auto-generated method stub
-        return null;
+        // reply new value
+        Long valueCurr = jedisCluster.incr(key);
+        jedisCluster.expire(key, expireSeconds);
+        return valueCurr;
     }
 
     /*
@@ -190,8 +207,12 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public Boolean applyRollingTimeWindow(String key,long limit,long window){
-        // TODO Auto-generated method stub
-        return false;
+        long now = System.currentTimeMillis();
+
+        jedisCluster.zremrangeByScore(key, 0, now - window * 1000);
+        jedisCluster.zadd(key, now, String.valueOf(now));
+
+        return (jedisCluster.zcard(key) <= limit);
     }
 
     /*
@@ -201,8 +222,19 @@ public class ClusterCacheManagerImpl extends AbstractCacheManager{
      */
     @Override
     public int removeByPrefix(String key){
-        // TODO Auto-generated method stub
-        return 0;
+        //        final String cleanKey = buildCleanKeyPattern(key);
+        //        int delCount = 0;
+        //        Set<String> delKeys = jedisCluster.keys(cleanKey);
+        //        if (isNotNullOrEmpty(delKeys)){
+        //            for (String delkey : delKeys){
+        //                jedisCluster.del(delkey);
+        //                delCount++;
+        //            }
+        //        }
+        //        return delCount;
+
+        //TODO
+        throw new NotImplementedException("removeByPrefix is not implemented!");
     }
 
 }
