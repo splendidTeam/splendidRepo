@@ -47,16 +47,10 @@ public class DefaultMemberPersonalDataPacker implements MemberPersonalDataPacker
         Validate.notNull(memberProfileForm, "memberProfileForm can not null");
 
         //***************************************************************************
-        Date date = DateUtil.toDate(memberProfileForm.getBirthday(), DatePattern.COMMON_DATE);
-        memberPersonalData.setBirthday(date);
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//        try{
-//            if (Validator.isNotNullOrEmpty(memberProfileForm.getBirthday())){
-//                memberPersonalData.setBirthday(sdf.parse(memberProfileForm.getBirthday()));
-//            }
-//        }catch (ParseException e){
-//            e.printStackTrace();
-//        }
+        if (Validator.isNotNullOrEmpty(memberProfileForm.getBirthday())){
+            memberPersonalData.setBirthday(DateUtil.toDate(memberProfileForm.getBirthday(), DatePattern.COMMON_DATE));
+        }
+        
         memberPersonalData.setEmail(memberProfileForm.getLoginEmail());
         memberPersonalData.setMobile(memberProfileForm.getLoginMobile());
 
