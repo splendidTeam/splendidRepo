@@ -22,6 +22,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,6 @@ import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -44,6 +44,9 @@ import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.member.build.DefaultMemberPersonalDataPacker;
+import com.baozun.nebula.web.controller.member.build.MemberPersonalDataPacker;
+import com.baozun.nebula.web.controller.member.converter.MemberViewCommandExtentMapBuilder;
 import com.baozun.nebula.web.controller.member.converter.MemberViewCommandConverter;
 import com.baozun.nebula.web.controller.member.form.MemberProfileForm;
 import com.baozun.nebula.web.controller.member.validator.MemberProfileFormValidator;
@@ -90,13 +93,24 @@ public class NebulaMemberProfileController extends BaseController {
 	@Autowired
 	@Qualifier("memberProfileFormValidator")
 	private MemberProfileFormValidator memberProfileFormValidator;
-
+	/**
+     * 保留字段的配置信息的map构造器
+     * @since 5.3.2.18
+     */
+	@Autowired(required=false)
+	private	MemberViewCommandExtentMapBuilder memberViewCommandExtentMapBuilder;
 	/**
 	 * 会员信息转换器
 	 */
 	@Autowired
 	@Qualifier("memberViewCommandConverter")
 	private MemberViewCommandConverter memberViewCommandConverter;
+	/**
+     * 会员信息包装器
+     * @since 5.3.2.18
+     */
+	@Autowired(required=false)
+	private MemberPersonalDataPacker memberPersonalDataPacker;
 
 	/**
 	 * 显示用户信息，默认推荐配置如下
@@ -126,9 +140,15 @@ public class NebulaMemberProfileController extends BaseController {
 
 		LOG.info("[MEM_VIEW_PROFILE] {} [{}] \"copy MemberCommand Properties to MemberViewCommand\"",memberViewCommand, new Date());
 
-		MemberPersonalData findMemberPersonData = sdkMemberManager.findMemberPersonData(memberDetails.getMemberId());
-	    memberViewCommand.setRealName(findMemberPersonData.getNickname());
-	    memberViewCommand.setSex(findMemberPersonData.getSex());
+		MemberPersonalData memberPersonData = sdkMemberManager.findMemberPersonData(memberDetails.getMemberId());
+		
+		//判断memberViewCommandExtentMapBuilder)是否有实现，如果有实现则表示需要显示保留字段
+		if(Validator.isNotNullOrEmpty(memberViewCommandExtentMapBuilder)){
+		    memberViewCommand.setExtendMap(memberViewCommandExtentMapBuilder.build(memberPersonData));
+		}
+        
+	    memberViewCommand.setRealName(memberPersonData.getNickname());
+	    memberViewCommand.setSex(memberPersonData.getSex());
 		model.addAttribute(MODEL_KEY_MEMBER_PROFILE, memberViewCommand);
 
 		return VIEW_MEMBER_PROFILE;
@@ -212,7 +232,6 @@ public class NebulaMemberProfileController extends BaseController {
 			BindingResult bindingResult) {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
-
 		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Start edit MemberProfile\"",
 				memberDetails.getLoginName(), new Date());
 
@@ -253,7 +272,9 @@ public class NebulaMemberProfileController extends BaseController {
 			return getResultFromBindingResult(bindingResult);
 		}
 		
-		memberProfile = memberProfileForm.toMemberPersonalData(memberProfile);
+		MemberPersonalDataPacker useMemberPersonalDataPacker=ObjectUtils.defaultIfNull(memberPersonalDataPacker, DefaultMemberPersonalDataPacker.INSTANCE);
+		
+		memberProfile = useMemberPersonalDataPacker.packer(memberProfile, memberProfileForm);
 
 		// 这里需要通过Form和会员信息来判断这些关键信息是否变化
 		boolean isPasswordChange = false;

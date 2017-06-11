@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.member.viewcommand;
 
+import java.util.Map;
+
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 public class MemberViewCommand extends BaseViewCommand {
@@ -103,7 +105,13 @@ public class MemberViewCommand extends BaseViewCommand {
 	private Integer receiveMail;
 
 	private String newPassword;
-
+	
+	/**
+     * 用于保存保留字段的信息的map
+     * @since 5.3.2.18
+     */
+    private Map<String,Object> extendMap;
+    
 	public Long getId() {
 		return id;
 	}
@@ -240,4 +248,19 @@ public class MemberViewCommand extends BaseViewCommand {
 		this.newPassword = newPassword;
 	}
 
+	/**
+     * 获取用于保存保留字段的信息的map
+     * @since 5.3.2.18
+     */
+    public Map<String,Object> getExtendMap(){
+        return extendMap;
+    }
+
+    /**
+     * @since 5.3.2.18
+     */
+    public void setExtendMap(Map<String,Object> map){
+        this.extendMap = map;
+    }
+	
 }

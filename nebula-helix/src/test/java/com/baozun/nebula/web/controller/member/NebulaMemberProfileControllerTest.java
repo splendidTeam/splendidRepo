@@ -138,9 +138,9 @@ public class NebulaMemberProfileControllerTest extends BaseControllerTest {
 				memberManager.findMemberPersonData(memberDetails.getMemberId()))
 				.andReturn(memberPersonalData);
 
-		EasyMock.expect(
-				memberProfileForm.toMemberPersonalData(memberPersonalData))
-				.andReturn(memberPersonalData);
+//		EasyMock.expect(
+//				memberProfileForm.toMemberPersonalData(memberPersonalData))
+//				.andReturn(memberPersonalData);
 
 		EasyMock.expect(memberManager.savePersonData(memberPersonalData))
 				.andReturn(memberPersonalData);
