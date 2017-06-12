@@ -1,4 +1,4 @@
-package com.baozun.nebula.manager;
+package com.baozun.nebula.sdk.manager.returnapplication;
 
 import java.util.List;
 

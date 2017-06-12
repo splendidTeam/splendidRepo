@@ -1,4 +1,4 @@
-package com.baozun.nebula.command;
+package com.baozun.nebula.web.controller.order.viewcommand;
 
 import java.util.List;
 

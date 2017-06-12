@@ -9,13 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baozun.nebula.command.ReturnApplicationCommand;
-import com.baozun.nebula.command.ReturnLineViewCommand;
 import com.baozun.nebula.constant.SoReturnConstants;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.dao.salesorder.SdkReturnApplicationDao;
-import com.baozun.nebula.manager.SoReturnApplicationManager;
-import com.baozun.nebula.manager.SoReturnLineManager;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
@@ -26,8 +23,11 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
+import com.baozun.nebula.sdk.manager.returnapplication.SoReturnApplicationManager;
+import com.baozun.nebula.sdk.manager.returnapplication.SoReturnLineManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
+import com.baozun.nebula.web.controller.order.viewcommand.ReturnLineViewCommand;
 
 @Service("returnApplicationResolver")
 public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{

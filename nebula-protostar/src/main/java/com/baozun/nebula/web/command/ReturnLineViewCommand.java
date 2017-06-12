@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.baozun.nebula.command;
+package com.baozun.nebula.web.command;
 
 import java.util.List;
 

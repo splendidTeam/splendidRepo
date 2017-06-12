@@ -1,4 +1,4 @@
-package com.baozun.nebula.manager;
+package com.baozun.nebula.sdk.manager.returnapplication;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.baozun.nebula.manager;
+package com.baozun.nebula.sdk.manager.returnapplication;
 
 import java.util.List;
 import java.util.Map;
@@ -10,8 +10,6 @@ import loxia.dao.Sort;
 
 import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
-import com.baozun.nebula.command.ReturnApplicationViewCommand;
-import com.baozun.nebula.command.ReturnLineViewCommand;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
@@ -72,17 +70,4 @@ public interface SoReturnApplicationManager {
 	 */
 	public List<ReturnApplicationCommand> findReturnApplicationCommandsByIds(List<Long> ids);
 	
-	/**
-	 * 通过ReturnApplicationCommand集合获得returnApplicationViewCommand集合对象
-	 * @param returnApplications
-	 * @return
-	 */
-	public List<ReturnApplicationViewCommand> findReturnApplicationViewCommand(List<ReturnApplicationCommand> returnApplications);
-	
-	public  List<ReturnLineViewCommand> findReturnLineViewCommandByLineIds(List<Long> orderLineIds);
-	
-	
-	
-	
-
 }
