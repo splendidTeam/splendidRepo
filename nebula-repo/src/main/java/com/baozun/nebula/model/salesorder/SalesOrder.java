@@ -71,6 +71,8 @@ public class SalesOrder extends BaseModel{
 
     /** 15 交易完成. */
     public static final int    SALES_ORDER_STATUS_FINISHED                  = 15;
+    
+  //---------------------------------------------------------------------------------------
 
     // so finance status
     /** 财务状态:未收款 1. */
@@ -84,6 +86,8 @@ public class SalesOrder extends BaseModel{
 
     /** 财务状态:已部分收款4. */
     public static final int    SALES_ORDER_FISTATUS_PART_PAYMENT            = 4;
+    
+    //---------------------------------------------------------------------------------------
 
     /** 1 货到付款. */
     public static final String SO_PAYMENT_TYPE_COD                          = "1";
@@ -153,6 +157,8 @@ public class SalesOrder extends BaseModel{
 	
 	/** 131 支付宝-国际卡 */
 	public static final String	SO_PAYMENT_TYPE_INTERNATIONALCARD		    = "131";
+	
+	   // -----------------------------------------------------------------
 
     /** 商城正常下单. */
     public static final int    SO_SOURCE_NORMAL                             = 1;
@@ -162,6 +168,8 @@ public class SalesOrder extends BaseModel{
 
     /** 手机端正常下单. */
     public static final int    SO_SOURCE_MOBILE_NORMAL                      = 3;
+    
+    // -----------------------------------------------------------------
 
     /** 订单类型 1-普通订单. */
     public static final int    NORMAL_ORDER                                 = 1;
@@ -174,6 +182,8 @@ public class SalesOrder extends BaseModel{
 
     /** 支付类型 2-分阶段付款. */
     public static final int    Phased_Payment                               = 2;
+    
+    // -----------------------------------------------------------------
 
     /** COD收款类型：现金. */
     public static final int    COD_TYPE_CASH                                = 1;

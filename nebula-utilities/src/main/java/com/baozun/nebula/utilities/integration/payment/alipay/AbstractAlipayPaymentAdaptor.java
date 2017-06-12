@@ -49,546 +49,525 @@ import com.baozun.nebula.utilities.integration.payment.exception.PaymentExceptio
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
 import com.baozun.nebula.utilities.io.http.HttpMethodType;
 import com.feilong.core.Validator;
+import com.feilong.tools.slf4j.Slf4jUtil;
 
-public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
+public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(AbstractAlipayPaymentAdaptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAlipayPaymentAdaptor.class);
 
-	protected Properties configs;
+    public static final String _INPUT_CHARSET = "utf-8";
 
-	private String payMethod;
+    //--------------------------------------------------------------------------------------------------------------------------
 
-	private String isDefault_login;
+    protected Properties configs;
 
-	private String returnUrl;
+    private String payMethod;
 
-	private String notifyUrl;
+    private String isDefault_login;
 
-	private String errorNotifyUrl;
+    private String returnUrl;
 
-	@Override
-	public abstract String getServiceProvider();
+    private String notifyUrl;
 
-	@Override
-	public String getServiceType() {
-		return "jishidaozhang";
-	}
+    private String errorNotifyUrl;
 
-	@Override
-	public String getServiceVersion() {
-		return "4.0";
-	}
+    //--------------------------------------------------------------------------------------------------------------------------
 
-	@Override
-	public PaymentRequest newPaymentRequest(String requestType,
-			Map<String, String> addition) {
-		AlipayPaymentRequest request = new AlipayPaymentRequest();
-		try {
-			request.setRequestType(requestType);
-			if (Validator.isNotNullOrEmpty(isDefault_login)) {
-				addition.put("default_login", isDefault_login);
-			}
-			request.initPaymentRequestParams(configs, addition,
-					this.getPayMethod(), returnUrl, notifyUrl, errorNotifyUrl);
-		} catch (PaymentException ex) {
-			logger.error("Alipay newPaymentRequest error: " + ex.toString());
-		}
-		return request;
-	}
+    @Override
+    public PaymentRequest newPaymentRequest(String requestType,Map<String, String> addition){
+        AlipayPaymentRequest request = new AlipayPaymentRequest();
+        try{
+            request.setRequestType(requestType);
+            if (Validator.isNotNullOrEmpty(isDefault_login)){
+                addition.put("default_login", isDefault_login);
+            }
+            request.initPaymentRequestParams(configs, addition, this.getPayMethod(), returnUrl, notifyUrl, errorNotifyUrl);
+        }catch (PaymentException ex){
+            logger.error("Alipay newPaymentRequest error: " + ex.toString());
+        }
+        return request;
+    }
 
-	@Override
-	public PaymentRequest newPaymentRequestForMobileCreateDirect(
-			Map<String, String> addition) {
-		AlipayPaymentRequest request = new AlipayPaymentRequest();
-		try {
-			request.initPaymentRequestParamsForMobileCreateDirect(configs,
-					addition, returnUrl, notifyUrl, errorNotifyUrl);
-		} catch (PaymentException ex) {
-			logger.error("Alipay newPaymentRequestForMobileCreateDirect error: "
-					+ ex.toString());
-		}
-		return request;
-	}
+    @Override
+    public PaymentRequest newPaymentRequestForMobileCreateDirect(Map<String, String> addition){
+        AlipayPaymentRequest request = new AlipayPaymentRequest();
+        try{
+            request.initPaymentRequestParamsForMobileCreateDirect(configs, addition, returnUrl, notifyUrl, errorNotifyUrl);
+        }catch (PaymentException ex){
+            logger.error("Alipay newPaymentRequestForMobileCreateDirect error: " + ex.toString());
+        }
+        return request;
+    }
 
-	@Override
-	public PaymentRequest newPaymentRequestForMobileAuthAndExecute(
-			Map<String, String> addition) {
-		AlipayPaymentRequest request = new AlipayPaymentRequest();
-		try {
-			request.initPaymentRequestParamsForMobileAuthAndExecute(configs,
-					addition);
-		} catch (PaymentException ex) {
-			logger.error("Alipay newPaymentRequestForMobileAuthAndExecute error: "
-					+ ex.toString());
-		}
-		return request;
-	}
+    private PaymentRequest newPaymentRequestForMobileAuthAndExecute(Map<String, String> addition){
+        AlipayPaymentRequest request = new AlipayPaymentRequest();
+        try{
+            request.initPaymentRequestParamsForMobileAuthAndExecute(configs, addition);
+        }catch (PaymentException ex){
+            logger.error("Alipay newPaymentRequestForMobileAuthAndExecute error: " + ex.toString());
+        }
+        return request;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public PaymentResult getPaymentResult(HttpServletRequest request) {
-		PaymentResult paymentResult = new PaymentResult();
-		Map<String, String> responseMap = new HashMap<String, String>();
-		RequestMapUtil.requestConvert(request, responseMap);
-		String sign = request.getParameter("sign").toString();
-		String resultStr = request.getParameter("trade_status").toString();
-		String satus = request.getParameter("is_success").toString();
-		String notify_id = request.getParameter("notify_id").toString();
+    //--------------------------------------------------------------------------------------------------------------------------
 
-		responseMap.remove("sign");
-		responseMap.remove("sign_type");
-		String toBeSignedString = MapAndStringConvertor
-				.getToBeSignedString(responseMap);
-		String localSign = Md5Encrypt.md5(
-				toBeSignedString + configs.getProperty("param.key"),
-				configs.getProperty("param._input_charset"));
+    @Override
+    public PaymentResult getPaymentResult(HttpServletRequest request){
+        PaymentResult paymentResult = new PaymentResult();
 
-		boolean verifyRequest = isNotifyVerifySuccess(notify_id);
+        //--------------------------------------------------------------------------------------------------------
 
-		// 返回函数进行加密比较
-		if (verifyRequest) {
-			if (sign.equals(localSign)) {
-				if (satus.equals("T")) {
-					getResult(resultStr, paymentResult);
-				} else if (satus.equals("F")) {
-					paymentResult
-							.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-					paymentResult.setMessage("failure");
-				} else {
-					paymentResult
-							.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
-					paymentResult.setMessage("undefined");
-				}
-			} else {
-				paymentResult
-						.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
-				paymentResult.setMessage("sign not match");
-			}
-		} else {
-			paymentResult
-					.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
-			paymentResult.setMessage("alipay return value error");
-		}
-		PaymentServiceReturnCommand paymentServiceReturnCommand = new PaymentServiceReturnCommand();
-		RequestToCommand requestToCommand = new RequestToCommand();
-		paymentServiceReturnCommand = requestToCommand
-				.alipaySynRequestToCommand(request);
-		paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);
-		return paymentResult;
-	}
+        RequestToCommand requestToCommand = new RequestToCommand();
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public PaymentResult getPaymentResultForMobileCreateDirect(Map<String,String> resultStr) {
-		PaymentResult paymentResult = new PaymentResult();
-		Map<String, String> responseMap = new HashMap<String, String>();
-		String sign = resultStr.get("sign");
-		
+        PaymentServiceReturnCommand paymentServiceReturnCommand = requestToCommand.alipaySynRequestToCommand(request);
+        paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);
 
-		try {
-			resultStr.remove("sign");
-			Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(resultStr.get("res_data").toString());
-			String toBeSignedString = MapAndStringConvertor
-					.getToBeSignedString(resultStr);
-			String localSign = Md5Encrypt.md5(
-					toBeSignedString + configs.getProperty("param.key"),
-					configs.getProperty("param._input_charset"));
+        //--------------------------------------------------------------------------------------------------------
 
-			// 返回函数进行加密比较
-			if (localSign.equals(sign)) {
-				if (null == resultMap.get("request_token")) {
-					paymentResult
-							.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-					paymentResult.setMessage(resultMap.get("code") + "/"
-							+ resultMap.get("detail"));
-				} else {
-					paymentResult
-							.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
-					paymentResult.setMessage(resultMap.get("request_token"));
-				}
-			} else {
-				paymentResult
-						.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
-				paymentResult.setMessage("sign not match");
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        //卖家支 付宝账 号        String(10 0)        卖家支付宝账号，可以是 Email 或手机号码。        可空
+        String sellerEmail = request.getParameter("seller_email");
 
-		return paymentResult;
-	}
+        //不是我们配置的seller_email
+        String configSellerEmail = configs.getProperty("param.seller_email");
+        if (!configSellerEmail.equals(sellerEmail)){
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+            paymentResult.setMessage(Slf4jUtil.format("get seller_email:[{}], not our config:[{}]", sellerEmail, configSellerEmail));
+            return paymentResult;
+        }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public PaymentResult getPaymentResultForMobileAuthAndExecuteSYN(
-			HttpServletRequest request) {
-		PaymentResult paymentResult = new PaymentResult();
-		Map<String, String> responseMap = new HashMap<String, String>();
-		RequestMapUtil.requestConvert(request, responseMap);
-		String sign = request.getParameter("sign").toString();
-		String result = request.getParameter("result").toString();
+        //--------------------------------------------------------------------------------------------------------
 
-		responseMap.remove("sign");
-		responseMap.remove("sign_type");
-		String toBeSignedString = MapAndStringConvertor
-				.getToBeSignedString(responseMap);
-		String localSign = Md5Encrypt.md5(
-				toBeSignedString + configs.getProperty("param.key"),
-				configs.getProperty("param._input_charset"));
+        // 返回函数进行加密比较
+        if (isNotifyVerifySuccess(request.getParameter("notify_id"))){
+            Map<String, String> responseMap = new HashMap<>();
+            RequestMapUtil.requestConvert(request, responseMap);
 
-		// 返回函数进行加密比较
-		if (sign.equals(localSign)) {
-			if (RequestParam.ALIPAYSUCCESS.equals(result)) {
-				paymentResult
-						.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
-			} else {
-				paymentResult
-						.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-			}
-		} else {
-			paymentResult
-					.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
-			paymentResult.setMessage("sign not match");
-		}
+            responseMap.remove("sign");
+            responseMap.remove("sign_type");
 
-		PaymentServiceReturnForMobileCommand paymentServiceReturnForMobileCommand = new PaymentServiceReturnForMobileCommand();
-		RequestToCommand requestToCommand = new RequestToCommand();
-		paymentServiceReturnForMobileCommand = requestToCommand.alipaySynRequestToCommandForMobile(request,null);
-		paymentResult.setPaymentStatusInformation(paymentServiceReturnForMobileCommand);
-		return paymentResult;
-	}
+            //----------------------------------
+            String toBeSignedString = MapAndStringConvertor.getToBeSignedString(responseMap);
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public PaymentResult getPaymentResultForMobileAuthAndExecuteASY(
-			HttpServletRequest request) {
-		PaymentResult paymentResult = new PaymentResult();
-		Map<String, String> resultMap = new HashMap<String, String>();
-		Map<String, String> responseMap = new HashMap<String, String>();
-		RequestMapUtil.requestConvert(request, responseMap);
-		String sign = request.getParameter("sign").toString();
-		try {
-			resultMap = MapAndStringConvertor.convertResultToMap(responseMap.get("notify_data"));
-			String resultStr = resultMap.get("trade_status").toString();
-			String notify_id = resultMap.get("notify_id").toString();
+            String localSign = Md5Encrypt.md5(toBeSignedString + configs.getProperty("param.key"), configs.getProperty("param._input_charset"));
+            String sign = request.getParameter("sign").toString();
 
-			responseMap.remove("sign");
-			String toBeSignedString = "service="+responseMap.get("service")+"&v="+responseMap.get("v")+"&sec_id="+responseMap.get("sec_id")+"&notify_data="+responseMap.get("notify_data");
-			String localSign = Md5Encrypt.md5(
-					toBeSignedString + configs.getProperty("param.key"),
-					configs.getProperty("param._input_charset"));
+            if (sign.equals(localSign)){
 
-			boolean verifyRequest = isNotifyVerifySuccess(notify_id);
+                String satus = request.getParameter("is_success");
 
-			if (verifyRequest) {
-				if (sign.equals(localSign)) {
-					getResult(resultStr, paymentResult);
-				} else {
-					paymentResult
-							.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-					paymentResult.setMessage("failure");
-				}
-			} else {
-				paymentResult
-						.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
-				paymentResult.setMessage("alipay return value error");
-			}
-			if (verifyRequest) {
-				paymentResult.setResponseValue(RequestParam.ALIPAYSUCCESS);
-			} else {
-				paymentResult.setResponseValue(RequestParam.ALIPAYFAIL);
-			}
-			PaymentServiceReturnForMobileCommand paymentServiceReturnForMobileCommand = new PaymentServiceReturnForMobileCommand();
-			RequestToCommand requestToCommand = new RequestToCommand();
-			paymentServiceReturnForMobileCommand = requestToCommand.alipaySynRequestToCommandForMobile(request,resultMap);
-			paymentResult.setPaymentStatusInformation(paymentServiceReturnForMobileCommand);
-		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+                if (satus.equals("T")){
+                    String resultStr = request.getParameter("trade_status");
+                    getResult(resultStr, paymentResult);
 
-		return paymentResult;
-	}
+                }else if (satus.equals("F")){
+                    paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                    paymentResult.setMessage("failure");
+                }else{
+                    paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+                    paymentResult.setMessage("undefined");
+                }
+            }else{
+                paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+                paymentResult.setMessage("sign not match");
+            }
+        }else{
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+            paymentResult.setMessage("alipay return value error");
+        }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public PaymentResult getPaymentResultFromNotification(
-			HttpServletRequest request) {
-		PaymentResult paymentResult = new PaymentResult();
-		Map<String, String> responseMap = new HashMap<String, String>();
-		RequestMapUtil.requestConvert(request, responseMap);
-		String sign = request.getParameter("sign").toString();
-		String resultStr = request.getParameter("trade_status").toString();
-		String notify_id = request.getParameter("notify_id").toString();
+        //----------------------------------------------------------------------------------------------------------------------
 
-		responseMap.remove("sign");
-		responseMap.remove("sign_type");
-		String toBeSignedString = MapAndStringConvertor
-				.getToBeSignedString(responseMap);
-		String localSign = Md5Encrypt.md5(
-				toBeSignedString + configs.getProperty("param.key"),
-				configs.getProperty("param._input_charset"));
+        return paymentResult;
+    }
 
-		boolean verifyRequest = isNotifyVerifySuccess(notify_id);
+    @Override
+    public PaymentResult getPaymentResultFromNotification(HttpServletRequest request){
+        PaymentResult paymentResult = new PaymentResult();
+        RequestToCommand requestToCommand = new RequestToCommand();
+        PaymentServiceReturnCommand paymentServiceReturnCommand = requestToCommand.alipayAsyRequestToCommand(request);
+        paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);
+        //--------------------------------------------------------------------------------------------------------
 
-		if (verifyRequest) {
-			if (sign.equals(localSign)) {
-				getResult(resultStr, paymentResult);
-			} else {
-				paymentResult
-						.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-				paymentResult.setMessage("failure");
-			}
-		} else {
-			paymentResult
-					.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
-			paymentResult.setMessage("alipay return value error");
-		}
-		if (verifyRequest) {
-			paymentResult.setResponseValue(RequestParam.ALIPAYSUCCESS);
-		} else {
-			paymentResult.setResponseValue(RequestParam.ALIPAYFAIL);
-		}
-		PaymentServiceReturnCommand paymentServiceReturnCommand = new PaymentServiceReturnCommand();
-		RequestToCommand requestToCommand = new RequestToCommand();
-		paymentServiceReturnCommand = requestToCommand
-				.alipayAsyRequestToCommand(request);
-		paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);
-		return paymentResult;
-	}
+        //卖家支 付宝账 号        String(10 0)        卖家支付宝账号，可以是 Email 或手机号码。        可空
+        String sellerEmail = request.getParameter("seller_email");
 
-	@Override
-	public PaymentResult closePaymentRequest(Map<String, String> parm) {
-		PaymentResult paymentResult = new PaymentResult();
-		AlipayPaymentRequest request = new AlipayPaymentRequest();
-		try {
-			request.initPaymentRequestParamsCancel(configs, parm);
-			_closeTrade(parm, paymentResult);
-		} catch (PaymentException e) {
-			logger.error("Alipay closePaymentRequest error: " + e.toString());
-			paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-			paymentResult.setMessage(e.toString());
-			e.printStackTrace();
-		}
-		return paymentResult;
-	}
+        //不是我们配置的seller_email
+        String configSellerEmail = configs.getProperty("param.seller_email");
+        if (!configSellerEmail.equals(sellerEmail)){
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+            paymentResult.setMessage(Slf4jUtil.format("get seller_email:[{}], not our config:[{}]", sellerEmail, configSellerEmail));
+            return paymentResult;
+        }
 
-	@Override
-	public boolean isSupportClosePaymentRequest() {
-		// TODO Auto-generated method stub
-		return true;
-	}
+        //--------------------------------------------------------------------------------------------------------
 
-	@Override
-	public PaymentResult getOrderInfo(Map<String, String> addition) {
-		PaymentResult paymentResult = new PaymentResult();
-		AlipayPaymentRequest request = new AlipayPaymentRequest();
-		try {
-			request.initPaymentRequestParamsForQuery(configs, addition);
-			queryOrderInfo(addition, paymentResult);
-		} catch (PaymentException e) {
-			logger.error("Alipay queryOrderInfo error: " + e.toString());
-			paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-			paymentResult.setMessage(e.toString());
-			e.printStackTrace();
-		}
-		return paymentResult;
-	}
-	
-	
+        if (isNotifyVerifySuccess(request.getParameter("notify_id"))){
 
-	public String getPayMethod() {
-		return payMethod;
-	}
+            Map<String, String> responseMap = new HashMap<>();
+            RequestMapUtil.requestConvert(request, responseMap);
 
-	public void setPayMethod(String payMethod) {
-		this.payMethod = payMethod;
-	}
+            responseMap.remove("sign");
+            responseMap.remove("sign_type");
 
-	public String getIsDefault_login() {
-		return isDefault_login;
-	}
+            String toBeSignedString = MapAndStringConvertor.getToBeSignedString(responseMap);
+            String localSign = Md5Encrypt.md5(toBeSignedString + configs.getProperty("param.key"), configs.getProperty("param._input_charset"));
+            String sign = request.getParameter("sign").toString();
 
-	public void setIsDefault_login(String isDefault_login) {
-		this.isDefault_login = isDefault_login;
-	}
+            if (sign.equals(localSign)){
+                String resultStr = request.getParameter("trade_status").toString();
+                getResult(resultStr, paymentResult);
+            }else{
+                paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                paymentResult.setMessage("failure");
+            }
+            paymentResult.setResponseValue(RequestParam.ALIPAYSUCCESS);
 
-	/**
-	 * 使用 HttpURLConnection 去alipay 上面 验证 是否确实 校验成功.
-	 * 
-	 * @param notifyVerifyUrl
-	 *            通知验证的url
-	 * @return 如果获得的信息是true，则校验成功；如果获得的信息是其他，则校验失败。
-	 */
-	public boolean isNotifyVerifySuccess(String notifyId) {
-		try {
-			StringBuffer sb = new StringBuffer();
-			sb.append(configs.getProperty("payment_gateway") + "?");
-			sb.append("service=" + configs.getProperty("notify_verify"))
-					.append("&");
-			sb.append("partner=" + configs.getProperty("param.partner"))
-					.append("&");
-			sb.append("notify_id=" + notifyId);
-			URL url = new URL(sb.toString());
-			HttpURLConnection urlConnection = (HttpURLConnection) url
-					.openConnection();
-			urlConnection.setRequestMethod("POST");
-			BufferedReader bufferedReader = new BufferedReader(
-					new InputStreamReader(urlConnection.getInputStream()));
+        }else{
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+            paymentResult.setMessage("alipay return value error");
+            paymentResult.setResponseValue(RequestParam.ALIPAYFAIL);
+        }
 
-			String notifyVerifyResult = bufferedReader.readLine();
-			// 如果获得的信息是true，则校验成功；如果获得的信息是其他，则校验失败。
-			return "true".equals(notifyVerifyResult);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+        return paymentResult;
+    }
 
-	private void _closeTrade(Map<String, String> params, PaymentResult result) {
-		String alipayUrl = params.get("action").toString();
-		params.remove("action");
-		String closeTradeUrl = MapAndStringConvertor
-				.getToBeSignedString(params);
-		String url = alipayUrl + "?" + closeTradeUrl;
-		String returnXML = HttpClientUtil.getHttpMethodResponseBodyAsString(
-				url, HttpMethodType.GET);
+    @Override
+    public PaymentResult getPaymentResultForMobileAuthAndExecuteSYN(HttpServletRequest request){
+        Map<String, String> responseMap = new HashMap<>();
+        RequestMapUtil.requestConvert(request, responseMap);
+        String sign = request.getParameter("sign").toString();
+        String result = request.getParameter("result").toString();
 
-		if (Validator.isNotNullOrEmpty(returnXML)) {
-			try {
-				Map<String, String> resultMap = MapAndStringConvertor
-						.convertResultToMap(returnXML);
-				if ("T".equals(resultMap.get("is_success"))) {
-					result.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
-				} else {
-					result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-					result.setMessage(resultMap.get("error"));
-				}
-			} catch (DocumentException e) {
-				result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-				result.setMessage(e.toString());
-				e.printStackTrace();
-			}
-		}
-	}
+        responseMap.remove("sign");
+        responseMap.remove("sign_type");
 
-	private void queryOrderInfo(Map<String, String> params, PaymentResult result) {
-		String alipayUrl = params.get("action").toString();
-		params.remove("action");
-		String queryUrl = MapAndStringConvertor.getToBeSignedString(params);
-		String url = alipayUrl + "?" + queryUrl;
-		String returnXML = HttpClientUtil.getHttpMethodResponseBodyAsString(
-				url, HttpMethodType.GET);
+        String toBeSignedString = MapAndStringConvertor.getToBeSignedString(responseMap);
+        String localSign = Md5Encrypt.md5(toBeSignedString + configs.getProperty("param.key"), configs.getProperty("param._input_charset"));
 
-		if (Validator.isNotNullOrEmpty(returnXML)) {
-			try {
-				Map<String, String> resultMap = MapAndStringConvertor
-						.convertResultToMap(returnXML);
-				if ("T".equals(resultMap.get("is_success"))) {
-					result.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
-					result.setMessage(resultMap.get("trade_status"));
+        PaymentResult paymentResult = new PaymentResult();
+        // 返回函数进行加密比较
+        if (sign.equals(localSign)){
+            if (RequestParam.ALIPAYSUCCESS.equals(result)){
+                paymentResult.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
+            }else{
+                paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+            }
+        }else{
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+            paymentResult.setMessage("sign not match");
+        }
 
-					PaymentServiceReturnCommand resultCommand = new PaymentServiceReturnCommand();
-					resultCommand.setTradeNo(resultMap.get("trade_no"));
-					resultCommand.setBuyer(resultMap.get("buyer_email"));
-					resultCommand.setTradeStatus(resultMap.get("trade_status"));
-					result.setPaymentStatusInformation(resultCommand);
-				} else {
-					result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-					result.setMessage(resultMap.get("error"));
-				}
-			} catch (DocumentException e) {
-				result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-				result.setMessage(e.toString());
-				e.printStackTrace();
-			}
-		}
-	}
+        RequestToCommand requestToCommand = new RequestToCommand();
+        PaymentServiceReturnForMobileCommand paymentServiceReturnForMobileCommand = requestToCommand.alipaySynRequestToCommandForMobile(request, null);
+        paymentResult.setPaymentStatusInformation(paymentServiceReturnForMobileCommand);
+        return paymentResult;
+    }
 
-	public void getResult(String resultStr, PaymentResult paymentResult) {
-		if (ResponseParam.WAIT_BUYER_PAY.equals(resultStr)) {
-			paymentResult
-					.setPaymentServiceSatus(PaymentServiceStatus.WAIT_BUYER_PAY);
-			paymentResult.setMessage("WAIT_BUYER_PAY");
-		} else if (ResponseParam.TRADE_CLOSED.equals(resultStr)) {
-			paymentResult
-					.setPaymentServiceSatus(PaymentServiceStatus.TRADE_CLOSED);
-			paymentResult.setMessage("TRADE_CLOSED");
-		} else if (ResponseParam.TRADE_FINISHED.equals(resultStr)) {
-			paymentResult
-					.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
-			paymentResult.setMessage("TRADE_FINISHED");
-		} else if (ResponseParam.TRADE_PENDING.equals(resultStr)) {
-			paymentResult
-					.setPaymentServiceSatus(PaymentServiceStatus.UNCONFIRUMED_PAYMENT_SUCCESS);
-			paymentResult.setMessage("TRADE_PENDING");
-		} else if (ResponseParam.TRADE_SUCCESS.equals(resultStr)) {
-			paymentResult
-					.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
-			paymentResult.setMessage("TRADE_SUCCESS");
-		}
-	}
+    @Override
+    public PaymentResult getPaymentResultForMobileAuthAndExecuteASY(HttpServletRequest request){
+        PaymentResult paymentResult = new PaymentResult();
 
-	/*
-	 * 初始化地址配置参数
-	 */
-	public void getAddress(String paymentType) {
-		Properties configs = ProfileConfigUtil.findCommonPro(PaymentFactory.ALIPAYADDRESS);
-		this.returnUrl = configs.getProperty(paymentType + ".return_url");
-		this.notifyUrl = configs.getProperty(paymentType + ".notify_url");
-		this.errorNotifyUrl = configs.getProperty(paymentType + ".error_notify_url");
-	}
-	
-	@Override
-	public PaymentResult unifiedOrder(Map<String, String> addition) {
-		PaymentResult paymentResult  = new PaymentResult();
-		return paymentResult;
-	}
-	
+        try{
+            Map<String, String> responseMap = new HashMap<>();
+            RequestMapUtil.requestConvert(request, responseMap);
 
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.utilities.integration.payment.PaymentAdaptor#getCreateResponseToken()
-	 */
-	@Override
-	public PaymentRequest getCreateResponseToken(PaymentRequest paymentRequest) {
-		String result = HttpClientUtil.getHttpMethodResponseBodyAsStringIgnoreCharSet(paymentRequest.getRequestURL(),HttpMethodType.GET,_INPUT_CHARSET);
-		Map<String,String> map = new HashMap<String,String>();
-					
-		if(Validator.isNotNullOrEmpty(result)){
-			try {
-				result = java.net.URLDecoder.decode(result,_INPUT_CHARSET);
-				String[] params = result.split("&");
-				if(Validator.isNotNullOrEmpty(params)){
-					for(String param:params){
-						String key = param.split("=")[0].toString();
-						String val = param.replace(param.split("=")[0].toString()+"=", "");
-						map.put(key, val);
-					}
-				}
-				
-				if(Validator.isNotNullOrEmpty(map)){
-					//手机WAP端授权结果
-					PaymentResult paymentResult = getPaymentResultForMobileCreateDirect(map);
-					if(paymentResult.getPaymentServiceSatus().equals(PaymentServiceStatus.SUCCESS)){
-						Map<String, String> resultMap;
-						resultMap = MapAndStringConvertor.convertResultToMap(map.get("res_data").toString());
-						//创建一个新的MOBILE端交易请求
-						paymentRequest = newPaymentRequestForMobileAuthAndExecute(resultMap);
-						logger.info("newPaymentRequestForMobileAuthAndExecute URL:{}",paymentRequest.getRequestURL());
-					}else{
-						logger.error("newPaymentRequestForMobileAuthAndExecute error:{}",paymentResult.getMessage()+paymentResult.getPaymentServiceSatus());
-					}
-				}
-			} catch (DocumentException e) {
-				logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
-				return null;
-			} catch (UnsupportedEncodingException e) {
-				logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
-			}
-		}
-		return paymentRequest;
-	}
-	
+            Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(responseMap.get("notify_data"));
+            String resultStr = resultMap.get("trade_status").toString();
+            String notify_id = resultMap.get("notify_id").toString();
+
+            responseMap.remove("sign");
+
+            String toBeSignedString = "service=" + responseMap.get("service") + "&v=" + responseMap.get("v") + "&sec_id=" + responseMap.get("sec_id") + "&notify_data=" + responseMap.get("notify_data");
+            String localSign = Md5Encrypt.md5(toBeSignedString + configs.getProperty("param.key"), configs.getProperty("param._input_charset"));
+
+            if (isNotifyVerifySuccess(notify_id)){
+                String sign = request.getParameter("sign").toString();
+                if (sign.equals(localSign)){
+                    getResult(resultStr, paymentResult);
+                }else{
+                    paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                    paymentResult.setMessage("failure");
+                }
+                paymentResult.setResponseValue(RequestParam.ALIPAYSUCCESS);
+            }else{
+                paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+                paymentResult.setMessage("alipay return value error");
+                paymentResult.setResponseValue(RequestParam.ALIPAYFAIL);
+            }
+
+            RequestToCommand requestToCommand = new RequestToCommand();
+            PaymentServiceReturnForMobileCommand paymentServiceReturnForMobileCommand = requestToCommand.alipaySynRequestToCommandForMobile(request, resultMap);
+            paymentResult.setPaymentStatusInformation(paymentServiceReturnForMobileCommand);
+        }catch (DocumentException e){
+            e.printStackTrace();
+        }
+
+        return paymentResult;
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public PaymentResult closePaymentRequest(Map<String, String> parm){
+        PaymentResult paymentResult = new PaymentResult();
+        AlipayPaymentRequest request = new AlipayPaymentRequest();
+        try{
+            request.initPaymentRequestParamsCancel(configs, parm);
+            _closeTrade(parm, paymentResult);
+        }catch (PaymentException e){
+            logger.error("Alipay closePaymentRequest error: " + e.toString());
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+            paymentResult.setMessage(e.toString());
+            e.printStackTrace();
+        }
+        return paymentResult;
+    }
+
+    @Override
+    public boolean isSupportClosePaymentRequest(){
+        return true;
+    }
+
+    @Override
+    public PaymentResult getOrderInfo(Map<String, String> addition){
+        PaymentResult paymentResult = new PaymentResult();
+        AlipayPaymentRequest request = new AlipayPaymentRequest();
+        try{
+            request.initPaymentRequestParamsForQuery(configs, addition);
+            queryOrderInfo(addition, paymentResult);
+        }catch (PaymentException e){
+            logger.error("Alipay queryOrderInfo error: " + e.toString());
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+            paymentResult.setMessage(e.toString());
+            e.printStackTrace();
+        }
+        return paymentResult;
+    }
+
+    /**
+     * 使用 HttpURLConnection 去alipay 上面 验证 是否确实 校验成功.
+     * 
+     * @param notifyVerifyUrl
+     *            通知验证的url
+     * @return 如果获得的信息是true，则校验成功；如果获得的信息是其他，则校验失败。
+     */
+    public boolean isNotifyVerifySuccess(String notifyId){
+        try{
+            StringBuffer sb = new StringBuffer();
+            sb.append(configs.getProperty("payment_gateway") + "?");
+            sb.append("service=" + configs.getProperty("notify_verify")).append("&");
+            sb.append("partner=" + configs.getProperty("param.partner")).append("&");
+            sb.append("notify_id=" + notifyId);
+
+            URL url = new URL(sb.toString());
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("POST");
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String notifyVerifyResult = bufferedReader.readLine();
+            // 如果获得的信息是true，则校验成功；如果获得的信息是其他，则校验失败。
+            return "true".equals(notifyVerifyResult);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void _closeTrade(Map<String, String> params,PaymentResult result){
+        String alipayUrl = params.get("action").toString();
+        params.remove("action");
+        String closeTradeUrl = MapAndStringConvertor.getToBeSignedString(params);
+        String url = alipayUrl + "?" + closeTradeUrl;
+        String returnXML = HttpClientUtil.getHttpMethodResponseBodyAsString(url, HttpMethodType.GET);
+
+        if (Validator.isNotNullOrEmpty(returnXML)){
+            try{
+                Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(returnXML);
+                if ("T".equals(resultMap.get("is_success"))){
+                    result.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
+                }else{
+                    result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                    result.setMessage(resultMap.get("error"));
+                }
+            }catch (DocumentException e){
+                result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                result.setMessage(e.toString());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void queryOrderInfo(Map<String, String> params,PaymentResult result){
+        String alipayUrl = params.get("action").toString();
+        params.remove("action");
+        String queryUrl = MapAndStringConvertor.getToBeSignedString(params);
+        String url = alipayUrl + "?" + queryUrl;
+        String returnXML = HttpClientUtil.getHttpMethodResponseBodyAsString(url, HttpMethodType.GET);
+
+        if (Validator.isNotNullOrEmpty(returnXML)){
+            try{
+                Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(returnXML);
+                if ("T".equals(resultMap.get("is_success"))){
+                    result.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
+                    result.setMessage(resultMap.get("trade_status"));
+
+                    PaymentServiceReturnCommand resultCommand = new PaymentServiceReturnCommand();
+                    resultCommand.setTradeNo(resultMap.get("trade_no"));
+                    resultCommand.setBuyer(resultMap.get("buyer_email"));
+                    resultCommand.setTradeStatus(resultMap.get("trade_status"));
+                    result.setPaymentStatusInformation(resultCommand);
+                }else{
+                    result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                    result.setMessage(resultMap.get("error"));
+                }
+            }catch (DocumentException e){
+                result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                result.setMessage(e.toString());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void getResult(String resultStr,PaymentResult paymentResult){
+        if (ResponseParam.WAIT_BUYER_PAY.equals(resultStr)){
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.WAIT_BUYER_PAY);
+            paymentResult.setMessage("WAIT_BUYER_PAY");
+        }else if (ResponseParam.TRADE_CLOSED.equals(resultStr)){
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.TRADE_CLOSED);
+            paymentResult.setMessage("TRADE_CLOSED");
+        }else if (ResponseParam.TRADE_FINISHED.equals(resultStr)){
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
+            paymentResult.setMessage("TRADE_FINISHED");
+        }else if (ResponseParam.TRADE_PENDING.equals(resultStr)){
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNCONFIRUMED_PAYMENT_SUCCESS);
+            paymentResult.setMessage("TRADE_PENDING");
+        }else if (ResponseParam.TRADE_SUCCESS.equals(resultStr)){
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
+            paymentResult.setMessage("TRADE_SUCCESS");
+        }
+    }
+
+    /*
+     * 初始化地址配置参数
+     */
+    public void getAddress(String paymentType){
+        Properties configs = ProfileConfigUtil.findCommonPro(PaymentFactory.ALIPAYADDRESS);
+        this.returnUrl = configs.getProperty(paymentType + ".return_url");
+        this.notifyUrl = configs.getProperty(paymentType + ".notify_url");
+        this.errorNotifyUrl = configs.getProperty(paymentType + ".error_notify_url");
+    }
+
+    @Override
+    public PaymentResult unifiedOrder(Map<String, String> addition){
+        PaymentResult paymentResult = new PaymentResult();
+        return paymentResult;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.utilities.integration.payment.PaymentAdaptor#getCreateResponseToken()
+     */
+    @Override
+    public PaymentRequest getCreateResponseToken(PaymentRequest paymentRequest){
+        String result = HttpClientUtil.getHttpMethodResponseBodyAsStringIgnoreCharSet(paymentRequest.getRequestURL(), HttpMethodType.GET, _INPUT_CHARSET);
+        Map<String, String> map = new HashMap<String, String>();
+
+        if (Validator.isNotNullOrEmpty(result)){
+            try{
+                result = java.net.URLDecoder.decode(result, _INPUT_CHARSET);
+                String[] params = result.split("&");
+                if (Validator.isNotNullOrEmpty(params)){
+                    for (String param : params){
+                        String key = param.split("=")[0].toString();
+                        String val = param.replace(param.split("=")[0].toString() + "=", "");
+                        map.put(key, val);
+                    }
+                }
+
+                if (Validator.isNotNullOrEmpty(map)){
+                    //手机WAP端授权结果
+                    PaymentResult paymentResult = getPaymentResultForMobileCreateDirect(map);
+                    if (paymentResult.getPaymentServiceSatus().equals(PaymentServiceStatus.SUCCESS)){
+                        Map<String, String> resultMap;
+                        resultMap = MapAndStringConvertor.convertResultToMap(map.get("res_data").toString());
+                        //创建一个新的MOBILE端交易请求
+                        paymentRequest = newPaymentRequestForMobileAuthAndExecute(resultMap);
+                        logger.info("newPaymentRequestForMobileAuthAndExecute URL:{}", paymentRequest.getRequestURL());
+                    }else{
+                        logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", paymentResult.getMessage() + paymentResult.getPaymentServiceSatus());
+                    }
+                }
+            }catch (DocumentException e){
+                logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
+                return null;
+            }catch (UnsupportedEncodingException e){
+                logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
+            }
+        }
+        return paymentRequest;
+    }
+
+    private PaymentResult getPaymentResultForMobileCreateDirect(Map<String, String> resultStr){
+        PaymentResult paymentResult = new PaymentResult();
+        String sign = resultStr.get("sign");
+
+        try{
+            resultStr.remove("sign");
+            //---------------------------------------------
+            Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(resultStr.get("res_data").toString());
+            String toBeSignedString = MapAndStringConvertor.getToBeSignedString(resultStr);
+            String localSign = Md5Encrypt.md5(toBeSignedString + configs.getProperty("param.key"), configs.getProperty("param._input_charset"));
+
+            // 返回函数进行加密比较
+            if (localSign.equals(sign)){
+                if (null == resultMap.get("request_token")){
+                    paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                    paymentResult.setMessage(resultMap.get("code") + "/" + resultMap.get("detail"));
+                }else{
+                    paymentResult.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
+                    paymentResult.setMessage(resultMap.get("request_token"));
+                }
+            }else{
+                paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+                paymentResult.setMessage("sign not match");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return paymentResult;
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public abstract String getServiceProvider();
+
+    @Override
+    public String getServiceType(){
+        return "jishidaozhang";
+    }
+
+    @Override
+    public String getServiceVersion(){
+        return "4.0";
+    }
+
+    public String getPayMethod(){
+        return payMethod;
+    }
+
+    public void setPayMethod(String payMethod){
+        this.payMethod = payMethod;
+    }
+
+    public String getIsDefault_login(){
+        return isDefault_login;
+    }
+
+    public void setIsDefault_login(String isDefault_login){
+        this.isDefault_login = isDefault_login;
+    }
+
 }
