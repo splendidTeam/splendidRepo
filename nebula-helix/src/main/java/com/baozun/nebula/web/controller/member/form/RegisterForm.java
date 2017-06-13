@@ -70,7 +70,7 @@ public class RegisterForm extends BaseForm{
 	private Long				provinceId;
 
 	/** 市id */
-	private Object				cityId;
+	private Long				cityId;
 
 	/** 区 id */
 	private Long				areaId;
@@ -330,7 +330,7 @@ public class RegisterForm extends BaseForm{
 	/**
 	 * @return the cityId
 	 */
-	public Object getCityId(){
+	public Long getCityId(){
 		return cityId;
 	}
 
@@ -338,7 +338,7 @@ public class RegisterForm extends BaseForm{
 	 * @param cityId
 	 *            the cityId to set
 	 */
-	public void setCityId(Object cityId){
+	public void setCityId(Long cityId){
 		this.cityId = cityId;
 	}
 
