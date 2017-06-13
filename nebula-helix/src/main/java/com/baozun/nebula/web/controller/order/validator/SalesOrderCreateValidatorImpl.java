@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
@@ -42,6 +43,9 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesOrderCreateValidatorImpl.class);
 
+    @Autowired(required = false)
+    private SalesOrderCreateValidatorHandler salesOrderCreateValidatorHandler;
+
     /*
      * (non-Javadoc)
      * 
@@ -54,15 +58,38 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
             return SalesOrderResult.ORDER_SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
-        //** 如果输入了优惠券则要进行优惠券验证
-        if (isNotNullOrEmpty(couponCode)){
-            //** 校驗优惠券促销 
-            SalesOrderResult salesOrderResult = checkCoupon(shoppingCartCommand, couponCode);
-            if (null != salesOrderResult){
+        //-------------------------------------------------------------------------
+        //如果实现了接口则执行preHandle()方法
+        if (null != salesOrderCreateValidatorHandler){
+            SalesOrderResult salesOrderResult = salesOrderCreateValidatorHandler.preHandle(shoppingCartCommand, couponCode);
+            //如果preHandle()方法返回值不是SalesOrderResult.SUCCESS则直接返回
+
+            if (SalesOrderResult.SUCCESS != salesOrderResult){
                 return salesOrderResult;
             }
         }
 
+        //-------------------------------------------------------------------------
+
+        //** 如果输入了优惠券则要进行优惠券验证
+        if (isNotNullOrEmpty(couponCode)){
+            //** 校驗优惠券促销 
+            SalesOrderResult salesOrderResult = checkCoupon(shoppingCartCommand, couponCode);
+            if (SalesOrderResult.SUCCESS != salesOrderResult){
+                return salesOrderResult;
+            }
+        }
+
+        //-------------------------------------------------------------------------
+
+        if (null != salesOrderCreateValidatorHandler){
+            SalesOrderResult salesOrderResult = salesOrderCreateValidatorHandler.postHandle(shoppingCartCommand, couponCode);
+            //如果postHandle()方法返回值不是SalesOrderResult.SUCCESS则直接返回
+
+            if (SalesOrderResult.SUCCESS != salesOrderResult){
+                return salesOrderResult;
+            }
+        }
         return SalesOrderResult.SUCCESS;
     }
 
