@@ -31,5 +31,5 @@ public interface OrderLineManager extends BaseManager {
 
 	public OrderLine findByPk(Long id);
 
-        public List<SimpleOrderLineSubViewCommand> findByOrderID(Long orderId); 
+    public List<SimpleOrderLineSubViewCommand> findByOrderID(Long orderId); 
 }
