@@ -54,6 +54,11 @@ public class InvoiceInfoSubForm implements Serializable {
 
 	/** 发票内容,比如 明细 办公用品 电脑配件 耗材. */
 	private String invoiceContent;
+	
+	/** 纳税人识别码 . 
+     * @since 5.3.2.18
+     * */
+    private String taxPayerId;
 
 	// XXX feilong 将来扩展发票类型， 比如 普通发票 增值税发票 电子发票等等
 
@@ -149,5 +154,24 @@ public class InvoiceInfoSubForm implements Serializable {
 	public void setNeedInvoice(boolean isNeedInvoice) {
 		this.isNeedInvoice = isNeedInvoice;
 	}
+	
+	/**
+     * 获得 纳税人识别码
+     * @return the 获取纳税人识别码
+     * @since 5.3.2.18
+     */
+    public String getTaxPayerId(){
+        return taxPayerId;
+    }
+
+    /**
+     * 设置 纳税人识别码
+     * @param taxPayerId
+     *              the new 纳税人识别码
+     * @since 5.3.2.18
+     */
+    public void setTaxPayerId(String taxPayerId){
+        this.taxPayerId = taxPayerId;
+    }
 
 }

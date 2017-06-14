@@ -1,5 +1,7 @@
 package com.baozun.nebula.wormhole.scm.makemsgcon;
 
+import static com.feilong.core.Validator.isNullOrEmpty;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import com.baozun.nebula.wormhole.mq.entity.order.OrderStatusV5;
 import com.baozun.nebula.wormhole.mq.entity.order.SalesOrderV5;
 import com.baozun.nebula.wormhole.mq.entity.pay.PaymentInfoV5;
 import com.baozun.nebula.wormhole.scm.handler.PropellingSalesOrderHandler;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;
 
 @Transactional
@@ -74,6 +77,9 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 
         salesOrderV5.setInvoiceTitle(salesOrderCommand.getReceiptTitle());
         salesOrderV5.setInvoiceContent(salesOrderCommand.getReceiptContent());
+        //纳税人识别码和发票类型
+        salesOrderV5.setBusinessType(buildBusinessType(salesOrderCommand));
+        salesOrderV5.setTaxPayerId(salesOrderCommand.getTaxPayerId());
 
         //商品总金额该金额为整单最终实际货款.(不包含运费且未扣减虚拟货币[实际支付金额])不含运费的客户端显示最终金额
         salesOrderV5.setTotalActual(salesOrderCommand.getTotal());
@@ -113,6 +119,29 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         }
 
         return propellingCommonManager.saveMsgBody(ConvertUtil.toList(salesOrderV5), msgSendRecord.getId());
+    }
+    /**
+     * 构造发票类型
+     * 
+     * @param  SalesOrderCommand 
+     * @return 1表示个人 2表示企业
+     */
+    private Integer buildBusinessType(SalesOrderCommand salesOrderCommand){
+        //XXX 逻辑等待确认
+        boolean isNeededInvoice = isNullOrEmpty(salesOrderCommand.getReceiptType());
+
+        if (!isNeededInvoice){
+            if(salesOrderCommand.getReceiptType()==1)
+            return 1;//1 个人 
+        }else{
+            if(salesOrderCommand.getReceiptType()==2)
+            return 2;
+        }
+
+        //----------------
+
+        
+        return null;
     }
 
     private static BigDecimal getPayDiscount(SalesOrderCommand salesOrderCommand){

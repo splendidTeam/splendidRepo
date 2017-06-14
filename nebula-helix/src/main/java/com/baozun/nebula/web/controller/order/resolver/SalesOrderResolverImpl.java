@@ -145,6 +145,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                 salesOrderCommand.setReceiptConsignee(invoiceInfoSubForm.getConsignee());
                 salesOrderCommand.setReceiptAddress(invoiceInfoSubForm.getAddress());
                 salesOrderCommand.setReceiptTelphone(invoiceInfoSubForm.getTelphone());
+                salesOrderCommand.setTaxPayerId(invoiceInfoSubForm.getTaxPayerId());
             }
         }
     }

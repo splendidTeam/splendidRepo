@@ -52,6 +52,11 @@ public class InvoiceInfoSubViewCommand extends BaseViewCommand {
 
     /** 发票收货地址. */
     private String receiptAddress;
+    
+    /** 纳税人识别码 . 
+     * @since 5.3.2.18
+     * */
+    private String taxPayerId;
 
     // XXX feilong 缺少属性
 
@@ -150,5 +155,23 @@ public class InvoiceInfoSubViewCommand extends BaseViewCommand {
 
     public void setReceiptAddress(String receiptAddress) {
         this.receiptAddress = receiptAddress;
+    }
+    /**
+     * 获得 纳税人识别码
+     * @return the 获取纳税人识别码
+     * @since 5.3.2.18
+     */
+    public String getTaxPayerId(){
+        return taxPayerId;
+    }
+
+    /**
+     * 设置 纳税人识别码
+     * @param taxPayerId
+     *              the new 纳税人识别码
+     * @since 5.3.2.18
+     */
+    public void setTaxPayerId(String taxPayerId){
+        this.taxPayerId = taxPayerId;
     }
 }

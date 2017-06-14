@@ -34,6 +34,7 @@
 						o.RECEIPT_TYPE as receiptType,
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_CONTENT as receiptContent,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.REMARK,
 						o.CREATE_TIME as createTime,
 						o.TRANS_CODE as transCode,
@@ -98,6 +99,7 @@
 						o.RECEIPT_TYPE as receiptType,
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_CONTENT as receiptCotent,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.REMARK,
 						o.CREATE_TIME as createTime
 						from t_so_salesorder as o 
@@ -140,6 +142,7 @@
 						o.RECEIPT_TELPHONE as receiptTelphone,
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_CONTENT as receiptContent,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
 						o.CREATE_TIME as createTime,
@@ -199,6 +202,7 @@
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_TELPHONE as receiptTelphone,
 						o.RECEIPT_CONTENT as receiptContent,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.REMARK,
 						o.CREATE_TIME as createTime,
 						o.logistics_provider_code as logisticsProviderCode,
@@ -244,6 +248,7 @@
 					o.RECEIPT_TYPE as receiptType,
 					o.RECEIPT_TITLE as receiptTitle,
 					o.RECEIPT_CONTENT as receiptContent,
+					o.TAXPAYER_ID  as taxPayerId,
 					o.REMARK,
 					o.MODIFY_TIME as modifyTime,
 					o.CREATE_TIME as createTime,
@@ -348,6 +353,7 @@
 					o.RECEIPT_TYPE as receiptType,
 					o.RECEIPT_TITLE as receiptTitle,
 					o.RECEIPT_CONTENT as receiptCotent,
+					o.TAXPAYER_ID  as taxPayerId,
 					o.REMARK,
 					o.MODIFY_TIME as modifyTime,
 					o.CREATE_TIME as createTime
@@ -418,6 +424,7 @@
 					o.RECEIPT_TYPE as receiptType,
 					o.RECEIPT_TITLE as receiptTitle,
 					o.RECEIPT_CONTENT as receiptContent,
+					o.TAXPAYER_ID  as taxPayerId,
 					o.REMARK,
 					o.MODIFY_TIME as modifyTime,
 					o.CREATE_TIME as createTime,
@@ -530,6 +537,7 @@
 					o.RECEIPT_TYPE as receiptType,
 					o.RECEIPT_TITLE as receiptTitle,
 					o.RECEIPT_CONTENT as receiptCotent,
+					o.TAXPAYER_ID  as taxPayerId,
 					o.REMARK,
 					o.MODIFY_TIME as modifyTime,
 					o.CREATE_TIME as createTime
@@ -741,6 +749,7 @@
 					o.RECEIPT_TYPE as receiptType,
 					o.RECEIPT_TITLE as receiptTitle,
 					o.RECEIPT_CONTENT as receiptContent,
+					o.TAXPAYER_ID  as taxPayerId,
 					o.REMARK,
 					o.CREATE_TIME as createTime,
 					sc.NAME,
@@ -880,6 +889,7 @@
 						o.RECEIPT_TYPE as receiptType,
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_CONTENT as receiptCotent,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
 						o.CREATE_TIME as createTime,
@@ -958,6 +968,7 @@
 						o.RECEIPT_TYPE as receiptType,
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_CONTENT as receiptCotent,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
 						o.CREATE_TIME as createTime
@@ -1006,6 +1017,7 @@
 						o.RECEIPT_TYPE as receiptType,
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_CONTENT as receiptCotent,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
 						o.CREATE_TIME as createTime
@@ -1051,6 +1063,7 @@
 						o.RECEIPT_TYPE as receiptType,
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_CONTENT as receiptCotent,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
 						o.CREATE_TIME as createTime
@@ -1101,6 +1114,7 @@
 						o.RECEIPT_TYPE as receiptType,
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_CONTENT as receiptCotent,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
 						o.CREATE_TIME as createTime

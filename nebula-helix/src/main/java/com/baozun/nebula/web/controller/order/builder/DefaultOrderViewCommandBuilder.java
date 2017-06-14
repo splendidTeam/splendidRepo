@@ -159,7 +159,7 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
     protected InvoiceInfoSubViewCommand buildInvoiceInfoSubViewCommand(SalesOrderCommand salesOrderCommand){
         // 发票信息
         InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
-        PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType", "receiptTitle", "receiptContent", "receiptCode", "receiptConsignee", "receiptTelphone", "receiptAddress");
+        PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType", "receiptTitle", "receiptContent", "receiptCode", "receiptConsignee", "receiptTelphone", "receiptAddress","taxPayerId");
         return invoiceInfoSubViewCommand;
     }
 

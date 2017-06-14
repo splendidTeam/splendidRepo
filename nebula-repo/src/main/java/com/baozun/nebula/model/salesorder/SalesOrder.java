@@ -284,6 +284,11 @@ public class SalesOrder extends BaseModel{
 
     /** 发票内容. */
     private String             receiptContent;
+    
+    /** 纳税人识别码 . 
+     * @since 5.3.2.18
+     * */
+    private String             taxPayerId;
 
     //**********************************************************************
     /** 下单时的语言 由于用于wormhole发邮件时邮件模板的多语言，以及地址信息的多语言. */
@@ -725,6 +730,26 @@ public class SalesOrder extends BaseModel{
      */
     public void setReceiptContent(String receiptContent){
         this.receiptContent = receiptContent;
+    }
+    
+    /**
+     * 获得 纳税人识别码
+     * @return the 获取纳税人识别码
+     * @since 5.3.2.18
+     */
+    @Column(name = "TAXPAYER_ID",length = 40,nullable = true,unique = false)
+    public String getTaxPayerId(){
+        return taxPayerId;
+    }
+
+    /**
+     * 设置 纳税人识别码
+     * @param taxPayerId
+     *              the new 纳税人识别码
+     * @since 5.3.2.18
+     */
+    public void setTaxPayerId(String taxPayerId){
+        this.taxPayerId = taxPayerId;
     }
 
     /**
