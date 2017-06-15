@@ -160,8 +160,8 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
         // 发票信息
         InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
         
-        //5.3.2.18添加对 "taxPayerId":纳税人识别码的转化
-        PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType", "receiptTitle", "receiptContent", "receiptCode", "receiptConsignee", "receiptTelphone", "receiptAddress","taxPayerId");
+        //5.3.2.18添加对 "taxPayerId":纳税人识别码,"companyAddress":公司地址,"companyPhone":公司电话,"accountBankName":开户银行名称,"accountBankNumber":开户银行账号的转换
+        PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType", "receiptTitle", "receiptContent", "receiptCode", "receiptConsignee", "receiptTelphone", "receiptAddress","taxPayerId","companyAddress","companyPhone","accountBankName","accountBankNumber");
         return invoiceInfoSubViewCommand;
     }
 
