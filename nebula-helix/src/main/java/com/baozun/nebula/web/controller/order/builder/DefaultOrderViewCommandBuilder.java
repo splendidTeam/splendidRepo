@@ -159,6 +159,8 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
     protected InvoiceInfoSubViewCommand buildInvoiceInfoSubViewCommand(SalesOrderCommand salesOrderCommand){
         // 发票信息
         InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
+        
+        //5.3.2.18添加对 "taxPayerId":纳税人识别码的转化
         PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType", "receiptTitle", "receiptContent", "receiptCode", "receiptConsignee", "receiptTelphone", "receiptAddress","taxPayerId");
         return invoiceInfoSubViewCommand;
     }

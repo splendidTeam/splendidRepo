@@ -145,6 +145,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                 salesOrderCommand.setReceiptConsignee(invoiceInfoSubForm.getConsignee());
                 salesOrderCommand.setReceiptAddress(invoiceInfoSubForm.getAddress());
                 salesOrderCommand.setReceiptTelphone(invoiceInfoSubForm.getTelphone());
+                //5.3.2.18 增加对TaxPayerId ：纳税人识别码的转换
                 salesOrderCommand.setTaxPayerId(invoiceInfoSubForm.getTaxPayerId());
             }
         }

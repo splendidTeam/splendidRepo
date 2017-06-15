@@ -286,6 +286,7 @@ public class SalesOrder extends BaseModel{
     private String             receiptContent;
     
     /** 纳税人识别码 . 
+     * 纳税人识别码就是税务登记证上的号，每个企业的识别号都是唯一的
      * @since 5.3.2.18
      * */
     private String             taxPayerId;
