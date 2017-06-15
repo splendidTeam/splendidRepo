@@ -10,18 +10,15 @@
 
     <!-- Load Balanced HttpSolrServer -->
     <bean id="solrServer_sku" class="org.apache.solr.client.solrj.impl.LBHttpSolrServer">
-        <constructor-arg>
-            <list>
-                <!--
 
-                    since 5.3.2.18 fix by feilong
+        <!--
 
-                    支持 逗号, 分号,空格 分隔的配置
+            since 5.3.2.18 fix by feilong
 
-                -->
-                <value>#{T(com.feilong.core.lang.StringUtil).tokenizeToStringArray(solr['solr.solrServerUrl'],',; ')}</value>
-            </list>
-        </constructor-arg>
+            支持 逗号, 分号,空格 分隔的配置
+
+        -->
+        <constructor-arg name="solrServerUrls" value="#{T(com.feilong.core.lang.StringUtil).tokenizeToStringArray(solr['solr.solrServerUrl'],',; ')}" />
 
         <property name="soTimeout" value="1000" />
         <property name="connectionTimeout" value="10000" />
