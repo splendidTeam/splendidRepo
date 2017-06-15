@@ -527,7 +527,6 @@ public class LogisticsManagerImpl implements LogisticsManager{
             freight = freightStrategy.cal(shippingFeeConfigCommand, itemList);
         }catch (Exception e){
             LOGGER.warn("计算运费异常。",e);
-            throw new BusinessException("计算运费异常！");
         }
         return freight;
     }
