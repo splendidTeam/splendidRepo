@@ -131,16 +131,18 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         boolean isNeededInvoice = isNullOrEmpty(salesOrderCommand.getReceiptType());
 
         if (!isNeededInvoice){
-            if(salesOrderCommand.getReceiptType()==1)
-            return 1;//1 个人 
-        }else{
-            if(salesOrderCommand.getReceiptType()==2)
-            return 2;
+            if(salesOrderCommand.getReceiptType()==1){
+              //1 个人 
+              return 1;
+            }
+            
+            if(salesOrderCommand.getReceiptType()==2){
+              //2 企业
+              return 2;
+            }
         }
 
-        //----------------
-
-        
+        //----------------      
         return null;
     }
 
