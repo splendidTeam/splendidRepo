@@ -142,8 +142,12 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
     @Override
     public SoReturnApplication findLastApplicationByOrderId(Long orderId){
         List<SoReturnApplication> returnApplication = soReturnApplicationDao.findLastApplicationByOrderId(orderId);
-        //获得的returnApplication是根据创建时间倒序排序，因此取第一个就是最新的一笔退货
-        return returnApplication.get(0);
+        if(Validator.isNotNullOrEmpty(returnApplication)){
+          //获得的returnApplication是根据创建时间倒序排序，因此取第一个就是最新的一笔退货
+            return returnApplication.get(0);
+        }else{
+            return null;
+        }
     }
 
     @Override

@@ -54,7 +54,7 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 				||null==saleOrder.getLogisticsStatus() 
 				||saleOrder.getLogisticsStatus().compareTo(
 								SalesOrder.SALES_ORDER_STATUS_FINISHED) != 0) {
-			errors.rejectValue("orderStatus", "order.status.unfinish");
+			errors.rejectValue("orderCode", "order.status.unfinish");
 		}
 		
 		//检查退货数量书否超出可退数量限制
@@ -71,7 +71,7 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 					Integer count=line.getCount();
 					if(count-Integer.parseInt(form.getSumSelected()[i])<returnedCount){
 						// 退货数量超出限制。
-						errors.rejectValue("returnCount", "return.count.outrange");
+						errors.rejectValue("orderCode", "return.count.outrange");
 					
 					}
 				}
@@ -80,13 +80,13 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 			SoReturnApplication app = soReturnApplicationManager.findLastApplicationByOrderLineId(line.getId());
 			if (null != app && app.getStatus() != SoReturnConstants.RETURN_COMPLETE&&app.getStatus()!=SoReturnConstants.REFUS_RETURN) {
 				// 当前订单尚有一笔未完成的退货单！无法再次申请
-				errors.rejectValue("returnOrder", "return.unfinish");
+				errors.rejectValue("orderCode", "return.unfinish");
 			}
 			Boolean isOutDayOrder = soReturnApplicationManager
 					.isFinishedAndOutDayOrderById(saleOrder.getId());
 			if (BooleanUtils.isTrue(isOutDayOrder)) {
 				// 如果是 超过收货14天的订单则不能 申请退货
-				errors.rejectValue("returnOrder", "return.outOfDate");
+				errors.rejectValue("orderCode", "return.outOfDate");
 			}
 		}
 		
