@@ -19,6 +19,8 @@ package com.baozun.nebula.web.controller.shoppingcart.factory;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +49,13 @@ public class ImmediatelyBuyShoppingCartLineCommandListFactoryImpl implements Imm
      * buildShoppingCartLineCommandList(com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm)
      */
     @Override
-    public List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(ImmediatelyBuyForm immediatelyBuyForm){
+    public List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(ImmediatelyBuyForm immediatelyBuyForm ,HttpServletRequest request){
         Validate.notNull(immediatelyBuyForm, "immediatelyBuyForm can't be null!");
 
         ImmediatelyBuyAdaptor immediatelyBuyAdaptor = immediatelyBuyFormAndAdaptorMap.get(immediatelyBuyForm.getClass().getName());
 
         Validate.notNull(immediatelyBuyAdaptor, "immediatelyBuyAdaptor can't be null!");
-        return immediatelyBuyAdaptor.buildShoppingCartLineCommandList(immediatelyBuyForm);
+        return immediatelyBuyAdaptor.buildShoppingCartLineCommandList(immediatelyBuyForm,request);
     }
 
     /**

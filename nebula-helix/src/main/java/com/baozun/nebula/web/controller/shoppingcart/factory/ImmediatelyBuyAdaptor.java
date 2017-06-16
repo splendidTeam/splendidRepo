@@ -18,6 +18,8 @@ package com.baozun.nebula.web.controller.shoppingcart.factory;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
 
@@ -36,5 +38,5 @@ public interface ImmediatelyBuyAdaptor{
      *            the immediately buy form
      * @return the list< shopping cart line command>
      */
-    List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(ImmediatelyBuyForm immediatelyBuyForm);
+    List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(ImmediatelyBuyForm immediatelyBuyForm , HttpServletRequest request);
 }
