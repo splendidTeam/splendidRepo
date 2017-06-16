@@ -38,7 +38,7 @@ public class InvoiceInfoSubForm implements Serializable {
 	/** 是否需要发票. */
 	private boolean isNeedInvoice;
 
-	/****** 1:个人 2:公司 ****/
+	/****** 1:个人 2:公司   3:增值税发票****/
 	private Integer invoiceType;
 
 	/** 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司. */
