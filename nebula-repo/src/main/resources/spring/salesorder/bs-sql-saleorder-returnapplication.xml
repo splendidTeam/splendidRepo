@@ -147,7 +147,7 @@
 					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '%$loginName%' AND member.id=application.memberid)
 					#end
 			        #if($returnCode)
-						AND application.platform_oms_code LIKE '%$returnCode%'
+						AND application.return_application_code LIKE '%$returnCode%'
 					#end
 					#if($oderCode)
 						AND application.so_order_code LIKE '%$oderCode%'

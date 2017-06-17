@@ -81,12 +81,6 @@
 						        </select>
 							</span>
 						</td>
-						 <td><label><spring:message code="return.order.code"/></label></td>
-		                <td>
-		                    <span id="searchkeytext">
-		                    	<input type="text" name="q_sl_returnOrderCode" loxiaType="input" mandatory="false" placeholder="<spring:message code="return.order.code"/>"></input>
-		                    </span>
-		                </td>
 		                </td>
 						 <td><label><spring:message code="return.login.name"/></label></td>
 		                <td>
@@ -124,13 +118,19 @@
 					<div class="ui-block-content ui-block-content-lb">
 						<table>
 							<tr>
-								<td><label>退货编号:</label></td>
+								<td><label>退换货编号:</label></td>
 								<td><span id="searchkeytext">
 								 <input type="text" name="q_sl_returnCode" id="returnCode" loxiaType="input" style="border-style:none" mandatory="false"  readonly="readonly"></label>
 								</span>
 							</tr>
+								<tr>
+								<td><label>退换货类型:</label></td>
+								<td><span id="searchkeytext">
+								 <input type="text" name="q_sl_returnType" id="returnType" loxiaType="input" style="border-style:none" mandatory="false"  readonly="readonly"></label>
+								</span>
+							</tr>
 							<tr>
-								<td><label>*OMS退货编号:</label></td>
+								<td><label>*OMS退换货编号:</label></td>
 								<td><span id="searchkeytext">
 								<input type="text" name="q_sl_omsCode" id="omsCode" loxiaType="input" mandatory="false" ></input>
 							</tr>
@@ -174,7 +174,7 @@
 					<div class="ui-block-content ui-block-content-lb">
 						<table>
 							<tr>
-								<td><label>退货单编号:</label></td>
+								<td><label>退换货单编号:</label></td>
 								<td><span id="searchkeytext"> <input
 										name="q_sl_orderCode" id="orderCode" loxiaType="input" style="border-style:none"
 										mandatory="false"  ></label>

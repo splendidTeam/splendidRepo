@@ -208,8 +208,8 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
         if (status == SoReturnConstants.AGREE_REFUND){
             returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
         }
-        // 当前状态为同意退款并且页面操作为退款完成
-        if (status == SoReturnConstants.RETURN_COMPLETE && returnapp.getStatus() == SoReturnConstants.AGREE_REFUND){
+        // 当前状态为同意退款或者退换货类型为换货并且页面操作为退款完成         如果是换货申请，则只需要审核通过即可执行完成操作
+        if (status == SoReturnConstants.RETURN_COMPLETE && (returnapp.getStatus() == SoReturnConstants.AGREE_REFUND||(SoReturnConstants.TYPE_EXCHANGE==returnapp.getType())&& returnapp.getStatus() == SoReturnConstants.TO_DELIVERY)){
             returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
         }
         returnapp.setOmsCode(omsCode);
@@ -252,22 +252,25 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
         returnapp.setApproveTime(now);
         returnapp.setVersion(now);
         returnapp.setReturnReason("");
-
-        // 同意
-        if (status == 4){
-            returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
-        }
-        // 拒绝退款
-        if (status == 1){
-            // 退货状态改为已拒绝
-            returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
-        }
-        if (returnapp.getStatus() == 4){
-            if (status == 5){
-                returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
-            }
+        //如果是换货
+        if(SoReturnConstants.TYPE_EXCHANGE==returnapp.getType()){
+            returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
         }else{
-            throw new Exception("物流状态异常！");
+            // 同意
+            if (status == 4){
+                returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
+            }
+            // 拒绝退款
+            if (status == 1){
+                // 退货状态改为已拒绝
+                returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
+            }
+            if (status == 5){
+             // 退货状态改为已完成
+                 returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
+            }else{
+                throw new Exception("物流状态异常！");
+            }
         }
         soReturnApplicationDao.save(returnapp);
     }

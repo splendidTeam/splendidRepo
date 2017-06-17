@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.command.MemberPersonalDataCommand;
+import com.baozun.nebula.constant.SoReturnConstants;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.member.MemberManager;
@@ -87,7 +88,6 @@ public class SalesOrderController extends BaseController{
 
     @Autowired
     private SdkShoppingCartManager                   sdkShoppingCartManager;
-
     @Autowired
     private SdkShoppingCartCommandBuilder            sdkShoppingCartCommandBuilder;
 

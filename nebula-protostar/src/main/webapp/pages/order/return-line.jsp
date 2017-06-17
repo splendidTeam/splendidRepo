@@ -83,6 +83,9 @@
 						<c:if test="${SoReturnApplication.refundType == 6}">
 							 			支付宝
 							 		 </c:if>
+						<c:if test="${SoReturnApplication.refundType == 3}">
+							 			支付宝网银
+							 		 </c:if>
 						<c:if test="${SoReturnApplication.refundType ==320}">
 							 			银联
 							 		 </c:if>
@@ -107,7 +110,7 @@
 							<c:if test="${SoReturnApplication.status == 0}">
 							 			待审核
 							 		 </c:if> <c:if test="${SoReturnApplication.status == 1}">
-							 			 拒绝退货
+							 			 拒绝退换货
 							 		 </c:if> <c:if test="${SoReturnApplication.status == 2}">
 							 			 待发货
 							 		 </c:if> <c:if test="${SoReturnApplication.status == 3}">
@@ -120,7 +123,7 @@
 							 			 取消
 							 		 </c:if>
 							 		  <c:if test="${SoReturnApplication.status == 7}">
-							 			 OMS退货入库
+							 			 OMS退换货入库
 							 		 </c:if>
 						</label>
 					</div>

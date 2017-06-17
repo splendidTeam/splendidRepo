@@ -1,5 +1,5 @@
 $j.extend(loxia.regional['zh-CN'],{
-	"LABEL_RETURN_CODE":"退货单编号",
+	"LABEL_RETURN_CODE":"退换货单编号",
 	"LABEL_LOGIN_CODE":"登录名",
 	"LABEL_RETURN_OMSCODE":"OMS退货单编号",
 	"LABEL_EXAM_STATUS":"退货申请状态",
@@ -14,7 +14,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"LABEL_OPERATE":"操作",
 	"OPERATOR_TOREFUND":"退款处理中",
 	"OPERATOR_WAIT":"审核通过",
-	"OPERATOR_UPPASS":"拒绝退货",
+	"OPERATOR_UPPASS":"拒绝退换货",
 	"OPERATOR_REFUNDED":"已退款",
 	"OPERATOR_REFUSED":"拒绝退款",
 	"OPERATOR_UNRETURN":"拒绝退货",
@@ -24,12 +24,12 @@ $j.extend(loxia.regional['zh-CN'],{
 	"OPERATOR_FINISH":"已完成",
 	"OPERATOR_CANALE":"取消",
 	"INFO_CONFIRM_MANAGING":"确认同意退款吗",
-	"INFO_CONFIRM_RDFUNDED":"确定将退货状态改为已完成吗",
+	"INFO_CONFIRM_RDFUNDED":"确定将退换货状态改为已完成吗",
 	"INFO_CONFIRM_REFUSED":"确认拒绝退款吗",
 	"PROPERT_OPERATOR_TIP" : "属性提示信息",
 	"INFO_TITLE_DATA" : "提示信息",
 	"RETURN_MANAGING":"退款正在处理中",
-	"RETURN_RDFUNDED":"退款已完成",
+	"RETURN_RDFUNDED":"退换货已完成",
 	"RETURN_AGREE":"退款申请已通过",
 	"RETURN_DISAGREE":"退款申请未通过",
 	"RETURN_REFUSED":"退款已拒绝",
@@ -52,7 +52,10 @@ $j.extend(loxia.regional['zh-CN'],{
 	"DATA_NULL":"在所选日期范围内，没有任何VIP数据导出!",
 	"EXPORT_DATE_LIMIT" : "导出时，最多只能导出一个月的数据！",
 	"OMS_CONFIRM":"oms退货入库",
-	"NULL_RETURNADDRESS":"退货地址不能为空"
+	"NULL_RETURNADDRESS":"退货地址不能为空",
+	"RETURN_TYPE":"退换货类型",
+	"RETURN":"退货",
+	"EXCHANGE":"换货"
 	
 });
 
@@ -135,29 +138,31 @@ function formatDate(val){
 }
 
 //退款处理函数
-function updateRefund(val, state,arg) {
+function updateRefund(val, state,arg,type) {
 	var info = "";
-	if(arg==2){
-		info = nps.i18n("RETURN_UNPOST");
-	}
-	if(arg==0){
-		info = nps.i18n("RETURN_UNEXAIM");
+	if(type==1){
+		if(arg==2){
+			info = nps.i18n("RETURN_UNPOST");
+		}
+		if(arg==0){
+			info = nps.i18n("RETURN_UNEXAIM");
+		}
+		//退款状态为3时允许处理退款
+		if(arg==3||arg==2){
+			if (state ==4) {
+				info = nps.i18n("INFO_CONFIRM_MANAGING");
+			} if(state==1) {
+				info = nps.i18n("INFO_CONFIRM_REFUSED");
+			}
+		}
 	}
 	if(arg==1){
 	return "<a style='cursor:pointer;' class='goto_aduit_dialog' data-returncode="+returnCode+" >"+nps.i18n("RETURN_REDUSE")+"</a>";
 		info = nps.i18n("RETURN_REDUSE");
 	}
 	
-	//退款状态为3时允许处理退款
-	if(arg==3||arg==2){
-		if (state ==4) {
-			info = nps.i18n("INFO_CONFIRM_MANAGING");
-		} if(state==1) {
-			info = nps.i18n("INFO_CONFIRM_REFUSED");
-		}
-	}
 
-	if(arg==4){
+	if(arg==4||(type==2&& arg==2)){
 		if(state==5){
 			info = nps.i18n("INFO_CONFIRM_RDFUNDED");
 		}
@@ -208,12 +213,12 @@ function updateRefund(val, state,arg) {
 
 //同意退款
 function fnAGREE(data, args, caller) {
-	updateRefund(data.returnApplicationCode, 4,data.status);
+	updateRefund(data.returnApplicationCode, 4,data.status,data.type);
 }
 
 //已完成
 function fnFINISH(data, args, caller) {
-	updateRefund(data.returnApplicationCode, 5,data.status);
+	updateRefund(data.returnApplicationCode, 5,data.status,data.type);
 }
 
 //同意退款
@@ -223,6 +228,7 @@ function fnPASS(data, args, caller) {
 	$j("#remark").val('');
 	$j("#returnCode").val(orderCode);
 	$j("#omsCode").val(omsCode);
+	$j("#returnType").val(data.type==1?'退货':'换货');
 	$j("#active-dialog").dialogff({type:'open',close:'in',width:'500px',height:'350px'});
 }
 
@@ -232,29 +238,44 @@ function fnREFUSED(data, args, caller){
 	var orderCode=data.returnApplicationCode;
 	$j("#orderCode").val(orderCode);
 	$j("#omsReturnCode").val(omsCode);
+	$j("#returnType").val(data.type==1?'退货':'换货');
 	$j("#memo").val('');
 	$j("#refuse-dialog").dialogff({type:'open',close:'in',width:'500px',height:'300px'});
 
+}
+
+function returnType(data){
+	var status=loxia.getObject("type", data);
+	if(status==1){
+		return nps.i18n("RETURN");
+	}
+	if(status==2){
+		return nps.i18n("EXCHANGE");
+	}
 }
 
 
 function refund(data){
 	var result = "";
 	var returnStatus = loxia.getObject("status", data);
-	//returnStatus:3  或者2 ，提供同意退款，和拒绝退款按钮
-	if (returnStatus == 3||returnStatus==2) {
-		result = [ {
-			label : nps.i18n("OPERATOR_AGREE"),
-			type : "jsfunc",
-			content : "fnAGREE"
-		},{
-			label : nps.i18n("OPERATOR_REFUSED"),
-			type : "jsfunc",
-			content : "fnREFUSED"
-		}];
-	} 
+	var type= loxia.getObject("type", data);
+	if(type==1){
+		//returnStatus:3  或者2 ，提供同意退款，和拒绝退款按钮
+		if ((returnStatus == 3||returnStatus==2)) {
+			result = [ {
+				label : nps.i18n("OPERATOR_AGREE"),
+				type : "jsfunc",
+				content : "fnAGREE"
+			},{
+				label : nps.i18n("OPERATOR_REFUSED"),
+				type : "jsfunc",
+				content : "fnREFUSED"
+			}];
+		} 
+	}
+	
 	//returnStatus:4  同意退款，并提供已完成按钮
-	if (returnStatus == 4) {
+	if (returnStatus == 4|| type==2 && (returnStatus == 3||returnStatus==2)) {
 		result = [ {
 			label : nps.i18n("OPERATOR_FINISH"),
 			type : "jsfunc",
@@ -366,11 +387,17 @@ $j(document).ready(function() {
 			width:"5%",
 			template : "status"
 		},{
+			label:nps.i18n("RETURN_TYPE"),
+			width:"6%",
+			template : returnType		
+		},{
 			label:nps.i18n("LABEL_RETURNMONEY_STATUS"),
 			width:"6%",
 			type : "oplist",
 			oplist : refund		
-		}],
+		}
+		
+		],
 		dataurl : orderReturnUrl
 	});
 

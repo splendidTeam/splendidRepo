@@ -187,7 +187,6 @@ public class OrderReturnController extends BaseController{
             UserDetails userDetails = this.getUserDetails();
             String lastModifier = userDetails.getUsername();
             soReturnApplicationManager.updateRefundType(returnOrderCode, lastModifier, state);
-
         }catch (Exception e){
             logger.error("==========修改退款状态失败===============");
             FAILTRUE.setDescription("退款审核状态失败");
