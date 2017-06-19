@@ -67,7 +67,7 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver{
 			exceptionMap.put("stackTrace", w.toString());
 			
 		}
-		if (RequestUtil.isNotAjaxRequest(request)){
+		if (RequestUtil.isAjaxRequest(request)){
 			mv.setView(new MappingJacksonJsonView());
 		}
 		result.put("exception", exceptionMap);

@@ -613,7 +613,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @return pdp的view
 	 */
 	protected String getPdpView(Long itemId, HttpServletRequest request, HttpServletResponse response, Model model) {
-		if(RequestUtil.isNotAjaxRequest(request)) {
+		if(RequestUtil.isAjaxRequest(request)) {
 			return VIEW_PRODUCT_DETAIL_QUICKVIEW;
 		}
 		return VIEW_PRODUCT_DETAIL;

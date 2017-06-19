@@ -100,7 +100,7 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver{
 			exception.printStackTrace(new PrintWriter(w));
 			exceptionMap.put("stackTrace", w.toString());
 		}
-		if (RequestUtil.isNotAjaxRequest(request)){
+		if (RequestUtil.isAjaxRequest(request)){
 			mv.setView(new MappingJacksonJsonView());
 		}
 		result.put("exception", exceptionMap);

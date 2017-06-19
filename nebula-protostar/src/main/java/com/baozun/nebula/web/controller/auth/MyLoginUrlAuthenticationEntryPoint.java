@@ -153,7 +153,7 @@ public class MyLoginUrlAuthenticationEntryPoint implements AuthenticationEntryPo
 	 */
 	public void commence(HttpServletRequest request,HttpServletResponse response,AuthenticationException authException) throws IOException,
 			ServletException{
-		if (RequestUtil.isNotAjaxRequest(request)){
+		if (RequestUtil.isAjaxRequest(request)){
 			Map<String, Object> exceptionMap = new HashMap<String, Object>();
 			Map<String, Map<String, Object>> result = new HashMap<String, Map<String, Object>>(1);
 			exceptionMap.put("statusCode", ErrorCodes.INVALID_SESSION);

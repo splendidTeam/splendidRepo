@@ -147,7 +147,7 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
      * @throws IOException
      */
     protected void interceptLogin(HttpServletRequest request,HttpServletResponse response,String returnURL) throws IOException{
-        if (RequestUtil.isAjaxRequest(request)){
+        if (RequestUtil.isNotAjaxRequest(request)){
             //注意在LoginController中需要使用loginForwardHandler来重定向
             loginForwardHandler.setForwardURL(request, returnURL);
             response.sendRedirect(request.getContextPath() + HelixConfig.getInstance().get(HelixConstants.SITE_LOGIN_URL));
@@ -164,7 +164,7 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
      * @throws IOException
      */
     protected void onMemberCheckFailure(HttpServletRequest request,HttpServletResponse response) throws IOException{
-        if (RequestUtil.isAjaxRequest(request)){
+        if (RequestUtil.isNotAjaxRequest(request)){
             response.sendRedirect(
                             request.getContextPath() + HelixConfig.getInstance().get(HelixConstants.SECURITY_SESSION_CHECK_FAILURE_URL));
         }else{
@@ -191,7 +191,7 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
                             memberDetails.getMemberId(),
                             memberDetails.getStatus().toArray(),
                             action);
-            if (RequestUtil.isAjaxRequest(request)){
+            if (RequestUtil.isNotAjaxRequest(request)){
                 response.sendRedirect(request.getContextPath() + action);
             }else{
                 response.sendError(ajaxErrorCode);

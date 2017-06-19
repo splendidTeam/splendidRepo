@@ -201,7 +201,7 @@ public class SecurityController extends BaseController{
 						ErrorCodes.BUSINESS_EXCEPTION_PREFIX + ErrorCodes.ACCESS_DENIED,
 						null,
 						LocaleContextHolder.getLocale()));
-		if (RequestUtil.isNotAjaxRequest(request)){
+		if (RequestUtil.isAjaxRequest(request)){
 			mv.setView(new MappingJacksonJsonView());
 		}
 		result.put("exception", exceptionMap);
