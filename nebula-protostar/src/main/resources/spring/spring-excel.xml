@@ -1,55 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
-	
-	<bean id="excelManipulatorFactory" class="loxia.support.excel.ExcelManipulatorFactory">
-		<property name="config">
-			<list>
-				<value>excelconfig/excel-template.xml</value>
-				<!-- 店铺可以覆盖该文件实现自定的excel配置 -->
-				<value>excelconfig/store-excel-template.xml</value>
-				<value>excelconfig/itemColorValueRef-excel-template.xml</value>
-			</list>
-		</property>	
-	</bean>
-	
-	<!--************************************************** 导出 **************************************************-->
-	<!-- 咨询列表导出 -->
-	<bean id="consultantWriter" factory-bean="excelManipulatorFactory" factory-method="createExcelWriter">
-		<constructor-arg>
-			<value>consultantExport</value>
-		</constructor-arg>
-	</bean>
-	
-	<!-- 邮件订阅导出 -->
-	<bean id="emailSubscribeWriter" factory-bean="excelManipulatorFactory" factory-method="createExcelWriter">
-		<constructor-arg>
-			<value>emailSubscribeExport</value>
-		</constructor-arg>
-	</bean>
-	 
-	
-	<!-- 所有未删除商品导出，导出code,title,salePrice,listPrice,skuId 用于批量修改价格 -->
-	<bean id="allSkuItemWriter" factory-bean="excelManipulatorFactory" factory-method="createExcelWriter">
-		<constructor-arg>
-			<array>
-				<value>exportItemInfo</value>
-				<value>exportItemSku</value>
-			</array>
-		</constructor-arg>
-	</bean>
 
-	<!--商品筛选色颜色对照上传-->
-	<bean id="itemColorRefReader" factory-bean="excelManipulatorFactory" factory-method="createExcelReader">
-		<constructor-arg>
-			<value>itemColorRefValue</value>
-		</constructor-arg>
-	</bean>
+    <bean id="excelManipulatorFactory" class="loxia.support.excel.ExcelManipulatorFactory">
+        <property name="config">
+            <list>
+                <value>excelconfig/excel-template.xml</value>
+                <!-- 店铺可以覆盖该文件实现自定的excel配置 -->
+                <value>excelconfig/store-excel-template.xml</value>
+                <value>excelconfig/itemColorValueRef-excel-template.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--************************************************** 导出 ************************************************** -->
+    <!-- 咨询列表导出 -->
+    <bean id="consultantWriter" factory-bean="excelManipulatorFactory" factory-method="createExcelWriter">
+        <constructor-arg>
+            <value>consultantExport</value>
+        </constructor-arg>
+    </bean>
+
+    <!-- 邮件订阅导出 -->
+    <bean id="emailSubscribeWriter" factory-bean="excelManipulatorFactory" factory-method="createExcelWriter">
+        <constructor-arg>
+            <value>emailSubscribeExport</value>
+        </constructor-arg>
+    </bean>
+
+
+    <!-- 所有未删除商品导出，导出code,title,salePrice,listPrice,skuId 用于批量修改价格 -->
+    <bean id="allSkuItemWriter" factory-bean="excelManipulatorFactory" factory-method="createExcelWriter">
+        <constructor-arg>
+            <array>
+                <value>exportItemInfo</value>
+                <value>exportItemSku</value>
+            </array>
+        </constructor-arg>
+    </bean>
+
+    <!--商品筛选色颜色对照上传 -->
+    <bean id="itemColorRefReader" factory-bean="excelManipulatorFactory" factory-method="createExcelReader">
+        <constructor-arg>
+            <value>itemColorRefValue</value>
+        </constructor-arg>
+    </bean>
 
 
 </beans>

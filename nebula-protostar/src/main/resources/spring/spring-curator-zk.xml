@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:loxia="http://loxia.benjamin.cn/schema/core"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	
-	<!-- curator zookeeper -->
-	<bean id="zkOperator" class="com.baozun.nebula.curator.ZkOperator">
-		<property name="connectionString" value="#{meta['zk.connectionString']}" />
-		<property name="namespace" value="#{meta['zk.namespace']}" />
-		<property name="sessionTimeoutMs" value="#{meta['zk.sessionTimeoutMs']}" />
-		<property name="connectionTimeoutMs" value="#{meta['zk.connectionTimeoutMs']}" />
-		<property name="bgThreadPoolSize" value="#{meta['zk.bgThreadPoolSize']}" />
-		<property name="retryType" value="#{meta['zk.retryType']}" />
-		<property name="maxElapsedTimeMs" value="#{meta['zk.maxElapsedTimeMs']}" />
-		<property name="sleepMsBetweenRetries" value="#{meta['zk.sleepMsBetweenRetries']}" />
-		<property name="lifeCycleNode" value="#{meta['zk.path.root']}" />
-	</bean>
-	
-	<bean id="zkWatchPath" class="com.baozun.nebula.curator.ZKWatchPath">
-		<property name="pathMap">
-			<map>
-				<entry key="EngineWatchInvoke" value="#{meta['zk.path.enginewatch']}"></entry>
-				<entry key="FreightWatchInvoke" value="#{meta['zk.path.freightwatch']}"></entry>
-				<entry key="I18nLangWatchInvoke" value="#{meta['zk.path.i18nlangwatch']}"></entry>
-				<entry key="ModuleMapWatchInvoke" value="#{meta['zk.path.modulemapwatch']}"></entry>
-				<entry key="ScheduleTaskWatchInvoker" value="#{meta['zk.path.scheduletaskwatch']}"></entry>
-				<entry key="SystemConfigWatchInvoke" value="#{meta['zk.path.systemconfigwatch']}"></entry>
-				<entry key="UrlMapWatchInvoke" value="#{meta['zk.path.urlmapwatch']}"></entry>
-			</map>
-		</property>
-	</bean>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:loxia="http://loxia.benjamin.cn/schema/core"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- curator zookeeper -->
+    <bean id="zkOperator" class="com.baozun.nebula.curator.ZkOperator">
+        <property name="connectionString" value="#{meta['zk.connectionString']}" />
+        <property name="namespace" value="#{meta['zk.namespace']}" />
+        <property name="sessionTimeoutMs" value="#{meta['zk.sessionTimeoutMs']}" />
+        <property name="connectionTimeoutMs" value="#{meta['zk.connectionTimeoutMs']}" />
+        <property name="bgThreadPoolSize" value="#{meta['zk.bgThreadPoolSize']}" />
+        <property name="retryType" value="#{meta['zk.retryType']}" />
+        <property name="maxElapsedTimeMs" value="#{meta['zk.maxElapsedTimeMs']}" />
+        <property name="sleepMsBetweenRetries" value="#{meta['zk.sleepMsBetweenRetries']}" />
+        <property name="lifeCycleNode" value="#{meta['zk.path.root']}" />
+    </bean>
+
+    <bean id="zkWatchPath" class="com.baozun.nebula.curator.ZKWatchPath">
+        <property name="pathMap">
+            <map>
+                <entry key="EngineWatchInvoke" value="#{meta['zk.path.enginewatch']}"></entry>
+                <entry key="FreightWatchInvoke" value="#{meta['zk.path.freightwatch']}"></entry>
+                <entry key="I18nLangWatchInvoke" value="#{meta['zk.path.i18nlangwatch']}"></entry>
+                <entry key="ModuleMapWatchInvoke" value="#{meta['zk.path.modulemapwatch']}"></entry>
+                <entry key="ScheduleTaskWatchInvoker" value="#{meta['zk.path.scheduletaskwatch']}"></entry>
+                <entry key="SystemConfigWatchInvoke" value="#{meta['zk.path.systemconfigwatch']}"></entry>
+                <entry key="UrlMapWatchInvoke" value="#{meta['zk.path.urlmapwatch']}"></entry>
+            </map>
+        </property>
+    </bean>
 </beans>
