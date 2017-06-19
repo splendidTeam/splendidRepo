@@ -1,7 +1,5 @@
 package com.baozun.nebula.wormhole.scm.makemsgcon;
 
-import static com.feilong.core.Validator.isNullOrEmpty;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +19,9 @@ import com.baozun.nebula.wormhole.mq.entity.order.OrderStatusV5;
 import com.baozun.nebula.wormhole.mq.entity.order.SalesOrderV5;
 import com.baozun.nebula.wormhole.mq.entity.pay.PaymentInfoV5;
 import com.baozun.nebula.wormhole.scm.handler.PropellingSalesOrderHandler;
-import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 @Transactional
 @Service("propellingSalesOrderManager")
@@ -120,30 +119,38 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 
         return propellingCommonManager.saveMsgBody(ConvertUtil.toList(salesOrderV5), msgSendRecord.getId());
     }
+
     /**
      * 构造发票类型
      * 
-     * @param  SalesOrderCommand 
+     * <h3>代码流程:</h3>
+     * <blockquote>
+     * <ol>
+     * <li>{@code if is null(salesOrderCommand)---->NullPointerException}</li>
+     * <li>isNotNullOrEmpty(salesOrderCommand.getReceiptType()) 发票类型是null或者empty 返回 null,表示不需要发票</li>
+     * <li>发票类型是1 ,返回1 表示是个人</li>
+     * <li>其他发票类型 ,目前返回2 表示是公司(典型的是adidas 项目 类型是3 是增值税发票)</li>
+     * </ol>
+     * </blockquote>
+     * 
+     * @param SalesOrderCommand
      * @return 1表示个人 2表示企业
      */
     private Integer buildBusinessType(SalesOrderCommand salesOrderCommand){
-        //XXX 逻辑等待确认
-        boolean isNeededInvoice = isNullOrEmpty(salesOrderCommand.getReceiptType());
+        Validate.notNull(salesOrderCommand, "salesOrderCommand can't be null!");
 
+        //如果 ReceiptType 有值,表示需要发票
+        boolean isNeededInvoice = isNotNullOrEmpty(salesOrderCommand.getReceiptType());
+
+        //如果不需要发票 返回null
         if (!isNeededInvoice){
-            if(salesOrderCommand.getReceiptType()==1){
-              //1 个人 
-              return 1;
-            }
-            
-            if(salesOrderCommand.getReceiptType()==2){
-              //2 企业
-              return 2;
-            }
+            return null;
         }
 
-        //----------------      
-        return null;
+        if (salesOrderCommand.getReceiptType() == 1){//1 个人 
+            return 1;
+        }
+        return 2;//2 企业 其他发票类型 ,目前返回2 表示是公司(典型的是adidas 项目 类型是3 是增值税发票)
     }
 
     private static BigDecimal getPayDiscount(SalesOrderCommand salesOrderCommand){
