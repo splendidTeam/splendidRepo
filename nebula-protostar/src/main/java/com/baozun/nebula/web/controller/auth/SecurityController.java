@@ -58,6 +58,7 @@ import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.command.UserManagerCommand;
 import com.baozun.nebula.web.controller.BaseController;
+import com.feilong.servlet.http.RequestUtil;
 
 /**
  * @author songdianchao 登录，认证， 授权相关
@@ -200,7 +201,7 @@ public class SecurityController extends BaseController{
 						ErrorCodes.BUSINESS_EXCEPTION_PREFIX + ErrorCodes.ACCESS_DENIED,
 						null,
 						LocaleContextHolder.getLocale()));
-		if (request.getHeader("X-Requested-With") != null){
+		if (RequestUtil.isNotAjaxRequest(request)){
 			mv.setView(new MappingJacksonJsonView());
 		}
 		result.put("exception", exceptionMap);

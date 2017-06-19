@@ -35,6 +35,7 @@ import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
+import com.feilong.servlet.http.RequestUtil;
 
 /**
  * @author dianchao.song
@@ -66,7 +67,7 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver{
 			exceptionMap.put("stackTrace", w.toString());
 			
 		}
-		if (request.getHeader("X-Requested-With") != null){
+		if (RequestUtil.isNotAjaxRequest(request)){
 			mv.setView(new MappingJacksonJsonView());
 		}
 		result.put("exception", exceptionMap);

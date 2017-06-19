@@ -53,6 +53,7 @@ import org.springframework.util.StringUtils;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
+import com.feilong.servlet.http.RequestUtil;
 
 /**
  * Used by the {@link ExceptionTranslationFilter} to commence a form login authentication via the
@@ -152,7 +153,7 @@ public class MyLoginUrlAuthenticationEntryPoint implements AuthenticationEntryPo
 	 */
 	public void commence(HttpServletRequest request,HttpServletResponse response,AuthenticationException authException) throws IOException,
 			ServletException{
-		if (((HttpServletRequest) request).getHeader("X-Requested-With") != null){
+		if (RequestUtil.isNotAjaxRequest(request)){
 			Map<String, Object> exceptionMap = new HashMap<String, Object>();
 			Map<String, Map<String, Object>> result = new HashMap<String, Map<String, Object>>(1);
 			exceptionMap.put("statusCode", ErrorCodes.INVALID_SESSION);

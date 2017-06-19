@@ -39,6 +39,7 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.NeedLogin;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.feilong.core.Validator;
+import com.feilong.servlet.http.RequestUtil;
 
 /**
  * 新版的用户信息拦截器，用于拦截需要登录的请求，并跳转
@@ -146,7 +147,7 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
      * @throws IOException
      */
     protected void interceptLogin(HttpServletRequest request,HttpServletResponse response,String returnURL) throws IOException{
-        if (request.getHeader("X-Requested-With") == null){
+        if (RequestUtil.isAjaxRequest(request)){
             //注意在LoginController中需要使用loginForwardHandler来重定向
             loginForwardHandler.setForwardURL(request, returnURL);
             response.sendRedirect(request.getContextPath() + HelixConfig.getInstance().get(HelixConstants.SITE_LOGIN_URL));
@@ -163,7 +164,7 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
      * @throws IOException
      */
     protected void onMemberCheckFailure(HttpServletRequest request,HttpServletResponse response) throws IOException{
-        if (request.getHeader("X-Requested-With") == null){
+        if (RequestUtil.isAjaxRequest(request)){
             response.sendRedirect(
                             request.getContextPath() + HelixConfig.getInstance().get(HelixConstants.SECURITY_SESSION_CHECK_FAILURE_URL));
         }else{
@@ -190,7 +191,7 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
                             memberDetails.getMemberId(),
                             memberDetails.getStatus().toArray(),
                             action);
-            if (request.getHeader("X-Requested-With") == null){
+            if (RequestUtil.isAjaxRequest(request)){
                 response.sendRedirect(request.getContextPath() + action);
             }else{
                 response.sendError(ajaxErrorCode);
