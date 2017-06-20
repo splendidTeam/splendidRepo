@@ -25,7 +25,9 @@ import java.io.Serializable;
  * @see CaptchaContainer
  * @see CaptchaValidateConfig
  * @since 1.5.3
+ * @deprecated 请使用 feilong-captch ,进行了框架的升级
  */
+@Deprecated
 public class CaptchaContainerAndValidateConfig implements Serializable{
 
     /** The Constant serialVersionUID. */

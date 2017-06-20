@@ -21,7 +21,9 @@ package com.baozun.nebula.manager.captcha.counter;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年4月5日 下午10:00:16
  * @since 1.5.3
+ * @deprecated 请使用 feilong-captch ,进行了框架的升级
  */
+@Deprecated
 public enum CounterCompareType{
 
     /** 都不超过阀值. */

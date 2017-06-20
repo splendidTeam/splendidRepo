@@ -33,7 +33,9 @@ import com.touclick.captcha.service.TouClick;
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 1.10.3
+ * @deprecated 请使用 feilong-captch ,进行了框架的升级
  */
+@Deprecated
 public class TouclickCaptchaValidate implements CaptchaValidate{
 
     /** The Constant LOGGER. */

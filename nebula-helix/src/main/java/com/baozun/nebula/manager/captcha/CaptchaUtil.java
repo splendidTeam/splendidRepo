@@ -142,7 +142,9 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年3月28日 下午4:34:27
  * @since 1.5.3
+ * @deprecated 请使用 feilong-captch ,进行了框架的升级
  */
+@Deprecated
 public class CaptchaUtil{
 
     /** The Constant log. */
