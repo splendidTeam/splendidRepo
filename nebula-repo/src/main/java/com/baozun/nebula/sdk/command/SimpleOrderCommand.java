@@ -36,6 +36,11 @@ public class SimpleOrderCommand {
     
     /** 折扣 */
     private BigDecimal discount;
+    
+    /** 订单类型 1-普通订单(默认), 2-预售订单,3-miadidas订单,4-hypelaunch订单. 
+     * @since 5.3.2.18
+     * */
+    private Integer            orderType;
 
     public Long getOrderId() {
         return orderId;
@@ -116,6 +121,27 @@ public class SimpleOrderCommand {
 
     public void setActualFreight(BigDecimal actualFreight) {
         this.actualFreight = actualFreight;
+    }
+    
+    /**
+     * 获取 订单类型
+     * 
+     * @return the 订单类型 1-普通订单(默认), 2-预售订单,3-miadidas订单,4-hypelaunch订单.
+     * @since 5.3.2.18
+     */
+    public Integer getOrderType(){
+        return orderType;
+    }
+    
+    /**
+     * 设置 订单类型1-普通订单(默认), 2-预售订单,3-miadidas订单,4-hypelaunch订单.
+     * s
+     * @param orderType
+     *          the new 订单类型1-普通订单(默认), 2-预售订单,3-miadidas订单,4-hypelaunch订单.
+     * @since 5.3.2.18
+     */
+    public void setOrderType(Integer orderType){
+        this.orderType = orderType;
     }
     
     

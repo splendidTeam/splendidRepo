@@ -1160,7 +1160,8 @@
 					o.TOTAL ,
 					o.DISCOUNT,
 					o. actual_freight as actualFreight,
-					mytable2.isRate
+					mytable2.isRate,
+					o.ORDER_TYPE as orderType
 					from t_so_salesorder as o
 					inner join (
 							select DISTINCT line.order_id as id from t_so_orderline line 
@@ -1225,7 +1226,8 @@
 					o.PAYMENT,
 					o.TOTAL ,
 					o.DISCOUNT,
-					o. actual_freight as actualFreight
+					o. actual_freight as actualFreight,
+					o.ORDER_TYPE as orderType
 					from t_so_salesorder as o
 					inner join (
 							select line.order_id as id,string_agg(line.item_pic,',') as itemPics from t_so_orderline line group by line.order_id 

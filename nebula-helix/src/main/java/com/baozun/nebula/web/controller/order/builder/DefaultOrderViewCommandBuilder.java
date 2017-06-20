@@ -127,8 +127,8 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
     protected OrderBaseInfoSubViewCommand buildOrderBaseInfoSubViewCommand(SalesOrderCommand salesOrderCommand){
         // 订单信息
         OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
-
-        PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime", "logisticsStatus", "financialStatus", "total", "discount", "actualFreight");
+        //5.3.2.18增加了对"orderType"字段的转换
+        PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime", "logisticsStatus", "financialStatus", "total", "discount", "actualFreight", "orderType");
 
         orderBaseInfoSubViewCommand.setOrderId(salesOrderCommand.getId());
         orderBaseInfoSubViewCommand.setOrderCode(salesOrderCommand.getCode());
