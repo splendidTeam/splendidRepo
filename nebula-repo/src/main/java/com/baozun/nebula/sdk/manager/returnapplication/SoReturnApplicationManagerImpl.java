@@ -1,6 +1,5 @@
 package com.baozun.nebula.sdk.manager.returnapplication;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -19,22 +18,14 @@ import org.springframework.util.Assert;
 import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.constant.SoReturnConstants;
-import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderDao;
-import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.dao.salesorder.SdkReturnApplicationDao;
 import com.baozun.nebula.dao.salesorder.SdkSoReturnApplicationDeliveryInfoDao;
-import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
 import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.salesorder.SoReturnLine;
-import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
-import com.baozun.nebula.sdk.command.SkuCommand;
-import com.baozun.nebula.sdk.command.SkuProperty;
-import com.baozun.nebula.sdk.manager.SdkSkuManager;
-import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.returnapplication.SoReturnLineManager;
 import com.feilong.core.Validator;
 
@@ -50,19 +41,11 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
     private SdkOrderDao sdkOrderDao;
 
     @Autowired
-    private SkuDao skuDao;
-
-    @Autowired
     private SoReturnLineManager soReturnLineManager;
 
     @Autowired
     private SdkSoReturnApplicationDeliveryInfoDao sdkSoReturnApplicationDeliveryInfoDao;
 
-    @Autowired
-    private SdkSkuManager sdkSkuManager;
-
-    @Autowired
-    private OrderManager orderManager;
 
     public final static Integer[] statusArr = { new Integer(SoReturnConstants.RETURN_COMPLETE) };
 
@@ -208,8 +191,8 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
         if (status == SoReturnConstants.AGREE_REFUND){
             returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
         }
-        // 当前状态为同意退款或者退换货类型为换货并且页面操作为退款完成         如果是换货申请，则只需要审核通过即可执行完成操作
-        if (status == SoReturnConstants.RETURN_COMPLETE && (returnapp.getStatus() == SoReturnConstants.AGREE_REFUND||(SoReturnConstants.TYPE_EXCHANGE==returnapp.getType())&& returnapp.getStatus() == SoReturnConstants.TO_DELIVERY)){
+        // 当前状态为同意退款并且页面操作为退款完成
+        if (status == SoReturnConstants.RETURN_COMPLETE && returnapp.getStatus() == SoReturnConstants.AGREE_REFUND){
             returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
         }
         returnapp.setOmsCode(omsCode);
@@ -252,25 +235,22 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
         returnapp.setApproveTime(now);
         returnapp.setVersion(now);
         returnapp.setReturnReason("");
-        //如果是换货
-        if(SoReturnConstants.TYPE_EXCHANGE==returnapp.getType()){
-            returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
-        }else{
-            // 同意
-            if (status == 4){
-                returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
-            }
-            // 拒绝退款
-            if (status == 1){
-                // 退货状态改为已拒绝
-                returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
-            }
+
+        // 同意
+        if (status == 4){
+            returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
+        }
+        // 拒绝退款
+        if (status == 1){
+            // 退货状态改为已拒绝
+            returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
+        }
+        if (returnapp.getStatus() == 4){
             if (status == 5){
-             // 退货状态改为已完成
-                 returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
-            }else{
-                throw new Exception("物流状态异常！");
+                returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
             }
+        }else{
+            throw new Exception("物流状态异常！");
         }
         soReturnApplicationDao.save(returnapp);
     }
