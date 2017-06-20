@@ -19,6 +19,9 @@ public class BankCodeConvertUtil {
 		if(SalesOrder.SO_PAYMENT_TYPE_ALIPAY.equals(payType)){
 		    pay_bank.append("支付宝支付");
 		}
+		if(SalesOrder.SO_PAYMENT_TYPE_NETPAY.equals(payType)){
+		    pay_bank.append("支付宝支付");
+		}
 		if(SalesOrder.SO_PAYMENT_TYPE_WECHAT.equals(payType)){
 		    pay_bank.append("微信支付");
 		}
