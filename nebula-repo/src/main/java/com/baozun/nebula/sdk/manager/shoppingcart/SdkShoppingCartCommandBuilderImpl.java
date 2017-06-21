@@ -121,6 +121,27 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         // 封装购物车的基本信息
         UserDetails userDetails = buildUserDetails(memberId, memberComIds);
+
+        return buildShoppingCartCommand(userDetails, chooseLinesShoppingCartLineCommandList, noChooseShoppingCartLineCommandList, lineIdAndShopIdMapList, coupons, calcFreightCommand);
+    }
+
+    /**
+     * @param userDetails
+     * @param chooseLinesShoppingCartLineCommandList
+     * @param noChooseShoppingCartLineCommandList
+     * @param lineIdAndShopIdMapList
+     * @param coupons
+     * @param calcFreightCommand
+     * @return
+     * @since 5.3.2.18
+     */
+    private ShoppingCartCommand buildShoppingCartCommand(
+                    UserDetails userDetails,
+                    List<ShoppingCartLineCommand> chooseLinesShoppingCartLineCommandList,
+                    List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList,
+                    Map<Long, Long> lineIdAndShopIdMapList,
+                    List<String> coupons,
+                    CalcFreightCommand calcFreightCommand){
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(userDetails, coupons, chooseLinesShoppingCartLineCommandList);
 
         // 设置分店铺的购物车
@@ -266,12 +287,13 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      * Do with no choose.
      *
      * @param noChooseShoppingCartLineCommandList
-     *            the no choose shopping cart line command list
+     *            没有被选中的购物车行
      * @param shoppingCartCommand
      *            the shopping cart command
      * @param shopIdAndShoppingCartCommandMap
      *            the shop id and shopping cart command map
-     *///XXX feilong 感觉下面的逻辑没有用
+     */
+    //XXX feilong 感觉下面的逻辑没有用
     private static void doWithNoChoose(List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList,ShoppingCartCommand shoppingCartCommand,Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap){
 
         // 因为某些NOTCHOOSE的购物车行不进行促销计算,如果全是无效数据,shopCartByShopIdMap中的值为空,所以这里帮助进行初始化shopCartByShopIdMap的数据
@@ -281,19 +303,27 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
             if (shoppingCartCommandByShopId == null){
                 shoppingCartCommandByShopId = new ShoppingCartCommand();
-                List<ShoppingCartLineCommand> sclcList = new ArrayList<>();
 
-                shoppingCartCommandByShopId.setShoppingCartLineCommands(sclcList);
+                shoppingCartCommandByShopId.setShoppingCartLineCommands(new ArrayList<ShoppingCartLineCommand>());
                 shopIdAndShoppingCartCommandMap.put(shopId, shoppingCartCommandByShopId);
 
-                ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
-                shopCartCommandByShop.setQty(0);
-                shopCartCommandByShop.setRealPayAmount(ZERO);
-                shopCartCommandByShop.setShopId(shopId);
-
+                ShopCartCommandByShop shopCartCommandByShop = buildShopCartCommandByShop(shopId);
                 shoppingCartCommand.setSummaryShopCartList(toList(shopCartCommandByShop));
             }
         }
+    }
+
+    /**
+     * @param shopId
+     * @return
+     * @since 5.3.2.18
+     */
+    private static ShopCartCommandByShop buildShopCartCommandByShop(Long shopId){
+        ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
+        shopCartCommandByShop.setQty(0);
+        shopCartCommandByShop.setRealPayAmount(ZERO);
+        shopCartCommandByShop.setShopId(shopId);
+        return shopCartCommandByShop;
     }
 
     /**

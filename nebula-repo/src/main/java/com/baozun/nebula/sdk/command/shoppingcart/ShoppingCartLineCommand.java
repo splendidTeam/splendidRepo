@@ -244,6 +244,7 @@ public class ShoppingCartLineCommand extends BaseModel{
     private Map<String, Object> customParamMap;
 
     //**********************************************************************************************
+    
     /**
      * 是否可见 1可见 /0不可见 *.
      * 
@@ -324,7 +325,15 @@ public class ShoppingCartLineCommand extends BaseModel{
      * @deprecated 没有引用, by feilong 2016-07-13
      */
     private String wareHoseName;
+    
+  //***************************************************************************************************
 
+    /** 杂项 可以存放商品信息. 
+     * @since 5.3.2.18
+     * */
+    private String misc;
+
+    //**********************************************************************************************
     /**
      * 获得 promotion ids.
      *
@@ -1453,4 +1462,23 @@ public class ShoppingCartLineCommand extends BaseModel{
     public void setShoppingCartLinePackageInfoCommandList(List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList){
         this.shoppingCartLinePackageInfoCommandList = shoppingCartLinePackageInfoCommandList;
     }
+
+    /**
+     * 获取 杂项信息
+     * @return String
+     * @since 5.3.2.18
+     */
+    public String getMisc(){
+        return misc;
+    }
+
+    /**
+     * 设置 杂项信息
+     * @param String
+     * @since 5.3.2.18
+     */
+    public void setMisc(String misc){
+        this.misc = misc;
+    }
+    
 }

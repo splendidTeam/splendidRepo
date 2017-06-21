@@ -1,5 +1,4 @@
-<Context reloadable="false" useHttpOnly="true"
-	sessionCookiePath="/">
-	
+<Context reloadable="false" useHttpOnly="true" sessionCookiePath="/">
+
 
 </Context>

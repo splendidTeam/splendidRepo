@@ -19,6 +19,7 @@ package com.baozun.nebula.sdk.command;
 import java.math.BigDecimal;
 import java.util.List;
 
+
 import com.baozun.nebula.model.BaseModel;
 
 public class OrderLineCommand extends BaseModel{
@@ -108,6 +109,15 @@ public class OrderLineCommand extends BaseModel{
     private String state;
 
     /******** 扩展engine所需要的字段end **********/
+    
+  //***************************************************************************************************
+
+    /** 杂项 可以存放商品信息. 
+     * @since 5.3.2.18
+     * */
+    private String misc;
+
+    //**********************************************************************************************
 
     /**
      * @return propertyName
@@ -351,5 +361,23 @@ public class OrderLineCommand extends BaseModel{
     public void setOrderLinePackageInfoCommandList(List<OrderLinePackageInfoCommand> orderLinePackageInfoCommandList){
         this.orderLinePackageInfoCommandList = orderLinePackageInfoCommandList;
     }
+    
+    /**
+     * 获取 杂项信息
+     * @return String
+     * @since 5.3.2.18
+     */
+    public String getMisc(){
+        return misc;
+    }
 
+    /**
+     * 设置 杂项信息
+     * @param String
+     * @since 5.3.2.18
+     */
+    public void setMisc(String misc){
+        this.misc = misc;
+    }
+    
 }

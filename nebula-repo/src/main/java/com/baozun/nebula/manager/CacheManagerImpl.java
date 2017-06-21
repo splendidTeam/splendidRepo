@@ -1,878 +1,280 @@
 package com.baozun.nebula.manager;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.configuration.ConfigurationKey;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+
+import com.baozun.nebula.command.cache.CacheExpiredCommand;
+import com.baozun.nebula.exception.CacheException;
+import com.baozun.nebula.utilities.common.SerializableUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;
 
-import com.baozun.nebula.command.cache.CacheExpiredCommand;
-import com.baozun.nebula.command.cache.CacheItemCommand;
-import com.baozun.nebula.dao.system.CacheItemDao;
-import com.baozun.nebula.exception.CacheException;
-import com.baozun.nebula.model.system.MataInfo;
-import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.common.SerializableUtil;
-import com.feilong.core.Validator;
-
 @Service("dataCacheManager")
-public class CacheManagerImpl implements CacheManager {
-	
-	protected Log				log					= LogFactory.getLog(getClass());
-
-	/**
-	 * 默认情况下返回的filedName
-	 */
-	private static final String DEFAULT_FIELD = "default-field";
-	
-	private static final String EXCEPTION_ERROR_MSG ="Call Redis Error";
-
-	// @Autowired
-	// private ShardedJedisPool jedisPool;
-
-	// 当使用redis的分布式环境时使用以下连接池(sentine做failover)
-
-	@Autowired
-	private SdkMataInfoManager sdkMataInfoManager;
-
-	//
-	@Autowired(required = false)
-	private JedisSentinelPool jedisPool;
-
-	@Autowired
-	private CacheItemDao cacheItemDao;
-
-	/**
-	 * 配置不同环境不同项目的key前辍
-	 */
-	private static final String REDIS_KEY_START = "redis.keystart";
-
-	private Jedis getJedis() {
-		return jedisPool.getResource();
-	}
-
-	/**
-	 * 无论是key为null或是配置的key前辍为null,都返回key的值
-	 * 
-	 * @param key
-	 * @return
-	 */
-	private String processKey(String key) {
-
-		Properties pro = ProfileConfigUtil.findPro("config/redis.properties");
-
-		String confKeyStart = pro.getProperty(REDIS_KEY_START, null);
-
-		if (StringUtils.isBlank(key) || StringUtils.isBlank(confKeyStart))
-			return key;
-
-		return confKeyStart + "_" + key;
-
-	}
-
-	/**
-	 * 返回true表示会使用缓存
-	 * 
-	 * @return
-	 */
-	private boolean useCache() {
-
-		String value = sdkMataInfoManager.findValue(MataInfo.KEY_HAS_CACHE);
-
-		if (value != null && "true".equals(value)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private void returnResource(Jedis redis) {
-		if (redis != null) {
-			jedisPool.returnResource(redis);
-		}
-	}
-
-	public void setValue(String key, String value, Integer expireSeconds) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.setex(key, expireSeconds, value);
-
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public Long addSetValue(String key, String value, Integer expireSeconds) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.expire(key, expireSeconds);
-			return jredis.sadd(key, value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public Long getSetLength(String key) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.scard(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public void setValue(String key, String value) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.set(key, value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public Long remove(String key) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.del(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public String getValue(String key) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.get(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-
-	}
-
-	public Map<String, String> getAllMap(String key) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.hgetAll(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public void pushToListHead(String key, String[] values) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.lpush(key, values);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public void pushToListHead(String key, String value) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.lpush(key, value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public void pushToListFooter(String key, String[] values) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.rpush(key, values);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public void pushToListFooter(String key, String value) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.rpush(key, value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public String popListHead(String key) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.lpop(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public String popListFooter(String key) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.rpop(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public String findListItem(String key, long index) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.lindex(key, index);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public List<String> findLists(String key, long start, long end) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.lrange(key, start, end);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-
-	}
-
-	public long listLen(String key) {
-		if (!useCache())
-			return 0;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.llen(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return 0;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public void addSet(String key, String[] values) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.sadd(key, values);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public String popSet(String key) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.spop(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public boolean existsInSet(String key, String member) {
-		if (!useCache())
-			return false;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.sismember(key, member);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return false;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public Long removeFromSet(String key, String[] values) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.srem(key, values);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public Set<String> findSetAll(String key) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.smembers(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public long findSetCount(String key) {
-		if (!useCache())
-			return 0;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.scard(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return 0;
-		} finally {
-			returnResource(jredis);
-		}
-
-	}
-
-	@Override
-	public <T> void setObject(String key, T t) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			String value = SerializableUtil.convert2String((Serializable) t);
-			setValue(key, value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	@Override
-	public <T> void setObject(String key, T t, Integer expireSeconds) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			String value = SerializableUtil.convert2String((Serializable) t);
-
-			setValue(key, value, expireSeconds);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getObject(String key) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			String value = getValue(key);
-			if (StringUtils.isBlank(value)) {
-				return null;
-			}
-			return (T) SerializableUtil.convert2Object(value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public void addSortSet(String key, String value, long sortNo) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.zadd(key, sortNo, value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-
-	}
-
-	public Set<String> findSortSets(String key, long start, long end) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.zrange(key, start, end);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public long findSortSetCount(String key) {
-		if (!useCache())
-			return 0;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.zcard(key);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return 0;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public long findSortSetCount(String key, long min, long max) {
-		if (!useCache())
-			return 0;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			return jredis.zcount(key, min, max);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return 0;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	@Override
-	public void removeMapValue(String key, String field) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			jredis.hdel(key, field);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	public void setMapValue(String key, String field, String value, int seconds) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-
-			CacheExpiredCommand<String> cec = new CacheExpiredCommand<String>();
-
-			cec.setObject(value);
-			cec.setExpiredTime(System.currentTimeMillis() + seconds * 1000l);
-
-			jredis.hset(key, field, SerializableUtil.convert2String((Serializable) cec));
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public String getMapValue(String key, String field) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			String value = jredis.hget(key, field);
-
-			if (StringUtils.isBlank(value)) {
-				return null;
-			}
-			CacheExpiredCommand<String> cec = (CacheExpiredCommand<String>) SerializableUtil.convert2Object(value);
-
-			if (System.currentTimeMillis() < cec.getExpiredTime())
-				return cec.getObject();
-			else
-				return null;
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	@Override
-	public <T> void setMapObject(String key, String field, T t, int seconds) {
-		if (!useCache())
-			return;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-
-			CacheExpiredCommand<T> cec = new CacheExpiredCommand<T>();
-
-			cec.setObject(t);
-			cec.setExpiredTime(System.currentTimeMillis() + seconds * 1000l);
-			String value = SerializableUtil.convert2String((Serializable) cec);
-			jredis.hset(key, field, value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getMapObject(String key, String field) {
-		if (!useCache())
-			return null;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			String value = jredis.hget(key, field);
-			if (StringUtils.isBlank(value)) {
-				return null;
-			}
-			CacheExpiredCommand<T> cec = (CacheExpiredCommand<T>) SerializableUtil.convert2Object(value);
-			if (System.currentTimeMillis() < cec.getExpiredTime())
-				return (T) cec.getObject();
-			else
-				return null;
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	@Override
-	public String generateMapFieldByDefault(Object... objArray) {
-		StringBuffer sb = new StringBuffer();
-
-		for (Object obj : objArray) {
-			sb.append(obj.toString() + "-");
-		}
-		if (sb.length() > 0) {
-			sb = sb.delete(sb.length() - 1, sb.length());
-		} else {
-			sb.append(DEFAULT_FIELD);
-
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * 计数器减少一个数量
-	 */
-	@Override
-	public Long Decr(String key, long value) {
-		if (!useCache())
-			return -1L;
-		Long valueCurr = 0L;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			valueCurr = jredis.decrBy(key, value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-		return valueCurr;
-	}
-
-	/**
-	 * 计数器增加一个数量
-	 */
-	@Override
-	public Long Incr(String key, long value) {
-		if (!useCache())
-			return -1L;
-		Long valueCurr = 0L;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			valueCurr = jredis.incrBy(key, value);
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-		return valueCurr;
-	}
-
-	@Override
-	public Long incr(String key, int expireSeconds) {
-		if (!useCache()) {
-			return -1L;
-		}
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			// reply new value
-			Long valueCurr = jredis.incr(key);
-			jredis.expire(key, expireSeconds);
-			return valueCurr;
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return null;
-		} finally {
-			returnResource(jredis);
-		}
-	}
-
-	@Override
-	public List<CacheItemCommand> findAllCacheItem(RowMapper<CacheItemCommand> rowMapper, Map<String, Object> paraMap) {
-		List<CacheItemCommand> list = new ArrayList<CacheItemCommand>();
-		// 获取全部的缓存项
-		list = cacheItemDao.findAllCacheItem(new BeanPropertyRowMapper<CacheItemCommand>(CacheItemCommand.class),
-				paraMap);
-		return list;
-	}
-
-	public boolean applyRollingTimeWindow(String key, long limit, long window) {
-		if (!useCache())
-			return true;
-		key = processKey(key);
-		Jedis jredis = null;
-		try {
-			jredis = getJedis();
-			long now = System.currentTimeMillis();
-			jredis.zremrangeByScore(key, 0, now - window * 1000);
-			jredis.zadd(key, now, String.valueOf(now));
-			if (jredis.zcard(key) <= limit) {
-				return true;
-			}
-		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			//throw new CacheException(e);
-		} finally {
-			returnResource(jredis);
-		}
-		return false;
-	}
-
-	@Override
-	public int removeByPrefix(String key) {
-		// TODO Auto-generated method stub
-		String cleanKey = "";
-		Properties pro = ProfileConfigUtil.findPro("config/redis.properties");
-		String confKeyStart = pro.getProperty(REDIS_KEY_START, null);
-		if(Validator.isNullOrEmpty(confKeyStart)){
-			cleanKey = key+"*";
-		}else{
-			
-			//因为setObject 这个方法 保存的cache的可以是 keyStart_keyStart_key,
-			//setValue 的key 是keystart_key
-			//所以这里根据key来删除就拼成 keystart*key* 这种
-			cleanKey = confKeyStart+"*"+key+"*";
-		}
-		
-		Jedis jredis = null;
-		int delCount = 0;
-		try{
-			jredis = this.getJedis();
-			Set<String> delKeys = jredis.keys(cleanKey);
-			if(Validator.isNotNullOrEmpty(delKeys)){
-				for(String delkey: delKeys){
-					jredis.del(delkey);
-					delCount ++ ;
-				}
-			}
-		}catch (Exception e) {
-			jedisPool.returnBrokenResource(jredis);
-			log.error(EXCEPTION_ERROR_MSG);
-			return delCount;
-		} finally {
-			returnResource(jredis);
-		}
-		
-		return delCount;
-	}
-	
+public class CacheManagerImpl extends AbstractCacheManager{
+
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(CacheManagerImpl.class);
+
+    @Autowired(required = false)
+    private JedisSentinelPool jedisSentinelPool;
+
+    //----------------------------------------------------------------------------------------
+
+    @Override
+    public void setValue(String key,final String value,final Integer expireSeconds){
+        handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.setex(finalKey, expireSeconds, value);
+            }
+        });
+    }
+
+    @Override
+    public void setValue(String key,final String value){
+        handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.set(finalKey, value);
+            }
+        });
+    }
+
+    @Override
+    public Long remove(String key){
+        return (Long) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.del(finalKey);
+            }
+        });
+    }
+
+    @Override
+    public String getValue(String key){
+        return (String) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.get(finalKey);
+            }
+        });
+    }
+
+    @Override
+    public void pushToListFooter(String key,final String value){
+        handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.rpush(finalKey, value);
+            }
+        });
+    }
+
+    @Override
+    public String popListHead(String key){
+        return (String) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.lpop(finalKey);
+            }
+        });
+    }
+
+    @Override
+    public Long listLen(String key){
+        return (Long) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.llen(finalKey);
+            }
+        });
+    }
+
+    @Override
+    public void addSet(String key,final String[] values){
+        handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.sadd(finalKey, values);
+            }
+        });
+    }
+
+    @Override
+    public Long removeFromSet(String key,final String[] values){
+        return (Long) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.srem(finalKey, values);
+            }
+        });
+    }
+
+    @Override
+    public void removeMapValue(String key,final String field){
+        handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.hdel(finalKey, field);
+            }
+        });
+    }
+
+    @Override
+    public <T> void setMapObject(String key,final String field,final T t,final int seconds){
+        handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                CacheExpiredCommand<T> cec = new CacheExpiredCommand<T>();
+
+                cec.setObject(t);
+                cec.setExpiredTime(System.currentTimeMillis() + seconds * 1000l);
+                String value = SerializableUtil.convert2String((Serializable) cec);
+                return jedis.hset(finalKey, field, value);
+
+            }
+        });
+    }
+
+    @Override
+    public <T> T getMapObject(String key,final String field){
+        return (T) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                String value = jedis.hget(finalKey, field);
+                if (StringUtils.isBlank(value)){
+                    return null;
+                }
+                CacheExpiredCommand<T> cec = (CacheExpiredCommand<T>) SerializableUtil.convert2Object(value);
+                if (System.currentTimeMillis() < cec.getExpiredTime()){
+                    return (T) cec.getObject();
+                }else{
+                    return null;
+                }
+            }
+        });
+    }
+
+    /**
+     * 计数器减少一个数量
+     */
+    @Override
+    public Long Decr(String key,final long value){
+        return (Long) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                return jedis.decrBy(finalKey, value);
+            }
+        });
+    }
+
+    @Override
+    public Long incr(String key,final int expireSeconds){
+        return (Long) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                // reply new value
+                Long valueCurr = jedis.incr(finalKey);
+                jedis.expire(finalKey, expireSeconds);
+                return valueCurr;
+            }
+        });
+    }
+
+    @Override
+    public Boolean applyRollingTimeWindow(String key,final long limit,final long window){
+        return (Boolean) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                long now = System.currentTimeMillis();
+
+                jedis.zremrangeByScore(finalKey, 0, now - window * 1000);
+                jedis.zadd(finalKey, now, String.valueOf(now));
+
+                return (jedis.zcard(finalKey) <= limit);
+            }
+        });
+    }
+
+    @Override
+    public int removeByPrefix(String key){
+        final String cleanKey = buildCleanKeyPattern(key);
+
+        return (int) handler(key, new RedisHandler(){
+
+            @Override
+            public Object handler(String finalKey,Jedis jedis){
+                int delCount = 0;
+                Set<String> delKeys = jedis.keys(cleanKey);
+                if (isNotNullOrEmpty(delKeys)){
+                    for (String delkey : delKeys){
+                        jedis.del(delkey);
+                        delCount++;
+                    }
+                }
+                return delCount;
+            }
+        });
+    }
+
+    //---------------------------------------------------------------------------------
+
+    public interface RedisHandler{
+
+        Object handler(String finalKey,Jedis jedis);
+    }
+
+    //---------------------------------------------------------------------
+
+    private Object handler(String key,RedisHandler redisHandler){
+        if (!useCache()){
+            return null;
+        }
+
+        String userKey = processKey(key);
+        return doHandler(userKey, redisHandler);
+    }
+
+    private Object doHandler(String userKey,RedisHandler redisHandler){
+        Jedis jedis = null;
+
+        try{
+            jedis = jedisSentinelPool.getResource();
+
+            return redisHandler.handler(userKey, jedis);
+
+        }catch (Exception e){
+            jedisSentinelPool.returnBrokenResource(jedis);
+            LOGGER.error("", e);
+            throw new CacheException(e);
+        }finally{
+            if (jedis != null){
+                jedisSentinelPool.returnResource(jedis);
+            }
+        }
+    }
 }

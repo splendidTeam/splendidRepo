@@ -2,9 +2,6 @@ package com.baozun.nebula.manager;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.springframework.jdbc.core.RowMapper;
 
 import com.baozun.nebula.command.cache.CacheItemCommand;
 
@@ -27,360 +24,202 @@ import com.baozun.nebula.command.cache.CacheItemCommand;
  */
 public interface CacheManager{
 
-	/**
-	 * 按照默认的方式生成map的field 其中的obj最后都会调用toString()方法
-	 * 
-	 * @param obj
-	 * @return
-	 */
-	public String generateMapFieldByDefault(Object...obj);
+    //----------------------value-------------------------------------------------------------------
+    /**
+     * 保存字符串到缓存中
+     * 
+     * @param key
+     * @param value
+     *            字符串值
+     * @param expireSeconds
+     *            过期时间(秒)
+     */
+    void setValue(String key,String value,Integer expireSeconds);
 
-	/**
-	 * 保存一个对象 方法中会序列化对象成字符串
-	 * 
-	 * @param key
-	 * @param t
-	 */
-	public <T> void setObject(String key,T obj);
+    /**
+     * 保存字符串到缓存中(没有过期时间)
+     * 
+     * @param key
+     * @param value
+     */
+    void setValue(String key,String value);
 
-	/**
-	 * 保存一个对象 方法中会序列化对象成字符串
-	 * 
-	 * @param key
-	 * @param t
-	 * @param expireSeconds
-	 *            过期时间
-	 */
-	public <T> void setObject(String key,T t,Integer expireSeconds);
+    /**
+     * 通过key获取数据
+     * 
+     * @param key
+     * @return
+     */
+    String getValue(String key);
 
-	/**
-	 * 获取一个对象 反序列化字符串
-	 * 
-	 * @param key
-	 * @return 对象
-	 */
-	public <T> T getObject(String key);
+    //-----------------object------------------------------------------------------------------------
 
-	/**
-	 * 保存字符串到缓存中
-	 * 
-	 * @param key
-	 * @param value
-	 *            字符串值
-	 * @param expireSeconds
-	 *            过期时间(秒)
-	 */
-	public void setValue(String key,String value,Integer expireSeconds);
+    /**
+     * 保存一个对象 方法中会序列化对象成字符串
+     * 
+     * @param key
+     * @param t
+     */
+    <T> void setObject(String key,T obj);
 
-	/**
-	 * 保存字符串到缓存中(没有过期时间)
-	 * 
-	 * @param key
-	 * @param value
-	 */
-	public void setValue(String key,String value);
+    /**
+     * 保存一个对象 方法中会序列化对象成字符串
+     * 
+     * @param key
+     * @param t
+     * @param expireSeconds
+     *            过期时间
+     */
+    <T> void setObject(String key,T t,Integer expireSeconds);
 
-	/**
-	 * sadd方式保存
-	 * 
-	 * @param key
-	 * @param value
-	 * @return
-	 */
-	public Long addSetValue(String key,String value,Integer expireSeconds);
+    /**
+     * 获取一个对象 反序列化字符串
+     * 
+     * @param key
+     * @return 对象
+     */
+    <T> T getObject(String key);
 
-	/**
-	 * 得到集合的数量
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public Long getSetLength(String key);
+    //----------------------------------------
+    /**
+     * 通过key移除数据
+     * 
+     * @param key
+     * @return
+     */
+    Long remove(String key);
+    //----------------------------------------
 
-	/**
-	 * 通过key移除数据
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public Long remove(String key);
+    /**
+     * 删除某个key的map对应field的值
+     * 
+     * @param key
+     * @param field
+     * @return
+     */
+    void removeMapValue(String key,String field);
 
-	/**
-	 * 通过key获取数据
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public String getValue(String key);
+    /**
+     * 通过key以及字段名称，保存对象到一个map中 使用时通过key与field来进行获取
+     * 
+     * @param key
+     * @param field
+     * @param value
+     * @param seconds
+     *            有效期时间
+     */
+    <T> void setMapObject(String key,String field,T t,int seconds);
 
-	/**
-	 * 通过key以及字段名称，保存字符到一个map中 使用时通过key与field来进行获取
-	 * 
-	 * @param key
-	 * @param field
-	 * @param value
-	 */
-	public void setMapValue(String key,String field,String value,int seconds);
+    /**
+     * 通过key以及map的field来获取具体的对象值
+     * 
+     * @param key
+     * @param field
+     * @return
+     */
+    <T> T getMapObject(String key,String field);
 
-	/**
-	 * 通过key以及map的field来获取具体的值
-	 * 
-	 * @param key
-	 * @param field
-	 * @return
-	 */
-	public String getMapValue(String key,String field);
+    /**
+     * 将当前字符串插入到队列的尾部
+     * 
+     * @param key
+     * @param value
+     */
+    void pushToListFooter(String key,String value);
 
-	/**
-	 * 删除某个key的map对应field的值
-	 * 
-	 * @param key
-	 * @param field
-	 * @return
-	 */
-	public void removeMapValue(String key,String field);
+    /**
+     * 取出并返回队列头部的数据元素 会在队列中删除返回的元素
+     * 
+     * @param key
+     * @return
+     */
+    String popListHead(String key);
 
-	/**
-	 * 通过key以及字段名称，保存对象到一个map中 使用时通过key与field来进行获取
-	 * 
-	 * @param key
-	 * @param field
-	 * @param value
-	 * @param seconds
-	 *            有效期时间
-	 */
-	public <T> void setMapObject(String key,String field,T t,int seconds);
+    //----------------------------------------------------------
 
-	/**
-	 * 通过key以及map的field来获取具体的对象值
-	 * 
-	 * @param key
-	 * @param field
-	 * @return
-	 */
-	public <T> T getMapObject(String key,String field);
+    /**
+     * 返回队列中元素数量
+     * 
+     * @param key
+     * @return
+     */
+    Long listLen(String key);
 
-	/**
-	 * 通过key获取整个map
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public Map<String, String> getAllMap(String key);
+    /**
+     * 添加字符串数组到set中
+     * 
+     * @param key
+     * @param values
+     */
+    void addSet(String key,String[] values);
 
-	/**
-	 * 将当前字符串数组插入到队列的头部
-	 * 
-	 * @param key
-	 * @param values
-	 *            字符串数组
-	 */
-	public void pushToListHead(String key,String[] values);
+    /****
+     * 从set中移除 指定value
+     * 
+     * @param key
+     * @param member
+     * @return
+     */
+    Long removeFromSet(String key,String[] values);
 
-	/**
-	 * 将当前字符串插入到队列的头部
-	 * 
-	 * @param key
-	 * @param value
-	 */
-	public void pushToListHead(String key,String value);
+    /**
+     * 计数器减少一个数量
+     */
+    Long Decr(String key,long value);
 
-	/**
-	 * 将当前字符串数组插入到队列的尾部
-	 * 
-	 * @param key
-	 * @param values
-	 */
-	public void pushToListFooter(String key,String[] values);
+    /**
+     * 计数器+1.
+     * 
+     * <p>
+     * If the key does not exist or contains a value of a wrong type,
+     * set the key to the value of "0" before to perform the increment operation
+     * </p>
+     * 
+     * <p>
+     * add by jim
+     * </p>
+     * 
+     * @param key
+     *            key
+     * @param expireSeconds
+     *            Set a timeout on the specified key.<br>
+     *            After the timeout the key will be automatically deleted by the server.<br>
+     *            A key with an associated timeout is said to be volatile in Redis terminology.
+     * @return reply new value
+     * @since 5.0.0
+     */
+    Long incr(String key,int expireSeconds);
 
-	/**
-	 * 将当前字符串插入到队列的尾部
-	 * 
-	 * @param key
-	 * @param value
-	 */
-	public void pushToListFooter(String key,String value);
+    /**
+     * Rolling Time Window, 用于控制用户在某个时间窗口内的访问次数，
+     * 比如：发送短信业务，5分钟内可以发送2次，24小时内可以发送5次
+     * 如果验证通过后需要将本次调用添加进去
+     * 基于redis集合特性实现
+     * 
+     * @param key
+     * @param limit
+     *            限制次数
+     * @param window
+     *            时间窗
+     * @return 验证结果
+     */
+    Boolean applyRollingTimeWindow(String key,long limit,long window);
 
-	/**
-	 * 取出并返回队列头部的数据元素 会在队列中删除返回的元素
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public String popListHead(String key);
+    /**
+     * 根据前缀删除缓存信息，只针对对象。文本，不包含map的删除
+     * 
+     * @param key
+     * @return 删除的条数
+     */
+    int removeByPrefix(String key);
 
-	/**
-	 * 取出并返回队到尾部的数据元素 会在队列中删除返回的元素
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public String popListFooter(String key);
+    //-----------------------------------------------------------------------------------------
 
-	/**
-	 * 返回某个index的队列元素
-	 * 
-	 * @param key
-	 * @param index
-	 * @return
-	 */
-	public String findListItem(String key,long index);
+    /**
+     * 获取全部缓存项
+     * 
+     * @since 5.3.2.18 remove RowMapper rowMapper, param
+     */
+    List<CacheItemCommand> findAllCacheItem(Map<String, Object> paraMap);
 
-	/**
-	 * 获取队列数据，通过start以及end,如果想获取全部数据，start填写0,end填写maxLong的值
-	 * 
-	 * @param key
-	 * @param start
-	 * @param end
-	 * @return
-	 */
-	public List<String> findLists(String key,long start,long end);
-
-	/**
-	 * 返回队列中元素数量
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public long listLen(String key);
-
-	/**
-	 * 添加字符串数组到set中
-	 * 
-	 * @param key
-	 * @param values
-	 */
-	public void addSet(String key,String[] values);
-
-	/**
-	 * 从set中返回一个元素
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public String popSet(String key);
-
-	/**
-	 * set中是否已存在某个值
-	 * 
-	 * @param key
-	 * @param member
-	 * @return
-	 */
-	public boolean existsInSet(String key,String member);
-
-	/****
-	 * 从set中移除 指定value
-	 * 
-	 * @param key
-	 * @param member
-	 * @return
-	 */
-	public Long removeFromSet(String key,String[] values);
-
-	/**
-	 * 获取整个set
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public Set<String> findSetAll(String key);
-
-	/**
-	 * 获取set的数量
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public long findSetCount(String key);
-
-	/**
-	 * 添加value到一个sortset中
-	 * 
-	 * @param key
-	 * @param value
-	 * @param sortNo
-	 */
-	public void addSortSet(String key,String value,long sortNo);
-
-	/**
-	 * 获取sortSet中sortNo为start到end的数据
-	 * 
-	 * @param key
-	 * @param start
-	 * @param end
-	 * @return
-	 */
-	public Set<String> findSortSets(String key,long start,long end);
-
-	/**
-	 * 获取sortSet的数量
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public long findSortSetCount(String key);
-
-	/**
-	 * 获取sortSet数量，通过sortNo的min到max进行筛选定位
-	 * 
-	 * @param key
-	 * @param min
-	 * @param max
-	 * @return
-	 */
-	public long findSortSetCount(String key,long min,long max);
-
-	/**
-	 * 计数器减少一个数量
-	 */
-	public Long Decr(String key,long value);
-
-	/**
-	 * 计数器增加一个数量
-	 */
-	public Long Incr(String key,long value);
-	
-	/**
-	 * 计数器+1.
-	 * 
-	 * <p>If the key does not exist or contains a value of a wrong type,
-	 *  set the key to the value of "0" before to perform the increment operation</p>
-	 * 
-	 * <p>add by jim</p>
-	* @param key  key
-	* @param expireSeconds Set a timeout on the specified key.<br>
-	*  After the timeout the key will be automatically deleted by the server.<br>
-	*  A key with an associated timeout is said to be volatile in Redis terminology. 
-	* @return reply new value
-	* @since 5.0.0
-	 */
-	Long incr(String key,int expireSeconds);
-
-	/**
-	 * 获取全部缓存项
-	 */
-	public List<CacheItemCommand> findAllCacheItem(RowMapper<CacheItemCommand> rowMapper,Map<String, Object> paraMap);
-	
-	/**
-	 * Rolling Time Window, 用于控制用户在某个时间窗口内的访问次数，
-	 * 比如：发送短信业务，5分钟内可以发送2次，24小时内可以发送5次
-	 * 如果验证通过后需要将本次调用添加进去
-	 * 基于redis集合特性实现
-	 * @param key
-	 * @param limit 限制次数
-	 * @param window 时间窗
-	 * @return　验证结果
-	 */
-	public boolean applyRollingTimeWindow(String key, long limit, long window);
-	
-	/**
-	 * 根据前缀删除缓存信息，只针对对象。文本，不包含map的删除
-	 * @param key
-	 * @return 删除的条数
-	 */
-	public int removeByPrefix(String key);
-	
-	
-	
 }

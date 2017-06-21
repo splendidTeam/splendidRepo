@@ -40,6 +40,7 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.ShopSkuVirtualInventoryHandler;
+import com.baozun.nebula.sdk.utils.ManagerValidate;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -137,6 +138,8 @@ public class SdkSkuManagerImpl implements SdkSkuManager{
     @Override
     public void addSkuInventory(String extentionCode,Integer count){
         Integer updateCount = sdkSkuInventoryDao.addSkuInventory(extentionCode, count);
+        
+    
         if (updateCount < 1)
             throw new BusinessException(Constants.ADD_SKU_INVENTORY_FAILURE);
     }
@@ -145,8 +148,10 @@ public class SdkSkuManagerImpl implements SdkSkuManager{
      * @see com.baozun.nebula.sdk.manager.SdkSkuManager#syncSkuPriceByExtentionCode(java.math.BigDecimal, java.math.BigDecimal, java.lang.String)
      */
     @Override
-    public Integer syncSkuPriceByExtentionCode(BigDecimal salesPrice,BigDecimal listPrice,String extentionCode){
-        return skuDao.syncSkuPriceByExtentionCode(salesPrice, listPrice, extentionCode);
+    public void syncSkuPriceByExtentionCode(BigDecimal salesPrice,BigDecimal listPrice,String extentionCode){
+        Integer updateCount = skuDao.syncSkuPriceByExtentionCode(salesPrice, listPrice, extentionCode);
+        ManagerValidate.isExpectedResult(1, updateCount, "extentionCode:[{}],update salesPrice:[{}],listPrice:[{}]", salesPrice, listPrice, extentionCode);
+       
     }
 
     /* (non-Javadoc)

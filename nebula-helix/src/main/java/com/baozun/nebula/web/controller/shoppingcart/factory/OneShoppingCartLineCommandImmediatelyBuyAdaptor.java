@@ -18,6 +18,8 @@ package com.baozun.nebula.web.controller.shoppingcart.factory;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.Validate;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -40,10 +42,10 @@ public abstract class OneShoppingCartLineCommandImmediatelyBuyAdaptor implements
      * controller.shoppingcart.form.ImmediatelyBuyForm)
      */
     @Override
-    public List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(ImmediatelyBuyForm immediatelyBuyForm){
+    public List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(ImmediatelyBuyForm immediatelyBuyForm ,HttpServletRequest request){
         Validate.notNull(immediatelyBuyForm, "immediatelyBuyForm can't be null!");
 
-        ShoppingCartLineCommand shoppingCartLineCommand = buildShoppingCartLineCommand(immediatelyBuyForm);
+        ShoppingCartLineCommand shoppingCartLineCommand = buildShoppingCartLineCommand(immediatelyBuyForm, request);
         Validate.notNull(shoppingCartLineCommand, "shoppingCartLineCommand can't be null!");
 
         return ConvertUtil.toList(shoppingCartLineCommand);
@@ -56,6 +58,6 @@ public abstract class OneShoppingCartLineCommandImmediatelyBuyAdaptor implements
      *            the immediately buy form
      * @return the shopping cart line command
      */
-    protected abstract ShoppingCartLineCommand buildShoppingCartLineCommand(ImmediatelyBuyForm immediatelyBuyForm);
+    protected abstract ShoppingCartLineCommand buildShoppingCartLineCommand(ImmediatelyBuyForm immediatelyBuyForm,HttpServletRequest request);
 
 }
