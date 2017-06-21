@@ -52,6 +52,31 @@ public class InvoiceInfoSubViewCommand extends BaseViewCommand {
 
     /** 发票收货地址. */
     private String receiptAddress;
+    
+    /** 纳税人识别码 . 
+     * @since 5.3.2.18
+     * */
+    private String taxPayerId;
+    
+    /** 公司地址.
+     * @since 5.3.2.18
+     *  */
+    private String                      companyAddress;
+    
+    /** 公司电话.
+     * @since 5.3.2.18
+     *  */
+    private String                      companyPhone;
+    
+    /** 开户银行名称.
+     * @since 5.3.2.18
+     *  */
+    private String                      accountBankName;
+    
+    /** 开户银行账号. 
+     * @since 5.3.2.18
+     * */
+    private String                      accountBankNumber;
 
     // XXX feilong 缺少属性
 
@@ -151,4 +176,99 @@ public class InvoiceInfoSubViewCommand extends BaseViewCommand {
     public void setReceiptAddress(String receiptAddress) {
         this.receiptAddress = receiptAddress;
     }
+    /**
+     * 获得 纳税人识别码
+     * @return the 获取纳税人识别码
+     * @since 5.3.2.18
+     */
+    public String getTaxPayerId(){
+        return taxPayerId;
+    }
+
+    /**
+     * 设置 纳税人识别码
+     * @param taxPayerId
+     *              the new 纳税人识别码
+     * @since 5.3.2.18
+     */
+    public void setTaxPayerId(String taxPayerId){
+        this.taxPayerId = taxPayerId;
+    }
+    
+    /**
+     * 获得 公司地址
+     * @return the 公司地址
+     * @since 5.3.2.18
+     */
+    public String getCompanyAddress(){
+        return companyAddress;
+    }
+
+    /**
+     * 设置 公司地址
+     * @param companyAddress
+     *              the new 公司地址
+     * @since 5.3.2.18
+     */
+    public void setCompanyAddress(String companyAddress){
+        this.companyAddress = companyAddress;
+    }
+
+    /**
+     * 获得 公司电话
+     * @return the 公司电话
+     * @since 5.3.2.18
+     */
+    public String getCompanyPhone(){
+        return companyPhone;
+    }
+
+    /**
+     * 设置 公司电话
+     * @param companyPhone
+     *              the new 公司电话
+     * @since 5.3.2.18
+     */
+    public void setCompanyPhone(String companyPhone){
+        this.companyPhone = companyPhone;
+    }
+
+    /**
+     * 获得 开户银行名称
+     * @return the 开户银行名称
+     * @since 5.3.2.18
+     */
+    public String getAccountBankName(){
+        return accountBankName;
+    }
+
+    /**
+     * 设置 开户银行名称
+     * @param accountBankName
+     *              the new 开户银行名称
+     * @since 5.3.2.18
+     */
+    public void setAccountBankName(String accountBankName){
+        this.accountBankName = accountBankName;
+    }
+
+    /**
+     * 获得 开户银行账号
+     * @return the 开户银行账号
+     * @since 5.3.2.18
+     */
+    public String getAccountBankNumber(){
+        return accountBankNumber;
+    }
+
+    /**
+     * 设置 开户银行账号
+     * @param accountBankNumber
+     *              the new 开户银行账号
+     * @since 5.3.2.18
+     */
+    public void setAccountBankNumber(String accountBankNumber){
+        this.accountBankNumber = accountBankNumber;
+    }
+
 }

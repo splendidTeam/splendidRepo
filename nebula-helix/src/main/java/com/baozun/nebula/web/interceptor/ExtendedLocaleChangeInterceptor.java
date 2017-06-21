@@ -28,7 +28,7 @@ import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
  * 
  */
 public class ExtendedLocaleChangeInterceptor extends LocaleChangeInterceptor {
-
+    
 	private String paramName = DEFAULT_PARAM_NAME;
 	
 	/**

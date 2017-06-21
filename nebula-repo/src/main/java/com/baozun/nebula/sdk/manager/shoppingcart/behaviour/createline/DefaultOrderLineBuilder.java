@@ -70,6 +70,8 @@ public class DefaultOrderLineBuilder implements OrderLineBuilder{
         orderLine.setItemName(shoppingCartLineCommand.getItemName());
         // 商品主图
         orderLine.setItemPic(shoppingCartLineCommand.getItemPic());
+        // 杂项
+        orderLine.setMisc(shoppingCartLineCommand.getMisc());
         //******************************************************************************************
 
         //设置价格信息
