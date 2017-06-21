@@ -71,15 +71,17 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
     /** 实付运费. */
     private BigDecimal actualFreight;
     
-    /** 订单类型 1-普通订单(默认), 2-预售订单,3-miadidas订单,4-hypelaunch订单. 
+    /** 
+     * 订单类型 (对应salesOrder表中orderType)
      * @since 5.3.2.18
      * */
-    private Integer   orderType;
+    private Integer orderType;
     
-    /** 显示时候用的订单总价(包括total加上运费和包装信息相关金额的总和)
+    /** 
+     * 显示时候用的订单总价(包括total加上运费和包装信息相关金额的总和)
      * @since 5.3.2.18
      * */
-    private BigDecimal   displayTotal;
+    private BigDecimal displayTotal;
 
     /**
      * 获得 订单id.
@@ -234,9 +236,9 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
     }
 
     /**
-     * 获得 订单类型
+     * 获得 订单类型(对应salesOrder表中orderType).
      * 
-     * @return the 订单类型 1-普通订单(默认), 2-预售订单,3-miadidas订单,4-hypelaunch订单.
+     * @return the 订单类型 
      * @since 5.3.2.18
      */
     public Integer getOrderType(){
@@ -244,10 +246,10 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
     }
     
     /**
-     * 设置 订单类型1-普通订单(默认), 2-预售订单,3-miadidas订单,4-hypelaunch订单.
+     * 设置 订单类型 (对应salesOrder表中orderType).
      * 
      * @param orderType
-     *          the new 订单类型1-普通订单(默认), 2-预售订单,3-miadidas订单,4-hypelaunch订单.
+     *          the new 订单类型 
      * @since 5.3.2.18
      */
     public void setOrderType(Integer orderType){
