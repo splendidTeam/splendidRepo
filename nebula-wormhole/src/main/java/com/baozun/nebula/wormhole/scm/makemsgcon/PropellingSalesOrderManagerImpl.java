@@ -21,8 +21,6 @@ import com.baozun.nebula.wormhole.mq.entity.pay.PaymentInfoV5;
 import com.baozun.nebula.wormhole.scm.handler.PropellingSalesOrderHandler;
 import com.feilong.core.bean.ConvertUtil;
 
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-
 @Transactional
 @Service("propellingSalesOrderManager")
 public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderManager{
@@ -77,7 +75,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         salesOrderV5.setInvoiceTitle(salesOrderCommand.getReceiptTitle());
         salesOrderV5.setInvoiceContent(salesOrderCommand.getReceiptContent());
         //纳税人识别码和发票类型
-        salesOrderV5.setBusinessType(buildBusinessType(salesOrderCommand));
+        salesOrderV5.setBusinessType(salesOrderCommand.getReceiptType());
         salesOrderV5.setTaxPayerId(salesOrderCommand.getTaxPayerId());
 
         //商品总金额该金额为整单最终实际货款.(不包含运费且未扣减虚拟货币[实际支付金额])不含运费的客户端显示最终金额
@@ -120,38 +118,6 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         return propellingCommonManager.saveMsgBody(ConvertUtil.toList(salesOrderV5), msgSendRecord.getId());
     }
 
-    /**
-     * 构造发票类型
-     * 
-     * <h3>代码流程:</h3>
-     * <blockquote>
-     * <ol>
-     * <li>{@code if is null(salesOrderCommand)---->NullPointerException}</li>
-     * <li>isNotNullOrEmpty(salesOrderCommand.getReceiptType()) 发票类型是null或者empty 返回 null,表示不需要发票</li>
-     * <li>发票类型是1 ,返回1 表示是个人</li>
-     * <li>其他发票类型 ,目前返回2 表示是公司(典型的是adidas 项目 类型是3 是增值税发票)</li>
-     * </ol>
-     * </blockquote>
-     * 
-     * @param SalesOrderCommand
-     * @return 1表示个人 2表示企业
-     */
-    private Integer buildBusinessType(SalesOrderCommand salesOrderCommand){
-        Validate.notNull(salesOrderCommand, "salesOrderCommand can't be null!");
-
-        //如果 ReceiptType 有值,表示需要发票
-        boolean isNeededInvoice = isNotNullOrEmpty(salesOrderCommand.getReceiptType());
-
-        //如果不需要发票 返回null
-        if (!isNeededInvoice){
-            return null;
-        }
-
-        if (salesOrderCommand.getReceiptType() == 1){//1 个人 
-            return 1;
-        }
-        return 2;//2 企业 其他发票类型 ,目前返回2 表示是公司(典型的是adidas 项目 类型是3 是增值税发票)
-    }
 
     private static BigDecimal getPayDiscount(SalesOrderCommand salesOrderCommand){
         //不是支付宝和货到付款的金额总和
