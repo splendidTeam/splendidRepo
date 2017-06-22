@@ -2,7 +2,6 @@ package com.baozun.nebula.web.interceptor;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,11 +18,8 @@ import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.model.i18n.I18nLang;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.utilities.common.LangUtil;
-import com.baozun.nebula.utils.Validator;
 import com.baozun.nebula.utils.cache.GuavaAbstractLoadingCache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.feilong.core.Validator;
 
 /**
  * 

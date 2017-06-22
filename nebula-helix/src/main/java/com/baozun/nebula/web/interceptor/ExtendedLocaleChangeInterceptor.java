@@ -48,7 +48,7 @@ public class ExtendedLocaleChangeInterceptor extends LocaleChangeInterceptor {
 	@Autowired
 	private ChooseOptionManager chooseOptionManager;
 	
-	private AtomicBoolean inited = new AtomicBoolean(false);
+	private AtomicBoolean initialized = new AtomicBoolean(false);
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -56,12 +56,12 @@ public class ExtendedLocaleChangeInterceptor extends LocaleChangeInterceptor {
 	    /**
 	     * 只初始化一次，无论langs和langAlias是否有值
 	     */
-	    if(!inited.get()) {
+	    if(!initialized.get()) {
     		//初始化langs
     		initLangs();
     		//初始化langAlias
     		initLangAlias();
-    		inited.set(true);
+    		initialized.set(true);
 	    }
 		
 		String newLocale = null;
