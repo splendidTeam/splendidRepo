@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,8 +43,6 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
     private static final String OTHERSTATUS = "OTHERSTATUS";
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractUnionPaymentAdaptor.class);
-
-    protected Properties configs;
 
     public AbstractUnionPaymentAdaptor(){
         SDKConfig.getConfig().loadProperties(ProfileConfigUtil.findCommonPro("config/unionpay.properties"));

@@ -69,6 +69,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
+import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 
@@ -612,7 +613,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @return pdp的view
 	 */
 	protected String getPdpView(Long itemId, HttpServletRequest request, HttpServletResponse response, Model model) {
-		if(request.getHeader("X-Requested-With") != null) {
+		if(RequestUtil.isAjaxRequest(request)) {
 			return VIEW_PRODUCT_DETAIL_QUICKVIEW;
 		}
 		return VIEW_PRODUCT_DETAIL;

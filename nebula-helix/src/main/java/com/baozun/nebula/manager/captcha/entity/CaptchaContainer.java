@@ -27,7 +27,9 @@ import java.io.Serializable;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年4月7日 下午8:11:54
  * @since 1.5.3
+ * @deprecated 请使用 feilong-captch ,进行了框架的升级
  */
+@Deprecated
 public class CaptchaContainer implements Serializable{
 
     private static final long serialVersionUID = 8400201075591072027L;

@@ -1,33 +1,32 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xsi:schemaLocation="
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
-	<mvc:annotation-driven>
-		<mvc:argument-resolvers>
-			<bean class="com.baozun.nebula.web.bind.ArrayCommandMethodArgumentResolver"/>
-			<bean class="com.baozun.nebula.web.bind.QueryBeanModelMethodProcessor"/>
-			<bean class="com.baozun.nebula.web.bind.I18nCommandMethodArgumentResolver"/> 
-		</mvc:argument-resolvers>
-	</mvc:annotation-driven>
+
+    <mvc:annotation-driven>
+        <mvc:argument-resolvers>
+            <bean class="com.baozun.nebula.web.bind.ArrayCommandMethodArgumentResolver" />
+            <bean class="com.baozun.nebula.web.bind.QueryBeanModelMethodProcessor" />
+            <bean class="com.baozun.nebula.web.bind.I18nCommandMethodArgumentResolver" />
+        </mvc:argument-resolvers>
+    </mvc:annotation-driven>
+
+    <mvc:resources mapping="/scripts/**" location="/scripts/" />
+    <mvc:resources mapping="/css/**" location="/css/" />
+    <mvc:resources mapping="/images/**" location="/images/" />
+    <mvc:resources mapping="/resources/**" location="/resources/" />
+    <mvc:resources mapping="/favicon.ico" location="/favicon.ico" />
     
-	<mvc:resources mapping="/scripts/**" location="/scripts/" />
-	<mvc:resources mapping="/css/**" location="/css/" />
-	<mvc:resources mapping="/images/**" location="/images/" />
-	<mvc:resources mapping="/resources/**" location="/resources/" />
-	<mvc:resources mapping="/favicon.ico" location="/favicon.ico" />
     <mvc:interceptors>
         <!--*************openSessionInViewInterceptor ************* -->
-        <bean id="openSessionInViewInterceptor"
-              class="org.springframework.orm.hibernate3.support.OpenSessionInViewInterceptor">
-            <property name="sessionFactory" ref="sessionFactory"/>
+        <bean id="openSessionInViewInterceptor" class="org.springframework.orm.hibernate3.support.OpenSessionInViewInterceptor">
+            <property name="sessionFactory" ref="sessionFactory" />
         </bean>
         <!--******* localeChangeInterceptor******** -->
         <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
-            <property name="paramName" value="siteLanguage"/>
+            <property name="paramName" value="siteLanguage" />
         </bean>
-        <bean class="com.baozun.nebula.web.interceptor.LangInterceptor"/>
+        <bean class="com.baozun.nebula.web.interceptor.LangInterceptor" />
     </mvc:interceptors>
 </beans>
