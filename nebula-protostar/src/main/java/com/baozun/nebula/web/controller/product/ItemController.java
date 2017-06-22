@@ -1704,7 +1704,20 @@ public class ItemController extends BaseController {
 		ids.add(itemId);
 
 		UserDetails userDetails = this.getUserDetails();
+		
+		//==================下架日志添加
+		
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.SaveSysItemOperateLog(itemId,userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + itemId);
+		}
+		
+		//==================下架日志添加
+		
 		Integer result = itemManager.enableOrDisableItemByIds(ids, state, userDetails.getUsername());
+		
 		if (result < 1) {
 			if (state != 1) {
 				throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DISABLED_FAIL);
@@ -1733,7 +1746,32 @@ public class ItemController extends BaseController {
 			ids.add(Long.parseLong(str));
 		}
 		UserDetails userDetails = this.getUserDetails();
+		
+		//==================上架日志添加
+		
+		
+		//记录商品修改日志
+		if(null != ids && ids.size()  > 0){
+			
+			for (Long itemId : ids) {
+				
+				try{
+					
+					saveSysItemOperateLog.SaveSysItemOperateLog(itemId,userDetails.getUserId(), 1l);
+					
+				}catch(Exception e){
+					
+					log.debug("记录修改操作日志失败,商品Id:" + itemId);
+				}
+				
+			}
+			
+		}
+		
+		//==================上架日志添加
+		
 		Integer result = itemManager.enableOrDisableItemByIds(ids, state, userDetails.getUsername());
+		
 		if (result < 1) {
 			if (state != 1) {
 				throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DISABLED_FAIL);
@@ -1774,8 +1812,32 @@ public class ItemController extends BaseController {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 			activeBeginTime = format.parse(activeBeginTimeStr);
 		}
+		
+		//==================批量定时上架日志添加
+		//记录商品修改日志
+		if(null != ids && ids.size()  > 0){
+			
+			Long userId = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+            if(userId == null){
+            	userId = -1l;
+            }
+            
+			for (Long itemId : ids) {
+				
+				try{
+					saveSysItemOperateLog.SaveSysItemOperateLog(itemId,userId, 1l);
+				}catch(Exception e){
+					
+					log.debug("记录修改操作日志失败,商品Id:" + itemId);
+				}
+				
+			}
+			
+		}
+		
+		//==================上架日志添加
+		
 		itemManager.activeItemByIds(ids, activeBeginTime);
-
 		return SUCCESS;
 	}
 
@@ -1831,6 +1893,7 @@ public class ItemController extends BaseController {
 
 		try {
 			List<Item> itemList = itemManager.importItemFromFileI18n(file.getInputStream(), shopId);
+			
 			// 刷solr
 			if (Validator.isNotNullOrEmpty(itemList)) {
 				List<Long> idList = new ArrayList<Long>();
