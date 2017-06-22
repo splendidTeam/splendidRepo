@@ -110,7 +110,7 @@ public class Member extends BaseModel{
 	private String				oldPassword;
 
 	/**
-	 * 第三方标识
+	 * 第三方标识（商城定制-personalData中指定字段获取）
 	 */
 	private String				thirdPartyIdentify;
 

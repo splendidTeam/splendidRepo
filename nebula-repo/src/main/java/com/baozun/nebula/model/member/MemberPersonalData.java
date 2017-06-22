@@ -221,22 +221,22 @@ public class MemberPersonalData extends BaseModel{
 	private String				short2;
 
 	/**
-	 * 保留字段短
+	 * 保留字段短（商城定制-第三方标识-QQ uid）
 	 */
 	private String				short3;
 
 	/**
-	 * 保留字段短
+	 * 保留字段短（商城定制-第三方标识-支付宝 uid）
 	 */
 	private String				short4;
 
 	/**
-	 * 保留字段短
+	 * 保留字段短（商城定制-第三方标识-微信 uid）
 	 */
 	private String				short5;
 
 	/**
-	 * 保留字段长
+	 * 保留字段长（商城定制-crmCustomerCode）
 	 */
 	private String				long1;
 
@@ -353,7 +353,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "COUNTRY_ID")
-    @Index(name = "IDX_PERSONAL_DATA_COUNTRY_ID")
+	@Index(name = "IDX_PERSONAL_DATA_COUNTRY_ID")
 	public Long getCountryId(){
 		return countryId;
 	}
@@ -363,7 +363,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "PROVINCE_ID")
-    @Index(name = "IDX_PERSONAL_DATA_PROVINCE_ID")
+	@Index(name = "IDX_PERSONAL_DATA_PROVINCE_ID")
 	public Long getProvinceId(){
 		return provinceId;
 	}
@@ -373,7 +373,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "CITY_ID")
-    @Index(name = "IDX_PERSONAL_DATA_CITY_ID")
+	@Index(name = "IDX_PERSONAL_DATA_CITY_ID")
 	public Long getCityId(){
 		return cityId;
 	}
@@ -383,7 +383,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "AREA_ID")
-    @Index(name = "IDX_PERSONAL_DATA_AREA_ID")
+	@Index(name = "IDX_PERSONAL_DATA_AREA_ID")
 	public Long getAreaId(){
 		return areaId;
 	}
@@ -393,7 +393,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "TOWN_ID")
-    @Index(name = "IDX_PERSONAL_DATA_TOWN_ID")
+	@Index(name = "IDX_PERSONAL_DATA_TOWN_ID")
 	public Long getTownId(){
 		return townId;
 	}
@@ -475,7 +475,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "EMAIL")
-    @Index(name = "IDX_PERSONAL_DATA_EMAIL")
+	@Index(name = "IDX_PERSONAL_DATA_EMAIL")
 	public String getEmail(){
 		return email;
 	}
@@ -485,7 +485,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "MOBILE")
-    @Index(name = "IDX_PERSONAL_DATA_MOBILE")
+	@Index(name = "IDX_PERSONAL_DATA_MOBILE")
 	public String getMobile(){
 		return mobile;
 	}

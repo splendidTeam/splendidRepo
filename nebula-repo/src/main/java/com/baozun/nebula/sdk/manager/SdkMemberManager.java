@@ -649,6 +649,15 @@ public interface SdkMemberManager extends BaseManager{
 	 * @return
 	 */
 	void deleteMemberBehaviorByMemberIdAndType(Long memberId,Long thirdPartyId,String type);
+	
+	/**
+	 * 根据thirdPartyIdentify,source查询会员信息（Tommy定制，第三方标识在persondata 中）
+	 * 
+	 * @param thirdPartyIdentify
+	 * @param source
+	 * @return
+	 */
+	Member findTommyThirdMemberByThirdIdAndSource(String thirdPartyIdentify,Integer source);
 
 	
 }

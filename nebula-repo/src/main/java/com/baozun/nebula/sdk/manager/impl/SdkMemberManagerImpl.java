@@ -1458,4 +1458,15 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			memberBehaviorStatusDao.deleteByPrimaryKey(mbs.getId());
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findTommyThirdMemberByThirdIdAndSource(java.lang.String, java.lang.Integer)
+	 */
+	@Override
+	public Member findTommyThirdMemberByThirdIdAndSource(String thirdPartyIdentify,Integer source){
+		Member member = memberDao.findTommyThirdMemberByUidAndSource(thirdPartyIdentify, source);
+		if (null != member)
+			return member;
+		return null;
+	}
 }

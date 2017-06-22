@@ -95,6 +95,10 @@ public class MemberPersonalDataCommand implements Command{
 
 	private String				short3;
 
+	private String				short4;
+
+	private String				short5;
+
 	private Integer				long1;
 
 	private Integer				long2;
@@ -607,6 +611,22 @@ public class MemberPersonalDataCommand implements Command{
 
 	public void setAreaId(Long areaId){
 		this.areaId = areaId;
+	}
+
+	public String getShort4(){
+		return short4;
+	}
+
+	public void setShort4(String short4){
+		this.short4 = short4;
+	}
+
+	public String getShort5(){
+		return short5;
+	}
+
+	public void setShort5(String short5){
+		this.short5 = short5;
 	}
 
 }
