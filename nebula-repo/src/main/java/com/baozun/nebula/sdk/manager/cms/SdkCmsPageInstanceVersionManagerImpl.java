@@ -12,7 +12,7 @@ import com.baozun.nebula.command.cms.CmsPageInstanceVersionCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.dao.cms.CmsPageInstanceVersionDao;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.model.cms.CmsPageInstanceVersion;
 import com.feilong.core.Validator;
 

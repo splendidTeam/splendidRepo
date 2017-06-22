@@ -29,7 +29,10 @@
 					sro.HANDLE_ID as handleId,
 					sro.HANDLE_NAME as handleName,
 					sro.CREATE_TIME as createTime,
-					sro.FEEDBACK
+					sro.FEEDBACK,
+					sro.code,
+					sro.OUT_ID as outId,
+					sro.ITEM_CODE as itemCode
 					from t_so_returnorderapp as sro
 					
 					
@@ -52,7 +55,10 @@
 					sro.HANDLE_ID as handleId,
 					sro.HANDLE_NAME as handleName,
 					sro.CREATE_TIME as createTime,
-					sro.FEEDBACK
+					sro.FEEDBACK,
+					sro.code,
+					sro.OUT_ID as outId,
+					sro.ITEM_CODE as itemCode
 					from t_so_returnorderapp as sro
 					
 					#end
@@ -142,7 +148,10 @@
 						sr.create_time as creatTime,
 						sr.modify_time as modifyTime,
 						sr."version",
-						sr.member_name as memberName
+						sr.member_name as memberName,
+						sr.code,
+						sr.out_id as outId,
+						sr.item_code as itemCode
 					from 
 						t_so_returnorderapp sr
 					where 

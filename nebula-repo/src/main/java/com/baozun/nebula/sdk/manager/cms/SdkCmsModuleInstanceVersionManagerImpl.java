@@ -40,7 +40,7 @@ import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
 import com.baozun.nebula.dao.cms.CmsModuleInstanceVersionDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.model.cms.CmsEditArea;
 import com.baozun.nebula.model.cms.CmsEditVersionArea;
 import com.baozun.nebula.model.cms.CmsModuleInstance;

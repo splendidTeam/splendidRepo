@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.exception.LoginException;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.manager.captcha.CaptchaUtil;
 import com.baozun.nebula.manager.captcha.entity.CaptchaContainerAndValidateConfig;
 import com.baozun.nebula.manager.member.MemberManager;

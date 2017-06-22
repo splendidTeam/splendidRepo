@@ -41,7 +41,7 @@ import com.baozun.nebula.dao.baseinfo.NavigationDao;
 import com.baozun.nebula.dao.baseinfo.NavigationLangDao;
 import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.model.baseinfo.Navigation;
 import com.baozun.nebula.model.baseinfo.NavigationLang;
 import com.baozun.nebula.model.product.Category;

@@ -128,6 +128,15 @@ public class OrderLine extends BaseModel{
     private Date              version;
 
     //**************************************************
+    
+    //***************************************************************************************************
+
+    /** 杂项 可以存放商品信息. 
+     * @since 5.3.2.18
+     * */
+    private String misc;
+
+    //**********************************************************************************************
 
     /**
      * 获得 pK.
@@ -552,4 +561,24 @@ public class OrderLine extends BaseModel{
     public void setRelatedItemId(Long relatedItemId){
         this.relatedItemId = relatedItemId;
     }
+    
+    /**
+     * 获取 杂项信息
+     * @return String
+     * @since 5.3.2.18
+     */
+    @Column(name = "MISC",length = 4000,nullable=true,unique=false)
+    public String getMisc(){
+        return misc;
+    }
+
+    /**
+     * 设置 杂项信息
+     * @param String
+     * @since 5.3.2.18
+     */
+    public void setMisc(String misc){
+        this.misc = misc;
+    }
+    
 }

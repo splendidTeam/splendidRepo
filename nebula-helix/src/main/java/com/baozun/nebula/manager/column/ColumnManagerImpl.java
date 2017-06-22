@@ -43,7 +43,7 @@ import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.dao.column.ColumnPublishedDao;
 import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.model.column.ColumnComponent;
 import com.baozun.nebula.model.column.ColumnModule;
 import com.baozun.nebula.model.column.ColumnPublished;

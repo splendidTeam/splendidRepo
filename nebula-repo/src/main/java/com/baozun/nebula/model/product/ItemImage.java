@@ -57,6 +57,8 @@ public class ItemImage extends BaseModel {
 	private Long itemId;
 	/**
 	 * 图片url
+	 * @since 5.3.2.18  
+	 * change length from 255 to 4000
 	 */
 	private String picUrl;
 	
@@ -184,7 +186,12 @@ public class ItemImage extends BaseModel {
 	public void setItemId(Long itemId) {
 		this.itemId = itemId;
 	}
-	@Column(name = "PIC_URL")
+	/**
+	 * @since 5.3.2.18  
+	 * change length from 255 to 4000
+	 * 
+	 */
+	@Column(name = "PIC_URL" ,length = 4000)
 	public String getPicUrl() {
 		return picUrl;
 	}

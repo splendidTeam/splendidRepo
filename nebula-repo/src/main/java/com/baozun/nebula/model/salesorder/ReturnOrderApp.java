@@ -116,8 +116,24 @@ public class ReturnOrderApp extends BaseModel{
 	/** version*/
 	private Date				version;
 	
+	/** 退单单号
+	 * @since 5.3.2.18
+	 * */
+	private String              code;
 	
-	@Id
+	/** 外部编码 对应sku.outId
+	 * @since 5.3.2.18
+	 * */
+    private String              outId;
+    
+    /** 商品编码 对应item.code
+     * @since 5.3.2.18
+     * */
+    private String              itemCode;
+	
+	
+
+    @Id
 	@Column(name = "ID")
 	@SequenceGenerator(name = "SEQ_T_SAL_RETURNORDERAPP",sequenceName = "S_T_SAL_RETURNORDERAPP",allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_T_SAL_RETURNORDERAPP")
@@ -327,7 +343,57 @@ public class ReturnOrderApp extends BaseModel{
 		this.version = version;
 	}
 
-	
+	/**
+     * 获取code :退单单号
+     * @since 5.3.2.18
+     * */
+    @Column(name = "CODE")
+    @Index(name = "IDX_RETURNORDERAPP_CODE")
+    public String getCode(){
+        return code;
+    }
+
+
+    /**
+     * @since 5.3.2.18
+     * */
+    public void setCode(String code){
+        this.code = code;
+    }
+
+    /**
+     * 获取outId 对应sku.outId
+     * @since 5.3.2.18
+     * */
+    @Column(name = "OUT_ID")
+    public String getOutId(){
+        return outId;
+    }
+
+
+    /**
+     * @since 5.3.2.18
+     * */
+    public void setOutId(String outId){
+        this.outId = outId;
+    }
+
+    /**
+     * 获取itemCode 对应Item.code
+     * @since 5.3.2.18
+     * */
+    @Column(name = "ITEM_CODE")
+    public String getItemCode(){
+        return itemCode;
+    }
+
+
+    /**
+     * @since 5.3.2.18
+     * */
+    public void setItemCode(String itemCode){
+        this.itemCode = itemCode;
+    }
 
 
 	

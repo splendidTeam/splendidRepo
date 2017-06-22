@@ -19,6 +19,7 @@ package com.baozun.nebula.sdk.manager;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.SkuCommand;
@@ -71,6 +72,8 @@ public interface SdkSkuManager extends BaseManager{
     /**
      * 同步商品价格(sku级别).
      *
+     *
+     *<p>在执行sql的时候，如果返回值不是1，那么会抛出  NativeUpdateRowCountNotEqualException 异常,如有需要可以捕获</p>
      * @param salesPrice
      *            the sales price
      * @param listPrice
@@ -78,8 +81,9 @@ public interface SdkSkuManager extends BaseManager{
      * @param extentionCode
      *            the extention code
      * @return the integer
+     * @since 5.3.2.18 change return type from Integer to void
      */
-    Integer syncSkuPriceByExtentionCode(BigDecimal salesPrice,BigDecimal listPrice,String extentionCode);
+    void syncSkuPriceByExtentionCode(BigDecimal salesPrice,BigDecimal listPrice,String extentionCode) ;
 
     /**
      * 同步商品的sku价格(item级别).

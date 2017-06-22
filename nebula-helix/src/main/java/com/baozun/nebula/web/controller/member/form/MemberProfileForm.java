@@ -16,14 +16,8 @@
  */
 package com.baozun.nebula.web.controller.member.form;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.controller.BaseForm;
-import com.feilong.core.Validator;
 
 public class MemberProfileForm extends BaseForm {
 
@@ -304,33 +298,6 @@ public class MemberProfileForm extends BaseForm {
 
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
-	}
-
-	public MemberPersonalData toMemberPersonalData(
-			MemberPersonalData memberPersonalData) {
-		if (null != memberPersonalData) {
-			memberPersonalData.setVersion(new Date());
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			try {
-				if(Validator.isNotNullOrEmpty(this.birthday)){
-					memberPersonalData.setBirthday(sdf.parse(this.birthday));
-				}
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			memberPersonalData.setEmail(this.loginEmail);
-			memberPersonalData.setMobile(this.loginMobile);
-			memberPersonalData.setNickname(this.loginName);
-			memberPersonalData.setSex(this.sex);
-			memberPersonalData.setCity(this.city);
-			memberPersonalData.setCityId(this.cityId);
-			memberPersonalData.setProvince(this.province);
-			memberPersonalData.setProvinceId(this.provinceId);
-			memberPersonalData.setArea(this.area);
-			memberPersonalData.setAreaId(this.areaId);
-			
-		}
-		return memberPersonalData;
 	}
 
 	public MemberCommand setMemberLoginEmail(MemberCommand memberCommand) {

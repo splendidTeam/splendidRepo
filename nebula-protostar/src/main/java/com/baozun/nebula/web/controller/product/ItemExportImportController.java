@@ -20,6 +20,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,10 +36,12 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.baseinfo.ShopManager;
 import com.baozun.nebula.manager.product.ItemExportImportManager;
+import com.baozun.nebula.manager.promotion.SaveSysItemOperateLog;
 import com.baozun.nebula.model.product.Industry;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.solr.manager.ItemSolrManager;
 import com.baozun.nebula.utils.InputStreamCacher;
+import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
@@ -64,6 +67,9 @@ public class ItemExportImportController extends BaseController {
 	
 	@Autowired
 	private PropertyDao propertyDao;
+	
+	@Autowired
+	private SaveSysItemOperateLog saveSysItemOperateLog;
 
 	/**
 	 * 转到商品导出和导入页面
@@ -189,6 +195,25 @@ public class ItemExportImportController extends BaseController {
 		try {
 			cacher = new InputStreamCacher(file.getInputStream());
 			List<Long> itemIdsForSolr = itemExportImportManager.itemImport(cacher.getInputStream(), shopId);
+			
+			//记录商品修改日志
+			if (itemIdsForSolr != null && !itemIdsForSolr.isEmpty()) {
+				
+				Long userId = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+	            if(userId == null){
+	            	userId = -1l;
+	            }
+	            
+				for (Long itemId : itemIdsForSolr) {
+					try{
+						//记录商品修改日志
+						saveSysItemOperateLog.SaveSysItemOperateLog(itemId,userId, 3l);
+					}catch(Exception e){
+						log.debug("记录修改操作日志失败,商品Id:" + itemId);
+					}
+				}
+			}
+			
 			// 更新商品索引信息
 			if (itemIdsForSolr != null && !itemIdsForSolr.isEmpty()) {
 				if (log.isDebugEnabled()) {

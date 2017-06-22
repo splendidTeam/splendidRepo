@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -99,6 +100,7 @@ import com.baozun.nebula.manager.product.ItemLangManager;
 import com.baozun.nebula.manager.product.ItemManager;
 import com.baozun.nebula.manager.product.ItemPresaleInfoManager;
 import com.baozun.nebula.manager.product.PropertyManager;
+import com.baozun.nebula.manager.promotion.SaveSysItemOperateLog;
 import com.baozun.nebula.manager.system.ChooseOptionManager;
 import com.baozun.nebula.model.bundle.Bundle;
 import com.baozun.nebula.model.i18n.I18nLang;
@@ -204,6 +206,9 @@ public class ItemController extends BaseController {
 	
 	@Autowired
 	private ChooseOptionManager	chooseOptionManager;
+	
+	@Autowired
+	private SaveSysItemOperateLog saveSysItemOperateLog;
 
 	/**
 	 * 上传图片的域名
@@ -2626,6 +2631,13 @@ public class ItemController extends BaseController {
 		Item item = itemManager.createOrUpdateSimpleItem(itemCommand, propertyValueIds, categoriesIds, defaultCategoryId, iProperties,
 				skuPropertyCommandArray);
 
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)) {
 			List<Long> itemIdsForSolr = new ArrayList<Long>();
 			itemIdsForSolr.add(item.getId());
@@ -2670,6 +2682,15 @@ public class ItemController extends BaseController {
 		// 保存商品
 		Item item = itemManager.createOrUpdateBundleItem(itemCommand, command, categoriesIds, defaultCategoryId);
 
+		
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
+		
 		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
 		backWarnEntity.setErrorCode(item.getId().intValue());
 		return backWarnEntity;
@@ -2712,7 +2733,15 @@ public class ItemController extends BaseController {
 		// 保存商品
 		Item item = itemLangManager.createOrUpdateSimpleItem(itemCommand, propertyValueIds, categoriesIds, defaultCategoryId, 
 				iProperties, skuPropertyCommandArray);
-
+		
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
+		
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)) {
 			List<Long> itemIdsForSolr = new ArrayList<Long>();
 			itemIdsForSolr.add(item.getId());
@@ -2760,6 +2789,13 @@ public class ItemController extends BaseController {
 		// 保存商品
 		Item item = itemLangManager.createOrUpdateBundleItem(itemCommand, command, categoriesIds, defaultCategoryId);
 
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
 		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
 		backWarnEntity.setErrorCode(item.getId().intValue());
 		return backWarnEntity;
@@ -2797,7 +2833,14 @@ public class ItemController extends BaseController {
 
 		// 保存商品
 		Item item = itemLangManager.createOrUpdateGroupItem(itemCommand, command, categoriesIds, defaultCategoryId);
-
+		
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
 		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
 		backWarnEntity.setErrorCode(item.getId().intValue());
 		return backWarnEntity;
