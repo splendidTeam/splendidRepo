@@ -251,11 +251,5 @@ public interface MemberDao extends GenericEntityDao<Member, Long>{
 	 */
 	@NativeQuery(model = Member.class)
 	List<Member> findMembersByGroupId(@QueryParam("groupId") Long groupId);
-	
-	/** 查询第三方会员 */
-	@NativeQuery(model = Member.class)
-	Member findTommyThirdMemberByUidAndSource(
-			@QueryParam("thirdPartyIdentify") String thirdPartyIdentify,
-			@QueryParam("source") Integer source);
 }
 

@@ -214,6 +214,11 @@ public class MemberPersonalData extends BaseModel{
 	 * 1 接收 0 不接收
 	 */
 	private Integer				receiveMail;
+	
+	/**
+	 * 保留字段短
+	 */
+	private String				short1;
 
 	/**
 	 * 保留字段短
@@ -221,22 +226,22 @@ public class MemberPersonalData extends BaseModel{
 	private String				short2;
 
 	/**
-	 * 保留字段短（商城定制-第三方标识-QQ uid）
+	 * 保留字段短
 	 */
 	private String				short3;
 
 	/**
-	 * 保留字段短（商城定制-第三方标识-支付宝 uid）
+	 * 保留字段短
 	 */
 	private String				short4;
 
 	/**
-	 * 保留字段短（商城定制-第三方标识-微信 uid）
+	 * 保留字段短
 	 */
 	private String				short5;
 
 	/**
-	 * 保留字段长（商城定制-crmCustomerCode）
+	 * 保留字段长
 	 */
 	private String				long1;
 
@@ -591,6 +596,17 @@ public class MemberPersonalData extends BaseModel{
 
 	public void setPostCode(String postCode){
 		this.postCode = postCode;
+	}
+	
+
+	@Column(name = "SHORT1")
+	public String getShort1(){
+		return short1;
+	}
+
+	
+	public void setShort1(String short1){
+		this.short1 = short1;
 	}
 
 	@Column(name = "SHORT2")
