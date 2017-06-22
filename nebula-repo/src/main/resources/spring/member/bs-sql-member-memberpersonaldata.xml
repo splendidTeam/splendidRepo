@@ -52,7 +52,6 @@
 		       		b.company as company,
 		       		b.interest as interest,
 		       		b.postcode as postcode,
-		       		b.short1 as short1,
 		       		b.short2 as short2,
 					b.short3 as short3,
 		       		b.short4 as short4,
@@ -245,11 +244,6 @@
 		       			
 		       				#if($interest)
 		       					and INTEREST=:interest
-		       				#end
-
-		       			
-		       				#if($short1)
-		       					and SHORT1=:short1
 		       				#end
 
 		       			
@@ -456,10 +450,6 @@
 		       					and INTEREST=:interest
 		       				#end
 
-		       			
-		       				#if($short1)
-		       					and SHORT1=:short1
-		       				#end
 
 		       			
 		       				#if($short2)
@@ -714,12 +704,7 @@
 		       					and INTEREST=:interest
 		       				#end
 
-		       			
-		       				#if($short1)
-		       					and SHORT1=:short1
-		       				#end
-
-		       			
+	
 		       				#if($short2)
 		       					and SHORT2=:short2
 		       				#end
@@ -918,10 +903,6 @@
 		       					and INTEREST=:interest
 		       				#end
 
-		       			
-		       				#if($short1)
-		       					and SHORT1=:short1
-		       				#end
 
 		       			
 		       				#if($short2)

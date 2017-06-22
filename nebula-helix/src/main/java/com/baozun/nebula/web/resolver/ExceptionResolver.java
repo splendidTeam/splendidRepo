@@ -39,6 +39,7 @@ import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.exception.ValidateException;
+import com.feilong.servlet.http.RequestUtil;
 
 /**
  * @author dianchao.song
@@ -99,7 +100,7 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver{
 			exception.printStackTrace(new PrintWriter(w));
 			exceptionMap.put("stackTrace", w.toString());
 		}
-		if (request.getHeader("X-Requested-With") != null){
+		if (RequestUtil.isAjaxRequest(request)){
 			mv.setView(new MappingJacksonJsonView());
 		}
 		result.put("exception", exceptionMap);

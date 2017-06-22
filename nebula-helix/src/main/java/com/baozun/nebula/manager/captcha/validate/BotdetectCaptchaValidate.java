@@ -106,7 +106,9 @@ import botdetect.web.Captcha;
  * @see <a href="https://captcha.com/doc/java/examples/jsp-captcha-tag-example.html">jsp-captcha-tag-example</a>
  * @see <a href="https://captcha.com/doc/java/api/captcha-web-reference.html">captcha-web-reference</a>
  * @since 1.5.3
+ * @deprecated 请使用 feilong-captch ,进行了框架的升级
  */
+@Deprecated
 public class BotdetectCaptchaValidate implements CaptchaValidate{
 
     /* (non-Javadoc)

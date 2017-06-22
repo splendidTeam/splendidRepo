@@ -26,7 +26,9 @@ import com.touclick.captcha.model.Status;
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 1.10.3
+ * @deprecated 请使用 feilong-captch ,进行了框架的升级
  */
+@Deprecated
 public interface TouclickCustomerValidator{
 
     /**

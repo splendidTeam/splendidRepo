@@ -1,153 +1,183 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp" xmlns:web="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
-  <display-name>Sitemanager</display-name>
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>
-			classpath*:loxia-hibernate-context.xml
-			classpath*:loxia-service-context.xml
-			classpath*:spring.xml
-		</param-value>
-  </context-param>
-  <context-param>
-    <param-name>logbackConfigLocation</param-name>
-    <param-value>classpath:config/logback.xml</param-value>
-  </context-param>
-  <listener>
-    <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
-  </listener>
-  <filter>
-    <filter-name>encodingFilter</filter-name>
-    <filter-class>org.springframework.web.filter.CharacterEncodingFilter
-		</filter-class>
-    <init-param>
-      <param-name>encoding</param-name>
-      <param-value>UTF-8</param-value>
-    </init-param>
-  </filter>
-  <filter-mapping>
-    <filter-name>encodingFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <filter>
-    <filter-name>auditLogFilter</filter-name>
-    <filter-class>com.baozun.nebula.web.filter.AuditLogFilter
-		</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>auditLogFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <filter>
-    <filter-name>springSecurityFilterChain</filter-name>
-    <filter-class>org.springframework.web.filter.DelegatingFilterProxy
-		</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>springSecurityFilterChain</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <filter>
-    <filter-name>securityFilter</filter-name>
-    <filter-class>com.baozun.nebula.security.SecurityFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>securityFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <filter>
-    <filter-name>csrfFilter</filter-name>
-    <filter-class>org.springframework.web.filter.DelegatingFilterProxy
-		</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>csrfFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.springframework.web.context.request.RequestContextListener
-		</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher
-		</listener-class>
-  </listener>
-  <listener>
-    <listener-class>com.baozun.nebula.web.listener.NebulaSystemInitListener
-		</listener-class>
-  </listener>
-  <filter>
-    <filter-name>FileUploadFilter</filter-name>
-    <filter-class>com.ckfinder.connector.FileUploadFilter</filter-class>
-    <init-param>
-      <param-name>sessionCookieName</param-name>
-      <param-value>JSESSIONID</param-value>
-    </init-param>
-    <init-param>
-      <param-name>sessionParameterName</param-name>
-      <param-value>jsessionid</param-value>
-    </init-param>
-  </filter>
-  <filter-mapping>
-    <filter-name>FileUploadFilter</filter-name>
-    <url-pattern>
-			/ckfinder/core/connector/java/connector.java
-		</url-pattern>
-  </filter-mapping>
-  <servlet>
-    <servlet-name>spring</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet
-		</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>spring</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <servlet-name>ConnectorServlet</servlet-name>
-    <servlet-class>com.ckfinder.connector.ConnectorServlet</servlet-class>
-    <init-param>
-      <param-name>XMLConfig</param-name>
-      <param-value>classpath:ckfinder/ckfinder-config.xml</param-value>
-    </init-param>
-    <init-param>
-      <param-name>debug</param-name>
-      <param-value>false</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>ConnectorServlet</servlet-name>
-    <url-pattern>
-			/ckfinder/core/connector/java/connector.java
-		</url-pattern>
-  </servlet-mapping>
-  <session-config>
-    <session-timeout>60</session-timeout>
-    <tracking-mode>COOKIE</tracking-mode>
-  </session-config>
-  <welcome-file-list>
-    <welcome-file>/</welcome-file>
-  </welcome-file-list>
-  <error-page>
-    <error-code>404</error-code>
-    <location>/errors/404.htm</location>
-  </error-page>
-  <error-page>
-    <exception-type>java.lang.Exception</exception-type>
-    <location>/errors/error.htm</location>
-  </error-page>
-  <jsp-config>
-    <jsp-property-group>
-      <url-pattern>*.jsp</url-pattern>
-      <el-ignored>false</el-ignored>
-      <page-encoding>UTF-8</page-encoding>
-      <trim-directive-whitespaces>true</trim-directive-whitespaces>
-    </jsp-property-group>
-  </jsp-config>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+    http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd" version="2.5">
+
+    <display-name>Sitemanager</display-name>
+
+    <!-- ********************************** Spring ********************************** -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath*:loxia-hibernate-context.xml
+            classpath*:loxia-service-context.xml
+            classpath*:spring.xml
+        </param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>logbackConfigLocation</param-name>
+        <param-value>classpath:config/logback.xml</param-value>
+    </context-param>
+
+    <!--
+        since spring3.2.2
+        need config first
+    -->
+    <listener>
+        <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
+    </listener>
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter
+        </filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>auditLogFilter</filter-name>
+        <filter-class>com.baozun.nebula.web.filter.AuditLogFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>auditLogFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Spring Security -->
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 用于防范XSS -->
+    <filter>
+        <filter-name>securityFilter</filter-name>
+        <filter-class>com.baozun.nebula.security.SecurityFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>securityFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>csrfFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>csrfFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener
+        </listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher
+        </listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.baozun.nebula.web.listener.NebulaSystemInitListener
+        </listener-class>
+    </listener>
+
+    <filter>
+        <filter-name>FileUploadFilter</filter-name>
+        <filter-class>com.ckfinder.connector.FileUploadFilter</filter-class>
+        <init-param>
+            <param-name>sessionCookieName</param-name>
+            <param-value>JSESSIONID</param-value>
+        </init-param>
+        <init-param>
+            <param-name>sessionParameterName</param-name>
+            <param-value>jsessionid</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>FileUploadFilter</filter-name>
+        <url-pattern>
+            /ckfinder/core/connector/java/connector.java
+        </url-pattern>
+    </filter-mapping>
+
+    <!-- ********************************** servlet ********************************** -->
+    <servlet>
+        <servlet-name>spring</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!-- ckfinder start -->
+    <servlet>
+        <servlet-name>ConnectorServlet</servlet-name>
+        <servlet-class>com.ckfinder.connector.ConnectorServlet</servlet-class>
+        <init-param>
+            <param-name>XMLConfig</param-name>
+            <param-value>classpath:ckfinder/ckfinder-config.xml</param-value>
+        </init-param>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ConnectorServlet</servlet-name>
+        <url-pattern>
+            /ckfinder/core/connector/java/connector.java
+        </url-pattern>
+    </servlet-mapping>
+    <!-- ckfinder end -->
+
+    <session-config>
+        <session-timeout>60</session-timeout>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+
+    <!-- Welcome files -->
+    <welcome-file-list>
+        <welcome-file>/</welcome-file>
+    </welcome-file-list>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/errors/404.htm</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Exception</exception-type>
+        <location>/errors/error.htm</location>
+    </error-page>
+
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <trim-directive-whitespaces>true</trim-directive-whitespaces>
+            <el-ignored>false</el-ignored>
+            <page-encoding>UTF-8</page-encoding>
+        </jsp-property-group>
+    </jsp-config>
+
 </web-app>

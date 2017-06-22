@@ -38,7 +38,9 @@ import javax.servlet.http.HttpSession;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年3月28日 上午1:26:18
  * @since 1.5.3
+ * @deprecated 请使用 feilong-captch ,进行了框架的升级
  */
+@Deprecated
 public interface SessionCounter extends Counter{
 
     /**

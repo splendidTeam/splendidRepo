@@ -251,9 +251,12 @@ public class CacheManagerImpl extends AbstractCacheManager{
     //---------------------------------------------------------------------
 
     private Object handler(String key,RedisHandler redisHandler){
-        if (!useCache()){
+        /**
+         * 全部启用cache，added by D.C 20170621
+         */
+     /*   if (!useCache()){
             return null;
-        }
+        }*/
 
         String userKey = processKey(key);
         return doHandler(userKey, redisHandler);

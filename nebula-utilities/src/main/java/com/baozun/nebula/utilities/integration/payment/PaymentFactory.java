@@ -18,7 +18,6 @@ import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvert
 import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorForAlipayAdaptor;
 import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorForUnionPayAdaptor;
 import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorForWechatAdaptor;
-import com.baozun.nebula.utilities.integration.payment.exception.PaymentAdaptorInitialFailureException;
 import com.baozun.nebula.utilities.integration.payment.unionpay.UnionPaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.unionpay.UnionPaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatPaymentAdaptor;
@@ -72,6 +71,10 @@ public class PaymentFactory{
 
     public static final String ALIPAYADDRESS = "config/payment/alipay/alipayAddress.properties";
 
+    /**
+     * @deprecated 目前银联配置文件格式参见 com.baozun.nebula.utilities.integration.payment.unionpay.AbstractUnionPaymentAdaptor.AbstractUnionPaymentAdaptor()
+     */
+    @Deprecated
     public static final String UNIONPAYDEFAULTALIPAYCONFIG = "config/payment/unionpay/unionpay.properties";
 
     //--------------------------------------------------------------------------------------------------------------
@@ -195,18 +198,9 @@ public class PaymentFactory{
     /*
      * 初始化配置参数
      */
-    public Properties initConfig(String payMentType) throws PaymentAdaptorInitialFailureException{
+    public Properties initConfig(String payMentType){
         String configFile = paymentConfigMap.get(payMentType);
-        try{
-            Properties configs = ProfileConfigUtil.findCommonPro(configFile);
-            if (null == configs.getProperty(PaymentAdaptor.PAYMENT_GATEWAY) && null == configs.getProperty("payment_gateway_front"))
-                throw new PaymentAdaptorInitialFailureException("No payment gateway address defined.");
-            return configs;
-        }catch (Exception e){
-            logger.error("Error occurs when loading {}", configFile);
-            throw new PaymentAdaptorInitialFailureException("Load Configuration failure", e);
-        }
-
+        return ProfileConfigUtil.findCommonPro(configFile);
     }
 
     //--------------------------------------------------------------------------------------------------------------
@@ -231,65 +225,36 @@ public class PaymentFactory{
      * 初始化Alipay适配器
      */
     private PaymentAdaptor initAlipayPaymentAdaptor(){
-        try{
-            return new AlipayPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
-        }catch (PaymentAdaptorInitialFailureException e){
-            logger.error("initAlipayPaymentAdaptor error: " + e.toString());
-            e.printStackTrace();
-        }
-        return null;
+        return new AlipayPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
     }
 
     /*
      * 初始化Alipay银行卡适配器
      */
     private PaymentAdaptor initAlipayBankPaymentAdaptor(){
-        try{
-            return new AlipayBankPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
-        }catch (PaymentAdaptorInitialFailureException e){
-            logger.error("initAlipayBankPaymentAdaptor error: " + e.toString());
-            e.printStackTrace();
-        }
-        return null;
+        return new AlipayBankPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
     }
 
     /*
      * 初始化Alipay国内信用卡适配器
      */
     private PaymentAdaptor initAlipayCreditCardPaymentAdaptor(){
-        try{
-            return new AlipayCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
-        }catch (PaymentAdaptorInitialFailureException e){
-            logger.error("initAlipayCreditCardPaymentAdaptor error: " + e.toString());
-            e.printStackTrace();
-        }
-        return null;
+        return new AlipayCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
     }
 
     /*
      * 初始化Alipay国外信用卡适配器
      */
     private PaymentAdaptor initAlipayInternationalCreditCardPaymentAdaptor(){
-        try{
-            return new AlipayInternationalCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY_CREDIT_INT));
-        }catch (PaymentAdaptorInitialFailureException e){
-            logger.error("initAlipayInternationalCreditCardPaymentAdaptor error: " + e.toString());
-            e.printStackTrace();
-        }
-        return null;
+        return new AlipayInternationalCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY_CREDIT_INT));
     }
 
     /*
      * 初始化银联适配器
      */
     private PaymentAdaptor initUnionPaymentAdaptor(){
-        try{
-            return new UnionPaymentAdaptor(initConfig(PAY_TYPE_UNIONPAY));
-        }catch (PaymentAdaptorInitialFailureException e){
-            logger.error("initUnionPaymentAdaptor error: " + e.toString());
-            e.printStackTrace();
-        }
-        return null;
+        //不需要传配置参数, 内部已经实现了
+        return new UnionPaymentAdaptor();
     }
 
     /*
