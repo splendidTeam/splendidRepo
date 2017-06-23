@@ -347,7 +347,8 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 			/** 设置注册会员附加信息 */
 			String clientIp = RequestUtil.getClientIp(request);
-			memberManager.setupMemberReference(memberFrontendCommand, clientIp);
+			//5.3.2.18增加参数request
+			memberManager.setupMemberReference(memberFrontendCommand, clientIp , request);
 
 			/** 用户注册 */
 			Member member = memberManager.rewriteRegister(memberFrontendCommand);

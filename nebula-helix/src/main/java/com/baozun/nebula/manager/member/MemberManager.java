@@ -2,6 +2,8 @@ package com.baozun.nebula.manager.member;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.exception.PasswordNotMatchException;
@@ -251,8 +253,9 @@ public interface MemberManager extends BaseManager{
      * 
      * @param memberFrontendCommand
      * @param clientIp
+     * @param request 
      */
-    void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp);
+    void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,HttpServletRequest request);
 
     /**
      * 根据memberIds批量查询member

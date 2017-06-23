@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -536,7 +538,7 @@ public class MemberManagerImpl implements MemberManager{
      * java.lang.String)
      */
     @Override
-    public void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp){
+    public void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,HttpServletRequest request){
         // 生命周期：未激活状态
         memberFrontendCommand.setLifecycle(Member.LIFECYCLE_UNACTIVE);
         // 来源：自注册
@@ -548,6 +550,8 @@ public class MemberManagerImpl implements MemberManager{
         Date registerTime = new Date();
 
         MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
+        //5.3.2.18增加对客户端识别码设置
+        conductCommand.setClientIdentificationMechanisms((String)request.getAttribute("clientIdentificationMechanisms"));
 
         memberFrontendCommand.setMemberConductCommand(conductCommand);
 
