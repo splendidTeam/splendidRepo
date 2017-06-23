@@ -200,7 +200,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         }
         if (!AcpService.validate(valideData, encoding)){
             page.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>失败</td></tr>");
-            logger.info("验证签名结果[失败].");
+            logger.error("验证签名结果[失败].");
             result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             result.setResponseValue(RequestParam.UNIONSUCCESS);
             result.setMessage(valideData.get("respMsg"));
