@@ -12,7 +12,7 @@
 		       		select id,
 		       		login_count as loginCount,register_time as registerTime,
 		       		pay_time as payTime,register_ip as registerIp,cumulative_con_amount as cumulativeConAmount,
-		       		login_ip as loginIp
+		       		login_ip as loginIp,c.client_identification_mechanisms as clientIdentificationMechanisms
 		       		from T_MEM_CONDUCT where id =:id
                  ]]>
 			</value>
