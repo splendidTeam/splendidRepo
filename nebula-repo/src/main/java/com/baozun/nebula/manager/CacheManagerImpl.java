@@ -3,6 +3,8 @@ package com.baozun.nebula.manager;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +18,7 @@ import com.baozun.nebula.utilities.common.SerializableUtil;
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisSentinelPool;
+import redis.clients.util.Pool;
 
 @Service("dataCacheManager")
 public class CacheManagerImpl extends AbstractCacheManager{
@@ -25,7 +27,17 @@ public class CacheManagerImpl extends AbstractCacheManager{
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheManagerImpl.class);
 
     @Autowired(required = false)
-    private JedisSentinelPool jedisSentinelPool;
+    private Pool<Jedis> pool;
+
+    /**
+     * Post construct.
+     */
+    @PostConstruct
+    protected void postConstruct(){
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info("dataCacheManager postConstruct,pool is:[{}]", pool.getClass().getName());
+        }
+    }
 
     //----------------------------------------------------------------------------------------
 
@@ -254,9 +266,11 @@ public class CacheManagerImpl extends AbstractCacheManager{
         /**
          * 全部启用cache，added by D.C 20170621
          */
-     /*   if (!useCache()){
-            return null;
-        }*/
+        /*
+         * if (!useCache()){
+         * return null;
+         * }
+         */
 
         String userKey = processKey(key);
         return doHandler(userKey, redisHandler);
@@ -266,17 +280,17 @@ public class CacheManagerImpl extends AbstractCacheManager{
         Jedis jedis = null;
 
         try{
-            jedis = jedisSentinelPool.getResource();
+            jedis = pool.getResource();
 
             return redisHandler.handler(userKey, jedis);
 
         }catch (Exception e){
-            jedisSentinelPool.returnBrokenResource(jedis);
+            pool.returnBrokenResource(jedis);
             LOGGER.error("", e);
             throw new CacheException(e);
         }finally{
             if (jedis != null){
-                jedisSentinelPool.returnResource(jedis);
+                pool.returnResource(jedis);
             }
         }
     }
