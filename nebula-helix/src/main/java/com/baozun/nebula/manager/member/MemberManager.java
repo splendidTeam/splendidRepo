@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.exception.PasswordNotMatchException;
 import com.baozun.nebula.exception.UserExpiredException;
@@ -14,7 +13,6 @@ import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.model.member.MemberCryptoguard;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 
@@ -30,7 +28,7 @@ public interface MemberManager extends BaseManager{
      * @param memberId
      * @return
      */
-    public MemberPersonalData findMemberPersonData(Long memberId);
+    MemberPersonalData findMemberPersonData(Long memberId);
 
     /**
      * 修改密码
@@ -41,7 +39,7 @@ public interface MemberManager extends BaseManager{
      * @param reNewPwd
      * @return
      */
-    public boolean updatePasswd(Long memberId,String pwd,String newPwd,String reNewPwd);
+    boolean updatePasswd(Long memberId,String pwd,String newPwd,String reNewPwd);
 
     /**
      * 保存密码保护
@@ -56,7 +54,7 @@ public interface MemberManager extends BaseManager{
      * @param memberId
      * @return
      */
-    public List<MemberCryptoguard> findCryptoguardList(Long memberId);
+    List<MemberCryptoguard> findCryptoguardList(Long memberId);
 
     /**
      * 保存个人资料(昵称需要重复性检查)
@@ -64,7 +62,7 @@ public interface MemberManager extends BaseManager{
      * @param personData
      * @return
      */
-    public MemberPersonalData savePersonData(MemberPersonalData personData);
+    MemberPersonalData savePersonData(MemberPersonalData personData);
 
     /**
      * 验证昵称重复
@@ -72,7 +70,7 @@ public interface MemberManager extends BaseManager{
      * @param nickname
      * @return
      */
-    public boolean checkNickname(String nickname);
+    boolean checkNickname(String nickname);
 
     /**
      * 发送绑定邮箱的特殊url
@@ -81,7 +79,7 @@ public interface MemberManager extends BaseManager{
      * @param email
      * @param path
      */
-    public void sendBindEmailUrl(Long memberId,String email,String path);
+    void sendBindEmailUrl(Long memberId,String email,String path);
 
     /**
      * 绑定邮箱，通过加密后的校验码校验后才可以
@@ -92,7 +90,7 @@ public interface MemberManager extends BaseManager{
      * @param email
      * @return
      */
-    public boolean bindEmail(Long memberId,String cryptCode,String email);
+    boolean bindEmail(Long memberId,String cryptCode,String email);
 
     /**
      * 发送绑定手机的SMS验证码
@@ -102,7 +100,7 @@ public interface MemberManager extends BaseManager{
      * @param memberId
      * @return
      */
-    public String sendBindMobileCode(String mobile,Long memberId);
+    String sendBindMobileCode(String mobile,Long memberId);
 
     /**
      * 绑定手机
@@ -112,7 +110,7 @@ public interface MemberManager extends BaseManager{
      * @param memberId
      * @return
      */
-    public boolean bindMobile(String mobile,Long memberId);
+    boolean bindMobile(String mobile,Long memberId);
 
     /**
      * 登录 (包含用户名、手机、邮箱)
@@ -121,8 +119,7 @@ public interface MemberManager extends BaseManager{
      * @param loginPwd
      * @return
      */
-    public MemberCommand login(MemberFrontendCommand memberCommand)
-                    throws UserNotExistsException,UserExpiredException,PasswordNotMatchException;
+    MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,PasswordNotMatchException;
 
     /**
      * 包含用户名、手机、邮箱
@@ -130,7 +127,7 @@ public interface MemberManager extends BaseManager{
      * @param loginName
      * @return
      */
-    public Member findMember(String loginName);
+    Member findMember(String loginName);
 
     /**
      * 根据用户名查询MemberCommand(用户名包含登录名、登录邮箱、登录手机)
@@ -140,7 +137,7 @@ public interface MemberManager extends BaseManager{
      * @author 冯明雷
      * @time 2016年3月30日上午10:42:13
      */
-    public MemberCommand findMemberCommandByLoginName(String loginName);
+    MemberCommand findMemberCommandByLoginName(String loginName);
 
     /**
      * 会员注册
@@ -148,7 +145,7 @@ public interface MemberManager extends BaseManager{
      * @param member
      * @return
      */
-    public Member register(MemberFrontendCommand memberCommand);
+    Member register(MemberFrontendCommand memberCommand);
 
     /**
      * 会员注册 <br/>
@@ -165,7 +162,7 @@ public interface MemberManager extends BaseManager{
      * @param loginName
      * @return
      */
-    public MemberCommand findMemberByUsername(String username);
+    MemberCommand findMemberByUsername(String username);
 
     /**
      * 根据手机号码查询用户详细信息
@@ -173,7 +170,7 @@ public interface MemberManager extends BaseManager{
      * @param mobile
      * @return
      */
-    public MemberPersonalData findMemberPersonDataByMobile(String mobile);
+    MemberPersonalData findMemberPersonDataByMobile(String mobile);
 
     /**
      * 找出会员的全部详细信息
@@ -181,21 +178,20 @@ public interface MemberManager extends BaseManager{
      * @param memberId
      * @return
      */
-
-    public MemberCommand findMemberById(Long memberId);
+    MemberCommand findMemberById(Long memberId);
 
     /**
      * @param memberCommand
      * @return
      */
-    public MemberCommand saveMember(MemberCommand memberCommand);
+    MemberCommand saveMember(MemberCommand memberCommand);
 
     /**
      * 发送激活邮件
      * 
      * @param email
      */
-    public void sendActiveByEmail(Long memberId,String domain);
+    void sendActiveByEmail(Long memberId,String domain);
 
     /**
      * 验证邮件url是否有效,有效则添加会员loginEmail字段的值,验证成功后。登录成功同步cookie中购物车数据
@@ -203,7 +199,7 @@ public interface MemberManager extends BaseManager{
      * @param email
      * @param activeUrl
      */
-    public void validEmailActiveUrl(Long memberId,String checkSum);
+    void validEmailActiveUrl(Long memberId,String checkSum);
 
     /**
      * 注册绑定手机号码，绑定成功后登录，登录成功同步cookie中购物车数据
@@ -213,7 +209,7 @@ public interface MemberManager extends BaseManager{
      * @param memberId
      * @return
      */
-    public boolean bindMobileAndSynShopppingCart(String mobile,Long memberId);
+    boolean bindMobileAndSynShopppingCart(String mobile,Long memberId);
 
     /**
      * 查询评价内容分页，根据用户信息
@@ -223,7 +219,7 @@ public interface MemberManager extends BaseManager{
      * @param searchParam
      * @return
      */
-    public Pagination<RateCommand> findItemRateListByMemberId(Page page,Sort[] sorts,Long memberId);
+    Pagination<RateCommand> findItemRateListByMemberId(Page page,Sort[] sorts,Long memberId);
 
     /**
      * 验证邮件url是否有效,有效则添加会员loginEmail字段的值,验证成功后。登录成功同步cookie中购物车数据
@@ -253,8 +249,8 @@ public interface MemberManager extends BaseManager{
      * 
      * @param memberFrontendCommand
      * @param clientIp
-     * @param request 
      */
+    //FIXME
     void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,HttpServletRequest request);
 
     /**

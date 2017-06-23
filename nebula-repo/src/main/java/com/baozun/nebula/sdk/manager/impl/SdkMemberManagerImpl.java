@@ -82,1380 +82,1303 @@ import loxia.utils.PropertyUtil;
 @Service("sdkMemberService")
 public class SdkMemberManagerImpl implements SdkMemberManager{
 
-	final Logger					log	= LoggerFactory.getLogger(this.getClass());
-
-	@Autowired
-	private MemberDao				memberDao;
-
-	@Autowired
-	private MemberGroupDao			memberGroupDao;
-
-	@Autowired
-	private CouponDao				couponDao;
-
-	@Autowired
-	private ContactDao				contactDao;
-
-	@Autowired
-	private MemberFavoritesDao		memberFavoritesDao;
-
-	@Autowired
-	private MemberConductDao		memberConductDao;
-
-	@Autowired
-	private MemberPersonalDataDao	memberPersonalDataDao;
-	
-	@Autowired
-    private MemberBehaviorStatusDao   memberBehaviorStatusDao;
-
-	@Autowired
-	private ItemRateDao				itemRateDao;
-
-	@Autowired
-	private ConsultantsDao			consultantsDao;
-
-	@Autowired
-	private MemberGroupRelationDao	memberGroupRelationDao;
-
-	@Autowired
-	private SdkOrderLineDao			sdkOrderLineDao;
-
-	@Autowired
-	private MemberCryptoguardDao	memberCryptoguardDao;
-
-	@Autowired
-	private SdkEngineManager		sdkEngineManager;
-
-	@Autowired
-	private SdkSkuManager			sdkSkuManager;
-
-	@Autowired
-	private SdkSecretManager		sdkSecretManager;
-	
-	
-	
-	/**
-	 * 加密Member对象
-	 * @param member
-	 */
-	private void encrypt(Member member){
-		sdkSecretManager.encrypt(member, new String[] {
-				"loginName",
-				"loginEmail",
-				"loginMobile",
-				"password",
-				"oldPassword"
-			});
-	}
-	
-	/**
-	 * 解密Member对象
-	 * @param member
-	 */
-	private void decrypt(Member member){
-		sdkSecretManager.decrypt(member, new String[] {
-				"loginName",
-				"loginEmail",
-				"loginMobile",
-				"password",
-				"oldPassword"
-			});
-	}
-
-	/**
-	 * 加密MemberPersonalData对象
-	 * @param mpd
-	 */
-	private void encrypt(MemberPersonalData mpd){
-		sdkSecretManager.encrypt(mpd, new String[] {
-				"nickname",
-				"localRealName",
-				"intelRealName",
-				"bloodType",
-				"marriage",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"credentialsNo",
-				"email",
-				"mobile",
-				"qq",
-				"weibo",
-				"weixin",
-				"edu",
-				"industy",
-				"position",
-				"salary",
-				"workingLife",
-				"company",
-				"interest",
-				"postCode" });
-	}
-
-	
-	/**
-	 * 解密MemberPersonalData对象
-	 * @param mpd
-	 */
-	private void decrypt(MemberPersonalData mpd){
-
-		sdkSecretManager.decrypt(mpd, new String[] {
-				"nickname",
-				"localRealName",
-				"intelRealName",
-				"bloodType",
-				"marriage",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"credentialsNo",
-				"email",
-				"mobile",
-				"qq",
-				"weibo",
-				"weixin",
-				"edu",
-				"industy",
-				"position",
-				"salary",
-				"workingLife",
-				"company",
-				"interest",
-				"postCode" });
-	}
-
-	private void encrypt(MemberPersonalDataCommand mpdc){
-
-		sdkSecretManager.encrypt(mpdc, new String[] {
-				"nickname",
-				"localRealName",
-				"intelRealName",
-				"bloodType",
-				"marriage",
-				"country",
-				"province",
-				"city",
-				"area",
-				"address",
-				"credentialsNo",
-				"postCode" });
-	}
-
-	private void decrypt(MemberPersonalDataCommand mpdc){
-
-		sdkSecretManager.decrypt(mpdc, new String[] {
-				"nickname",
-				"localRealName",
-				"intelRealName",
-				"bloodType",
-				"marriage",
-				"country",
-				"province",
-				"city",
-				"area",
-				"address",
-				"credentialsNo",
-				"postCode" });
-	}
-
-	/**
-	 * 去除加密的字段"loginEmail", "loginMobile", "realName"
-	 * @param memberCommand
-	 */
-	private void encrypt(MemberCommand memberCommand){
-
-		sdkSecretManager.encrypt(memberCommand, new String[] {  });
-	}
-	
-	/**
-	 * 去除解密的字段"loginEmail", "loginMobile", "realName"
-	 * @param memberCommand
-	 */
-	private void decrypt(MemberCommand memberCommand){
-
-		sdkSecretManager.decrypt(memberCommand, new String[] {  });
-	}
-
-	private void encryptContact(ContactCommand contact){
-
-		sdkSecretManager.encrypt(contact, new String[] {
-				"name",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"postcode",
-				"telphone",
-				"mobile",
-				"email" });
-	}
-
-	private void decryptContact(ContactCommand contact){
-
-		sdkSecretManager.decrypt(contact, new String[] {
-				"name",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"postcode",
-				"telphone",
-				"mobile",
-				"email" });
-	}
-
-	private void encryptContact(Contact contact){
-
-		sdkSecretManager.encrypt(contact, new String[] {
-				"name",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"postcode",
-				"telphone",
-				"mobile",
-				"email" });
-	}
-
-	private void decryptContact(Contact contact){
-
-		sdkSecretManager.decrypt(contact, new String[] {
-				"name",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"postcode",
-				"telphone",
-				"mobile",
-				"email" });
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberCommand findMemberById(Long id){
-		Member member = memberDao.findMemberById(id);
-		MemberCommand memberCommand = null;
-		if (null != member){
-			memberCommand = convertMemberToMemberCommand(member);
-			// 敏感信息加密存储完后，解密传输至Controller
-			//decrypt(memberCommand);
-			return memberCommand;
-		}
-		return memberCommand;
-	}
-
-	@Override
-	public MemberCommand saveMember(MemberCommand memberCommand){
-		Member member = null;
-		if (memberCommand.getId() == null || memberCommand.getId() == 0){
-			// 保存
-			member = new Member();
-		}else{
-			// 更新
-			member = memberDao.findMemberById(memberCommand.getId());
-		}
-		// 敏感信息加密存储
-		//encrypt(memberCommand);
-		member = convertMemberCommandToMember(memberCommand, member);
-		member = memberDao.save(member);
-		if (null != member){
-			memberCommand = convertMemberToMemberCommand(member);
-			// 敏感信息加密存储完后，解密传输至Controller
-			//decrypt(memberCommand);
-			return memberCommand;
-		}
-		return null;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginName(String loginName){
-		Member member = null;
-		MemberCommand memberCommand = null;
-		if (StringUtils.isNotBlank(loginName))
-			member = memberDao.findMemberByLoginName(loginName.toUpperCase());
-		if (null != member){
-			memberCommand = convertMemberToMemberCommand(member);
-			// 敏感信息加密存储完后，解密传输至Controller
-			//decrypt(memberCommand);
-			return memberCommand;
-		}
-		return null;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginEmail(String loginName){
-		Member member = null;
-		MemberCommand memberCommand = null;
-		if (StringUtils.isNotBlank(loginName))
-			member = memberDao.findMemberByLoginEmail(loginName.toUpperCase());
-		if (null != member){
-			memberCommand = convertMemberToMemberCommand(member);
-			// 敏感信息加密存储完后，解密传输至Controller
-			//decrypt(memberCommand);
-			return memberCommand;
-		}
-		return null;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginNameAndPasswd(String loginName,String password){
-		Member member = memberDao.findMemberByLoginNameAndPasswd(loginName, password);
-		MemberCommand memberCommand = null;
-		if (null != member){
-			memberCommand = convertMemberToMemberCommand(member);
-			// 敏感信息加密存储完后，解密传输至Controller
-			//decrypt(memberCommand);
-			return memberCommand;
-		}
-		return null;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<CouponCommand> findCouponCommandList(Page page,Sort[] sorts,Map<String, Object> searchParam){
-		return couponDao.findCouponCommandList(page, sorts, searchParam);
-	}
-
-	/**
-	 * @deprecated {@link com.baozun.nebula.sdk.manager.SdkMemberManager#findContactById(Long, Long)}
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public ContactCommand findContactById(Long contactId){
-		Contact contact = contactDao.findContactById(contactId);
-		decryptContact(contact);
-		if (null != contact)
-			return (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
-		return null;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public ContactCommand findContactById(Long contactId,Long memberId){
-		Contact contact = contactDao.findContactByCantactIdAndMemberId(contactId, memberId);
-		decryptContact(contact);
-		if (null != contact)
-			return (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
-		return null;
-	}
-
-	@Override
-	public ContactCommand saveContactCommand(ContactCommand contactCommand){
-		encryptContact(contactCommand);
-		Contact contact = null;
-		if (contactCommand.getId() == null || contactCommand.getId() == 0){
-			// 保存
-			contact = new Contact();
-		}else{
-			// 更新
-			contact = contactDao.getByPrimaryKey(contactCommand.getId());
-		}
-		contactCommand.setModifyTime(new Date());
-		contact = (Contact) ConvertUtils.convertTwoObject(contact, contactCommand);
-		contact = contactDao.save(contact);
-		if (null != contact){
-			decryptContact(contact);
-			return (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
-		}
-		return null;
-	}
-
-	/**
-	 * 重写联系人信息中的区划的国际化信息
-	 * 
-	 * @param contactCommand
-	 */
-	private void rewriteIntlDistrictInfo(ContactCommand contactCommand){
-		if (contactCommand == null)
-			return;
-		Address country = AddressUtil.getAddressById(contactCommand.getCountryId());
-		Address province = AddressUtil.getAddressById(contactCommand.getProvinceId());
-		Address city = AddressUtil.getAddressById(contactCommand.getCityId());
-		Address area = AddressUtil.getAddressById(contactCommand.getAreaId());
-		Address town = AddressUtil.getAddressById(contactCommand.getTownId());
-		contactCommand.setCountry(country == null ? "" : country.getName());
-		contactCommand.setProvince(province == null ? "" : province.getName());
-		contactCommand.setCity(city == null ? "" : city.getName());
-		contactCommand.setArea(area == null ? "" : area.getName());
-		contactCommand.setTown(town == null ? "" : town.getName());
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<ContactCommand> findAllContactListByMemberId(Long memberId){
-		List<Contact> contacts = contactDao.findAllContactListByMemberId(memberId);
-		List<ContactCommand> contactCommands = new ArrayList<ContactCommand>();
-		for (Contact contact : contacts){
-			decryptContact(contact);
-			ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
-			// 用id获取中文名称
-			rewriteIntlDistrictInfo(contactCommand);
-			contactCommands.add(contactCommand);
-		}
-		return contactCommands;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<ContactCommand> findContactsByMemberId(Page page,Sort[] sorts,Long memberId){
-		Pagination<Contact> contacts = contactDao.findContactsByMemberId(page, sorts, memberId);
-		Pagination<ContactCommand> resultContacts = new Pagination<ContactCommand>();
-		try{
-			PropertyUtil.copyProperties(contacts, resultContacts, new PropListCopyable(
-					"count",
-					"currentPage",
-					"totalPages",
-					"start",
-					"size",
-					"sortStr"));
-		}catch (Exception e){
-			// should not occur
-			e.printStackTrace();
-		}
-		resultContacts.setItems(new ArrayList<ContactCommand>());
-		for (Contact contact : contacts.getItems()){
-			decryptContact(contact);
-			ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
-			// 用id获取中文名称
-			rewriteIntlDistrictInfo(contactCommand);
-			resultContacts.getItems().add(contactCommand);
-		}
-		return resultContacts;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<MemberFavoritesCommand> memberFavoritesList(Page page,Sort[] sorts,Map<String, Object> searchParam){
-		return memberFavoritesDao.memberFavoritesList(page, sorts, searchParam);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberFavoritesCommand findMemberFavoritesByMemberIdAndItemId(Long itemId,Long memberId,Long skuId){
-		Map<String, Long> paramMap = new HashMap<String, Long>();
-		paramMap.put("itemId", itemId);
-		paramMap.put("memberId", memberId);
-		if (null != skuId){
-			paramMap.put("skuId", skuId);
-		}
-		MemberFavorites memberFavorites = memberFavoritesDao.findMemberFavoritesByMemberIdAndItemId(paramMap);
-		if (null != memberFavorites)
-			return (MemberFavoritesCommand) ConvertUtils.convertTwoObject(new MemberFavoritesCommand(), memberFavorites);
-		return null;
-	}
-
-	@Override
-	public void deleteMemberFavorites(MemberFavoritesCommand memberFavoritesCommand){
-		Map<String, Long> paramMap = new HashMap<String, Long>();
-		paramMap.put("itemId", memberFavoritesCommand.getItemId());
-		paramMap.put("memberId", memberFavoritesCommand.getMemberId());
-		Long skuId = memberFavoritesCommand.getSkuId();
-		if (null != skuId){
-			paramMap.put("skuId", skuId);
-		}
-		MemberFavorites memberFavorites = memberFavoritesDao.findMemberFavoritesByMemberIdAndItemId(paramMap);
-		memberFavoritesDao.delete(memberFavorites);
-	}
-
-	private MemberCommand convertMemberToMemberCommand(Member member){
-		MemberCommand memberCommand = new MemberCommand();
-
-		memberCommand.setLoginName(member.getLoginName());
-		memberCommand.setSalt(member.getSalt());//新增盐值字段
-		memberCommand.setPassword(member.getPassword());
-		memberCommand.setOldPassword(member.getOldPassword());// BrandStore迁移的历史密码
-		memberCommand.setLoginEmail(member.getLoginEmail());
-
-		// memberCommand.setIsaddgroup(member.getIsaddgroup());//未加入组
-		memberCommand.setLifecycle(member.getLifecycle());
-
-		memberCommand.setLoginMobile(member.getLoginMobile());
-		memberCommand.setThirdPartyIdentify(member.getThirdPartyIdentify());
-		memberCommand.setId(member.getId());
-
-		memberCommand.setSource(member.getSource());
-		memberCommand.setReceiveMail(member.getReceiveMail());
-		memberCommand.setType(member.getType());
-		memberCommand.setGroupId(member.getGroupId());		
-		
-		return memberCommand;
-	}
-
-	private Member convertMemberCommandToMember(MemberCommand memberCommand,Member member){
-		member.setLoginName(memberCommand.getLoginName());
-		member.setSalt(memberCommand.getSalt());//保存盐值
-		member.setPassword(memberCommand.getPassword());
-		member.setLoginEmail(memberCommand.getLoginEmail());
-
-		// member.setIsaddgroup(memberCommand.getIsaddgroup());//未加入组
-		member.setLifecycle(memberCommand.getLifecycle());
-
-		member.setLoginMobile(memberCommand.getLoginMobile());
-		member.setThirdPartyIdentify(memberCommand.getThirdPartyIdentify());
-		member.setId(memberCommand.getId());
-
-		member.setSource(memberCommand.getSource());
-		member.setReceiveMail(memberCommand.getReceiveMail());
-		member.setType(memberCommand.getType());
-		return member;
-	}
-
-	@Override
-	public MemberConductCommand saveMemberConduct(MemberConductCommand memberConductCommand){
-		MemberConduct conduct = memberConductDao.findMemberConductById(memberConductCommand.getId());
-		if (null == conduct)
-			conduct = new MemberConduct();
-		conduct = (MemberConduct) ConvertUtils.convertTwoObject(conduct, memberConductCommand);
-		conduct = memberConductDao.save(conduct);
-		if (null != conduct){
-			return (MemberConductCommand) ConvertUtils.convertTwoObject(new MemberConductCommand(), conduct);
-		}
-		return null;
-	}
-
-	@Override
-	public MemberPersonalDataCommand saveMemberPersonDataCommand(MemberPersonalDataCommand memberPersonalDataCommand){
-		encrypt(memberPersonalDataCommand);
-		MemberPersonalData memberPersonalData = memberPersonalDataDao.getByPrimaryKey(memberPersonalDataCommand.getId());
-		if (null == memberPersonalData){
-			memberPersonalData = new MemberPersonalData();
-		}
-		memberPersonalData = (MemberPersonalData) ConvertUtils.convertTwoObject(memberPersonalData, memberPersonalDataCommand);
-		memberPersonalData = memberPersonalDataDao.save(memberPersonalData);
-		if (null != memberPersonalData)
-			return (MemberPersonalDataCommand) ConvertUtils.convertTwoObject(new MemberPersonalDataCommand(), memberPersonalData);
-		return null;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberConductCommand findMemberConductCommandById(Long id){
-		return memberConductDao.findMemberConductCommandById(id);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberPersonalDataCommand findMemberPersonDataCommandById(Long id){
-		MemberPersonalDataCommand mpdc = memberPersonalDataDao.findById(id);
-
-		decrypt(mpdc);
-		return mpdc;
-	}
-
-	@Override
-	public Integer updateContactIsDefault(Long memberId,Long contactId,boolean isDefault){
-		contactDao.updateContactByMemberId(memberId, Contact.NOTDEFAULT);
-		return contactDao.updateContactByContactId(contactId, isDefault, memberId);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public CouponCommand findByMemberIdAndCardNo(Long memberId,String couponNo){
-		return couponDao.findCouponCommandByMemberIdAndCardNo(memberId, couponNo);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<ContactCommand> findContactCommandByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> searchParam){
-		Pagination<ContactCommand> contactPage = contactDao.findContactByQueryMapWithPage(page, sorts, searchParam);
-
-		for (ContactCommand cc : contactPage.getItems()){
-			decryptContact(cc);
-		}
-
-		return contactPage;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findContactList(loxia. dao.Page, loxia.dao.Sort[], java.util.Map)
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<ContactCommand> findContactList(Page page,Sort[] sorts,Map<String, Object> searchParam){
-
-		Pagination<ContactCommand> contactPage = contactDao.findContactByQueryMapWithPage(page, sorts, searchParam);
-
-		for (ContactCommand cc : contactPage.getItems()){
-			decryptContact(cc);
-		}
-
-		return contactPage;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createOrUpdateContact( com.baozun.nebula.command.ContactCommand)
-	 */
-	@Override
-	public ContactCommand createOrUpdateContact(ContactCommand contactCommand){
+    final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private MemberDao memberDao;
+
+    @Autowired
+    private MemberGroupDao memberGroupDao;
+
+    @Autowired
+    private CouponDao couponDao;
+
+    @Autowired
+    private ContactDao contactDao;
+
+    @Autowired
+    private MemberFavoritesDao memberFavoritesDao;
+
+    @Autowired
+    private MemberConductDao memberConductDao;
+
+    @Autowired
+    private MemberPersonalDataDao memberPersonalDataDao;
+
+    @Autowired
+    private MemberBehaviorStatusDao memberBehaviorStatusDao;
+
+    @Autowired
+    private ItemRateDao itemRateDao;
+
+    @Autowired
+    private ConsultantsDao consultantsDao;
+
+    @Autowired
+    private MemberGroupRelationDao memberGroupRelationDao;
+
+    @Autowired
+    private SdkOrderLineDao sdkOrderLineDao;
+
+    @Autowired
+    private MemberCryptoguardDao memberCryptoguardDao;
+
+    @Autowired
+    private SdkEngineManager sdkEngineManager;
+
+    @Autowired
+    private SdkSkuManager sdkSkuManager;
+
+    @Autowired
+    private SdkSecretManager sdkSecretManager;
+
+    /**
+     * 加密Member对象
+     * 
+     * @param member
+     */
+    private void encrypt(Member member){
+        sdkSecretManager.encrypt(member, new String[] { "loginName", "loginEmail", "loginMobile", "password", "oldPassword" });
+    }
+
+    /**
+     * 解密Member对象
+     * 
+     * @param member
+     */
+    private void decrypt(Member member){
+        sdkSecretManager.decrypt(member, new String[] { "loginName", "loginEmail", "loginMobile", "password", "oldPassword" });
+    }
+
+    /**
+     * 加密MemberPersonalData对象
+     * 
+     * @param mpd
+     */
+    private void encrypt(MemberPersonalData mpd){
+        sdkSecretManager.encrypt(mpd, new String[] {
+                                                     "nickname",
+                                                     "localRealName",
+                                                     "intelRealName",
+                                                     "bloodType",
+                                                     "marriage",
+                                                     "country",
+                                                     "province",
+                                                     "city",
+                                                     "area",
+                                                     "town",
+                                                     "address",
+                                                     "credentialsNo",
+                                                     "email",
+                                                     "mobile",
+                                                     "qq",
+                                                     "weibo",
+                                                     "weixin",
+                                                     "edu",
+                                                     "industy",
+                                                     "position",
+                                                     "salary",
+                                                     "workingLife",
+                                                     "company",
+                                                     "interest",
+                                                     "postCode" });
+    }
+
+    /**
+     * 解密MemberPersonalData对象
+     * 
+     * @param mpd
+     */
+    private void decrypt(MemberPersonalData mpd){
+
+        sdkSecretManager.decrypt(mpd, new String[] {
+                                                     "nickname",
+                                                     "localRealName",
+                                                     "intelRealName",
+                                                     "bloodType",
+                                                     "marriage",
+                                                     "country",
+                                                     "province",
+                                                     "city",
+                                                     "area",
+                                                     "town",
+                                                     "address",
+                                                     "credentialsNo",
+                                                     "email",
+                                                     "mobile",
+                                                     "qq",
+                                                     "weibo",
+                                                     "weixin",
+                                                     "edu",
+                                                     "industy",
+                                                     "position",
+                                                     "salary",
+                                                     "workingLife",
+                                                     "company",
+                                                     "interest",
+                                                     "postCode" });
+    }
+
+    private void encrypt(MemberPersonalDataCommand mpdc){
+
+        sdkSecretManager.encrypt(mpdc, new String[] { "nickname", "localRealName", "intelRealName", "bloodType", "marriage", "country", "province", "city", "area", "address", "credentialsNo", "postCode" });
+    }
+
+    private void decrypt(MemberPersonalDataCommand mpdc){
+
+        sdkSecretManager.decrypt(mpdc, new String[] { "nickname", "localRealName", "intelRealName", "bloodType", "marriage", "country", "province", "city", "area", "address", "credentialsNo", "postCode" });
+    }
+
+    /**
+     * 去除加密的字段"loginEmail", "loginMobile", "realName"
+     * 
+     * @param memberCommand
+     */
+    private void encrypt(MemberCommand memberCommand){
+
+        sdkSecretManager.encrypt(memberCommand, new String[] {});
+    }
+
+    /**
+     * 去除解密的字段"loginEmail", "loginMobile", "realName"
+     * 
+     * @param memberCommand
+     */
+    private void decrypt(MemberCommand memberCommand){
+
+        sdkSecretManager.decrypt(memberCommand, new String[] {});
+    }
+
+    private void encryptContact(ContactCommand contact){
+
+        sdkSecretManager.encrypt(contact, new String[] { "name", "country", "province", "city", "area", "town", "address", "postcode", "telphone", "mobile", "email" });
+    }
+
+    private void decryptContact(ContactCommand contact){
+
+        sdkSecretManager.decrypt(contact, new String[] { "name", "country", "province", "city", "area", "town", "address", "postcode", "telphone", "mobile", "email" });
+    }
+
+    private void encryptContact(Contact contact){
+
+        sdkSecretManager.encrypt(contact, new String[] { "name", "country", "province", "city", "area", "town", "address", "postcode", "telphone", "mobile", "email" });
+    }
+
+    private void decryptContact(Contact contact){
+
+        sdkSecretManager.decrypt(contact, new String[] { "name", "country", "province", "city", "area", "town", "address", "postcode", "telphone", "mobile", "email" });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberCommand findMemberById(Long id){
+        Member member = memberDao.findMemberById(id);
+        MemberCommand memberCommand = null;
+        if (null != member){
+            memberCommand = convertMemberToMemberCommand(member);
+            // 敏感信息加密存储完后，解密传输至Controller
+            //decrypt(memberCommand);
+            return memberCommand;
+        }
+        return memberCommand;
+    }
+
+    @Override
+    public MemberCommand saveMember(MemberCommand memberCommand){
+        Member member = null;
+        if (memberCommand.getId() == null || memberCommand.getId() == 0){
+            // 保存
+            member = new Member();
+        }else{
+            // 更新
+            member = memberDao.findMemberById(memberCommand.getId());
+        }
+        // 敏感信息加密存储
+        //encrypt(memberCommand);
+        member = convertMemberCommandToMember(memberCommand, member);
+        member = memberDao.save(member);
+        if (null != member){
+            memberCommand = convertMemberToMemberCommand(member);
+            // 敏感信息加密存储完后，解密传输至Controller
+            //decrypt(memberCommand);
+            return memberCommand;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberCommand findMemberByLoginName(String loginName){
+        Member member = null;
+        MemberCommand memberCommand = null;
+        if (StringUtils.isNotBlank(loginName))
+            member = memberDao.findMemberByLoginName(loginName.toUpperCase());
+        if (null != member){
+            memberCommand = convertMemberToMemberCommand(member);
+            // 敏感信息加密存储完后，解密传输至Controller
+            //decrypt(memberCommand);
+            return memberCommand;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberCommand findMemberByLoginEmail(String loginName){
+        Member member = null;
+        MemberCommand memberCommand = null;
+        if (StringUtils.isNotBlank(loginName))
+            member = memberDao.findMemberByLoginEmail(loginName.toUpperCase());
+        if (null != member){
+            memberCommand = convertMemberToMemberCommand(member);
+            // 敏感信息加密存储完后，解密传输至Controller
+            //decrypt(memberCommand);
+            return memberCommand;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberCommand findMemberByLoginNameAndPasswd(String loginName,String password){
+        Member member = memberDao.findMemberByLoginNameAndPasswd(loginName, password);
+        MemberCommand memberCommand = null;
+        if (null != member){
+            memberCommand = convertMemberToMemberCommand(member);
+            // 敏感信息加密存储完后，解密传输至Controller
+            //decrypt(memberCommand);
+            return memberCommand;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<CouponCommand> findCouponCommandList(Page page,Sort[] sorts,Map<String, Object> searchParam){
+        return couponDao.findCouponCommandList(page, sorts, searchParam);
+    }
+
+    /**
+     * @deprecated {@link com.baozun.nebula.sdk.manager.SdkMemberManager#findContactById(Long, Long)}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ContactCommand findContactById(Long contactId){
+        Contact contact = contactDao.findContactById(contactId);
+        decryptContact(contact);
+        if (null != contact)
+            return (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ContactCommand findContactById(Long contactId,Long memberId){
+        Contact contact = contactDao.findContactByCantactIdAndMemberId(contactId, memberId);
+        decryptContact(contact);
+        if (null != contact)
+            return (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
+        return null;
+    }
+
+    @Override
+    public ContactCommand saveContactCommand(ContactCommand contactCommand){
+        encryptContact(contactCommand);
+        Contact contact = null;
+        if (contactCommand.getId() == null || contactCommand.getId() == 0){
+            // 保存
+            contact = new Contact();
+        }else{
+            // 更新
+            contact = contactDao.getByPrimaryKey(contactCommand.getId());
+        }
+        contactCommand.setModifyTime(new Date());
+        contact = (Contact) ConvertUtils.convertTwoObject(contact, contactCommand);
+        contact = contactDao.save(contact);
+        if (null != contact){
+            decryptContact(contact);
+            return (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
+        }
+        return null;
+    }
+
+    /**
+     * 重写联系人信息中的区划的国际化信息
+     * 
+     * @param contactCommand
+     */
+    private void rewriteIntlDistrictInfo(ContactCommand contactCommand){
+        if (contactCommand == null)
+            return;
+        Address country = AddressUtil.getAddressById(contactCommand.getCountryId());
+        Address province = AddressUtil.getAddressById(contactCommand.getProvinceId());
+        Address city = AddressUtil.getAddressById(contactCommand.getCityId());
+        Address area = AddressUtil.getAddressById(contactCommand.getAreaId());
+        Address town = AddressUtil.getAddressById(contactCommand.getTownId());
+        contactCommand.setCountry(country == null ? "" : country.getName());
+        contactCommand.setProvince(province == null ? "" : province.getName());
+        contactCommand.setCity(city == null ? "" : city.getName());
+        contactCommand.setArea(area == null ? "" : area.getName());
+        contactCommand.setTown(town == null ? "" : town.getName());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ContactCommand> findAllContactListByMemberId(Long memberId){
+        List<Contact> contacts = contactDao.findAllContactListByMemberId(memberId);
+        List<ContactCommand> contactCommands = new ArrayList<ContactCommand>();
+        for (Contact contact : contacts){
+            decryptContact(contact);
+            ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
+            // 用id获取中文名称
+            rewriteIntlDistrictInfo(contactCommand);
+            contactCommands.add(contactCommand);
+        }
+        return contactCommands;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<ContactCommand> findContactsByMemberId(Page page,Sort[] sorts,Long memberId){
+        Pagination<Contact> contacts = contactDao.findContactsByMemberId(page, sorts, memberId);
+        Pagination<ContactCommand> resultContacts = new Pagination<ContactCommand>();
+        try{
+            PropertyUtil.copyProperties(contacts, resultContacts, new PropListCopyable("count", "currentPage", "totalPages", "start", "size", "sortStr"));
+        }catch (Exception e){
+            // should not occur
+            e.printStackTrace();
+        }
+        resultContacts.setItems(new ArrayList<ContactCommand>());
+        for (Contact contact : contacts.getItems()){
+            decryptContact(contact);
+            ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
+            // 用id获取中文名称
+            rewriteIntlDistrictInfo(contactCommand);
+            resultContacts.getItems().add(contactCommand);
+        }
+        return resultContacts;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<MemberFavoritesCommand> memberFavoritesList(Page page,Sort[] sorts,Map<String, Object> searchParam){
+        return memberFavoritesDao.memberFavoritesList(page, sorts, searchParam);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberFavoritesCommand findMemberFavoritesByMemberIdAndItemId(Long itemId,Long memberId,Long skuId){
+        Map<String, Long> paramMap = new HashMap<String, Long>();
+        paramMap.put("itemId", itemId);
+        paramMap.put("memberId", memberId);
+        if (null != skuId){
+            paramMap.put("skuId", skuId);
+        }
+        MemberFavorites memberFavorites = memberFavoritesDao.findMemberFavoritesByMemberIdAndItemId(paramMap);
+        if (null != memberFavorites)
+            return (MemberFavoritesCommand) ConvertUtils.convertTwoObject(new MemberFavoritesCommand(), memberFavorites);
+        return null;
+    }
+
+    @Override
+    public void deleteMemberFavorites(MemberFavoritesCommand memberFavoritesCommand){
+        Map<String, Long> paramMap = new HashMap<String, Long>();
+        paramMap.put("itemId", memberFavoritesCommand.getItemId());
+        paramMap.put("memberId", memberFavoritesCommand.getMemberId());
+        Long skuId = memberFavoritesCommand.getSkuId();
+        if (null != skuId){
+            paramMap.put("skuId", skuId);
+        }
+        MemberFavorites memberFavorites = memberFavoritesDao.findMemberFavoritesByMemberIdAndItemId(paramMap);
+        memberFavoritesDao.delete(memberFavorites);
+    }
+
+    private MemberCommand convertMemberToMemberCommand(Member member){
+        MemberCommand memberCommand = new MemberCommand();
+
+        memberCommand.setLoginName(member.getLoginName());
+        memberCommand.setSalt(member.getSalt());//新增盐值字段
+        memberCommand.setPassword(member.getPassword());
+        memberCommand.setOldPassword(member.getOldPassword());// BrandStore迁移的历史密码
+        memberCommand.setLoginEmail(member.getLoginEmail());
+
+        // memberCommand.setIsaddgroup(member.getIsaddgroup());//未加入组
+        memberCommand.setLifecycle(member.getLifecycle());
+
+        memberCommand.setLoginMobile(member.getLoginMobile());
+        memberCommand.setThirdPartyIdentify(member.getThirdPartyIdentify());
+        memberCommand.setId(member.getId());
+
+        memberCommand.setSource(member.getSource());
+        memberCommand.setReceiveMail(member.getReceiveMail());
+        memberCommand.setType(member.getType());
+        memberCommand.setGroupId(member.getGroupId());
+
+        return memberCommand;
+    }
+
+    private Member convertMemberCommandToMember(MemberCommand memberCommand,Member member){
+        member.setLoginName(memberCommand.getLoginName());
+        member.setSalt(memberCommand.getSalt());//保存盐值
+        member.setPassword(memberCommand.getPassword());
+        member.setLoginEmail(memberCommand.getLoginEmail());
+
+        // member.setIsaddgroup(memberCommand.getIsaddgroup());//未加入组
+        member.setLifecycle(memberCommand.getLifecycle());
+
+        member.setLoginMobile(memberCommand.getLoginMobile());
+        member.setThirdPartyIdentify(memberCommand.getThirdPartyIdentify());
+        member.setId(memberCommand.getId());
+
+        member.setSource(memberCommand.getSource());
+        member.setReceiveMail(memberCommand.getReceiveMail());
+        member.setType(memberCommand.getType());
+        return member;
+    }
+
+    @Override
+    public MemberConductCommand saveMemberConduct(MemberConductCommand memberConductCommand){
+        MemberConduct conduct = memberConductDao.findMemberConductById(memberConductCommand.getId());
+        if (null == conduct)
+            conduct = new MemberConduct();
+        conduct = (MemberConduct) ConvertUtils.convertTwoObject(conduct, memberConductCommand);
+        conduct = memberConductDao.save(conduct);
+        if (null != conduct){
+            return (MemberConductCommand) ConvertUtils.convertTwoObject(new MemberConductCommand(), conduct);
+        }
+        return null;
+    }
+
+    @Override
+    public MemberPersonalDataCommand saveMemberPersonDataCommand(MemberPersonalDataCommand memberPersonalDataCommand){
+        encrypt(memberPersonalDataCommand);
+        MemberPersonalData memberPersonalData = memberPersonalDataDao.getByPrimaryKey(memberPersonalDataCommand.getId());
+        if (null == memberPersonalData){
+            memberPersonalData = new MemberPersonalData();
+        }
+        memberPersonalData = (MemberPersonalData) ConvertUtils.convertTwoObject(memberPersonalData, memberPersonalDataCommand);
+        memberPersonalData = memberPersonalDataDao.save(memberPersonalData);
+        if (null != memberPersonalData)
+            return (MemberPersonalDataCommand) ConvertUtils.convertTwoObject(new MemberPersonalDataCommand(), memberPersonalData);
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberConductCommand findMemberConductCommandById(Long id){
+        return memberConductDao.findMemberConductCommandById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberPersonalDataCommand findMemberPersonDataCommandById(Long id){
+        MemberPersonalDataCommand mpdc = memberPersonalDataDao.findById(id);
+
+        decrypt(mpdc);
+        return mpdc;
+    }
+
+    @Override
+    public Integer updateContactIsDefault(Long memberId,Long contactId,boolean isDefault){
+        contactDao.updateContactByMemberId(memberId, Contact.NOTDEFAULT);
+        return contactDao.updateContactByContactId(contactId, isDefault, memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CouponCommand findByMemberIdAndCardNo(Long memberId,String couponNo){
+        return couponDao.findCouponCommandByMemberIdAndCardNo(memberId, couponNo);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<ContactCommand> findContactCommandByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> searchParam){
+        Pagination<ContactCommand> contactPage = contactDao.findContactByQueryMapWithPage(page, sorts, searchParam);
+
+        for (ContactCommand cc : contactPage.getItems()){
+            decryptContact(cc);
+        }
+
+        return contactPage;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findContactList(loxia. dao.Page, loxia.dao.Sort[], java.util.Map)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<ContactCommand> findContactList(Page page,Sort[] sorts,Map<String, Object> searchParam){
+
+        Pagination<ContactCommand> contactPage = contactDao.findContactByQueryMapWithPage(page, sorts, searchParam);
+
+        for (ContactCommand cc : contactPage.getItems()){
+            decryptContact(cc);
+        }
+
+        return contactPage;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createOrUpdateContact( com.baozun.nebula.command.ContactCommand)
+     */
+    @Override
+    public ContactCommand createOrUpdateContact(ContactCommand contactCommand){
         Validate.notNull(contactCommand, "command can't be null!");
-        
+
         Long memberId = contactCommand.getMemberId();
         Validate.notNull(memberId, "memberId can't be null!");
 
-		Contact contact = null;
-		Long id = contactCommand.getId();
-		
-		//新增
+        Contact contact = null;
+        Long id = contactCommand.getId();
+
+        //新增
         if (id == null || id == 0){
-			// 保存
-			contact = new Contact();
-			contact = convertContactCommandToContact(contactCommand, contact);
-			encryptContact(contact);
-			if (contactCommand.getIsDefault()){// 设置其他为非默认
-			    updateContactIsDefault(memberId, id, Contact.ISDEFAULT);
-			}
-			contact = contactDao.save(contact);
-		}
-     // 更新
+            // 保存
+            contact = new Contact();
+            contact = convertContactCommandToContact(contactCommand, contact);
+            encryptContact(contact);
+            if (contactCommand.getIsDefault()){// 设置其他为非默认
+                updateContactIsDefault(memberId, id, Contact.ISDEFAULT);
+            }
+            contact = contactDao.save(contact);
+        }
+        // 更新
         else{
             //by feilong 最小成本修补漏洞
             //理论上是首先需要拆分 add 和 update 的方法,  其次应该是 memberId 和 contact id 一起查询来 sql 过滤掉不匹配的数据
-            
-			contact = contactDao.getByPrimaryKey(id);
+
+            contact = contactDao.getByPrimaryKey(id);
             Validate.notNull(contact, "contact can't be null!");
-            
+
             //不是自己的数据, 可能被人为的修改了参数 http://jira.baozun.cn/browse/NB-500?filter=10744
-            Validate.isTrue(memberId.equals(contact.getMemberId()), "memberId:%s must equals contact.getMemberId():%s",memberId,contact.getMemberId());
-			
-			contact = convertContactCommandToContact(contactCommand, contact);
-			encryptContact(contact);
-			if (contactCommand.getIsDefault()){
-				// 设置其他为非默认
-				updateContactIsDefault(memberId, id, Contact.ISDEFAULT);
-			}
-		}
-		return convertContactToContactCommand(contact);
-	}
-
-	private ContactCommand convertContactToContactCommand(Contact con){
-		ContactCommand command = new ContactCommand();
-
-		ConvertUtils.convertTwoObject(command, con);
-		rewriteIntlDistrictInfo(command);
-
-		return command;
-	}
-
-	// TODO 这个方法的地址转换需要检查逻辑是否正确。从我个人理解来看，数据转换为展现的时候要转，但是存储的时候也转是否有必要和合适
-	// 是为了匹配历史不用ID而直接用名字时的兼容性么？
-	private Contact convertContactCommandToContact(ContactCommand command,Contact con){
-		// con.setId(command.getId());
-		con.setName(command.getName());
-		con.setAddress(command.getAddress());
-		con.setAreaId(command.getAreaId());
-		con.setCityId(command.getCityId());
-		con.setCountryId(command.getCountryId());
-		con.setIsDefault(command.getIsDefault());
-		con.setMobile(command.getMobile());
-		con.setPostcode(command.getPostcode());
-		con.setProvinceId(command.getProvinceId());
-		con.setTelphone(command.getTelphone());
-		con.setTownId(command.getTownId());
-		con.setEmail(command.getEmail());
-		con.setMemberId(command.getMemberId());
-		Address country = AddressUtil.getAddressById(command.getCountryId());
-		Address province = AddressUtil.getAddressById(command.getProvinceId());
-		Address city = AddressUtil.getAddressById(command.getCityId());
-		Address area = AddressUtil.getAddressById(command.getAreaId());
-		Address town = AddressUtil.getAddressById(command.getTownId());
-		con.setCountry(country == null ? "" : country.getName());
-		con.setProvince(province == null ? "" : province.getName());
-		con.setCity(city == null ? "" : city.getName());
-		con.setArea(area == null ? "" : area.getName());
-		con.setTown(town == null ? "" : town.getName());
-		return con;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#removeContactById(java .lang.Long, java.lang.Long)
-	 */
-	@Override
-	public Integer removeContactById(Long contactId,Long memberId){
-		return contactDao.removeContactById(contactId, memberId);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findFavoritesList(loxia .dao.Page, loxia.dao.Sort[], java.util.Map)
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<MemberFavoritesCommand> findFavoritesList(Page page,Sort[] sorts,Map<String, Object> searchParam){
-
-		Pagination<MemberFavoritesCommand> favoritesPage = memberFavoritesDao.findFavoritesList(page, sorts, searchParam);
-		if (favoritesPage != null && favoritesPage.getItems() != null){
-			for (MemberFavoritesCommand favortiesCommand : favoritesPage.getItems()){
-				if (favortiesCommand != null && favortiesCommand.getSkuId() != null){
-					List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(favortiesCommand.getProperties());
-					if (null != skuPros && !skuPros.isEmpty()){
-						favortiesCommand.setSkuPropertys(skuPros);
-					}
-				}
-			}
-		}
-
-		return favoritesPage;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createFavorites(java.lang .Long, java.lang.Long, java.lang.String,
-	 * java.lang.String)
-	 */
-	@Override
-	public MemberFavoritesCommand createFavorites(Long memberId,Long itemId,Long skuId){
-		MemberFavorites meberFavorites = new MemberFavorites();
-		meberFavorites.setItemId(itemId);
-		meberFavorites.setSkuId(skuId);
-		meberFavorites.setMemberId(memberId);
-		meberFavorites.setCreateDate(new Date());
-		meberFavorites.setVersion(new Date());
-		MemberFavorites newMeberFavorites = memberFavoritesDao.save(meberFavorites);
-		MemberFavoritesCommand memberFavoritesCommand = new MemberFavoritesCommand();
-		memberFavoritesCommand = (MemberFavoritesCommand) ConvertUtils.convertTwoObject(memberFavoritesCommand, newMeberFavorites);
-		return memberFavoritesCommand;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#removeFavoritesByIds(java .util.List, java.lang.Long)
-	 */
-	@Override
-	public Integer removeFavoritesByIds(List<Long> itemIds,List<Long> skuIds,Long memberId){
-		return memberFavoritesDao.removeFavoritesByIds(itemIds, skuIds, memberId);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findItemRateList(loxia .dao.Page, loxia.dao.Sort[], java.util.Map)
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<ItemRateCommand> findItemRateList(Page page,Sort[] sorts,Map<String, Object> searchParam){
-		Pagination<ItemRateCommand> ItemRateCommandList = new Pagination<ItemRateCommand>();
-		List<ItemRateCommand> itemRateList = new ArrayList<ItemRateCommand>();
-		Pagination<ItemRateListCommand> itemteList = itemRateDao.findeStatusNndOrderListQueryMapWithPage(page, sorts, searchParam);
-		if (itemteList != null && itemteList.getItems().size() > 0){
-			for (ItemRateListCommand itemRate : itemteList.getItems()){
-				ItemRateCommand itemRateCommand = new ItemRateCommand();
-				OrderLineCommand orderLine = new OrderLineCommand();
-				RateCommand rateCommand = new RateCommand();
-				orderLine.setItemPic(itemRate.getItemPic());
-				orderLine.setItemId(itemRate.getItemId());
-				orderLine.setItemName(itemRate.getItemName());
-				orderLine.setEvaluationStatus(itemRate.getEvaluationStatus());
-				orderLine.setOrderId(itemRate.getOrderId());
-				orderLine.setId(itemRate.getSoLineId());
-				rateCommand.setId(itemRate.getRateId());
-				rateCommand.setReply(itemRate.getReply());
-				rateCommand.setMemberId(itemRate.getMemberId());
-				rateCommand.setLifecycle(itemRate.getLifecycle());
-
-				itemRateCommand.setRateCommand(rateCommand);
-				itemRateCommand.setOrderLineCommand(orderLine);
-				itemRateCommand.setCreateTime(itemRate.getCreateTime());
-				itemRateList.add(itemRateCommand);
-			}
-		}
-		ItemRateCommandList.setItems(itemRateList);
-		ItemRateCommandList.setCount(itemteList.getCount());
-		ItemRateCommandList.setSize(itemteList.getSize());
-		ItemRateCommandList.setTotalPages(itemteList.getTotalPages());
-		ItemRateCommandList.setSortStr(itemteList.getSortStr());
-		ItemRateCommandList.setCurrentPage(itemteList.getCurrentPage());
-		ItemRateCommandList.setStart(itemteList.getStart());
-		return ItemRateCommandList;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findItemRateById(java. lang.Long)
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public RateCommand findItemRateById(Long rateId){
-		ItemRate newItemRate = itemRateDao.getByPrimaryKey(rateId);
-		RateCommand newItemRateCommand = new RateCommand();
-		if (null != newItemRate)
-			newItemRateCommand = (RateCommand) ConvertUtils.convertTwoObject(newItemRateCommand, newItemRate);
-		return newItemRateCommand;
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createRate(com.baozun. nebula.command.RateCommand)
-	 */
-	@Override
-	public ItemRate createRate(RateCommand itemRateCommand){
-		ItemRate newItemRate = new ItemRate();
-		newItemRate.setId(itemRateCommand.getId());
-		newItemRate.setItemId(itemRateCommand.getItemId());
-		newItemRate.setContent(itemRateCommand.getContent());
-		newItemRate.setCreateTime(new Date());
-		newItemRate.setMemberId(itemRateCommand.getMemberId());
-		newItemRate.setScore(itemRateCommand.getScore());
-		newItemRate.setLifecycle(BaseModel.LIFECYCLE_INIT.longValue());
-		newItemRate.setOrderLineId(itemRateCommand.getOrderLineId());
-		ItemRate itemRate = itemRateDao.save(newItemRate);
-		return itemRate;
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findConsultantsList(loxia .dao.Page, loxia.dao.Sort[], java.util.Map)
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<ConsultantCommand> findConsultantsList(Page page,Sort[] sorts,Map<String, Object> searchParam){
-		return consultantsDao.findConsultants(page, sorts, searchParam);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createConsultants(com. baozun.nebula.command.product.ItemConsultantCommand)
-	 */
-	@Override
-	public Consultants createConsultants(Consultants consultants){
-		return consultantsDao.save(consultants);
-	}
-
-	@Deprecated
-	@Override
-	public Member register(Member sourceMember){
-		sourceMember.setLifecycle(BaseModel.LIFECYCLE_ENABLE);// 有效
-		// sourceMember.setIsaddgroup(0);//未加入组
-		String encodePassword = EncryptUtil.getInstance().hash(sourceMember.getPassword(), sourceMember.getLoginName());
-		sourceMember.setPassword(encodePassword);
-		sourceMember.setLoginName(sourceMember.getLoginName());
-		Member member = memberDao.save(sourceMember);
-		return member;
-	}
-
-	/**
-	 * 新增对象 加密对象
-	 */
-	@Override
-	public Member rewriteRegister(Member member){
-		if(Validator.isNotNullOrEmpty(member)){
-			if(Validator.isNotNullOrEmpty(member.getPassword())){
-				//生成新的盐值，用新的加密算法进行加密，
-				String salt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
-				String encodePassword = EncryptUtil.getInstance().hashSalt(member.getPassword(), salt);
-				//保存密码和盐值
-				member.setSalt(salt);
-				member.setPassword(encodePassword);
-			}
-			member = memberDao.save(member);
-		}
-		return member;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public boolean validUserName(String username){
-		boolean flag = false;
-		Member member = memberDao.findMemberByLoginName(username);
-		if (null == member){
-			flag = true;
-		}
-		return flag;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public boolean validEmail(String email){
-		boolean flag = false;
-		Member member = memberDao.findMemberByLoginEmail(email);
-		if (null == member){
-			flag = true;
-		}
-		return flag;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public boolean validMobile(String mobile){
-		boolean flag = false;
-		Member member = memberDao.findMemberByLoginMobile(mobile);
-		if (null == member){
-			flag = true;
-		}
-		return flag;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<MemberCryptoguard> findCryptoguardList(Long memberId){
-		return memberCryptoguardDao.findByMemberId(memberId);
-	}
-
-	@Override
-	public String sendPassResetCodeByEmail(Long memberId){
-		String genericRandomCode = genericRandomCode();
-		log.info(genericRandomCode);
-		return genericRandomCode;
-	}
-
-	@Override
-	public String sendPassResetCodeBySms(Long memberId){
-		String genericRandomCode = genericRandomCode();
-		log.info(genericRandomCode);
-		return genericRandomCode;
-	}
-
-	private String genericRandomCode(){
-		Random random = new Random();
-		String result = "";
-		for (int i = 0; i < 4; i++){
-			result += String.valueOf(random.nextInt(10));
-		}
-		return result;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public boolean checkCryptoguard(List<MemberCryptoguard> cryptoguardList){
-		boolean result = true;
-		for (MemberCryptoguard c : cryptoguardList){
-			MemberCryptoguard newCry = memberCryptoguardDao.findByQa(c.getQuestion(), c.getAnswer());
-			result = result && (newCry != null);
-		}
-		return result;
-	}
-
-	@Override
-	public boolean checkEmailUrl(String code,Long memberId){
-		return false;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberPersonalData findMemberPersonData(Long memberId){
-		MemberPersonalData mpd = memberPersonalDataDao.findByMemberId(memberId);
-
-		decrypt(mpd);
-
-		return mpd;
-
-	}
-
-	@Override
-	public boolean resetPasswd(Long memberId,String newPwd){
-		Integer res = memberDao.updatePasswd(memberId, newPwd);
-		if (res > 0)
-			return true;
-		return false;
-	}
-	
-	@Override
-	public boolean resetPasswdWithSalt(Long memberId,String newPwd,String salt){
-		Integer res = memberDao.updatePasswdAndSalt(memberId, newPwd, salt);
-		if (res > 0)
-			return true;
-		return false;
-	}
-
-	@Override
-	public boolean updatePasswd(Long memberId,String pwd,String newPwd,String reNewPwd){
-		Member member = memberDao.findMemberById(memberId);
-		String salt = member.getSalt();
-		String encodePassword = null;
-		Integer res = 0;
-		String encodeNewPassword = null;
-		//如果盐值为空，对密码验证走老的加密验证逻辑 add by ruichao.gao
-		if(Validator.isNullOrEmpty(member.getSalt())){
-			 encodePassword = EncryptUtil.getInstance().hash(pwd, member.getLoginName());
-		}else{
-			encodePassword = EncryptUtil.getInstance().hashSalt(pwd, salt);
-		}
-		
-		if (!encodePassword.equals(member.getPassword())){
-			throw new BusinessException(Constants.OLDPASSWORD_ISWRONG_ERROR);
-		}
-		if (pwd.equals(newPwd)){
-			throw new BusinessException(Constants.OLDPASSWORD_ASSAMEAS_NEWPASSWORD_ERROR);
-		}
-		if (!newPwd.equals(reNewPwd)){
-			throw new BusinessException(Constants.RENEWPASSWORD_NOTSAMEAS_NEWPASSWORD_ERROR);
-		}
-		if(Validator.isNullOrEmpty(member.getSalt())){
-			//生成新的盐值，用新的加密算法进行加密，(仅适用于更新加密算法之后，第一次直接更改密码) add by ruichao.gao
-			String newSalt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
-			encodeNewPassword = EncryptUtil.getInstance().hashSalt(newPwd, newSalt);
-			//更新保存盐值和新密码
-			res = memberDao.updatePasswdAndSalt(memberId, encodeNewPassword, newSalt);
-		}else{
-			 encodeNewPassword = EncryptUtil.getInstance().hashSalt(newPwd, salt);
-			 res = memberDao.updatePasswd(memberId, encodeNewPassword);
-		}
-		
-		if (res > 0)
-			return true;
-		return false;
-	}
-
-	@Override
-	public void saveCryptoguard(MemberCryptoguard memberCryptoguard){
-		memberCryptoguardDao.save(memberCryptoguard);
-
-	}
-
-	@Override
-	public void removeCryptoguardByMemberId(Long memberId){
-		memberCryptoguardDao.removeMemberCryptoguardByMemberId(memberId);
-
-	}
-
-	@Override
-	public MemberPersonalData savePersonData(MemberPersonalData personData){
-		encrypt(personData);
-		MemberPersonalData oldMemberPersonalData = memberPersonalDataDao.getByPrimaryKey(personData.getId());
-		MemberPersonalData memberPersonalData = null;
-		if (oldMemberPersonalData != null){
-			Date ver = oldMemberPersonalData.getVersion();
-			personData.setVersion(ver);
-			oldMemberPersonalData = personData;
-			memberPersonalData = memberPersonalDataDao.save(oldMemberPersonalData);
-		}else{
-			memberPersonalData = memberPersonalDataDao.save(personData);
-		}
-		return memberPersonalData;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public boolean checkNickname(String nickname){
-		MemberPersonalData memberPersonalData = memberPersonalDataDao.findByNickname(nickname);
-		if (memberPersonalData == null)
-			return false;
-		return true;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public void sendBindEmailUrl(Long memberId,String email,String path){
-		String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
-		Member member = memberDao.findMemberById(memberId);
-		MemberConductCommand conduct = findMemberConductCommandById(member.getId());
-		StringBuffer emailContent = new StringBuffer();
-		emailContent.append(member.getId()).append(member.getId()).append(email).append(member.getType()).append(member.getSource())
-				.append(conduct.getRegisterTime());
-		String checksum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
-		StringBuffer activeEmailUrl = new StringBuffer();
-
-		try{
-			StringBuffer encryptParams = new StringBuffer();
-			encryptParams.append("member_id=").append(member.getId()).append("&checksum=").append(checksum).append("&sendTime=")
-					.append(new Date().getTime()).append("&email=").append(email);
-			String encrypt = EncryptUtil.getInstance().encrypt(encryptParams.toString());
-			activeEmailUrl.append(path).append("?registerComfirm=").append(URLEncoder.encode(encrypt, "UTF-8"));
-
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-		log.info("activeEmailUrl-----------------------: " + activeEmailUrl);
-	}
-
-	@Override
-	public boolean bindEmail(Long memberId,String checkSum,String email){
-		String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
-		Member member = memberDao.findMemberById(memberId);
-		MemberConductCommand conduct = memberConductDao.findMemberConductCommandById(memberId);
-		StringBuffer emailContent = new StringBuffer();
-		emailContent.append(member.getId()).append(member.getId()).append(email).append(member.getType()).append(member.getSource())
-				.append(conduct.getRegisterTime());
-		String encodeChckSum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
-
-		if (!encodeChckSum.equals(checkSum)){
-			throw new BusinessException(Constants.VALIDEMAIL_ERROR);
-		}
-		Member mem = memberDao.getByPrimaryKey(memberId);
-		mem.setLoginEmail(email);
-		Member memRes = memberDao.save(mem);
-
-		MemberPersonalData personData = memberPersonalDataDao.getByPrimaryKey(memberId);
-		personData.setEmail(email);
-		MemberPersonalData personDataRes = memberPersonalDataDao.save(personData);
-		if (personDataRes == null || memRes == null){
-			throw new BusinessException(Constants.BINDEMAIL_ERROR);
-		}
-		return true;
-	}
-
-	@Override
-	public String sendBindMobileCode(String mobile,Long memberId){
-		return null;
-	}
-
-	@Override
-	public boolean bindMobile(String mobile,Long memberId){
-		Member member = memberDao.getByPrimaryKey(memberId);
-		member.setLoginMobile(mobile);
-		Member res = memberDao.save(member);
-		if (res == null){
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * 获取随机用户名
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("unused")
-	private String getUsername(){
-		StringBuffer sb = new StringBuffer();
-		sb.append("bz").append(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())).append(getRandomNumber());
-		return sb.toString();
-	}
-
-	/**
-	 * 获取一个四位随机数，并且四位数不重复
-	 * 
-	 * @return Set<Integer>
-	 */
-	private static Set<Integer> getRandomNumber(){
-		// 使用SET以此保证写入的数据不重复
-		Set<Integer> set = new HashSet<Integer>();
-		// 随机数
-		Random random = new Random();
-
-		while (set.size() < 4){
-			// nextInt返回一个伪随机数，它是取自此随机数生成器序列的、在 0（包括）
-			// 和指定值（不包括）之间均匀分布的 int 值。
-			set.add(random.nextInt(10));
-		}
-		return set;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberFavorites findMemberFavoritesByIdAndMemberId(Long id,Long memberId){
-		return memberFavoritesDao.findMemberFavoritesByIdAndMemberId(id, memberId);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Member findMember(String loginName){
-		Member member = null;
-		if (StringUtils.isNotBlank(loginName)){
-			String name = loginName.toUpperCase();
-			// 先检查loginName
-			member = memberDao.findMemberByLoginName(name);
-			if (null == member){
-				// 如果loginName没有对应的用户，则检查该loginName是否符合手机号码或邮箱,查看是否有对应的用户
-				if (RegulareExpUtils.isMobileNO(loginName)){
-					member = memberDao.findMemberByLoginMobile(loginName);
-				}else if (RegulareExpUtils.isSureEmail(loginName)){
-					member = memberDao.findMemberByLoginEmail(name);
-				}
-			}
-		}
-		return member;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberPersonalData findMemberPersonDataByMobile(String mobile){
-
-		MemberPersonalData mpd = memberPersonalDataDao.findMemberPersonDataByMobile(mobile);
-
-		decrypt(mpd);
-
-		return mpd;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public void sendActiveByEmail(Long memberId,String path){
-		String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
-		Member member = memberDao.findMemberById(memberId);
-		MemberPersonalData personData = memberPersonalDataDao.findByMemberId(memberId);
-		decrypt(personData);
-		MemberConductCommand conduct = findMemberConductCommandById(member.getId());
-		StringBuffer emailContent = new StringBuffer();
-		emailContent.append(member.getId()).append(member.getId()).append(personData.getEmail()).append(member.getType())
-				.append(member.getSource()).append(conduct.getRegisterTime());
-		String checksum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
-		StringBuffer activeEmailUrl = new StringBuffer();
-
-		try{
-			StringBuffer encryptParams = new StringBuffer();
-			encryptParams.append("member_id=").append(member.getId()).append("&checksum=").append(checksum).append("&sendTime=")
-					.append(new Date().getTime());
-			String encrypt = EncryptUtil.getInstance().encrypt(encryptParams.toString());
-			activeEmailUrl.append(path).append("?registerComfirm=").append(URLEncoder.encode(encrypt, Constants.CHARSET));
-
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-		log.info("activeEmailUrl-----------------------: " + activeEmailUrl);
-	}
-
-	@Override
-	public void validEmailActiveUrl(Long memberId,String checkSum){
-		String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
-		Member member = memberDao.findMemberById(memberId);
-		MemberPersonalData personData = memberPersonalDataDao.findByMemberId(memberId);
-		decrypt(personData);
-		MemberConductCommand conduct = memberConductDao.findMemberConductCommandById(memberId);
-		StringBuffer emailContent = new StringBuffer();
-		emailContent.append(member.getId()).append(member.getId()).append(personData.getEmail()).append(member.getType())
-				.append(member.getSource()).append(conduct.getRegisterTime());
-		String encodeChckSum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
-		if (!encodeChckSum.equals(checkSum)){
-			throw new BusinessException(Constants.VALIDEMAIL_ERROR);
-		}
-		member.setLoginEmail(personData.getEmail());
-		Member res = memberDao.save(member);
-		if (res == null){
-			throw new BusinessException(Constants.BINDEMAIL_ERROR);
-		}
-
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Member findThirdMemberByThirdIdAndSource(String thirdPartyIdentify,Integer source){
-		Member member = memberDao.findThirdMemberByUidAndSource(thirdPartyIdentify, source, Member.MEMBER_TYPE_THIRD_PARTY_MEMBER);
-		if (null != member)
-			return member;
-		return null;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<MemberGroupRelation> findMemberGroupRelationListByMemberId(Long memberId){
-		return memberGroupRelationDao.findMemberGroupRelationListByMemberId(memberId);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<MemberGroup> findMemberGroupListByIds(List<Long> ids){
-
-		return memberGroupDao.findMemberGroupListByIds(ids);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<OrderLineCommand> findOrderLineCompletionByItemIdOrUserId(Long memberId,Long itemId){
-
-		return sdkOrderLineDao.findOrderLineCompletionByItemIdOrUserId(memberId, itemId);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<RateCommand> findItemRateListByMemberId(Page page,Sort[] sorts,Long memberId){
-		Pagination<RateCommand> itemRateCommand = itemRateDao.findItemRateListByMemberId(page, sorts, memberId);
-		return itemRateCommand;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Set<String> getMemComboIdsByGroupIdMemberId(List<Long> groupIds,Long memberId){
-		return sdkEngineManager.getCrowdScopeListByMemberAndGroup(memberId, groupIds);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginMobile(String loginMobile){		
-		Member member = null;
-		MemberCommand memberCommand = null;
-		if (StringUtils.isNotBlank(loginMobile))
-			member = memberDao.findMemberByLoginMobile(loginMobile);
-		if (null != member){
-			memberCommand = convertMemberToMemberCommand(member);
-			// 敏感信息加密存储完后，解密传输至Controller
-			//decrypt(memberCommand);
-			return memberCommand;
-		}	
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#updateMemberGroupIdById(java.lang.Long, java.lang.Long)
-	 */
-	@Override
-	public int updateMemberGroupIdById(Long memberId,Long groupId){
-		return memberDao.updateMemberGroupIdById(memberId, groupId);
-	}
-
-	@Override
-	public int saveMemberBehaviorStatus(MemberBehaviorStatus memberBehaviorStatus) {
-		//return memberDao.saveMemberBehaviorStatus(memberBehaviorStatus);
-	      memberBehaviorStatusDao.save(memberBehaviorStatus);
-		return 0;
-	}
-
-	@Override
-	public MemberBehaviorStatus findMemberBehaviorStatusByTypeAndMemberId(String type, Long memberId) {
-		return memberBehaviorStatusDao.findMemberBehaviorStatusByTypeAndMemberId(type, memberId);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<MemberCommand> findMembersByIds(List<Long> ids){
-		List<Member> members= memberDao.findMembersByIds(ids);
-		return convertMembersToMemberCommands(members);
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public List<Member> findMemberListByGroupId(Long groupId){
-		List<Member> members= memberDao.findMembersByGroupId(groupId);
-		return members;
-	}
-	
-	private List<MemberCommand> convertMembersToMemberCommands(List<Member> members){
-		if(null==members){
-			return null;
-		}
-		
-		List<MemberCommand> memberCommands = new ArrayList<MemberCommand>();
-		for(Member member : members){
-			MemberCommand memberCommand = null;
-			if (null != member){
-				memberCommand = convertMemberToMemberCommand(member);
-				// 敏感信息加密存储完后，解密传输至Controller
-				//decrypt(memberCommand);
-				memberCommands.add(memberCommand);
-			}
-		}
-		return memberCommands;
-	}
-
-	@Override
-	public void deleteMemberBehaviorByMemberIdAndType(Long memberId,Long thirdPartyId,String type){
-		MemberBehaviorStatus mbs=findMemberBehaviorStatusByTypeAndMemberId(type, thirdPartyId);
-		if(Validator.isNotNullOrEmpty(mbs)){
-			updateMemberGroupIdById(memberId,null);
-			memberBehaviorStatusDao.deleteByPrimaryKey(mbs.getId());
-		}
-	}
+            Validate.isTrue(memberId.equals(contact.getMemberId()), "memberId:%s must equals contact.getMemberId():%s", memberId, contact.getMemberId());
+
+            contact = convertContactCommandToContact(contactCommand, contact);
+            encryptContact(contact);
+            if (contactCommand.getIsDefault()){
+                // 设置其他为非默认
+                updateContactIsDefault(memberId, id, Contact.ISDEFAULT);
+            }
+        }
+        return convertContactToContactCommand(contact);
+    }
+
+    private ContactCommand convertContactToContactCommand(Contact con){
+        ContactCommand command = new ContactCommand();
+
+        ConvertUtils.convertTwoObject(command, con);
+        rewriteIntlDistrictInfo(command);
+
+        return command;
+    }
+
+    // TODO 这个方法的地址转换需要检查逻辑是否正确。从我个人理解来看，数据转换为展现的时候要转，但是存储的时候也转是否有必要和合适
+    // 是为了匹配历史不用ID而直接用名字时的兼容性么？
+    private Contact convertContactCommandToContact(ContactCommand command,Contact con){
+        // con.setId(command.getId());
+        con.setName(command.getName());
+        con.setAddress(command.getAddress());
+        con.setAreaId(command.getAreaId());
+        con.setCityId(command.getCityId());
+        con.setCountryId(command.getCountryId());
+        con.setIsDefault(command.getIsDefault());
+        con.setMobile(command.getMobile());
+        con.setPostcode(command.getPostcode());
+        con.setProvinceId(command.getProvinceId());
+        con.setTelphone(command.getTelphone());
+        con.setTownId(command.getTownId());
+        con.setEmail(command.getEmail());
+        con.setMemberId(command.getMemberId());
+        Address country = AddressUtil.getAddressById(command.getCountryId());
+        Address province = AddressUtil.getAddressById(command.getProvinceId());
+        Address city = AddressUtil.getAddressById(command.getCityId());
+        Address area = AddressUtil.getAddressById(command.getAreaId());
+        Address town = AddressUtil.getAddressById(command.getTownId());
+        con.setCountry(country == null ? "" : country.getName());
+        con.setProvince(province == null ? "" : province.getName());
+        con.setCity(city == null ? "" : city.getName());
+        con.setArea(area == null ? "" : area.getName());
+        con.setTown(town == null ? "" : town.getName());
+        return con;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#removeContactById(java .lang.Long, java.lang.Long)
+     */
+    @Override
+    public Integer removeContactById(Long contactId,Long memberId){
+        return contactDao.removeContactById(contactId, memberId);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findFavoritesList(loxia .dao.Page, loxia.dao.Sort[], java.util.Map)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<MemberFavoritesCommand> findFavoritesList(Page page,Sort[] sorts,Map<String, Object> searchParam){
+
+        Pagination<MemberFavoritesCommand> favoritesPage = memberFavoritesDao.findFavoritesList(page, sorts, searchParam);
+        if (favoritesPage != null && favoritesPage.getItems() != null){
+            for (MemberFavoritesCommand favortiesCommand : favoritesPage.getItems()){
+                if (favortiesCommand != null && favortiesCommand.getSkuId() != null){
+                    List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(favortiesCommand.getProperties());
+                    if (null != skuPros && !skuPros.isEmpty()){
+                        favortiesCommand.setSkuPropertys(skuPros);
+                    }
+                }
+            }
+        }
+
+        return favoritesPage;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createFavorites(java.lang .Long, java.lang.Long, java.lang.String,
+     * java.lang.String)
+     */
+    @Override
+    public MemberFavoritesCommand createFavorites(Long memberId,Long itemId,Long skuId){
+        MemberFavorites meberFavorites = new MemberFavorites();
+        meberFavorites.setItemId(itemId);
+        meberFavorites.setSkuId(skuId);
+        meberFavorites.setMemberId(memberId);
+        meberFavorites.setCreateDate(new Date());
+        meberFavorites.setVersion(new Date());
+        MemberFavorites newMeberFavorites = memberFavoritesDao.save(meberFavorites);
+        MemberFavoritesCommand memberFavoritesCommand = new MemberFavoritesCommand();
+        memberFavoritesCommand = (MemberFavoritesCommand) ConvertUtils.convertTwoObject(memberFavoritesCommand, newMeberFavorites);
+        return memberFavoritesCommand;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#removeFavoritesByIds(java .util.List, java.lang.Long)
+     */
+    @Override
+    public Integer removeFavoritesByIds(List<Long> itemIds,List<Long> skuIds,Long memberId){
+        return memberFavoritesDao.removeFavoritesByIds(itemIds, skuIds, memberId);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findItemRateList(loxia .dao.Page, loxia.dao.Sort[], java.util.Map)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<ItemRateCommand> findItemRateList(Page page,Sort[] sorts,Map<String, Object> searchParam){
+        Pagination<ItemRateCommand> ItemRateCommandList = new Pagination<ItemRateCommand>();
+        List<ItemRateCommand> itemRateList = new ArrayList<ItemRateCommand>();
+        Pagination<ItemRateListCommand> itemteList = itemRateDao.findeStatusNndOrderListQueryMapWithPage(page, sorts, searchParam);
+        if (itemteList != null && itemteList.getItems().size() > 0){
+            for (ItemRateListCommand itemRate : itemteList.getItems()){
+                ItemRateCommand itemRateCommand = new ItemRateCommand();
+                OrderLineCommand orderLine = new OrderLineCommand();
+                RateCommand rateCommand = new RateCommand();
+                orderLine.setItemPic(itemRate.getItemPic());
+                orderLine.setItemId(itemRate.getItemId());
+                orderLine.setItemName(itemRate.getItemName());
+                orderLine.setEvaluationStatus(itemRate.getEvaluationStatus());
+                orderLine.setOrderId(itemRate.getOrderId());
+                orderLine.setId(itemRate.getSoLineId());
+                rateCommand.setId(itemRate.getRateId());
+                rateCommand.setReply(itemRate.getReply());
+                rateCommand.setMemberId(itemRate.getMemberId());
+                rateCommand.setLifecycle(itemRate.getLifecycle());
+
+                itemRateCommand.setRateCommand(rateCommand);
+                itemRateCommand.setOrderLineCommand(orderLine);
+                itemRateCommand.setCreateTime(itemRate.getCreateTime());
+                itemRateList.add(itemRateCommand);
+            }
+        }
+        ItemRateCommandList.setItems(itemRateList);
+        ItemRateCommandList.setCount(itemteList.getCount());
+        ItemRateCommandList.setSize(itemteList.getSize());
+        ItemRateCommandList.setTotalPages(itemteList.getTotalPages());
+        ItemRateCommandList.setSortStr(itemteList.getSortStr());
+        ItemRateCommandList.setCurrentPage(itemteList.getCurrentPage());
+        ItemRateCommandList.setStart(itemteList.getStart());
+        return ItemRateCommandList;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findItemRateById(java. lang.Long)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public RateCommand findItemRateById(Long rateId){
+        ItemRate newItemRate = itemRateDao.getByPrimaryKey(rateId);
+        RateCommand newItemRateCommand = new RateCommand();
+        if (null != newItemRate)
+            newItemRateCommand = (RateCommand) ConvertUtils.convertTwoObject(newItemRateCommand, newItemRate);
+        return newItemRateCommand;
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createRate(com.baozun. nebula.command.RateCommand)
+     */
+    @Override
+    public ItemRate createRate(RateCommand itemRateCommand){
+        ItemRate newItemRate = new ItemRate();
+        newItemRate.setId(itemRateCommand.getId());
+        newItemRate.setItemId(itemRateCommand.getItemId());
+        newItemRate.setContent(itemRateCommand.getContent());
+        newItemRate.setCreateTime(new Date());
+        newItemRate.setMemberId(itemRateCommand.getMemberId());
+        newItemRate.setScore(itemRateCommand.getScore());
+        newItemRate.setLifecycle(BaseModel.LIFECYCLE_INIT.longValue());
+        newItemRate.setOrderLineId(itemRateCommand.getOrderLineId());
+        ItemRate itemRate = itemRateDao.save(newItemRate);
+        return itemRate;
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findConsultantsList(loxia .dao.Page, loxia.dao.Sort[], java.util.Map)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<ConsultantCommand> findConsultantsList(Page page,Sort[] sorts,Map<String, Object> searchParam){
+        return consultantsDao.findConsultants(page, sorts, searchParam);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createConsultants(com. baozun.nebula.command.product.ItemConsultantCommand)
+     */
+    @Override
+    public Consultants createConsultants(Consultants consultants){
+        return consultantsDao.save(consultants);
+    }
+
+    @Deprecated
+    @Override
+    public Member register(Member sourceMember){
+        sourceMember.setLifecycle(BaseModel.LIFECYCLE_ENABLE);// 有效
+        // sourceMember.setIsaddgroup(0);//未加入组
+        String encodePassword = EncryptUtil.getInstance().hash(sourceMember.getPassword(), sourceMember.getLoginName());
+        sourceMember.setPassword(encodePassword);
+        sourceMember.setLoginName(sourceMember.getLoginName());
+        Member member = memberDao.save(sourceMember);
+        return member;
+    }
+
+    /**
+     * 新增对象 加密对象
+     */
+    @Override
+    public Member rewriteRegister(Member member){
+        if (Validator.isNotNullOrEmpty(member)){
+            if (Validator.isNotNullOrEmpty(member.getPassword())){
+                //生成新的盐值，用新的加密算法进行加密，
+                String salt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
+                String encodePassword = EncryptUtil.getInstance().hashSalt(member.getPassword(), salt);
+                //保存密码和盐值
+                member.setSalt(salt);
+                member.setPassword(encodePassword);
+            }
+            member = memberDao.save(member);
+        }
+        return member;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean validUserName(String username){
+        boolean flag = false;
+        Member member = memberDao.findMemberByLoginName(username);
+        if (null == member){
+            flag = true;
+        }
+        return flag;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean validEmail(String email){
+        boolean flag = false;
+        Member member = memberDao.findMemberByLoginEmail(email);
+        if (null == member){
+            flag = true;
+        }
+        return flag;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean validMobile(String mobile){
+        boolean flag = false;
+        Member member = memberDao.findMemberByLoginMobile(mobile);
+        if (null == member){
+            flag = true;
+        }
+        return flag;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MemberCryptoguard> findCryptoguardList(Long memberId){
+        return memberCryptoguardDao.findByMemberId(memberId);
+    }
+
+    @Override
+    public String sendPassResetCodeByEmail(Long memberId){
+        String genericRandomCode = genericRandomCode();
+        log.info(genericRandomCode);
+        return genericRandomCode;
+    }
+
+    @Override
+    public String sendPassResetCodeBySms(Long memberId){
+        String genericRandomCode = genericRandomCode();
+        log.info(genericRandomCode);
+        return genericRandomCode;
+    }
+
+    private String genericRandomCode(){
+        Random random = new Random();
+        String result = "";
+        for (int i = 0; i < 4; i++){
+            result += String.valueOf(random.nextInt(10));
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean checkCryptoguard(List<MemberCryptoguard> cryptoguardList){
+        boolean result = true;
+        for (MemberCryptoguard c : cryptoguardList){
+            MemberCryptoguard newCry = memberCryptoguardDao.findByQa(c.getQuestion(), c.getAnswer());
+            result = result && (newCry != null);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean checkEmailUrl(String code,Long memberId){
+        return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberPersonalData findMemberPersonData(Long memberId){
+        MemberPersonalData mpd = memberPersonalDataDao.findByMemberId(memberId);
+
+        decrypt(mpd);
+
+        return mpd;
+
+    }
+
+    @Override
+    public boolean resetPasswd(Long memberId,String newPwd){
+        Integer res = memberDao.updatePasswd(memberId, newPwd);
+        if (res > 0)
+            return true;
+        return false;
+    }
+
+    @Override
+    public boolean resetPasswdWithSalt(Long memberId,String newPwd,String salt){
+        Integer res = memberDao.updatePasswdAndSalt(memberId, newPwd, salt);
+        if (res > 0)
+            return true;
+        return false;
+    }
+
+    @Override
+    public boolean updatePasswd(Long memberId,String pwd,String newPwd,String reNewPwd){
+        Member member = memberDao.findMemberById(memberId);
+        String salt = member.getSalt();
+        String encodePassword = null;
+        Integer res = 0;
+        String encodeNewPassword = null;
+        //如果盐值为空，对密码验证走老的加密验证逻辑 add by ruichao.gao
+        if (Validator.isNullOrEmpty(member.getSalt())){
+            encodePassword = EncryptUtil.getInstance().hash(pwd, member.getLoginName());
+        }else{
+            encodePassword = EncryptUtil.getInstance().hashSalt(pwd, salt);
+        }
+
+        if (!encodePassword.equals(member.getPassword())){
+            throw new BusinessException(Constants.OLDPASSWORD_ISWRONG_ERROR);
+        }
+        if (pwd.equals(newPwd)){
+            throw new BusinessException(Constants.OLDPASSWORD_ASSAMEAS_NEWPASSWORD_ERROR);
+        }
+        if (!newPwd.equals(reNewPwd)){
+            throw new BusinessException(Constants.RENEWPASSWORD_NOTSAMEAS_NEWPASSWORD_ERROR);
+        }
+        if (Validator.isNullOrEmpty(member.getSalt())){
+            //生成新的盐值，用新的加密算法进行加密，(仅适用于更新加密算法之后，第一次直接更改密码) add by ruichao.gao
+            String newSalt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
+            encodeNewPassword = EncryptUtil.getInstance().hashSalt(newPwd, newSalt);
+            //更新保存盐值和新密码
+            res = memberDao.updatePasswdAndSalt(memberId, encodeNewPassword, newSalt);
+        }else{
+            encodeNewPassword = EncryptUtil.getInstance().hashSalt(newPwd, salt);
+            res = memberDao.updatePasswd(memberId, encodeNewPassword);
+        }
+
+        if (res > 0)
+            return true;
+        return false;
+    }
+
+    @Override
+    public void saveCryptoguard(MemberCryptoguard memberCryptoguard){
+        memberCryptoguardDao.save(memberCryptoguard);
+
+    }
+
+    @Override
+    public void removeCryptoguardByMemberId(Long memberId){
+        memberCryptoguardDao.removeMemberCryptoguardByMemberId(memberId);
+
+    }
+
+    @Override
+    public MemberPersonalData savePersonData(MemberPersonalData personData){
+        encrypt(personData);
+        MemberPersonalData oldMemberPersonalData = memberPersonalDataDao.getByPrimaryKey(personData.getId());
+        MemberPersonalData memberPersonalData = null;
+        if (oldMemberPersonalData != null){
+            Date ver = oldMemberPersonalData.getVersion();
+            personData.setVersion(ver);
+            oldMemberPersonalData = personData;
+            memberPersonalData = memberPersonalDataDao.save(oldMemberPersonalData);
+        }else{
+            memberPersonalData = memberPersonalDataDao.save(personData);
+        }
+        return memberPersonalData;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean checkNickname(String nickname){
+        MemberPersonalData memberPersonalData = memberPersonalDataDao.findByNickname(nickname);
+        if (memberPersonalData == null)
+            return false;
+        return true;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void sendBindEmailUrl(Long memberId,String email,String path){
+        String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
+        Member member = memberDao.findMemberById(memberId);
+        MemberConductCommand conduct = findMemberConductCommandById(member.getId());
+        StringBuffer emailContent = new StringBuffer();
+        emailContent.append(member.getId()).append(member.getId()).append(email).append(member.getType()).append(member.getSource()).append(conduct.getRegisterTime());
+        String checksum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
+        StringBuffer activeEmailUrl = new StringBuffer();
+
+        try{
+            StringBuffer encryptParams = new StringBuffer();
+            encryptParams.append("member_id=").append(member.getId()).append("&checksum=").append(checksum).append("&sendTime=").append(new Date().getTime()).append("&email=").append(email);
+            String encrypt = EncryptUtil.getInstance().encrypt(encryptParams.toString());
+            activeEmailUrl.append(path).append("?registerComfirm=").append(URLEncoder.encode(encrypt, "UTF-8"));
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        log.info("activeEmailUrl-----------------------: " + activeEmailUrl);
+    }
+
+    @Override
+    public boolean bindEmail(Long memberId,String checkSum,String email){
+        String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
+        Member member = memberDao.findMemberById(memberId);
+        MemberConductCommand conduct = memberConductDao.findMemberConductCommandById(memberId);
+        StringBuffer emailContent = new StringBuffer();
+        emailContent.append(member.getId()).append(member.getId()).append(email).append(member.getType()).append(member.getSource()).append(conduct.getRegisterTime());
+        String encodeChckSum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
+
+        if (!encodeChckSum.equals(checkSum)){
+            throw new BusinessException(Constants.VALIDEMAIL_ERROR);
+        }
+        Member mem = memberDao.getByPrimaryKey(memberId);
+        mem.setLoginEmail(email);
+        Member memRes = memberDao.save(mem);
+
+        MemberPersonalData personData = memberPersonalDataDao.getByPrimaryKey(memberId);
+        personData.setEmail(email);
+        MemberPersonalData personDataRes = memberPersonalDataDao.save(personData);
+        if (personDataRes == null || memRes == null){
+            throw new BusinessException(Constants.BINDEMAIL_ERROR);
+        }
+        return true;
+    }
+
+    @Override
+    public String sendBindMobileCode(String mobile,Long memberId){
+        return null;
+    }
+
+    @Override
+    public boolean bindMobile(String mobile,Long memberId){
+        Member member = memberDao.getByPrimaryKey(memberId);
+        member.setLoginMobile(mobile);
+        Member res = memberDao.save(member);
+        if (res == null){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 获取随机用户名
+     * 
+     * @return
+     */
+    @SuppressWarnings("unused")
+    private String getUsername(){
+        StringBuffer sb = new StringBuffer();
+        sb.append("bz").append(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())).append(getRandomNumber());
+        return sb.toString();
+    }
+
+    /**
+     * 获取一个四位随机数，并且四位数不重复
+     * 
+     * @return Set<Integer>
+     */
+    private static Set<Integer> getRandomNumber(){
+        // 使用SET以此保证写入的数据不重复
+        Set<Integer> set = new HashSet<Integer>();
+        // 随机数
+        Random random = new Random();
+
+        while (set.size() < 4){
+            // nextInt返回一个伪随机数，它是取自此随机数生成器序列的、在 0（包括）
+            // 和指定值（不包括）之间均匀分布的 int 值。
+            set.add(random.nextInt(10));
+        }
+        return set;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberFavorites findMemberFavoritesByIdAndMemberId(Long id,Long memberId){
+        return memberFavoritesDao.findMemberFavoritesByIdAndMemberId(id, memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Member findMember(String loginName){
+        Member member = null;
+        if (StringUtils.isNotBlank(loginName)){
+            String name = loginName.toUpperCase();
+            // 先检查loginName
+            member = memberDao.findMemberByLoginName(name);
+            if (null == member){
+                // 如果loginName没有对应的用户，则检查该loginName是否符合手机号码或邮箱,查看是否有对应的用户
+                if (RegulareExpUtils.isMobileNO(loginName)){
+                    member = memberDao.findMemberByLoginMobile(loginName);
+                }else if (RegulareExpUtils.isSureEmail(loginName)){
+                    member = memberDao.findMemberByLoginEmail(name);
+                }
+            }
+        }
+        return member;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberPersonalData findMemberPersonDataByMobile(String mobile){
+
+        MemberPersonalData mpd = memberPersonalDataDao.findMemberPersonDataByMobile(mobile);
+
+        decrypt(mpd);
+
+        return mpd;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void sendActiveByEmail(Long memberId,String path){
+        String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
+        Member member = memberDao.findMemberById(memberId);
+        MemberPersonalData personData = memberPersonalDataDao.findByMemberId(memberId);
+        decrypt(personData);
+        MemberConductCommand conduct = findMemberConductCommandById(member.getId());
+        StringBuffer emailContent = new StringBuffer();
+        emailContent.append(member.getId()).append(member.getId()).append(personData.getEmail()).append(member.getType()).append(member.getSource()).append(conduct.getRegisterTime());
+        String checksum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
+        StringBuffer activeEmailUrl = new StringBuffer();
+
+        try{
+            StringBuffer encryptParams = new StringBuffer();
+            encryptParams.append("member_id=").append(member.getId()).append("&checksum=").append(checksum).append("&sendTime=").append(new Date().getTime());
+            String encrypt = EncryptUtil.getInstance().encrypt(encryptParams.toString());
+            activeEmailUrl.append(path).append("?registerComfirm=").append(URLEncoder.encode(encrypt, Constants.CHARSET));
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        log.info("activeEmailUrl-----------------------: " + activeEmailUrl);
+    }
+
+    @Override
+    public void validEmailActiveUrl(Long memberId,String checkSum){
+        String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
+        Member member = memberDao.findMemberById(memberId);
+        MemberPersonalData personData = memberPersonalDataDao.findByMemberId(memberId);
+        decrypt(personData);
+        MemberConductCommand conduct = memberConductDao.findMemberConductCommandById(memberId);
+        StringBuffer emailContent = new StringBuffer();
+        emailContent.append(member.getId()).append(member.getId()).append(personData.getEmail()).append(member.getType()).append(member.getSource()).append(conduct.getRegisterTime());
+        String encodeChckSum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
+        if (!encodeChckSum.equals(checkSum)){
+            throw new BusinessException(Constants.VALIDEMAIL_ERROR);
+        }
+        member.setLoginEmail(personData.getEmail());
+        Member res = memberDao.save(member);
+        if (res == null){
+            throw new BusinessException(Constants.BINDEMAIL_ERROR);
+        }
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Member findThirdMemberByThirdIdAndSource(String thirdPartyIdentify,Integer source){
+        Member member = memberDao.findThirdMemberByUidAndSource(thirdPartyIdentify, source, Member.MEMBER_TYPE_THIRD_PARTY_MEMBER);
+        if (null != member)
+            return member;
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MemberGroupRelation> findMemberGroupRelationListByMemberId(Long memberId){
+        return memberGroupRelationDao.findMemberGroupRelationListByMemberId(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MemberGroup> findMemberGroupListByIds(List<Long> ids){
+        return memberGroupDao.findMemberGroupListByIds(ids);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderLineCommand> findOrderLineCompletionByItemIdOrUserId(Long memberId,Long itemId){
+        return sdkOrderLineDao.findOrderLineCompletionByItemIdOrUserId(memberId, itemId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<RateCommand> findItemRateListByMemberId(Page page,Sort[] sorts,Long memberId){
+        Pagination<RateCommand> itemRateCommand = itemRateDao.findItemRateListByMemberId(page, sorts, memberId);
+        return itemRateCommand;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getMemComboIdsByGroupIdMemberId(List<Long> groupIds,Long memberId){
+        return sdkEngineManager.getCrowdScopeListByMemberAndGroup(memberId, groupIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberCommand findMemberByLoginMobile(String loginMobile){
+        Member member = null;
+        if (StringUtils.isNotBlank(loginMobile)){
+            member = memberDao.findMemberByLoginMobile(loginMobile);
+        }
+
+        //---------------------------------------------------------------
+        if (null != member){
+            MemberCommand memberCommand = convertMemberToMemberCommand(member);
+            // 敏感信息加密存储完后，解密传输至Controller
+            //decrypt(memberCommand);
+            return memberCommand;
+        }
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkMemberManager#updateMemberGroupIdById(java.lang.Long, java.lang.Long)
+     */
+    @Override
+    public int updateMemberGroupIdById(Long memberId,Long groupId){
+        return memberDao.updateMemberGroupIdById(memberId, groupId);
+    }
+
+    @Override
+    public int saveMemberBehaviorStatus(MemberBehaviorStatus memberBehaviorStatus){
+        //return memberDao.saveMemberBehaviorStatus(memberBehaviorStatus);
+        memberBehaviorStatusDao.save(memberBehaviorStatus);
+        return 0;
+    }
+
+    @Override
+    public MemberBehaviorStatus findMemberBehaviorStatusByTypeAndMemberId(String type,Long memberId){
+        return memberBehaviorStatusDao.findMemberBehaviorStatusByTypeAndMemberId(type, memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MemberCommand> findMembersByIds(List<Long> ids){
+        List<Member> members = memberDao.findMembersByIds(ids);
+        return convertMembersToMemberCommands(members);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Member> findMemberListByGroupId(Long groupId){
+        List<Member> members = memberDao.findMembersByGroupId(groupId);
+        return members;
+    }
+
+    private List<MemberCommand> convertMembersToMemberCommands(List<Member> members){
+        if (null == members){
+            return null;
+        }
+
+        List<MemberCommand> memberCommands = new ArrayList<MemberCommand>();
+        for (Member member : members){
+            MemberCommand memberCommand = null;
+            if (null != member){
+                memberCommand = convertMemberToMemberCommand(member);
+                // 敏感信息加密存储完后，解密传输至Controller
+                //decrypt(memberCommand);
+                memberCommands.add(memberCommand);
+            }
+        }
+        return memberCommands;
+    }
+
+    @Override
+    public void deleteMemberBehaviorByMemberIdAndType(Long memberId,Long thirdPartyId,String type){
+        MemberBehaviorStatus mbs = findMemberBehaviorStatusByTypeAndMemberId(type, thirdPartyId);
+        if (Validator.isNotNullOrEmpty(mbs)){
+            updateMemberGroupIdById(memberId, null);
+            memberBehaviorStatusDao.deleteByPrimaryKey(mbs.getId());
+        }
+    }
 }
