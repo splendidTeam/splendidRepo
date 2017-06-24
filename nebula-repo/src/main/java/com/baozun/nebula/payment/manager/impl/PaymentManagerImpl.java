@@ -89,18 +89,14 @@ public class PaymentManagerImpl implements PaymentManager{
     public PaymentResult getPaymentResultForSyn(HttpServletRequest request,String paymentType){
         PaymentFactory paymentFactory = PaymentFactory.getInstance();
         PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(paymentType);// 获得支付适配器
-        PaymentResult result = new PaymentResult();
-        result = paymentAdaptor.getPaymentResult(request);
-        return result;
+        return paymentAdaptor.getPaymentResult(request);
     }
 
     @Override
     public PaymentResult getPaymentResultForAsy(HttpServletRequest request,String paymentType){
         PaymentFactory paymentFactory = PaymentFactory.getInstance();
         PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(paymentType);// 获得支付适配器
-        PaymentResult result = new PaymentResult();
-        result = paymentAdaptor.getPaymentResultFromNotification(request);
-        return result;
+        return paymentAdaptor.getPaymentResultFromNotification(request);
     }
 
     @Override

@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +22,15 @@ import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.PaymentUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
 import com.unionpay.acp.sdk.AcpService;
 import com.unionpay.acp.sdk.SDKConfig;
 import com.unionpay.acp.sdk.SDKConstants;
 import com.unionpay.acp.sdk.UnionPayBase;
 
 public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractUnionPaymentAdaptor.class);
 
     private static final String UNIONPAY_RETRUNCODE_NOTEXSITS = "34";
 
@@ -41,8 +45,6 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
     private static final String ORDERNOTEXIST = "ORDERNOTEXIST";
 
     private static final String OTHERSTATUS = "OTHERSTATUS";
-
-    private static final Logger logger = LoggerFactory.getLogger(AbstractUnionPaymentAdaptor.class);
 
     public AbstractUnionPaymentAdaptor(){
         SDKConfig.getConfig().loadProperties(ProfileConfigUtil.findCommonPro("config/unionpay.properties"));
@@ -84,14 +86,14 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         /** 请求参数设置完毕，以下对请求参数进行签名并生成html表单，将表单写入浏览器跳转打开银联页面 **/
         Map<String, String> submitFromData = AcpService.sign(map, SDKConstants.UTF_8_ENCODING);
         // 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
-        logger.info("submitFromData：" + submitFromData);
+        LOGGER.info("submitFromData：" + submitFromData);
         String requestFrontUrl = SDKConfig.getConfig().getFrontRequestUrl(); // 获取请求银联的前台地址：对应属性文件acp_sdk.properties文件中的acpsdk.frontTransUrl
         String html = AcpService.createAutoFormHtml(requestFrontUrl, submitFromData, SDKConstants.UTF_8_ENCODING); // 生成自动跳转的Html表单
 
-        logger.info("打印请求HTML，此为请求报文，为联调排查问题的依据：" + html);
+        LOGGER.info("打印请求HTML，此为请求报文，为联调排查问题的依据：" + html);
         // 将生成的html写到浏览器中完成自动跳转打开银联支付页面；这里调用signData之后，将html写到浏览器跳转到银联页面之前均不能对html中的表单项的名称和值进行修改，如果修改会导致验签不通过
 
-        logger.info("html:" + html);
+        LOGGER.info("html:" + html);
         unionPaymentRequest.setRequestHtml(html);
         unionPaymentRequest.setPaymentParameters(submitFromData);
         return unionPaymentRequest;
@@ -134,10 +136,10 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         String html = AcpService.createAutoFormHtml(requestFrontUrl, submitFromData, SDKConstants.UTF_8_ENCODING);
         // 生成自动跳转的Html表单
 
-        logger.info("打印请求HTML，此为请求报文，为联调排查问题的依据：" + html);
+        LOGGER.info("打印请求HTML，此为请求报文，为联调排查问题的依据：" + html);
         // 将生成的html写到浏览器中完成自动跳转打开银联支付页面；这里调用signData之后，将html写到浏览器跳转到银联页面之前均不能对html中的表单项的名称和值进行修改，如果修改会导致验签不通过
 
-        logger.info("html:" + html);
+        LOGGER.info("html:" + html);
         unionPaymentRequest.setRequestHtml(html);
         unionPaymentRequest.setPaymentParameters(submitFromData);
         return unionPaymentRequest;
@@ -150,9 +152,6 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      * 
      * 产品：跳转网关支付产品<br>
      * 功能：前台通知接收处理示例 <br>
-     * 日期： 2015-09<br>
-     * 版本： 1.0.0
-     * 版权： 中国银联<br>
      * 说明：以下代码只是为了方便商户测试而提供的样例代码，商户可以根据自己需要，按照技术文档编写。该代码仅供参考。<br>
      * 该接口参考文档位置：open.unionpay.com帮助中心 下载 产品接口规范 《网关支付产品接口规范》，<br>
      * 《平台接入接口规范-第5部分-附录》（内包含应答码接口规范，全渠道平台银行名称-简码对照表），
@@ -164,61 +163,70 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      */
     @Override
     public PaymentResult getPaymentResult(HttpServletRequest request){
-        PaymentResult result = new PaymentResult();
 
-        logger.info("FrontRcvResponse前台接收报文返回开始");
+        LOGGER.info("FrontRcvResponse前台接收报文返回开始");
         String encoding = request.getParameter(SDKConstants.param_encoding);
-        logger.info("返回报文中encoding=[" + encoding + "]");
+        LOGGER.info("返回报文中encoding=[" + encoding + "]");
 
         Map<String, String> respParam = getAllRequestParam(request);
+        Validate.notEmpty(respParam, "respParam can't be null/empty!");
+
         // 打印请求报文
-        logger.info("" + respParam);
+        LOGGER.info("getAllRequestParam:{}" + JsonUtil.format(respParam));
 
         Map<String, String> valideData = null;
-        StringBuffer page = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
+        //---------------------------------------------------------------
+        PaymentResult paymentResult = new PaymentResult();
         try{
-            if (null != respParam && !respParam.isEmpty()){
-                Iterator<Entry<String, String>> it = respParam.entrySet().iterator();
-                valideData = new HashMap<String, String>(respParam.size());
-                while (it.hasNext()){
-                    Entry<String, String> e = it.next();
-                    String key = (String) e.getKey();
-                    String value = (String) e.getValue();
+            Iterator<Entry<String, String>> it = respParam.entrySet().iterator();
+            valideData = new HashMap<>(respParam.size());
+            while (it.hasNext()){
+                Entry<String, String> e = it.next();
+                String key = e.getKey();
+                String value = e.getValue();
 
-                    value = new String(value.getBytes(encoding), encoding);
+                value = new String(value.getBytes(encoding), encoding);
 
-                    page.append("<tr><td width=\"30%\" align=\"right\">" + key + "(" + key + ")</td><td>" + value + "</td></tr>");
-                    valideData.put(key, value);
-                }
+                sb.append("<tr><td width=\"30%\" align=\"right\">" + key + "(" + key + ")</td><td>" + value + "</td></tr>");
+                valideData.put(key, value);
             }
         }catch (UnsupportedEncodingException e){
-            result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-            result.setResponseValue(RequestParam.UNIONFAIL);
-            result.setMessage(respParam.get("respMsg"));
-            logger.error("getPaymentResult error : {}", e.getMessage());
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+            paymentResult.setResponseValue(RequestParam.UNIONFAIL);
+            paymentResult.setMessage(respParam.get("respMsg"));
+            LOGGER.error("getPaymentResult error : {}", e.getMessage());
         }
+
+        //---------------------------------------------------------------
+
         if (!AcpService.validate(valideData, encoding)){
-            page.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>失败</td></tr>");
-            logger.error("验证签名结果[失败].");
-            result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-            result.setResponseValue(RequestParam.UNIONSUCCESS);
-            result.setMessage(valideData.get("respMsg"));
+            sb.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>失败</td></tr>");
+            LOGGER.error("验证签名结果[失败].");
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+            paymentResult.setResponseValue(RequestParam.UNIONSUCCESS);
+            paymentResult.setMessage(valideData.get("respMsg"));
         }else{
-            page.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>成功</td></tr>");
-            logger.info("验证签名结果[成功].");
+            sb.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>成功</td></tr>");
+            LOGGER.info("验证签名结果[成功].");
             System.out.println(valideData.get("orderId")); // 其他字段也可用类似方式获取
-            result.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
-            result.setResponseValue(RequestParam.UNIONSUCCESS);
-            result.setMessage(valideData.get("respMsg"));
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
+            paymentResult.setResponseValue(RequestParam.UNIONSUCCESS);
+            paymentResult.setMessage(valideData.get("respMsg"));
         }
-        request.setAttribute("result", page.toString());
-        logger.info("FrontRcvResponse前台接收报文返回结束");
 
-        result.setPaymentStatusInformation(buildPaymentServiceReturnCommand(valideData));
+        //---------------------------------------------------------------
 
-        return result;
+        request.setAttribute("result", sb.toString());
+        LOGGER.info("FrontRcvResponse前台接收报文返回结束");
+
+        paymentResult.setPaymentStatusInformation(buildPaymentServiceReturnCommand(valideData));
+
+        return paymentResult;
     }
+
+    //---------------------------------------------------------------
 
     /**
      * @param valideData
@@ -240,14 +248,13 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         return paymentServiceReturnCommand;
     }
 
+    //---------------------------------------------------------------
+
     /**
      * 重要：联调测试时请仔细阅读注释！
      * 
      * 产品：跳转网关支付产品<br>
      * 功能：后台通知接收处理示例 <br>
-     * 日期： 2015-09<br>
-     * 版本： 1.0.0
-     * 版权： 中国银联<br>
      * 说明：以下代码只是为了方便商户测试而提供的样例代码，商户可以根据自己需要，按照技术文档编写。该代码仅供参考。<br>
      * 该接口参考文档位置：open.unionpay.com帮助中心 下载 产品接口规范 《网关支付产品接口规范》，<br>
      * 《平台接入接口规范-第5部分-附录》（内包含应答码接口规范，全渠道平台银行名称-简码对照表），
@@ -260,13 +267,13 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
     @Override
     public PaymentResult getPaymentResultFromNotification(HttpServletRequest request){
         PaymentResult result = new PaymentResult();
-        logger.info("BackRcvResponse接收后台通知开始");
+        LOGGER.info("BackRcvResponse接收后台通知开始");
 
         String encoding = request.getParameter(SDKConstants.param_encoding);
         // 获取银联通知服务器发送的后台通知参数
         Map<String, String> reqParam = getAllRequestParam(request);
 
-        logger.info("" + reqParam);
+        LOGGER.info("" + reqParam);
 
         Map<String, String> valideData = null;
 
@@ -276,8 +283,8 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
                 valideData = new HashMap<String, String>(reqParam.size());
                 while (it.hasNext()){
                     Entry<String, String> e = it.next();
-                    String key = (String) e.getKey();
-                    String value = (String) e.getValue();
+                    String key = e.getKey();
+                    String value = e.getValue();
                     value = new String(value.getBytes(encoding), encoding);
 
                     valideData.put(key, value);
@@ -287,19 +294,19 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
             result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             result.setResponseValue(RequestParam.UNIONFAIL);
             result.setMessage(reqParam.get("respMsg"));
-            logger.error("getPaymentResult error : {}", e.getMessage());
+            LOGGER.error("getPaymentResult error : {}", e.getMessage());
         }
 
         // 重要！验证签名前不要修改reqParam中的键值对的内容，否则会验签不过
         if (!AcpService.validate(valideData, encoding)){
-            logger.info("验证签名结果[失败].");
+            LOGGER.info("验证签名结果[失败].");
             // 验签失败，需解决验签问题
             result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             result.setResponseValue(RequestParam.UNIONSUCCESS);
             result.setMessage(valideData.get("respMsg"));
 
         }else{
-            logger.info("验证签名结果[成功].");
+            LOGGER.info("验证签名结果[成功].");
             result.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
             result.setResponseValue(RequestParam.UNIONSUCCESS);
             result.setMessage(valideData.get("respMsg"));
@@ -307,7 +314,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
 
         result.setPaymentStatusInformation(buildPaymentServiceReturnCommand(valideData));
 
-        logger.info("BackRcvResponse接收后台通知结束");
+        LOGGER.info("BackRcvResponse接收后台通知结束");
 
         return result;
     }
@@ -319,8 +326,6 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      * 
      * 产品：跳转网关支付产品<br>
      * 交易：交易状态查询交易：只有同步应答 <br>
-     * 日期： 2015-09<br>
-     * 版本： 1.0.0 版权： 中国银联<br>
      * 说明：以下代码只是为了方便商户测试而提供的样例代码，商户可以根据自己需要，按照技术文档编写。该代码仅供参考，不提供编码性能及规范性等方面的保障<br>
      * 该接口参考文档位置：open.unionpay.com帮助中心 下载 产品接口规范 《网关支付产品接口规范》，<br>
      * 《平台接入接口规范-第5部分-附录》（内包含应答码接口规范，全渠道平台银行名称-简码对照表）<br>
@@ -358,7 +363,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         // 应答码规范参考open.unionpay.com帮助中心 下载 产品接口规范 《平台接入接口规范-第5部分-附录》
         if (!rspData.isEmpty()){
             if (AcpService.validate(rspData, SDKConstants.UTF_8_ENCODING)){
-                logger.info("验证签名成功");
+                LOGGER.info("验证签名成功");
                 if ("00".equals(rspData.get("respCode"))){
                     // 如果查询交易成功
                     // 处理被查询交易的应答码逻辑
@@ -382,20 +387,22 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
                     result.setMessage(OTHERSTATUS);
                 }
             }else{
-                logger.error("验证签名失败");
+                LOGGER.error("验证签名失败");
                 // 检查验证签名失败的原因
                 result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
                 result.setMessage("sign not match");
             }
         }else{
             // 未返回正确的http状态
-            logger.error("未获取到返回报文或返回http状态码非200");
+            LOGGER.error("未获取到返回报文或返回http状态码非200");
             result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             result.setMessage("HTTP Status Code is not 200 !");
         }
+
+        //---------------------------------------------------------------
         String reqMessage = genHtmlResult(reqData);
         String rspMessage = genHtmlResult(rspData);
-        logger.warn("</br>请求报文:<br/>" + reqMessage + "<br/>" + "应答报文:</br>" + rspMessage + "");
+        LOGGER.warn("</br>请求报文:<br/>" + reqMessage + "<br/>" + "应答报文:</br>" + rspMessage + "");
         PaymentServiceReturnCommand paymentServiceReturnCommand = new PaymentServiceReturnCommand();
         paymentServiceReturnCommand.setOrderNo(rspData.get("orderId"));
         result.setPaymentStatusInformation(paymentServiceReturnCommand);
@@ -419,8 +426,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      * @return
      */
     private static String genHtmlResult(Map<String, String> data){
-
-        TreeMap<String, String> tree = new TreeMap<String, String>();
+        Map<String, String> tree = new TreeMap<>();
         Iterator<Entry<String, String>> it = data.entrySet().iterator();
         while (it.hasNext()){
             Entry<String, String> en = it.next();
@@ -447,7 +453,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      * @return
      */
     private static Map<String, String> getAllRequestParam(final HttpServletRequest request){
-        Map<String, String> res = new HashMap<String, String>();
+        Map<String, String> res = new HashMap<>();
         Enumeration<?> temp = request.getParameterNames();
         if (null != temp){
             while (temp.hasMoreElements()){
@@ -455,7 +461,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
                 String value = request.getParameter(en);
                 res.put(en, value);
                 // 在报文上送时，如果字段的值为空，则不上送<下面的处理为在获取所有参数数据时，判断若值为空，则删除这个字段>
-                logger.debug("支付回调request temp数据，键：{}；值：{}", en, value);
+                LOGGER.debug("支付回调request temp数据，键：{}；值：{}", en, value);
                 if (null == res.get(en) || "".equals(res.get(en))){
                     res.remove(en);
                 }
@@ -509,9 +515,6 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      * 
      * 产品：跳转网关支付产品<br>
      * 交易：消费撤销：后台资金类交易，有同步应答和后台通知应答<br>
-     * 日期： 2015-09<br>
-     * 版本： 1.0.0
-     * 版权： 中国银联<br>
      * 说明：以下代码只是为了方便商户测试而提供的样例代码，商户可以根据自己需要，按照技术文档编写。该代码仅供参考，不提供编码性能规范性等方面的保障<br>
      * 该接口参考文档位置：open.unionpay.com帮助中心 下载 产品接口规范 《网关支付产品接口规范》<br>
      * 《平台接入接口规范-第5部分-附录》（内包含应答码接口规范，全渠道平台银行名称-简码对照表）<br>
@@ -540,7 +543,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         // 应答码规范参考open.unionpay.com帮助中心 下载 产品接口规范 《平台接入接口规范-第5部分-附录》
         if (!rspData.isEmpty()){
             if (AcpService.validate(rspData, SDKConstants.UTF_8_ENCODING)){
-                logger.info("验证签名成功");
+                LOGGER.info("验证签名成功");
                 String respCode = rspData.get("respCode");
                 if ("00".equals(respCode)){
                     // 交易已受理(不代表交易已成功），等待接收后台通知确定交易成功，也可以主动发起 查询交易确定交易状态。
@@ -557,21 +560,20 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
                     result.setMessage(OTHERSTATUS);
                 }
             }else{
-                logger.error("验证签名失败");
+                LOGGER.error("验证签名失败");
                 // TODO 检查验证签名失败的原因
                 result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
                 result.setMessage(OTHERSTATUS);
             }
         }else{
             // 未返回正确的http状态
-            logger.error("未获取到返回报文或返回http状态码非200");
-            logger.error("未获取到返回报文或返回http状态码非200");
+            LOGGER.error("未获取到返回报文或返回http状态码非200");
             result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             result.setMessage("HTTP Status Code is not 200 !");
         }
         String reqMessage = UnionPayBase.genHtmlResult(reqData);
         String rspMessage = UnionPayBase.genHtmlResult(rspData);
-        logger.warn("</br>请求报文:<br/>" + reqMessage + "<br/>" + "应答报文:</br>" + rspMessage + "");
+        LOGGER.warn("</br>请求报文:<br/>" + reqMessage + "<br/>" + "应答报文:</br>" + rspMessage + "");
 
         PaymentServiceReturnCommand paymentServiceReturnCommand = new PaymentServiceReturnCommand();
         paymentServiceReturnCommand.setOrderNo(rspData.get("orderId"));
