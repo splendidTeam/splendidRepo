@@ -16,6 +16,11 @@
  */
 package com.baozun.nebula.utilities.integration.payment.alipay;
 
+import static com.baozun.nebula.utilities.common.condition.RequestParam.ALIPAYFAIL;
+import static com.baozun.nebula.utilities.common.condition.RequestParam.ALIPAYSUCCESS;
+import static com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus.FAILURE;
+import static com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus.UNDEFINED;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -53,7 +58,7 @@ import com.feilong.tools.slf4j.Slf4jUtil;
 
 public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractAlipayPaymentAdaptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAlipayPaymentAdaptor.class);
 
     public static final String _INPUT_CHARSET = "utf-8";
 
@@ -83,7 +88,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             }
             request.initPaymentRequestParams(configs, addition, this.getPayMethod(), returnUrl, notifyUrl, errorNotifyUrl);
         }catch (PaymentException ex){
-            logger.error("Alipay newPaymentRequest error: " + ex.toString());
+            LOGGER.error("Alipay newPaymentRequest error: " + ex.toString());
         }
         return request;
     }
@@ -94,7 +99,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         try{
             request.initPaymentRequestParamsForMobileCreateDirect(configs, addition, returnUrl, notifyUrl, errorNotifyUrl);
         }catch (PaymentException ex){
-            logger.error("Alipay newPaymentRequestForMobileCreateDirect error: " + ex.toString());
+            LOGGER.error("Alipay newPaymentRequestForMobileCreateDirect error: " + ex.toString());
         }
         return request;
     }
@@ -104,7 +109,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         try{
             request.initPaymentRequestParamsForMobileAuthAndExecute(configs, addition);
         }catch (PaymentException ex){
-            logger.error("Alipay newPaymentRequestForMobileAuthAndExecute error: " + ex.toString());
+            LOGGER.error("Alipay newPaymentRequestForMobileAuthAndExecute error: " + ex.toString());
         }
         return request;
     }
@@ -194,15 +199,18 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         //不是我们配置的seller_email
         String configSellerEmail = configs.getProperty("param.seller_email");
         if (!configSellerEmail.equals(sellerEmail)){
-            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+            paymentResult.setPaymentServiceSatus(UNDEFINED);
             paymentResult.setMessage(Slf4jUtil.format("get seller_email:[{}], not our config:[{}]", sellerEmail, configSellerEmail));
             return paymentResult;
+        }
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("seller_email is our config:[{}],bingo~~", sellerEmail);
         }
 
         //--------------------------------------------------------------------------------------------------------
 
         if (isNotifyVerifySuccess(request.getParameter("notify_id"))){
-
             Map<String, String> responseMap = new HashMap<>();
             RequestMapUtil.requestConvert(request, responseMap);
 
@@ -214,18 +222,22 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             String sign = request.getParameter("sign").toString();
 
             if (sign.equals(localSign)){
+                if (LOGGER.isDebugEnabled()){
+                    LOGGER.debug("sign equals our sign:[{}],bingo~~", localSign);
+                }
+
                 String resultStr = request.getParameter("trade_status").toString();
                 getResult(resultStr, paymentResult);
             }else{
-                paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                paymentResult.setPaymentServiceSatus(FAILURE);
                 paymentResult.setMessage("failure");
             }
-            paymentResult.setResponseValue(RequestParam.ALIPAYSUCCESS);
+            paymentResult.setResponseValue(ALIPAYSUCCESS);
 
         }else{
-            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.UNDEFINED);
+            paymentResult.setPaymentServiceSatus(UNDEFINED);
             paymentResult.setMessage("alipay return value error");
-            paymentResult.setResponseValue(RequestParam.ALIPAYFAIL);
+            paymentResult.setResponseValue(ALIPAYFAIL);
         }
 
         return paymentResult;
@@ -299,7 +311,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             PaymentServiceReturnForMobileCommand paymentServiceReturnForMobileCommand = requestToCommand.alipaySynRequestToCommandForMobile(request, resultMap);
             paymentResult.setPaymentStatusInformation(paymentServiceReturnForMobileCommand);
         }catch (DocumentException e){
-            e.printStackTrace();
+            LOGGER.error("", e);
         }
 
         return paymentResult;
@@ -315,10 +327,10 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             request.initPaymentRequestParamsCancel(configs, parm);
             _closeTrade(parm, paymentResult);
         }catch (PaymentException e){
-            logger.error("Alipay closePaymentRequest error: " + e.toString());
+            LOGGER.error("Alipay closePaymentRequest error: " + e.toString());
             paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             paymentResult.setMessage(e.toString());
-            e.printStackTrace();
+            LOGGER.error("", e);
         }
         return paymentResult;
     }
@@ -336,10 +348,10 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             request.initPaymentRequestParamsForQuery(configs, addition);
             queryOrderInfo(addition, paymentResult);
         }catch (PaymentException e){
-            logger.error("Alipay queryOrderInfo error: " + e.toString());
+            LOGGER.error("Alipay queryOrderInfo error: " + e.toString());
             paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             paymentResult.setMessage(e.toString());
-            e.printStackTrace();
+            LOGGER.error("", e);
         }
         return paymentResult;
     }
@@ -365,10 +377,14 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             String notifyVerifyResult = bufferedReader.readLine();
+
             // 如果获得的信息是true，则校验成功；如果获得的信息是其他，则校验失败。
-            return "true".equals(notifyVerifyResult);
+            boolean result = "true".equals(notifyVerifyResult);
+
+            LOGGER.debug("validate notifyId:[{}],result:[{}]", notifyId, result);
+            return result;
         }catch (Exception e){
-            e.printStackTrace();
+            LOGGER.error("", e);
         }
         return false;
     }
@@ -392,7 +408,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             }catch (DocumentException e){
                 result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
                 result.setMessage(e.toString());
-                e.printStackTrace();
+                LOGGER.error("", e);
             }
         }
     }
@@ -423,7 +439,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             }catch (DocumentException e){
                 result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
                 result.setMessage(e.toString());
-                e.printStackTrace();
+                LOGGER.error("", e);
             }
         }
     }
@@ -493,16 +509,16 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
                         resultMap = MapAndStringConvertor.convertResultToMap(map.get("res_data").toString());
                         //创建一个新的MOBILE端交易请求
                         paymentRequest = newPaymentRequestForMobileAuthAndExecute(resultMap);
-                        logger.info("newPaymentRequestForMobileAuthAndExecute URL:{}", paymentRequest.getRequestURL());
+                        LOGGER.info("newPaymentRequestForMobileAuthAndExecute URL:{}", paymentRequest.getRequestURL());
                     }else{
-                        logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", paymentResult.getMessage() + paymentResult.getPaymentServiceSatus());
+                        LOGGER.error("newPaymentRequestForMobileAuthAndExecute error:{}", paymentResult.getMessage() + paymentResult.getPaymentServiceSatus());
                     }
                 }
             }catch (DocumentException e){
-                logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
+                LOGGER.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
                 return null;
             }catch (UnsupportedEncodingException e){
-                logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
+                LOGGER.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
             }
         }
         return paymentRequest;
@@ -533,7 +549,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
                 paymentResult.setMessage("sign not match");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            LOGGER.error("", e);
         }
 
         return paymentResult;
