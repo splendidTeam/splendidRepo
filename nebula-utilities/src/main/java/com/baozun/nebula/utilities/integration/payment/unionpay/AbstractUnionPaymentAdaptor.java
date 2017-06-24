@@ -1,5 +1,9 @@
 package com.baozun.nebula.utilities.integration.payment.unionpay;
 
+import static com.baozun.nebula.utilities.common.condition.RequestParam.UNIONSUCCESS;
+import static com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus.FAILURE;
+import static com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus.PAYMENT_SUCCESS;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -204,15 +208,15 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         if (!AcpService.validate(valideData, encoding)){
             sb.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>失败</td></tr>");
             LOGGER.error("验证签名结果[失败].");
-            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-            paymentResult.setResponseValue(RequestParam.UNIONSUCCESS);
+            paymentResult.setPaymentServiceSatus(FAILURE);
+            paymentResult.setResponseValue(UNIONSUCCESS);
             paymentResult.setMessage(valideData.get("respMsg"));
         }else{
             sb.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>成功</td></tr>");
             LOGGER.info("验证签名结果[成功].");
             System.out.println(valideData.get("orderId")); // 其他字段也可用类似方式获取
-            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
-            paymentResult.setResponseValue(RequestParam.UNIONSUCCESS);
+            paymentResult.setPaymentServiceSatus(PAYMENT_SUCCESS);
+            paymentResult.setResponseValue(UNIONSUCCESS);
             paymentResult.setMessage(valideData.get("respMsg"));
         }
 
