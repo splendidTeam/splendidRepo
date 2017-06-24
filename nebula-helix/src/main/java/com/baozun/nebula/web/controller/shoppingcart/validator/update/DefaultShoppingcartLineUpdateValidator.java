@@ -25,6 +25,8 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +44,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.AbstractShoppingc
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLinePackageInfoFormListValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartOneLineMaxQuantityValidator;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.util.CollectionsUtil.collect;
 import static com.feilong.core.util.CollectionsUtil.find;
@@ -55,6 +58,9 @@ import static com.feilong.core.util.CollectionsUtil.find;
  */
 @Component("shoppingcartLineUpdateValidator")
 public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcartLineOperateValidator implements ShoppingcartLineUpdateValidator{
+
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingcartLineUpdateValidator.class);
 
     /** The sdk sku manager. */
     @Autowired
@@ -139,15 +145,29 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
                         shoppingcartUpdateDetermineSameLineElementsBuilder.build(currentShoppingCartLineCommand, shoppingCartLineUpdateSkuForm));
 
         if (null == needCombinedShoppingCartLineCommand){
+            LOGGER.debug("can not find need Combined ShoppingCartLineCommand,just update self line data");
+
             //没有找到,那么更新当前行
             updateCurrentShoppingCartLineCommand(currentShoppingCartLineCommand, shoppingCartLineUpdateSkuForm, targetSku);
         }else{
+
+            //---------------------------------------------------------------
             int totalQuantity = needCombinedShoppingCartLineCommand.getQuantity() + count;
             //校验单行库存
             if (shoppingcartLineUpdateValidatorConfig.getIsCheckSingleLineSkuInventory() && useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, totalQuantity)){
                 return ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
             }
+
+            //---------------------------------------------------------------
+
             needCombinedShoppingCartLineCommand.setQuantity(totalQuantity);
+            LOGGER.debug("need Combined Line:[{}],update Quantity to:[{}]", needCombinedShoppingCartLineCommand.getId(), totalQuantity);
+
+            //---------------------------------------------------------------
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("shoppingCartLine List:[{}] will remove current Line :[{}]", JsonUtil.formatWithIncludes(shoppingCartLineCommandList, "id"), currentShoppingCartLineCommand.getId());
+            }
 
             //如果需要合并,那么当前行删掉合并到需要合并的行 
             shoppingCartLineCommandList.remove(currentShoppingCartLineCommand);
@@ -172,15 +192,24 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
      * @since 5.3.2.13
      */
     protected void updateCurrentShoppingCartLineCommand(ShoppingCartLineCommand currentShoppingCartLineCommand,ShoppingCartLineUpdateSkuForm shoppingCartLineUpdateSkuForm,Sku sku){
-        currentShoppingCartLineCommand.setSkuId(sku.getId());//注意这里只修改了当前行的skuid  其他属性没有修改 比如价格等
+        Long id = sku.getId();
+        Integer count = shoppingCartLineUpdateSkuForm.getCount();
+        String outid = sku.getOutid();
 
-        currentShoppingCartLineCommand.setQuantity(shoppingCartLineUpdateSkuForm.getCount());
+        currentShoppingCartLineCommand.setSkuId(id);//注意这里只修改了当前行的skuid  其他属性没有修改 比如价格等
+
+        currentShoppingCartLineCommand.setQuantity(count);
 
         //如果有修改newSkuId 那么把 ExtentionCode 重新设置,以便后面使用
-        currentShoppingCartLineCommand.setExtentionCode(sku.getOutid());
+        currentShoppingCartLineCommand.setExtentionCode(outid);
 
         //since 5.3.2.13
         currentShoppingCartLineCommand.setShoppingCartLinePackageInfoCommandList(buildShoppingCartLinePackageInfoCommandList(shoppingCartLineUpdateSkuForm.getPackageInfoFormList()));
+
+        //---------------------------------------------------------------
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("update self line:[{}],new info:{}", currentShoppingCartLineCommand.getId(), JsonUtil.formatWithIncludes(currentShoppingCartLineCommand, "skuId", "quantity", "extentionCode", "shoppingCartLinePackageInfoCommandList"));
+        }
     }
 
     /**
