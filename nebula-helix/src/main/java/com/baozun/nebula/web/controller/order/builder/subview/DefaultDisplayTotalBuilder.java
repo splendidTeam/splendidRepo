@@ -78,6 +78,7 @@ public class DefaultDisplayTotalBuilder implements DisplayTotalBuilder{
      * @param orderLineCommandList
      * @return
      */
+    //XXX 可能可以提取代码
     private Number getTotalPackInfoFee(List<OrderLineCommand> orderLineCommandList){
         List<List<OrderLinePackageInfoCommand>> orderLinePackageInfoCommandListList = getPropertyValueList(orderLineCommandList, "orderLinePackageInfoCommandList");
 
