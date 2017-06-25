@@ -308,24 +308,29 @@ public class MemberManagerImpl implements MemberManager{
     public MemberCommand login(MemberFrontendCommand memberFrontendCommand) throws UserNotExistsException,UserExpiredException,PasswordNotMatchException{
         String loginName = memberFrontendCommand.getLoginName();
 
-        MemberCommand memberCommand = findMemberCommandByLoginName(loginName);
-
-        if (memberCommand == null){
+        MemberCommand memberCommandDb = findMemberCommandByLoginName(loginName);
+        if (memberCommandDb == null){
             throw new UserNotExistsException();
         }
 
         //---------------------------------------------------------------
 
         //盐值为空时走原来验证逻辑，验证通过使用新的加密算法生成新的密码，然后保存盐值和新密码 add by ruichao.gao
-        String password = memberFrontendCommand.getPassword();
-        String memberCommandSalt = memberCommand.getSalt();
+
+        //传过来的密码
+        String inputPassword = memberFrontendCommand.getPassword();
+        String memberCommandSalt = memberCommandDb.getSalt();
 
         //---------------------------------------------------------------
         EncryptUtil encryptUtil = EncryptUtil.getInstance();
 
+        //数据库中的密码
+        String dbPassword = memberCommandDb.getPassword();
+
+        Long memberId = memberCommandDb.getId();
         if (isNullOrEmpty(memberCommandSalt)){
-            String encodePassword = encryptUtil.hash(password, memberCommand.getLoginName());
-            if (!encodePassword.equals(memberCommand.getPassword())){
+            String encodePassword = encryptUtil.hash(inputPassword, memberCommandDb.getLoginName());
+            if (!encodePassword.equals(dbPassword)){
                 throw new PasswordNotMatchException();
             }
 
@@ -333,25 +338,24 @@ public class MemberManagerImpl implements MemberManager{
 
             //生成新的盐值，用新的加密算法进行加密，
             String salt = RandomUtil.createRandomFromString(DECIMAL_AND_LETTERS, 88);
-            String pwd = encryptUtil.hashSalt(password, salt);
+            String pwd = encryptUtil.hashSalt(inputPassword, salt);
 
             //---------------------------------------------------------------
             //保存密码和盐值
-            Member member = memberDao.findMemberById(memberCommand.getId());
+            Member member = memberDao.findMemberById(memberId);
             member.setSalt(salt);
             member.setPassword(pwd);
             memberDao.save(member);
         }else{
-
-            String encodePassword = encryptUtil.hashSalt(password, memberCommandSalt);
-            if (!encodePassword.equals(memberCommand.getPassword())){
+            String encodePassword = encryptUtil.hashSalt(inputPassword, memberCommandSalt);
+            if (!encodePassword.equals(dbPassword)){
                 throw new PasswordNotMatchException();
             }
         }
 
         // 保存用户行为信息
-        saveLoginMemberConduct(memberFrontendCommand.getMemberConductCommand(), memberCommand.getId());
-        return memberCommand;
+        saveLoginMemberConduct(memberFrontendCommand.getMemberConductCommand(), memberId);
+        return memberCommandDb;
     }
 
     @Override
