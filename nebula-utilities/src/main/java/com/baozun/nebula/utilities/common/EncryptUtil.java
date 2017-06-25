@@ -21,6 +21,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,8 @@ import com.baozun.nebula.utilities.common.convertor.Base64Convertor;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.utilities.common.encryptor.Encryptor;
 
+import static com.feilong.core.date.DateExtensionUtil.formatDuration;
+
 /**
  * 常用加解密，hash，digest
  * 
@@ -44,7 +47,7 @@ import com.baozun.nebula.utilities.common.encryptor.Encryptor;
  */
 public class EncryptUtil{
 
-    private static final Logger LOG = LoggerFactory.getLogger(EncryptUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EncryptUtil.class);
 
     public static final String ENCRYPTOR_PREFIX = "encryptor.";
 
@@ -81,13 +84,16 @@ public class EncryptUtil{
     private SecretKeyFactory secretKeyFactory;
 
     private EncryptUtil(){
+
+        Date beginDate = new Date();
+
         //init SecretKeyFactory
         String hashAlgorithm = null;
         try{
             hashAlgorithm = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(ConfigurationUtil.HASHSALT_ALGORITHM_KEY);
             secretKeyFactory = SecretKeyFactory.getInstance(hashAlgorithm == null ? DEFAULT_HASHSALT_ALGORITHM : hashAlgorithm);
         }catch (NoSuchAlgorithmException e1){
-            LOG.error("No algorithm found for digest with name {}", hashAlgorithm == null ? DEFAULT_HASHSALT_ALGORITHM : hashAlgorithm);
+            LOGGER.error("No algorithm found for digest with name {}", hashAlgorithm == null ? DEFAULT_HASHSALT_ALGORITHM : hashAlgorithm);
         }
 
         //init encryptor
@@ -101,12 +107,16 @@ public class EncryptUtil{
                 Encryptor e = (Encryptor) Class.forName(encryptClass).newInstance();
                 encryptors.put(strEnc, e);
             }catch (Exception e){
-                LOG.error("Encryptor initialization fail. {} can not be initialized with Error {}", encryptClassKey, e.getClass());
+                LOGGER.error("Encryptor initialization fail. {} can not be initialized with Error {}", encryptClassKey, e.getClass());
             }
         }
         String encryptMethod = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(ConfigurationUtil.ENCRYPT_ALGORITHM_KEY);
         encryptMethod = encryptMethod == null ? DEFAULT_ENCRYPT_ALGORITHM : encryptMethod;
         encryptor = encryptors.get(encryptMethod);
+
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info("use time: [{}]", formatDuration(beginDate));
+        }
 
     }
 
@@ -142,7 +152,7 @@ public class EncryptUtil{
             byte[] encoded = key.getEncoded();
             return base64Convertor.format(encoded);
         }catch (InvalidKeySpecException | UnsupportedEncodingException e){
-            LOG.error("Get Bytes error with UTF-8", e);
+            LOGGER.error("Get Bytes error with UTF-8", e);
             throw new RuntimeException("Get Bytes error with UTF-8");
         }
     }
@@ -167,8 +177,8 @@ public class EncryptUtil{
         try{
             return MessageDigest.getInstance(hashAlgorithm == null ? DEFAULT_HASH_ALGORITHM : hashAlgorithm);
         }catch (NoSuchAlgorithmException e){
-            LOG.error("No algorithm found for digest with name {}", hashAlgorithm == null ? DEFAULT_HASH_ALGORITHM : hashAlgorithm);
-            LOG.error("Digester for Hash initialzation fail, so no further hash operation can be success");
+            LOGGER.error("No algorithm found for digest with name {}", hashAlgorithm == null ? DEFAULT_HASH_ALGORITHM : hashAlgorithm);
+            LOGGER.error("Digester for Hash initialzation fail, so no further hash operation can be success");
         }
         return null;
     }
@@ -178,8 +188,8 @@ public class EncryptUtil{
         try{
             return MessageDigest.getInstance(digestAlgorithm == null ? DEFAULT_DIGEST_ALGORITHM : digestAlgorithm);
         }catch (NoSuchAlgorithmException e){
-            LOG.error("No algorithm found for digest with name {}", digestAlgorithm == null ? DEFAULT_DIGEST_ALGORITHM : digestAlgorithm);
-            LOG.error("Digester initialzation fail, so no further digest operation can be success");
+            LOGGER.error("No algorithm found for digest with name {}", digestAlgorithm == null ? DEFAULT_DIGEST_ALGORITHM : digestAlgorithm);
+            LOGGER.error("Digester initialzation fail, so no further digest operation can be success");
         }
         return null;
     }
@@ -206,7 +216,7 @@ public class EncryptUtil{
             }
             return bytes;
         }catch (UnsupportedEncodingException e){
-            LOG.error("Get Bytes for digest data error with UTF-8");
+            LOGGER.error("Get Bytes for digest data error with UTF-8");
             throw new RuntimeException("Get Bytes for digest data error with UTF-8");
         }
     }
@@ -308,7 +318,7 @@ public class EncryptUtil{
             digester.reset();
             return StringUtil.bytes2String(digester.digest(data.getBytes(ConfigurationUtil.DEFAULT_ENCODING)));
         }catch (UnsupportedEncodingException e){
-            LOG.error("Get Bytes for digest data error with UTF-8");
+            LOGGER.error("Get Bytes for digest data error with UTF-8");
             throw new RuntimeException("Get Bytes for digest data error with UTF-8");
         }
     }
