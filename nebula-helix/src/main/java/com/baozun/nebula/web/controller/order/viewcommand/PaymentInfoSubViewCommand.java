@@ -33,10 +33,12 @@ public class PaymentInfoSubViewCommand extends BaseViewCommand{
     private static final long serialVersionUID = -6400008677521495969L;
 
     /** 支付方式. */
-    private Integer           payment;
-    
+    private Integer payment;
+
     /** 支付流水号 **/
-    private String           subOrdinate;
+    private String subOrdinate;
+
+    //---------------------------------------------------------------
 
     /**
      * 获得 支付方式.
@@ -57,13 +59,12 @@ public class PaymentInfoSubViewCommand extends BaseViewCommand{
         this.payment = payment;
     }
 
-    public String getSubOrdinate() {
+    public String getSubOrdinate(){
         return subOrdinate;
     }
 
-    public void setSubOrdinate(String subOrdinate) {
+    public void setSubOrdinate(String subOrdinate){
         this.subOrdinate = subOrdinate;
     }
-    
-    
+
 }

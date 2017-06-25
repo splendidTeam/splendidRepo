@@ -14,28 +14,26 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager;
+package com.baozun.nebula.web.controller.order.builder.subview;
 
 import java.math.BigDecimal;
 
-import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.model.payment.PayCode;
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
 /**
- * 
- * 处理 {@link PayCode} 的业务类.
+ * 计算显示的金额.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @version 5.3.1 2016年5月13日 下午4:56:05
- * @since 5.3.1
+ * @see com.baozun.nebula.sdk.manager.payment.PayMoneyBuilder
+ * @since 5.3.2.18
  */
-public interface SdkPayCodeManager extends BaseManager{
+public interface DisplayTotalBuilder{
 
     /**
-     * 保存 {@link PayCode}
+     * 
      *
-     * @param subOrdinate
-     * @param payMoney
+     * @param salesOrderCommand
+     * @return
      */
-    void savaPayCode(String subOrdinate,BigDecimal payMoney);
+    BigDecimal build(SalesOrderCommand salesOrderCommand);
 }

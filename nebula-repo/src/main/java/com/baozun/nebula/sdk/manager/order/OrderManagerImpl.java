@@ -73,6 +73,9 @@ import com.baozun.nebula.sdk.manager.SdkSecretManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.feilong.core.Validator;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toList;
+
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
@@ -92,6 +95,8 @@ public class OrderManagerImpl implements OrderManager{
 
     /** The Constant FAILURE. */
     private static final Integer FAILURE = 0;
+
+    //---------------------------------------------------------------
 
     /** The sdk order email manager. */
     @Autowired
@@ -164,6 +169,8 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkOrderLinePackInfoManager sdkOrderLinePackInfoManager;
 
+    //---------------------------------------------------------------
+
     /*
      * (non-Javadoc)
      * 
@@ -173,34 +180,75 @@ public class OrderManagerImpl implements OrderManager{
     @Transactional(readOnly = true)
     public SalesOrderCommand findOrderByCode(String code,Integer type){
         SalesOrderCommand salesOrderCommand = sdkOrderDao.findOrderByCode(code, type);
-        if (null == type)
-            return salesOrderCommand;
-        if (null == salesOrderCommand)
-            return null;
-        if (type == 1){
-            //收货人信息解密
-            decryptSalesOrderCommand(salesOrderCommand);
-            // 订单支付信息
-            List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
-            // 订单行信息
-            List<Long> orderIds = new ArrayList<Long>();
-            orderIds.add(salesOrderCommand.getId());
-            List<OrderLineCommand> orderLines = sdkOrderLineDao.findOrderDetailListByOrderIds(orderIds);
-            for (OrderLineCommand orderLineCommand : orderLines){
-                String properties = orderLineCommand.getSaleProperty();
-                List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-                orderLineCommand.setSkuPropertys(propList);
-            }
-            // 订单行促销
-            List<OrderPromotionCommand> orderPrm = sdkOrderPromotionDao.findOrderProInfoByOrderId(salesOrderCommand.getId(), 1);
+        return pack(salesOrderCommand, type);
+    }
 
-            salesOrderCommand.setPayInfo(payInfos);
-            salesOrderCommand.setOrderLines(orderLines);
-            salesOrderCommand.setOrderPromotions(orderPrm);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.OrderManager#findOrderById(java.lang.Long, java.lang.Integer)
+     */
+    @Override
+    //@Transactional(readOnly = true)
+    public SalesOrderCommand findOrderById(Long id,Integer type){
+        // 包含订单基本信息和收货信息
+        SalesOrderCommand salesOrderCommand = sdkOrderDao.findOrderById(id, type);
+        return pack(salesOrderCommand, type);
+    }
+
+    /**
+     * @param salesOrderCommand
+     * @param type
+     * @param code
+     * @return
+     * @since 5.3.2.18
+     */
+    private SalesOrderCommand pack(SalesOrderCommand salesOrderCommand,Integer type){
+        if (null == salesOrderCommand){
+            return null;
         }
+        String code = salesOrderCommand.getCode();
+        //---------------------------------------------------------------
+        if (1 == type){
+            LOGGER.debug("begin decrypt order:[{}] ~~", code);
+            //type为1时将查处收货人信息，此时解密
+            decryptSalesOrderCommand(salesOrderCommand);
+            LOGGER.debug("end decrypt order:[{}]~~", code);
+        }
+
+        //---------------------------------------------------------------
+        // 订单支付信息
+        LOGGER.debug("begin load order:[{}] pay info~~", code);
+        List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
+        LOGGER.debug("end load order:[{}] pay info~~", code);
+
+        //---------------------------------------------------------------
+        // 订单行信息
+        LOGGER.debug("begin load order:[{}] order lines info~~", code);
+        List<OrderLineCommand> orderLineCommandList = sdkOrderLineDao.findOrderDetailListByOrderIds(toList(salesOrderCommand.getId()));
+        for (OrderLineCommand orderLineCommand : orderLineCommandList){
+            List<SkuProperty> propList = sdkSkuManager.getSkuPros(orderLineCommand.getSaleProperty());
+            orderLineCommand.setSkuPropertys(propList);
+        }
+
+        LOGGER.debug("end load order:[{}] order lines info~~", code);
+
+        //---------------------------------------------------------------
+        // 订单行促销
+        LOGGER.debug("begin load order:[{}] promotion info~~", code);
+        List<OrderPromotionCommand> orderPrm = sdkOrderPromotionDao.findOrderProInfoByOrderId(salesOrderCommand.getId(), 1);
+        LOGGER.debug("end load order:[{}] promotion info~~", code);
+        //---------------------------------------------------------------
+
+        salesOrderCommand.setPayInfo(payInfos);
+        // since 5.3.2.18 fix http://jira.baozun.cn/browse/NB-493
+        salesOrderCommand.setOrderLines(sdkOrderLinePackInfoManager.packOrderLinesPackageInfo(orderLineCommandList));
+        salesOrderCommand.setOrderPromotions(orderPrm);
 
         return salesOrderCommand;
     }
+
+    //---------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -217,7 +265,7 @@ public class OrderManagerImpl implements OrderManager{
         }
 
         List<Long> idList = new ArrayList<Long>(salesOrderPage.size());
-        boolean isDecrypt = Validator.isNotNullOrEmpty(searchParam) && Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType")) && searchParam.get("sdkQueryType").equals("1");
+        boolean isDecrypt = isNotNullOrEmpty(searchParam) && isNotNullOrEmpty(searchParam.get("sdkQueryType")) && searchParam.get("sdkQueryType").equals("1");
         for (SalesOrderCommand cmd : salesOrderPage){
             if (isDecrypt){
                 decryptSalesOrderCommand(cmd);
@@ -669,40 +717,6 @@ public class OrderManagerImpl implements OrderManager{
     @Override
     public Integer updateOrderLineEvaulationStatus(Long skuId,Long orderId){
         return sdkOrderLineDao.updateOrderLineEvaulationStatusByOrderLineid(skuId, orderId);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.sdk.manager.OrderManager#findOrderById(java.lang.Long, java.lang.Integer)
-     */
-    @Override
-    //@Transactional(readOnly = true)
-    public SalesOrderCommand findOrderById(Long id,Integer type){
-        // 包含订单基本信息和收货信息
-        SalesOrderCommand salesOrderCommand = sdkOrderDao.findOrderById(id, type);
-
-        if (null == salesOrderCommand || null == type){
-            return salesOrderCommand;
-        }
-        if (type.equals(1)){
-            //type为1时将查处收货人信息，此时解密
-            decryptSalesOrderCommand(salesOrderCommand);
-        }
-        // 订单支付信息
-        List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
-        salesOrderCommand.setPayInfo(payInfos);
-        // 订单行信息
-        List<Long> orderIds = new ArrayList<Long>();
-        orderIds.add(salesOrderCommand.getId());
-
-        List<OrderLineCommand> orderLines = sdkOrderLineDao.findOrderDetailListByOrderIds(orderIds);
-        salesOrderCommand.setOrderLines(sdkOrderLinePackInfoManager.packOrderLinesPackageInfo(orderLines));
-        // 订单行促销
-        List<OrderPromotionCommand> orderPrm = sdkOrderPromotionDao.findOrderProInfoByOrderId(salesOrderCommand.getId(), null);
-        salesOrderCommand.setOrderPromotions(orderPrm);
-
-        return salesOrderCommand;
     }
 
     /*

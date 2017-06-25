@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.sdk.manager.payment;
 
+import static java.math.BigDecimal.ZERO;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -29,12 +31,13 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.feilong.core.lang.NumberUtil;
-import com.feilong.core.util.CollectionsUtil;
 import com.google.common.collect.Iterables;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toList;
 import static com.feilong.core.util.AggregateUtil.sum;
+import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
+import static com.feilong.core.util.CollectionsUtil.removeAll;
 
 /**
  * 
@@ -67,7 +70,6 @@ public class DefaultPayMoneyBuilder implements PayMoneyBuilder{
                 String[] strs = soPayMentDetail.split(SEPARATOR_FLAG);
 
                 BigDecimal payMoney = new BigDecimal(strs[2]);
-
                 paySum = paySum.subtract(payMoney);//减去其他方式支付的金额
             }
         }
@@ -82,11 +84,11 @@ public class DefaultPayMoneyBuilder implements PayMoneyBuilder{
      */
     private Number getTotalPackInfoFee(ShoppingCartCommand shoppingCartCommand){
         List<ShoppingCartLineCommand> shoppingCartLineCommands = shoppingCartCommand.getShoppingCartLineCommands();
-        List<List<ShoppingCartLinePackageInfoCommand>> shoppingCartLinePackageInfoCommandListList = CollectionsUtil.getPropertyValueList(shoppingCartLineCommands, "shoppingCartLinePackageInfoCommandList");
+        List<List<ShoppingCartLinePackageInfoCommand>> shoppingCartLinePackageInfoCommandListList = getPropertyValueList(shoppingCartLineCommands, "shoppingCartLinePackageInfoCommandList");
 
-        shoppingCartLinePackageInfoCommandListList = CollectionsUtil.removeAll(shoppingCartLinePackageInfoCommandListList, toList(null, Collections.<ShoppingCartLinePackageInfoCommand> emptyList()));
+        shoppingCartLinePackageInfoCommandListList = removeAll(shoppingCartLinePackageInfoCommandListList, toList(null, Collections.<ShoppingCartLinePackageInfoCommand> emptyList()));
         if (isNullOrEmpty(shoppingCartLinePackageInfoCommandListList)){
-            return BigDecimal.ZERO;
+            return ZERO;
         }
 
         //Iterables.concat 要求元素不能有null
