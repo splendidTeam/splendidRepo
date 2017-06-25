@@ -46,6 +46,9 @@ public class ShoppingCartLineCommandOrganizeCountCommonBehaviour extends Abstrac
                     ShoppingCartLineCommand shoppingCartLineCommand,
                     Map<String, Integer> extentionCodeAndCountMap){
 
+       if(shoppingCartLineCommand.getIsGift()){
+          return;
+       }
         Integer quantity = shoppingCartLineCommand.getQuantity();
 
         //主卖品和赠品都扣库存
