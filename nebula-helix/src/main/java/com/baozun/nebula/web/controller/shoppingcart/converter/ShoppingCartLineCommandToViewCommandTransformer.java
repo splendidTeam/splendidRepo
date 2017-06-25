@@ -19,8 +19,6 @@ package com.baozun.nebula.web.controller.shoppingcart.converter;
 import java.util.Map;
 
 import org.apache.commons.collections4.Transformer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -28,12 +26,12 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLin
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLineSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.Status;
 import com.feilong.core.bean.PropertyUtil;
-import com.feilong.core.util.CollectionsUtil;
 import com.feilong.tools.slf4j.Slf4jUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toInteger;
 import static com.feilong.core.util.CollectionsUtil.collect;
+import static com.feilong.core.util.CollectionsUtil.groupOne;
 
 /**
  * 将 {@link ShoppingCartLineCommand} 转成 {@link ShoppingCartLineSubViewCommand}.
@@ -42,8 +40,6 @@ import static com.feilong.core.util.CollectionsUtil.collect;
  * @since 5.3.2.13
  */
 public class ShoppingCartLineCommandToViewCommandTransformer implements Transformer<ShoppingCartLineCommand, ShoppingCartLineSubViewCommand>{
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartLineCommandToViewCommandTransformer.class);
 
     /*
      * (non-Javadoc)
@@ -78,7 +74,7 @@ public class ShoppingCartLineCommandToViewCommandTransformer implements Transfor
                         "id",
                         "subTotalAmt");
 
-        Map<String, SkuProperty> map = CollectionsUtil.groupOne(shoppingCartLineCommand.getSkuPropertys(), "pName");
+        Map<String, SkuProperty> map = groupOne(shoppingCartLineCommand.getSkuPropertys(), "pName");
         shoppingCartLineSubViewCommand.setPropertiesMap(map);
         shoppingCartLineSubViewCommand.setStatus(toStatus(shoppingCartLineCommand));
         shoppingCartLineSubViewCommand.setShoppingCartLinePackageInfoViewCommandList(collect(shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList(), ShoppingCartLinePackageInfoViewCommand.class));
