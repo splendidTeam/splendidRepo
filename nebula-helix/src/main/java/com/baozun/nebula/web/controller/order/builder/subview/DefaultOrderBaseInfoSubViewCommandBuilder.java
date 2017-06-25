@@ -20,6 +20,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +58,8 @@ public class DefaultOrderBaseInfoSubViewCommandBuilder implements OrderBaseInfoS
      */
     @Override
     public OrderBaseInfoSubViewCommand build(SalesOrderCommand salesOrderCommand){
+        Validate.notNull(salesOrderCommand, "salesOrderCommand can't be null!");
+
         // 订单信息
         OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
         //5.3.2.18增加了对"orderType"字段的转换

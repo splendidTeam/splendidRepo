@@ -51,14 +51,15 @@ import com.baozun.nebula.utils.EmailParamEnciphermentUtil;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.feilong.core.Alphabet;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.Validator;
 import com.feilong.core.util.RandomUtil;
 import com.feilong.core.util.RegexUtil;
 
+import static com.feilong.core.Alphabet.DECIMAL_AND_LETTERS;
 import static com.feilong.core.RegexPattern.EMAIL;
 import static com.feilong.core.RegexPattern.MOBILEPHONE;
+import static com.feilong.core.Validator.isNullOrEmpty;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -304,47 +305,62 @@ public class MemberManagerImpl implements MemberManager{
     }
 
     @Override
-    public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,PasswordNotMatchException{
-        MemberCommand member = findMemberCommandByLoginName(memberCommand.getLoginName());
+    public MemberCommand login(MemberFrontendCommand memberFrontendCommand) throws UserNotExistsException,UserExpiredException,PasswordNotMatchException{
+        String loginName = memberFrontendCommand.getLoginName();
 
-        if (member == null){
+        MemberCommand memberCommand = findMemberCommandByLoginName(loginName);
+
+        if (memberCommand == null){
             throw new UserNotExistsException();
         }
+
+        //---------------------------------------------------------------
+
         //盐值为空时走原来验证逻辑，验证通过使用新的加密算法生成新的密码，然后保存盐值和新密码 add by ruichao.gao
-        if (Validator.isNullOrEmpty(member.getSalt())){
-            String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
-            if (!encodePassword.equals(member.getPassword())){
+        String password = memberFrontendCommand.getPassword();
+        String memberCommandSalt = memberCommand.getSalt();
+
+        //---------------------------------------------------------------
+        EncryptUtil encryptUtil = EncryptUtil.getInstance();
+
+        if (isNullOrEmpty(memberCommandSalt)){
+            String encodePassword = encryptUtil.hash(password, memberCommand.getLoginName());
+            if (!encodePassword.equals(memberCommand.getPassword())){
                 throw new PasswordNotMatchException();
             }
 
+            //---------------------------------------------------------------
+
             //生成新的盐值，用新的加密算法进行加密，
-            String salt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
-            String pwd = EncryptUtil.getInstance().hashSalt(memberCommand.getPassword(), salt);
+            String salt = RandomUtil.createRandomFromString(DECIMAL_AND_LETTERS, 88);
+            String pwd = encryptUtil.hashSalt(password, salt);
+
+            //---------------------------------------------------------------
             //保存密码和盐值
-            Member mem = memberDao.findMemberById(member.getId());
-            mem.setSalt(salt);
-            mem.setPassword(pwd);
-            memberDao.save(mem);
+            Member member = memberDao.findMemberById(memberCommand.getId());
+            member.setSalt(salt);
+            member.setPassword(pwd);
+            memberDao.save(member);
         }else{
-            String encodePassword = EncryptUtil.getInstance().hashSalt(memberCommand.getPassword(), member.getSalt());
-            if (!encodePassword.equals(member.getPassword())){
+
+            String encodePassword = encryptUtil.hashSalt(password, memberCommandSalt);
+            if (!encodePassword.equals(memberCommand.getPassword())){
                 throw new PasswordNotMatchException();
             }
         }
 
         // 保存用户行为信息
-        saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
-        return member;
+        saveLoginMemberConduct(memberFrontendCommand.getMemberConductCommand(), memberCommand.getId());
+        return memberCommand;
     }
 
     @Override
     public MemberCommand findMemberCommandByLoginName(String loginName){
         if (RegexUtil.matches(MOBILEPHONE, loginName)){
             return sdkMemberManager.findMemberByLoginMobile(loginName);
-
-        }else if (RegexUtil.matches(EMAIL, loginName)){
+        }
+        if (RegexUtil.matches(EMAIL, loginName)){
             return sdkMemberManager.findMemberByLoginEmail(loginName);
-
         }
         return sdkMemberManager.findMemberByLoginName(loginName);
     }
