@@ -242,6 +242,10 @@ public class ItemForSolrCommand implements Serializable {
 //	@Field
 //	private Integer industrySortNo;
 	
+	/** 销售额 */
+	@Field
+	private Double salesVolume;
+	
 	/**
 	 * 动态属性值
 	 */
@@ -937,6 +941,16 @@ public class ItemForSolrCommand implements Serializable {
 
 	public void setNavigationTree(List<String> navigationTree) {
 		this.navigationTree = navigationTree;
+	}
+
+	
+	public Double getSalesVolume(){
+		return salesVolume;
+	}
+
+	
+	public void setSalesVolume(Double salesVolume){
+		this.salesVolume = salesVolume;
 	}
 
 
