@@ -16,9 +16,6 @@
  */
 package com.baozun.nebula.web.resolver;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +39,13 @@ import com.baozun.nebula.exception.ValidateException;
 import com.feilong.servlet.http.RequestUtil;
 
 /**
- * 
+ * 这个ExceptionResolver原本设计是供PTS使用的，现在已经被大量复制并散落到各个项目，大家也扩充了很多业务类型的异常
+ * 目前存在的问题是，关键的异常信息没有打印，大量的StackTrace信息会占用大量的内存，目前这两个问题已经解决
+ * 请各位记住一个原则，被ExceptionResolver捕获的异常信息已经打印出来了，在各自的业务方法中切勿再次打印。
  * @author dianchao.song
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
-public class ExceptionResolver extends SimpleMappingExceptionResolver{
+public class ExceptionResolver extends SimpleMappingExceptionResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionResolver.class);
 
@@ -56,10 +55,10 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver{
     //---------------------------------------------------------------
 
     @Override
-    protected ModelAndView getModelAndView(String viewName,Exception exception,HttpServletRequest request){
+    protected ModelAndView getModelAndView(String viewName, Exception exception, HttpServletRequest request) {
         LOGGER.error("", exception);
 
-        Map<String, Object> exceptionMap = new HashMap<>();
+        Map<String, Object> exceptionMap = new HashMap<>(3);
 
         if (exception instanceof BusinessException){
             BusinessException businessException = (BusinessException) exception;
@@ -69,7 +68,6 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver{
             exceptionMap.put("linkedException", ((BusinessException) exception).getLinkedException());
         }else if (exception instanceof ValidateException){//如果是通用服务端验证的异常
             ValidateException ve = (ValidateException) exception;
-
             exceptionMap.put("statusCode", ErrorCodes.PARAMS_ERROR);
             String message = null;
             if (ve.getFullKey() != null){
@@ -91,17 +89,23 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver{
             exceptionMap.put("statusCode", ErrorCodes.DATA_BIND_EXCEPTION);
             exceptionMap.put("message", msg);
 
-            Writer writer = new StringWriter();
-            exception.printStackTrace(new PrintWriter(writer));
-            exceptionMap.put("stackTrace", writer.toString());
+            /*
+             * 移除stacktrace信息
+             * Writer writer = new StringWriter();
+             * exception.printStackTrace(new PrintWriter(writer));
+             * exceptionMap.put("stackTrace", writer.toString());
+             */
         }else{
             BusinessException runtimeException = encode(new BusinessException(ErrorCodes.SYSTEM_ERROR));
             exceptionMap.put("statusCode", runtimeException.getErrorCode());
             exceptionMap.put("message", runtimeException.getMessage());
 
-            Writer writer = new StringWriter();
-            exception.printStackTrace(new PrintWriter(writer));
-            exceptionMap.put("stackTrace", writer.toString());
+            /*
+             *  移除stacktrace信息
+             * Writer writer = new StringWriter();
+             * exception.printStackTrace(new PrintWriter(writer));
+             * exceptionMap.put("stackTrace", writer.toString());
+             */
         }
 
         //---------------------------------------------------------------
@@ -116,7 +120,7 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver{
         return modelAndView;
     }
 
-    private BusinessException encode(BusinessException businessException){
+    private BusinessException encode(BusinessException businessException) {
         String key = ErrorCodes.BUSINESS_EXCEPTION_PREFIX + businessException.getErrorCode();
         int errorCode = businessException.getErrorCode();
         Object[] args = businessException.getArgs();
