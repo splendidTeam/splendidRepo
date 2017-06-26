@@ -123,14 +123,14 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
                                     continue;
                                 }
                                 if (couponCodes.contains(couponCode)){
-                                    return null;
+                                    return SalesOrderResult.SUCCESS;
                                 }
                             }
                         }
                         continue;
                     }
                     if (promotionSettingDetail.getCouponCodes().contains(couponCode)){
-                        return null;
+                        return SalesOrderResult.SUCCESS;
                     }
                 }
             }
