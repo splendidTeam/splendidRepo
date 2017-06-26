@@ -1,6 +1,7 @@
 package com.baozun.nebula.web.filter;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -17,71 +18,73 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.baozun.nebula.command.product.FilterNavigationCommand;
 import com.baozun.nebula.manager.navigation.NavigationHelperManager;
-import com.baozun.nebula.sdk.manager.SdkNavigationManager;
+import com.baozun.nebula.utils.cache.GuavaAbstractLoadingCache;
 import com.feilong.core.Validator;
+import com.google.common.base.Optional;
 
 /**
  * 导航的filter，将商品集合的导航跳转到对应的collection中去
+ * 
  * @author long.xia
- *
+ * @author dianchao.song   添加了1分钟缓存，可以缓解每次拦截时的数据库连接的占用
  */
-public class NavigationFilter implements Filter{
-	
-	private WebApplicationContext webApplicationContext;
-	
-	private SdkNavigationManager	sdkNavigationManager;
-	
-	private NavigationHelperManager		navigationHelperManager;
-	
+public class NavigationFilter implements Filter {
 
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		// TODO Auto-generated method stub
-		ServletContext servletContext = filterConfig.getServletContext(); 
-		 
-		 webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext); 
-		
-		sdkNavigationManager = webApplicationContext.getBean(SdkNavigationManager.class);
-		navigationHelperManager = webApplicationContext.getBean(NavigationHelperManager.class);
-		
-	}
+    private WebApplicationContext webApplicationContext;
 
-	@Override
-	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
-			throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest) servletRequest;
-		HttpServletResponse response = (HttpServletResponse) servletResponse;
-		
-		String pathURI = request.getRequestURI();
-		
-		pathURI = pathURI.endsWith("/") ? pathURI.substring(0, pathURI.length()-1) : pathURI;
-		
-		String	queryStr = request.getQueryString();
-		
-		FilterNavigationCommand filterNavigation = navigationHelperManager.matchNavigationByUrl(pathURI, queryStr);
-		
-		//如果导航是实际的商品列表导航页面，那需要跳转到导航的列表页，
-		if(Validator.isNotNullOrEmpty(filterNavigation)){
-			StringBuffer _urlBuff = new StringBuffer("/sys/navigation?nid="+filterNavigation.getNavId());
-			if(Validator.isNotNullOrEmpty(filterNavigation.getCollectionId())){
-				_urlBuff.append("&cid=").append(filterNavigation.getCollectionId());
-			}
-			request.getRequestDispatcher(_urlBuff.toString()).forward(request, response);
-		}else{
-			chain.doFilter(request, response);
-		}
-		
-		
-		
-		
-	}
-	
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-		
-	}
+    private NavigationHelperManager navigationHelperManager;
 
-	
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        ServletContext servletContext = filterConfig.getServletContext();
 
+        webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+        navigationHelperManager = webApplicationContext.getBean(NavigationHelperManager.class);
+
+    }
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        try{
+            Optional<String> url = cache.getValue(request.getRequestURI() + "<>" + request.getQueryString());
+            if(url.isPresent()) {
+                request.getRequestDispatcher(url.get()).forward(request, response);
+            } else {
+                chain.doFilter(request, response);
+            }
+        }catch (ExecutionException e){
+            chain.doFilter(request, response);
+        }
+    }
+
+    @Override
+    public void destroy() {
+    }
+
+    private GuavaAbstractLoadingCache<String, Optional<String>> cache = new GuavaAbstractLoadingCache<String, Optional<String>>() {
+
+        @Override
+        protected Optional<String> fetchData(String key) {
+            String[] keys = key.split("<>");
+            String pathURI = keys[0];
+            pathURI = pathURI.endsWith("/") ? pathURI.substring(0, pathURI.length() - 1) : pathURI;
+            String queryStr = keys[1];
+
+            FilterNavigationCommand filterNavigation = navigationHelperManager.matchNavigationByUrl(pathURI, queryStr);
+
+            //如果导航是实际的商品列表导航页面，那需要跳转到导航的列表页，
+            if (Validator.isNotNullOrEmpty(filterNavigation)){
+                StringBuilder forwardURL = new StringBuilder("/sys/navigation?nid=" + filterNavigation.getNavId());
+                if (Validator.isNotNullOrEmpty(filterNavigation.getCollectionId())){
+                    forwardURL.append("&cid=").append(filterNavigation.getCollectionId());
+                }
+                return Optional.fromNullable(forwardURL.toString());
+            }else{
+                return Optional.fromNullable(null);
+            }
+        }
+    };
 }
