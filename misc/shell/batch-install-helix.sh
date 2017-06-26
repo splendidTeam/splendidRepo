@@ -1,28 +1,32 @@
-#		one key clean install nebula-helix
-#
-#
-#  helix is nebula child project,dependency on nebula-repo,and nebula-repo dependency nebula-utilities,
-#	if nebula-utilities or nebula-repo,has any code change,we need first step install nebula-utilities,second step install nebula-repo
-#	At this time is more complicated, so we provide one key clean install nebula-helix function
-#
-# step0 chmod +x  *.sh
-#
-# step1 base on nebula parent git update
-#
-# step2 double clike this bat file,will auto install parent project,
-#		and nebula-utilities,nebula-repo,nebula-helix
-#		don't need youself install project-by-project
-#
-#--by feilong 2017年03月10日
+# arr=($a)用于将字符串$a分割到数组$arr ${arr[0]} ${arr[1]} ... 分别存储分割后的数组第1 2 ... 项
+# projects=($1)
+# command=$2
+projects="nebula-utilities,nebula-repo,nebula-helix"
+command="clean install"
 
-echo
-echo create by feilong
-echo 2017年03月10日
+# echo
+# echo
+#
+# echo cd ..
+# cd ..
+#
+# echo cd ..
+# cd ..
 
-echo pwd:$pwd
+cd /Users/feilong/workspace/baozun/Nebula5.3.2
 
-#basepath=$(cd `dirname $0`; pwd)
-basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo ${basepath}/batchInstall.sh "nebula-utilities,nebula-repo,nebula-helix"
-${basepath}/batchInstall.sh "nebula-utilities,nebula-repo,nebula-helix"
+##-----------------------------------------------------------------------------------
+
+#::MAVEN_BATCH_ECHO - 设为'on'使能批处理命令的反馈
+MAVEN_BATCH_ECHO=off
+
+#::设为'on',在结束前等待一个键的按下.
+MAVEN_BATCH_PAUSE=off
+
+##-----------------------------------------------------------------------------------
+echo mvn clean install -N
+mvn clean install -N
+
+echo mvn clean install -pl $projects
+mvn clean install -pl $projects
