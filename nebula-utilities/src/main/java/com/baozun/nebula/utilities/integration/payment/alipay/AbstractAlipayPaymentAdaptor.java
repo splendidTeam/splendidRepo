@@ -19,11 +19,11 @@ package com.baozun.nebula.utilities.integration.payment.alipay;
 import static com.baozun.nebula.utilities.common.condition.RequestParam.ALIPAYFAIL;
 import static com.baozun.nebula.utilities.common.condition.RequestParam.ALIPAYSUCCESS;
 import static com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus.FAILURE;
+import static com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus.SUCCESS;
 import static com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus.UNDEFINED;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -32,6 +32,7 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.Validate;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         try{
             request.initPaymentRequestParamsForMobileCreateDirect(configs, addition, returnUrl, notifyUrl, errorNotifyUrl);
         }catch (PaymentException ex){
-            LOGGER.error("Alipay newPaymentRequestForMobileCreateDirect error: " + ex.toString());
+            LOGGER.error("Alipay newPaymentRequestForMobileCreateDirect error: ", ex);
         }
         return request;
     }
@@ -109,7 +110,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         try{
             request.initPaymentRequestParamsForMobileAuthAndExecute(configs, addition);
         }catch (PaymentException ex){
-            LOGGER.error("Alipay newPaymentRequestForMobileAuthAndExecute error: " + ex.toString());
+            LOGGER.error("Alipay newPaymentRequestForMobileAuthAndExecute error: ", ex);
         }
         return request;
     }
@@ -254,7 +255,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         responseMap.remove("sign_type");
 
         String toBeSignedString = MapAndStringConvertor.getToBeSignedString(responseMap);
-        String localSign = Md5Encrypt.md5(toBeSignedString + configs.getProperty("param.key"), configs.getProperty("param._input_charset"));
+        String localSign = Md5Encrypt.md5(toBeSignedString + AlipayMobileParams.KEY, configs.getProperty("param._input_charset"));
 
         PaymentResult paymentResult = new PaymentResult();
         // 返回函数进行加密比较
@@ -290,7 +291,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             responseMap.remove("sign");
 
             String toBeSignedString = "service=" + responseMap.get("service") + "&v=" + responseMap.get("v") + "&sec_id=" + responseMap.get("sec_id") + "&notify_data=" + responseMap.get("notify_data");
-            String localSign = Md5Encrypt.md5(toBeSignedString + configs.getProperty("param.key"), configs.getProperty("param._input_charset"));
+            String localSign = Md5Encrypt.md5(toBeSignedString + AlipayMobileParams.KEY, configs.getProperty("param._input_charset"));
 
             if (isNotifyVerifySuccess(notify_id)){
                 String sign = request.getParameter("sign").toString();
@@ -487,41 +488,39 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
     @Override
     public PaymentRequest getCreateResponseToken(PaymentRequest paymentRequest){
         String result = HttpClientUtil.getHttpMethodResponseBodyAsStringIgnoreCharSet(paymentRequest.getRequestURL(), HttpMethodType.GET, _INPUT_CHARSET);
-        Map<String, String> map = new HashMap<String, String>();
+        Validate.notBlank(result, "result can't be blank!");
 
-        if (Validator.isNotNullOrEmpty(result)){
-            try{
-                result = java.net.URLDecoder.decode(result, _INPUT_CHARSET);
-                String[] params = result.split("&");
-                if (Validator.isNotNullOrEmpty(params)){
-                    for (String param : params){
-                        String key = param.split("=")[0].toString();
-                        String val = param.replace(param.split("=")[0].toString() + "=", "");
-                        map.put(key, val);
-                    }
-                }
+        try{
+            result = java.net.URLDecoder.decode(result, _INPUT_CHARSET);
+            String[] params = result.split("&");
 
-                if (Validator.isNotNullOrEmpty(map)){
-                    //手机WAP端授权结果
-                    PaymentResult paymentResult = getPaymentResultForMobileCreateDirect(map);
-                    if (paymentResult.getPaymentServiceSatus().equals(PaymentServiceStatus.SUCCESS)){
-                        Map<String, String> resultMap;
-                        resultMap = MapAndStringConvertor.convertResultToMap(map.get("res_data").toString());
-                        //创建一个新的MOBILE端交易请求
-                        paymentRequest = newPaymentRequestForMobileAuthAndExecute(resultMap);
-                        LOGGER.info("newPaymentRequestForMobileAuthAndExecute URL:{}", paymentRequest.getRequestURL());
-                    }else{
-                        LOGGER.error("newPaymentRequestForMobileAuthAndExecute error:{}", paymentResult.getMessage() + paymentResult.getPaymentServiceSatus());
-                    }
-                }
-            }catch (DocumentException e){
-                LOGGER.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
-                return null;
-            }catch (UnsupportedEncodingException e){
-                LOGGER.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
+            Map<String, String> map = new HashMap<>();
+            for (String param : params){
+                String key = param.split("=")[0].toString();
+                String val = param.replace(param.split("=")[0].toString() + "=", "");
+                map.put(key, val);
             }
+
+            //手机WAP端授权结果
+            PaymentResult paymentResult = getPaymentResultForMobileCreateDirect(map);
+            PaymentServiceStatus paymentServiceSatus = paymentResult.getPaymentServiceSatus();
+            if (paymentServiceSatus.equals(SUCCESS)){
+                Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(map.get("res_data").toString());
+                //创建一个新的MOBILE端交易请求
+                paymentRequest = newPaymentRequestForMobileAuthAndExecute(resultMap);
+                LOGGER.info("newPaymentRequestForMobileAuthAndExecute URL:[{}]", paymentRequest.getRequestURL());
+                return paymentRequest;
+            }
+
+            String message = Slf4jUtil.format("newPaymentRequestForMobileAuthAndExecute error:[{}]", paymentResult.getMessage() + paymentServiceSatus);
+
+            LOGGER.error(message);
+            throw new RuntimeException(message);
+
+        }catch (Exception e){
+            LOGGER.error("newPaymentRequestForMobileAuthAndExecute error", e);
+            throw new RuntimeException(e);
         }
-        return paymentRequest;
     }
 
     private PaymentResult getPaymentResultForMobileCreateDirect(Map<String, String> resultStr){
@@ -533,7 +532,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             //---------------------------------------------
             Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(resultStr.get("res_data").toString());
             String toBeSignedString = MapAndStringConvertor.getToBeSignedString(resultStr);
-            String localSign = Md5Encrypt.md5(toBeSignedString + configs.getProperty("param.key"), configs.getProperty("param._input_charset"));
+            String localSign = Md5Encrypt.md5(toBeSignedString + AlipayMobileParams.KEY, configs.getProperty("param._input_charset"));
 
             // 返回函数进行加密比较
             if (localSign.equals(sign)){
