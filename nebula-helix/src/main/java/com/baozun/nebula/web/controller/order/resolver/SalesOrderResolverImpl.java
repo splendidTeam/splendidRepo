@@ -197,7 +197,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         salesOrderCommand.setBuyerName(shippingInfoSubForm.getBuyerName());
         salesOrderCommand.setBuyerTel(shippingInfoSubForm.getBuyerTel());
         //5.3.2.18增加对客户端识别码属性设置
-        salesOrderCommand.setClientIdentificationMechanisms((String)request.getAttribute("clientIdentificationMechanisms"));
+        salesOrderCommand.setClientIdentificationMechanisms((String)request.getAttribute(SalesOrderCommand.CLIENT_IDENTIFICATION_MECHANISMS));
     }
 
     /**

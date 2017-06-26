@@ -249,9 +249,10 @@ public interface MemberManager extends BaseManager{
      * 
      * @param memberFrontendCommand
      * @param clientIp
+     * @param clientIdentificationMechanisms   5.3.2.18新增参数
      */
-    //FIXME
-    void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,HttpServletRequest request);
+    
+    void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,String clientIdentificationMechanisms);
 
     /**
      * 根据memberIds批量查询member

@@ -173,7 +173,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 
 		MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
 		//5.3.2.18增加对客户端识别码属性设置
-		conductCommand.setClientIdentificationMechanisms((String)request.getAttribute("clientIdentificationMechanisms"));
+		conductCommand.setClientIdentificationMechanisms((String)request.getAttribute(MemberConductCommand.CLIENT_IDENTIFICATION_MECHANISMS));
 
 		frontendCommand.setMemberConductCommand(conductCommand);
 		

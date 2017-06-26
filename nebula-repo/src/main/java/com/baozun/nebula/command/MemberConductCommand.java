@@ -10,6 +10,9 @@ public class MemberConductCommand implements Command{
 	 * 
 	 */
 	private static final long	serialVersionUID	= 228221051958999914L;
+	
+	//5.3.2.18 客户端识别码规定绑定名称
+    public static final String CLIENT_IDENTIFICATION_MECHANISMS = MemberConductCommand.class.getName()+"clientIdentificationMechanisms";
 
 	/**
 	 * id

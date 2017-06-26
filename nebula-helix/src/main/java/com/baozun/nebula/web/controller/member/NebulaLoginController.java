@@ -259,7 +259,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
                 // 用户行为信息
                 MemberConductCommand memberConductCommand = new MemberConductCommand(new Date(), RequestUtil.getClientIp(request));
                 //5.3.2.18增加对客户端识别码属性设置
-                memberConductCommand.setClientIdentificationMechanisms((String) request.getAttribute("clientIdentificationMechanisms"));
+                memberConductCommand.setClientIdentificationMechanisms((String) request.getAttribute(MemberConductCommand.CLIENT_IDENTIFICATION_MECHANISMS));
 
                 memberFrontendCommand.setMemberConductCommand(memberConductCommand);
 

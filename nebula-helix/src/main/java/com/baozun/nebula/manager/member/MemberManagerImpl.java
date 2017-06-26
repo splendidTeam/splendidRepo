@@ -557,7 +557,7 @@ public class MemberManagerImpl implements MemberManager{
      * java.lang.String)
      */
     @Override
-    public void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,HttpServletRequest request){
+    public void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,String clientIdentificationMechanisms){
         // 生命周期：未激活状态
         memberFrontendCommand.setLifecycle(Member.LIFECYCLE_UNACTIVE);
         // 来源：自注册
@@ -569,10 +569,9 @@ public class MemberManagerImpl implements MemberManager{
         Date registerTime = new Date();
 
         MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
+        
         //5.3.2.18增加对客户端识别码设置
-
-        //FIXME 不良代码
-        conductCommand.setClientIdentificationMechanisms(null == request ? null : (String) request.getAttribute("clientIdentificationMechanisms"));
+        conductCommand.setClientIdentificationMechanisms(clientIdentificationMechanisms);
 
         memberFrontendCommand.setMemberConductCommand(conductCommand);
 
