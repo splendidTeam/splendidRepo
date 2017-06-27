@@ -142,6 +142,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      *            the member details
      * @param request
      *            the request
+     * @param response
      * @param model
      *            the model
      * @return the string
@@ -151,7 +152,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
         ShoppingCartViewCommand shoppingCartViewCommand = buildShoppingCartViewCommand(memberDetails, request);
 
         //将状态不对的 选中状态的订单行 变成不选中. 
-        uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand,request,response);
+        uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand, request, response);
 
         model.addAttribute("shoppingCartViewCommand", shoppingCartViewCommand);
         return "shoppingcart.shoppingcart";
@@ -209,7 +210,8 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      * @param model
      *            the model
      * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
-     * 
+     * @see #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse, Model)
+     * @see #addShoppingCartBatch(MemberDetails, Long[], Integer, HttpServletRequest, HttpServletResponse, Model)
      * @since 5.3.2.13
      * @RequestMapping(value = "/shoppingcart/addcart", method = RequestMethod.POST)
      */
