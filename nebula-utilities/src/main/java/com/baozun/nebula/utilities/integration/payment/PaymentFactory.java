@@ -25,7 +25,7 @@ import com.baozun.nebula.utilities.integration.payment.wechat.WechatPaymentReque
 
 public class PaymentFactory{
 
-    private static final Logger logger = LoggerFactory.getLogger(PaymentFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentFactory.class);
 
     //--------------------------------------------------------------------------------------------------------------
     /** 支付宝 */
@@ -195,15 +195,6 @@ public class PaymentFactory{
     }
 
     //--------------------------------------------------------------------------------------------------------------
-    /*
-     * 初始化配置参数
-     */
-    public Properties initConfig(String payMentType){
-        String configFile = paymentConfigMap.get(payMentType);
-        return ProfileConfigUtil.findCommonPro(configFile);
-    }
-
-    //--------------------------------------------------------------------------------------------------------------
 
     /*
      * 初始化适配器Map
@@ -225,28 +216,55 @@ public class PaymentFactory{
      * 初始化Alipay适配器
      */
     private PaymentAdaptor initAlipayPaymentAdaptor(){
-        return new AlipayPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
+        String type = PAY_TYPE_ALIPAY;
+        Properties properties = loadProperties(type);
+
+        return null == properties ? null : new AlipayPaymentAdaptor(properties);
     }
 
     /*
      * 初始化Alipay银行卡适配器
      */
     private PaymentAdaptor initAlipayBankPaymentAdaptor(){
-        return new AlipayBankPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
+        String type = PAY_TYPE_ALIPAY;
+        Properties properties = loadProperties(type);
+
+        return null == properties ? null : new AlipayBankPaymentAdaptor(properties);
     }
 
     /*
      * 初始化Alipay国内信用卡适配器
      */
     private PaymentAdaptor initAlipayCreditCardPaymentAdaptor(){
-        return new AlipayCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
+        String type = PAY_TYPE_ALIPAY;
+        Properties properties = loadProperties(type);
+
+        return null == properties ? null : new AlipayCreditCardPaymentAdaptor(properties);
     }
 
     /*
      * 初始化Alipay国外信用卡适配器
      */
     private PaymentAdaptor initAlipayInternationalCreditCardPaymentAdaptor(){
-        return new AlipayInternationalCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY_CREDIT_INT));
+        String type = PAY_TYPE_ALIPAY_CREDIT_INT;
+        Properties properties = loadProperties(type);
+        return null == properties ? null : new AlipayInternationalCreditCardPaymentAdaptor(properties);
+    }
+
+    /**
+     * @param type
+     * @return 如果读不到配置文件,那么返回null
+     * @since 5.3.2.18
+     */
+    private Properties loadProperties(String type){
+        String configFile = paymentConfigMap.get(type);
+
+        try{
+            return ProfileConfigUtil.findCommonPro(configFile);
+        }catch (Exception e){
+            LOGGER.warn("can not load configFile:" + configFile, e);
+            return null;
+        }
     }
 
     /*
