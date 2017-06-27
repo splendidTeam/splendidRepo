@@ -196,7 +196,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      * <li>通常而言不同的商城其实包装信息不同</li>
      * <li>价格等因子理论上都是内部计算(不可以通过url传输)</li>
      * </ol>
-     * 所以此处设置为 protected 作用域, 此方法一般不直接mapping url 地址, 而是url地址解析到mapping方法,再调用这个方法
+     * 此方法一般不直接mapping url 地址, 而是url地址解析到mapping方法,再调用这个方法
      * </blockquote>
      *
      * @param memberDetails
