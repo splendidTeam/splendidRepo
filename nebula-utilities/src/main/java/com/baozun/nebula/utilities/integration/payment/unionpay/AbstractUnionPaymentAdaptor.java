@@ -235,7 +235,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
     /**
      * @param valideData
      * @return
-     * @since 5.3.2.17
+     * @since 5.3.2.18
      */
     private PaymentServiceReturnCommand buildPaymentServiceReturnCommand(Map<String, String> valideData){
         PaymentServiceReturnCommand paymentServiceReturnCommand = new PaymentServiceReturnCommand();
@@ -246,7 +246,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         paymentServiceReturnCommand.setOrderNo(valideData.get("orderId"));
         paymentServiceReturnCommand.setTradeNo(valideData.get("queryId"));
 
-        //since 5.3.2.17  txnAmt
+        //since 5.3.2.18  txnAmt
         paymentServiceReturnCommand.setTotalFee(PaymentUtil.toYuanString(valideData.get("txnAmt")));
 
         return paymentServiceReturnCommand;

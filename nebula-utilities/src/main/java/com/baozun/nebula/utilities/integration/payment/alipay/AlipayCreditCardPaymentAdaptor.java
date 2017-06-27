@@ -7,7 +7,7 @@ import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 
 /**
  *
- * @deprecated 支付宝已经停止该产品申请 @since 5.3.2.17 <br>
+ * @deprecated 支付宝已经停止该产品申请 @since 5.3.2.18 <br>
  *             add javadoc by jinxin (2017年6月1日 下午1:40:49)
  */
 @Deprecated
