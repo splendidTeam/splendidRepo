@@ -1021,6 +1021,7 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
         }
         //以paycode中的支付方式为准
         payType = payCode.getPayType();
+        salesOrderCommand.setPayType(payType);
         if(payType.equals(ReservedPaymentType.WECHAT)){
             salesOrderCommand.setCode(thirdPayNo);
         }else{
@@ -1041,21 +1042,21 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
             }else{
                 subOrdinate = subOrdinate.replaceFirst(WechatResponseKeyConstants.TRADE_TYPE_NATIVE, "");
             }
-            paymentResult.getPaymentStatusInformation().setOrderNo(subOrdinate);
             if (!(SUCCESS.equals(paymentResult.getMessage()) || USERPAYING.equals(paymentResult.getMessage()))){
                 LOGGER.info("订单未支付，直接返回，不进行更新财务状态。");
                 return true;
             }
+            paymentResult.getPaymentStatusInformation().setOrderNo(subOrdinate);
 
         }else if (payType.equals(ReservedPaymentType.ALIPAY)){
             /**
              * 支付宝支付
              */
-            paymentResult.getPaymentStatusInformation().setOrderNo(subOrdinate);
             if (!TRADE_SUCCESS.equals(paymentResult.getMessage())){
                 LOGGER.info("订单未支付，直接返回，不进行更新财务状态。");
                 return false;
             }
+            paymentResult.getPaymentStatusInformation().setOrderNo(subOrdinate);
         }else if(payType.equals(ReservedPaymentType.UNIONPAY)){
             /**
              * 银联支付
