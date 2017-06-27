@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
+import java.util.List;
+
 import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -36,17 +38,52 @@ public interface SdkShoppingCartAddManager extends BaseManager{
      * 否则添加
      * </p>
      * 
+     * <p>
+     * 如果 <code>memberId</code> 是null,抛出 {@link NullPointerException}<br>
+     * 如果 <code>shoppingCartLineCommand</code> 是null,抛出 {@link NullPointerException}<br>
+     * </p>
+     * 
      * @param memberId
      *            会员
-     * @param shoppingCartLineCommand
+     * @param toBeOperatedShoppingCartLineCommand
      *            最终的购物车行,如果是修改会直接拿里面的count 直接覆盖修改
      * @throws NativeUpdateRowCountNotEqualException
      *             在sql操作返回的影响行数不是期待的结果,将会抛出异常
      */
-    void addOrUpdateCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand) throws NativeUpdateRowCountNotEqualException;
+    void addOrUpdateCartLine(Long memberId,ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand) throws NativeUpdateRowCountNotEqualException;
 
     /**
+     * 添加或者修改购物车(批量/事务).
+     * 
+     * <p>
+     * 如果 lineId != null && lineId > 0 那么更新数量;<br>
+     * 否则添加
+     * </p>
+     * 
+     * <p>
+     * 如果 <code>memberId</code> 是null,抛出 {@link NullPointerException}<br>
+     * 如果 <code>toBeOperatedShoppingCartLineCommandList</code> 是null,抛出 {@link NullPointerException}<br>
+     * 如果 <code>toBeOperatedShoppingCartLineCommandList</code> 是empty,抛出 {@link IllegalArgumentException}<br>
+     * </p>
+     * 
+     * @param memberId
+     *            会员
+     * @param toBeOperatedShoppingCartLineCommandList
+     *            最终的需要被操作的购物车行List,如果是修改会直接拿里面的count 直接覆盖修改
+     * @throws NativeUpdateRowCountNotEqualException
+     *             在sql操作返回的影响行数不是期待的结果,将会抛出异常
+     * @since 5.3.2.18
+     */
+    void addOrUpdateCartLine(Long memberId,List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList) throws NativeUpdateRowCountNotEqualException;
+
+    //---------------------------------------------------------------------
+    /**
      * 添加到购物车.
+     * 
+     * <p>
+     * 如果 <code>memberId</code> 是null,抛出 {@link NullPointerException}<br>
+     * 如果 <code>shoppingCartLineCommand</code> 是null,抛出 {@link NullPointerException}<br>
+     * </p>
      * 
      * @param memberId
      *            会员

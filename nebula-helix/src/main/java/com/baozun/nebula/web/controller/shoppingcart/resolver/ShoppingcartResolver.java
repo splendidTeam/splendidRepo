@@ -73,6 +73,11 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * <td>{@link #addShoppingCart(MemberDetails, ShoppingCartLineAddForm, HttpServletRequest, HttpServletResponse) addShoppingCart(use ShoppingCartLineAddForm)}</td>
  * <td>将特定的shoppingCartLineAddForm,加入到用户的购物车里面去.since 5.3.2.13</td>
  * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #addShoppingCart(MemberDetails, Long[], Integer, HttpServletRequest, HttpServletResponse) addShoppingCart(batch)}</td>
+ * <td>将特定的skuids,指定的数量count,加入到用户的购物车里面去.</td>
+ * </tr>
  * </table>
  * 
  * <p>
@@ -177,7 +182,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  */
 public interface ShoppingcartResolver{
 
-    //------------------------------------------------------------------------------------------
+    //-----------------------------get-------------------------------------------------------------
 
     /**
      * 获得指定用户的购物车list(所有的包括选中的及没有选中的).
@@ -190,7 +195,8 @@ public interface ShoppingcartResolver{
      */
     List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request);
 
-    //***************************************************************************************
+    //----------------------------add-----------------------------------
+
     /**
      * 将特定的<code>skuid</code>,指定的数量<code>count</code>,加入到用户的购物车里面去.
      * 
@@ -220,6 +226,26 @@ public interface ShoppingcartResolver{
      *             如果 <code>skuId</code> 是null,或者 <code>count</code>是null
      */
     ShoppingcartResult addShoppingCart(MemberDetails memberDetails,Long skuId,Integer count,HttpServletRequest request,HttpServletResponse response);
+
+    /**
+     * 将特定的skuids,指定的数量count,加入到用户的购物车里面去.
+     *
+     * 
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param skuIds
+     *            几个skuIds
+     * @param count
+     *            数量
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
+     * @since 5.3.2.18
+     */
+    ShoppingcartResult addShoppingCart(MemberDetails memberDetails,Long[] skuIds,Integer count,HttpServletRequest request,HttpServletResponse response);
 
     //***************************************************************************************
     /**
@@ -251,7 +277,7 @@ public interface ShoppingcartResolver{
      */
     ShoppingcartResult addShoppingCart(MemberDetails memberDetails,ShoppingCartLineAddForm shoppingCartLineAddForm,HttpServletRequest request,HttpServletResponse response);
 
-    //------------------------------------------------------------------------------------------
+    //---------------------------update---------------------------------------------------------------
 
     /**
      * 更新指定的购物车行<code>shoppingcartLineId</code>的数量<code>count</code>.

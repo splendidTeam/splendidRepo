@@ -79,6 +79,8 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     @Autowired
     private ShoppingcartAddDetermineSameLineElementsBuilder shoppingcartAddDetermineSameLineElementsBuilder;
 
+    //---------------------------------------------------------------------
+
     /*
      * (non-Javadoc)
      * 

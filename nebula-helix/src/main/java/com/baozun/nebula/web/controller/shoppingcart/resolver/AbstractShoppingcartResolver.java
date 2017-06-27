@@ -20,6 +20,7 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_SIZE_NOT_EXPECT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SUCCESS;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,11 +95,15 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     @Autowired
     protected ShoppingCartInventoryValidator shoppingCartInventoryValidator;
 
+    /**  */
     @Autowired
     private ShoppingcartAddDetermineSameLineElementsBuilder shoppingcartAddDetermineSameLineElementsBuilder;
 
+    /**  */
     @Autowired
     private ToggleCheckStatusShoppingCartLinePredicateBuilder toggleCheckStatusShoppingCartLinePredicateBuilder;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -114,6 +119,77 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         ShoppingCartLineAddForm shoppingCartLineAddForm = new ShoppingCartLineAddForm(skuId, count);
         return addShoppingCart(memberDetails, shoppingCartLineAddForm, request, response);
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#addShoppingCart(com.baozun.nebula.web.MemberDetails, java.lang.Long[], java.lang.Integer, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public ShoppingcartResult addShoppingCart(MemberDetails memberDetails,Long[] skuIds,Integer count,HttpServletRequest request,HttpServletResponse response){
+        Validate.notEmpty(skuIds, "skuIds can't be null/empty!");
+        Validate.notNull(count, "count can't be null!");
+
+        Validate.noNullElements(skuIds, "skuIds can't has null element");
+
+        //TODO 待重构
+
+        //********1. 校验************************************
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = defaultIfNullOrEmpty(getShoppingCartLineCommandList(memberDetails, request), new ArrayList<ShoppingCartLineCommand>());
+
+        for (Long skuId : skuIds){
+            ShoppingCartLineAddForm shoppingCartLineAddForm = new ShoppingCartLineAddForm(skuId, count);
+            ShoppingcartResult validatorShoppingcartResult = shoppingcartLineAddValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingCartLineAddForm);
+
+            if (null != validatorShoppingcartResult){
+                return validatorShoppingcartResult;
+            }
+        }
+
+        //---------------------------------------------------------------------
+
+        //待操作的购物车行
+        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+
+        List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList = new ArrayList<>();
+        for (Long skuId : skuIds){
+            ShoppingCartLineAddForm shoppingCartLineAddForm = new ShoppingCartLineAddForm(skuId, count);
+            ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingcartAddDetermineSameLineElementsBuilder.build(shoppingCartLineAddForm));
+            toBeOperatedShoppingCartLineCommandList.add(toBeOperatedShoppingCartLineCommand);
+        }
+
+        //---------------------------------------------------------------------
+
+        ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(//
+                        memberDetails,
+                        shoppingCartLineCommandList,
+                        toBeOperatedShoppingCartLineCommandList,
+                        request,
+                        response);
+
+        //---------------------------------------------------------------------
+
+        return postShoppingcartResult(memberDetails, addShoppingCartShoppingcartResult, shoppingCartLineCommandList, request, response);
+    }
+
+    /**
+     * @param memberDetails
+     * @param shoppingCartLineCommandList
+     *            总最终数据
+     * @param toBeOperatedShoppingCartLineCommandList
+     *            待操作的数据
+     * @param request
+     * @param response
+     * @return
+     * @since 5.3.2.18
+     */
+    protected abstract ShoppingcartResult doAddShoppingCart(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList,
+                    HttpServletRequest request,
+                    HttpServletResponse response);
 
     /*
      * (non-Javadoc)
@@ -144,11 +220,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingcartAddDetermineSameLineElementsBuilder.build(shoppingCartLineAddForm));
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(memberDetails, shoppingCartLineCommandList, toBeOperatedShoppingCartLineCommand, request, response);
 
-        if (null != addShoppingCartShoppingcartResult){
-            return addShoppingCartShoppingcartResult;
-        }
-        afterOperateShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
-        return SUCCESS;
+        return postShoppingcartResult(memberDetails, addShoppingCartShoppingcartResult, shoppingCartLineCommandList, request, response);
     }
 
     //**************************************************************************************
@@ -196,12 +268,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         ShoppingcartResult deleteShoppingCartResult = doDeleteShoppingCartLine(memberDetails, shoppingCartLineCommandList, shoppingcartLineIds, request, response);
 
-        if (null != deleteShoppingCartResult){
-            return deleteShoppingCartResult;
-        }
-
-        afterOperateShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
-        return SUCCESS;
+        return postShoppingcartResult(memberDetails, deleteShoppingCartResult, shoppingCartLineCommandList, request, response);
     }
 
     /*
@@ -212,13 +279,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     @Override
     public ShoppingcartResult clearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
         ShoppingcartResult clearShoppingCartResult = doClearShoppingCartLine(memberDetails, request, response);
-
-        if (null != clearShoppingCartResult){
-            return clearShoppingCartResult;
-        }
-
-        afterOperateShoppingCart(memberDetails, null, request, response);
-        return SUCCESS;
+        return postShoppingcartResult(memberDetails, clearShoppingCartResult, null, request, response);
     }
 
     //**************************************************************************************
@@ -277,13 +338,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         //3.不同方法的实现****************************************************************
         ShoppingcartResult updateShoppingcartResult = doBatchUpdateShoppingCart(memberDetails, shoppingCartLineCommandList, shoppingcartLineIdAndCountMap, request, response);
 
-        if (null != updateShoppingcartResult){
-            return updateShoppingcartResult;
-        }
-
-        //4.afterOperateShoppingCart****************************************
-        afterOperateShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
-        return SUCCESS;
+        return postShoppingcartResult(memberDetails, updateShoppingcartResult, shoppingCartLineCommandList, request, response);
     }
 
     /*
@@ -307,13 +362,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         //3.不同方法的实现****************************************************************
         ShoppingcartResult updateShoppingcartResult = doUpdateShoppingCart(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, request, response);
 
-        if (null != updateShoppingcartResult){
-            return updateShoppingcartResult;
-        }
-
-        //4.afterOperateShoppingCart****************************************
-        afterOperateShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
-        return SUCCESS;
+        return postShoppingcartResult(memberDetails, updateShoppingcartResult, shoppingCartLineCommandList, request, response);
     }
     //******************************************************************************************************
 
@@ -411,12 +460,14 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, toList(needChangeCheckedCommand), checkStatus, request, response);
 
-        if (null != toggleShoppingcartResult){
-            return toggleShoppingcartResult;
-        }
-        return SUCCESS;
+        return defaultIfNull(toggleShoppingcartResult, SUCCESS);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#uncheckShoppingCartLines(com.baozun.nebula.web.MemberDetails, java.util.List, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     public ShoppingcartResult uncheckShoppingCartLines(MemberDetails memberDetails,List<Long> shoppingcartLineIdList,HttpServletRequest request,HttpServletResponse response){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
@@ -524,29 +575,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     //**************************************************************************************
 
     /**
-     * 操作购物车之后做的事情.
-     * 
-     * <p>
-     * 通常
-     * {@link #addShoppingCart(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model) addShoppingCart},
-     * {@link #updateShoppingCartCount(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model) updateShoppingCartCount},
-     * {@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse, Model) deleteShoppingCartLine} 都需要调用他
-     * </p>
-     * 
-     * @param memberDetails
-     *            the member details
-     * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
-     * @param request
-     *            the request
-     * @param response
-     *            the response
-     */
-    private void afterOperateShoppingCart(@SuppressWarnings("unused") MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
-        shoppingcartCountPersister.save(shoppingCartLineCommandList, request, response);
-    }
-
-    /**
      * Toggle shopping cart line check status.
      *
      * @param memberDetails
@@ -585,10 +613,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         //---------------改变选中状态------------------------------------------------------------------------------
         ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, toDoNeedChangeCheckedCommandList, checkStatus, request, response);
 
-        if (null != toggleShoppingcartResult){
-            return toggleShoppingcartResult;
-        }
-        return SUCCESS;
+        return defaultIfNull(toggleShoppingcartResult, SUCCESS);
     }
 
     /**
@@ -602,6 +627,54 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      */
     private static boolean isSameCheckStatus(Integer settlementState,boolean checkStatus){
         return checkStatus ? settlementState.equals(1) : settlementState.equals(0);
+    }
+
+    //---------------------------------------------------------------------
+
+    /**
+     * 操作执行之后的数据处理.
+     * 
+     * @param memberDetails
+     * @param shoppingcartResult
+     *            操作的结果
+     * @param shoppingCartLineCommandList
+     *            最终的购物车数据
+     * @param request
+     * @param response
+     * @return 如果 null!=shoppingcartResult 直接返回;<br>
+     *         否则会调用 {@link #afterOperateShoppingCart(MemberDetails, List, HttpServletRequest, HttpServletResponse)} 方法,没有异常的话,会返回 {@link ShoppingcartResult#SUCCESS}<br>
+     *         如果 <code>shoppingCartLineCommandList</code> 是null或者是empty 视具体的实现,会重置cookie 购物车数量为0
+     * @since 5.3.2.18
+     */
+    private ShoppingcartResult postShoppingcartResult(MemberDetails memberDetails,ShoppingcartResult shoppingcartResult,List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
+        if (null != shoppingcartResult){
+            return shoppingcartResult;
+        }
+        afterOperateShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
+        return SUCCESS;
+    }
+
+    /**
+     * 操作购物车之后做的事情.
+     * 
+     * <p>
+     * 通常
+     * {@link #addShoppingCart(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model) addShoppingCart},
+     * {@link #updateShoppingCartCount(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model) updateShoppingCartCount},
+     * {@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse, Model) deleteShoppingCartLine} 都需要调用他
+     * </p>
+     * 
+     * @param memberDetails
+     *            the member details
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     */
+    private void afterOperateShoppingCart(@SuppressWarnings("unused") MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
+        shoppingcartCountPersister.save(shoppingCartLineCommandList, request, response);
     }
 
 }

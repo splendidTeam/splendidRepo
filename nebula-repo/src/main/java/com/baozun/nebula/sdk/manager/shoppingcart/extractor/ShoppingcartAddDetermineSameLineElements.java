@@ -20,7 +20,7 @@ package com.baozun.nebula.sdk.manager.shoppingcart.extractor;
  * 购物车添加的时候判断相同行要素.
  * 
  * <p>
- * 判断的原则: 在购物车行list里面查找,相同 skuId, 且packageInfoFormList 相同
+ * 判断的原则: 在购物车行list里面找相同 skuId, 且packageInfoFormList 相同
  * </p>
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>

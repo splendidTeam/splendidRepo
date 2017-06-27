@@ -47,6 +47,8 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     @Autowired
     private GuestShoppingcartPersister guestShoppingcartPersister;
 
+    //---------------------------------------------------------------------
+
     /*
      * (non-Javadoc)
      * 
@@ -65,6 +67,22 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
      */
     @Override
     protected ShoppingcartResult doAddShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
+        return commonUpdate(shoppingCartLineCommandList, request, response);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doAddShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, java.util.List, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    protected ShoppingcartResult doAddShoppingCart(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
         return commonUpdate(shoppingCartLineCommandList, request, response);
     }
 
