@@ -36,7 +36,11 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * 
  * <blockquote>
  * 
- * <table border="1" cellspacing="0" cellpadding="4">
+ * <p>
+ * 1.查询篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
  * <tr style="background-color:#ccccff">
  * <th align="left">字段</th>
  * <th align="left">说明</th>
@@ -46,11 +50,40 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * <td>{@link #getShoppingCartLineCommandList(MemberDetails,HttpServletRequest ) getShoppingCartLineCommandList}</td>
  * <td>获得指定用户的购物车list(所有的包括选中的及没有选中的).</td>
  * </tr>
- * <tr valign="top" style="background-color:#eeeeff">
+ * 
+ * </table>
+ * 
+ * <p>
+ * 2.添加篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
+ * 
+ * <tr style="background-color:#ccccff">
+ * <th align="left">字段</th>
+ * <th align="left">说明</th>
+ * </tr>
+ * 
+ * <tr valign="top">
  * <td>{@link #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse) addShoppingCart}</td>
  * <td>将特定的skuid,指定的数量count,加入到用户的购物车里面去.</td>
  * </tr>
  * 
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>{@link #addShoppingCart(MemberDetails, ShoppingCartLineAddForm, HttpServletRequest, HttpServletResponse) addShoppingCart(use ShoppingCartLineAddForm)}</td>
+ * <td>将特定的shoppingCartLineAddForm,加入到用户的购物车里面去.since 5.3.2.13</td>
+ * </tr>
+ * </table>
+ * 
+ * <p>
+ * 3.修改篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
+ * <tr style="background-color:#ccccff">
+ * <th align="left">字段</th>
+ * <th align="left">说明</th>
+ * </tr>
  * 
  * <tr valign="top">
  * <td>{@link #updateShoppingCartCount(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse) updateShoppingCartCount}</td>
@@ -61,16 +94,20 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * <td>批量更新购物车行shoppingcartLineId的数量count.(since 5.3.1.9)</td>
  * </tr>
  * 
- * 
  * <tr valign="top">
- * <td>{@link #toggleShoppingCartLineCheckStatus(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse)
- * toggleShoppingCartLineCheckStatus}</td>
- * <td>切换指定购物车行的选中状态.</td>
+ * <td>{@link #updateShoppingCartLine(MemberDetails, Long, ShoppingCartLineUpdateSkuForm, HttpServletRequest, HttpServletResponse) updateShoppingCartLine}</td>
+ * <td>更新指定的购物车行shoppingcartLineId的相关参数.(since 5.3.2.3)</td>
  * </tr>
- * <tr valign="top" style="background-color:#eeeeff">
- * <td>{@link #toggleAllShoppingCartLineCheckStatus(MemberDetails, boolean, HttpServletRequest, HttpServletResponse)
- * toggleAllShoppingCartLineCheckStatus}</td>
- * <td>切换所有购物车行的选中状态.</td>
+ * </table>
+ * 
+ * <p>
+ * 4.删除篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
+ * <tr style="background-color:#ccccff">
+ * <th align="left">字段</th>
+ * <th align="left">说明</th>
  * </tr>
  * 
  * <tr valign="top">
@@ -78,7 +115,46 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * <td>删除某个用户的某个特定 shoppingcartLineId 的购物车行.</td>
  * </tr>
  * 
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>{@link #deleteShoppingCartLine(MemberDetails, Long[], HttpServletRequest, HttpServletResponse) deleteShoppingCartLine(with batch)}</td>
+ * <td>删除某个用户的某个特定 shoppingcartLineIds 的一批购物车行.(since 5.3.2.14)</td>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #clearShoppingCartLine(MemberDetails, HttpServletRequest, HttpServletResponse) clearShoppingCartLine}</td>
+ * <td>清空购物车. (since 5.3.2.14)</td>
+ * </tr>
  * </table>
+ * 
+ * 
+ * <p>
+ * 5.选中/不选中篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
+ * <tr style="background-color:#ccccff">
+ * <th align="left">字段</th>
+ * <th align="left">说明</th>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #toggleShoppingCartLineCheckStatus(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse) toggleShoppingCartLineCheckStatus}</td>
+ * <td>切换指定购物车行的选中状态.</td>
+ * </tr>
+ * 
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>{@link #toggleAllShoppingCartLineCheckStatus(MemberDetails, boolean, HttpServletRequest, HttpServletResponse) toggleAllShoppingCartLineCheckStatus}</td>
+ * <td>切换所有购物车行的选中状态.</td>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #uncheckShoppingCartLines(MemberDetails, List, HttpServletRequest, HttpServletResponse) uncheckShoppingCartLines}</td>
+ * <td>将指定的购物车行不选中.(since 5.3.2.6)</td>
+ * </tr>
+ * 
+ * </table>
+ * 
+ * 
  * </blockquote>
  * 
  * <h3>缺少的功能:</h3>
@@ -90,8 +166,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * </p>
  * 
  * <ol>
- * <li>批量删除用户购物车行</li>
- * <li>清空用户购物车行</li>
+ * <li>暂无</li>
  * </ol>
  * </blockquote>
  * 
@@ -368,7 +443,8 @@ public interface ShoppingcartResolver{
      * @param memberDetails
      * @param request
      * @param response
-     * @return
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
      * @since 5.3.2.14
      */
     ShoppingcartResult clearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response);
