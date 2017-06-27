@@ -133,7 +133,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
             paymentServiceReturnCommand.setTradeNo(billNo);
             paymentServiceReturnCommand.setBuyer(responseMap.get(WechatResponseKeyConstants.OPENID));
 
-            //since 5.3.2.17
+            //since 5.3.2.18
             paymentServiceReturnCommand.setTotalFee(PaymentUtil.toYuanString(responseMap.get(WechatResponseKeyConstants.TOTAL_FEE)));
             result.setPaymentStatusInformation(paymentServiceReturnCommand);
 

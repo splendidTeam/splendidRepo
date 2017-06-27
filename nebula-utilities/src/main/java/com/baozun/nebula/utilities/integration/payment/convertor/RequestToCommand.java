@@ -132,7 +132,7 @@ public class RequestToCommand{
      * @param request
      * @param alipaySyn
      * @return
-     * @since 5.3.2.17
+     * @since 5.3.2.18
      */
     private PaymentServiceReturnCommand buildPaymentServiceReturnCommand(HttpServletRequest request,Map<String, String> alipaySyn){
         Map<String, String[]> map = request.getParameterMap();
