@@ -37,9 +37,6 @@ public class SalesOrderCommand extends BaseModel{
 
     /** The Constant serialVersionUID. */
     private static final long           serialVersionUID = 4539781027280506601L;
-    
-    //5.3.2.18 客户端识别码规定绑定名称
-    public static final String CLIENT_IDENTIFICATION_MECHANISMS = SalesOrderCommand.class.getName()+"clientIdentificationMechanisms";
 
     /** PK. */
     private Long                        id;

@@ -49,6 +49,7 @@ import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.order.NebulaOrderCreateController;
 import com.baozun.nebula.web.controller.order.form.InvoiceInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.PaymentInfoSubForm;
@@ -197,7 +198,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         salesOrderCommand.setBuyerName(shippingInfoSubForm.getBuyerName());
         salesOrderCommand.setBuyerTel(shippingInfoSubForm.getBuyerTel());
         //5.3.2.18增加对客户端识别码属性设置
-        salesOrderCommand.setClientIdentificationMechanisms((String)request.getAttribute(SalesOrderCommand.CLIENT_IDENTIFICATION_MECHANISMS));
+        salesOrderCommand.setClientIdentificationMechanisms((String)request.getAttribute(NebulaOrderCreateController.CLIENT_IDENTIFICATION_MECHANISMS));
     }
 
     /**

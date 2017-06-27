@@ -349,13 +349,11 @@ public class NebulaRegisterController extends NebulaLoginController{
 			/** 设置注册会员附加信息 */
 			String clientIp = RequestUtil.getClientIp(request);
 			
-			/** 客户端识别码
-			 * @since 5.3.2.18
-			 * */
-			String clientIdentificationMechanisms = (String) request.getAttribute(MemberConductCommand.CLIENT_IDENTIFICATION_MECHANISMS);
+			//注册客户端识别码  @since 5.3.2.18
+			String registerClientIdentificationMechanisms = (String) request.getAttribute(NebulaAbstractLoginController.REGISTER_CLIENT_IDENTIFICATION_MECHANISMS);
 			
-			//5.3.2.18增加参数String : clientIdentificationMechanisms
-			memberManager.setupMemberReference(memberFrontendCommand, clientIp, clientIdentificationMechanisms);
+			//5.3.2.18增加参数String : registerClientIdentificationMechanisms
+			memberManager.setupMemberReference(memberFrontendCommand, clientIp, registerClientIdentificationMechanisms);
 
 			/** 用户注册 */
 			Member member = memberManager.rewriteRegister(memberFrontendCommand);

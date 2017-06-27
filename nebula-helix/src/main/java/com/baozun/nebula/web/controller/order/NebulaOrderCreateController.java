@@ -125,6 +125,12 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaOrderCreateController.class);
+    
+    /**
+     * 5.3.2.18 客户端识别码规定绑定名称
+     * @since 5.3.2.18
+     */
+    public static final String CLIENT_IDENTIFICATION_MECHANISMS = NebulaOrderCreateController.class.getName()+"clientIdentificationMechanisms";
 
     /** 订单提交的form 校验，需要在商城 spring 相关xml 里面进行配置. */
     @Autowired

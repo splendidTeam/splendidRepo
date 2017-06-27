@@ -249,10 +249,10 @@ public interface MemberManager extends BaseManager{
      * 
      * @param memberFrontendCommand
      * @param clientIp
-     * @param clientIdentificationMechanisms   5.3.2.18新增参数
+     * @param registerClientIdentificationMechanisms   5.3.2.18新增参数
      */
     
-    void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,String clientIdentificationMechanisms);
+    void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,String registerClientIdentificationMechanisms);
 
     /**
      * 根据memberIds批量查询member

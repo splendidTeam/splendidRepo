@@ -557,7 +557,7 @@ public class MemberManagerImpl implements MemberManager{
      * java.lang.String)
      */
     @Override
-    public void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,String clientIdentificationMechanisms){
+    public void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,String registerClientIdentificationMechanisms){
         // 生命周期：未激活状态
         memberFrontendCommand.setLifecycle(Member.LIFECYCLE_UNACTIVE);
         // 来源：自注册
@@ -570,8 +570,8 @@ public class MemberManagerImpl implements MemberManager{
 
         MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
         
-        //5.3.2.18增加对客户端识别码设置
-        conductCommand.setClientIdentificationMechanisms(clientIdentificationMechanisms);
+        //5.3.2.18增加对注册客户端识别码设置
+        conductCommand.setRegisterClientIdentificationMechanisms(registerClientIdentificationMechanisms);
 
         memberFrontendCommand.setMemberConductCommand(conductCommand);
 

@@ -35,6 +35,18 @@ import com.feilong.servlet.http.SessionUtil;
 public abstract class NebulaAbstractLoginController extends BaseController{
 
     private static final Logger LOG = LoggerFactory.getLogger(NebulaAbstractLoginController.class);
+    
+    /**
+     * 5.3.2.18 登录客户端识别码规定绑定名称
+     * @since 5.3.2.18
+     */
+    public static final String CLIENT_IDENTIFICATION_MECHANISMS = NebulaAbstractLoginController.class.getName()+"clientIdentificationMechanisms";
+    
+    /**
+     * 5.3.2.18 注册客户端识别码规定绑定名称
+     * @since 5.3.2.18
+     */
+    public static final String REGISTER_CLIENT_IDENTIFICATION_MECHANISMS = NebulaAbstractLoginController.class.getName()+"registerClientIdentificationMechanisms";
 
     @Autowired
     private MemberStatusFlowProcessor memberStatusFlowProcessor;

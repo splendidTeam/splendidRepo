@@ -10,9 +10,6 @@ public class MemberConductCommand implements Command{
 	 * 
 	 */
 	private static final long	serialVersionUID	= 228221051958999914L;
-	
-	//5.3.2.18 客户端识别码规定绑定名称
-    public static final String CLIENT_IDENTIFICATION_MECHANISMS = MemberConductCommand.class.getName()+"clientIdentificationMechanisms";
 
 	/**
 	 * id
@@ -55,11 +52,18 @@ public class MemberConductCommand implements Command{
 	private BigDecimal			cumulativeConAmount;
 	
 	/**
-     * 客户端识别码
+     * 登录客户端识别码
      * 类似ip一样的信息
      * @since 5.3.2.18
      */
     private String clientIdentificationMechanisms;
+    
+    /**
+     * 注册客户端识别码
+     * 类似ip一样的信息
+     * @since 5.3.2.18
+     */
+    private String registerClientIdentificationMechanisms;
 
 	public MemberConductCommand(){
 		super();
@@ -153,7 +157,8 @@ public class MemberConductCommand implements Command{
 	}
 	
 	/**
-     * 获得 客户端识别码
+     * 获得 登录客户端识别码
+     *       类似ip一样的信息
      * @return clientIdentificationMechanisms
      * @since 5.3.2.18
      */
@@ -162,12 +167,35 @@ public class MemberConductCommand implements Command{
     }
 
     /**
-     * 设置 客户端识别码
+     * 设置 登录客户端识别码
+     *       类似ip一样的信息
      * @param clientIdentificationMechanisms
      * @since 5.3.2.18
      */
     public void setClientIdentificationMechanisms(String clientIdentificationMechanisms){
         this.clientIdentificationMechanisms = clientIdentificationMechanisms;
     }
+
+    /**
+     * 获得 注册客户端识别码
+     *      类似ip一样的信息
+     * @return registerClientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public String getRegisterClientIdentificationMechanisms(){
+        return registerClientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 注册客户端识别码
+     *      类似ip一样的信息
+     * @param registerClientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setRegisterClientIdentificationMechanisms(String registerClientIdentificationMechanisms){
+        this.registerClientIdentificationMechanisms = registerClientIdentificationMechanisms;
+    }
+    
+    
 
 }
