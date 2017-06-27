@@ -54,19 +54,16 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
     @Autowired
     private ShoppingcartFactory shoppingcartFactory;
 
-    /**  */
     @Autowired
     private CalcFreightCommandBuilder calcFreightCommandBuilder;
 
-    /**  */
     @Autowired
     private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
 
-    /**
-     * 
-     */
     @Autowired(required = false)
     private ShoppingCartCommandCheckedBuilderHandler shoppingCartCommandCheckedBuilderHandler;
+
+    //---------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -94,22 +91,24 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
     @Override
     public ShoppingCartCommand buildShoppingCartCommandWithCheckStatus(MemberDetails memberDetails,String key,CalcFreightCommand calcFreightCommand,List<String> couponList,HttpServletRequest request){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, key, request);
-        shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
-
-        //购物行为空，抛出异常
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
+        //---------------------------------------------------------------
+        List<ShoppingCartLineCommand> shoppingCartLineCommandListWithCheckStatus = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
+        Validate.notEmpty(shoppingCartLineCommandListWithCheckStatus, "shoppingCartLineCommandList [is not] null/empty,but checkStatus shoppingCartLineCommandList is null/empty");
+
+        //---------------------------------------------------------------
         if (null != shoppingCartCommandCheckedBuilderHandler){
-            shoppingCartCommandCheckedBuilderHandler.preHandle(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList, request);
+            shoppingCartCommandCheckedBuilderHandler.preHandle(memberDetails, shoppingCartLineCommandListWithCheckStatus, calcFreightCommand, couponList, request);
         }
 
-        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
-
-        //购物车为空，抛出异常
+        //---------------------------------------------------------------
+        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, shoppingCartLineCommandListWithCheckStatus, calcFreightCommand, couponList);
         Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null");
 
+        //---------------------------------------------------------------
         if (null != shoppingCartCommandCheckedBuilderHandler){
-            shoppingCartCommandCheckedBuilderHandler.postHandle(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList, request);
+            shoppingCartCommandCheckedBuilderHandler.postHandle(memberDetails, shoppingCartLineCommandListWithCheckStatus, calcFreightCommand, couponList, request);
         }
         return shoppingCartCommand;
     }
