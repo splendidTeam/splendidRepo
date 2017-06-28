@@ -14,7 +14,7 @@
 	</modules>
 
 	<properties>
-		<version.nebula>5.3.2.14-tommy-SNAPSHOT</version.nebula>
+		<version.nebula>5.3.2.18-tommy</version.nebula>
 		<!-- 让整个项目统一字符集编码 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
