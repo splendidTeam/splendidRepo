@@ -203,13 +203,14 @@ public class OrderManagerImpl implements OrderManager{
      * @return
      * @since 5.3.2.18
      */
+    //TODO type值的方案 很挫
     private SalesOrderCommand pack(SalesOrderCommand salesOrderCommand,Integer type){
         if (null == salesOrderCommand){
             return null;
         }
         String code = salesOrderCommand.getCode();
         //---------------------------------------------------------------
-        if (1 == type){
+        if (Objects.equals(1, type)){//since 5.3.2.18
             LOGGER.debug("begin decrypt order:[{}] ~~", code);
             //type为1时将查处收货人信息，此时解密
             decryptSalesOrderCommand(salesOrderCommand);
