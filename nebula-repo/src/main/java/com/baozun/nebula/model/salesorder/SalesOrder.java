@@ -315,6 +315,12 @@ public class SalesOrder extends BaseModel{
 
     /** version. */
     private Date               version;
+    
+    /**
+     * 纳税人识别码 .
+     * 纳税人识别码是税务登记证上的号，每个企业的识别号都是唯一的
+     * */
+    private String taxPayerId;
 
     //**********************************************************************
 
@@ -1035,5 +1041,14 @@ public class SalesOrder extends BaseModel{
     public void setReceiptAddress(String receiptAddress){
         this.receiptAddress = receiptAddress;
     }
+    
+    @Column(name = "TAXPAYER_ID",length = 40,nullable = true,unique = false)
+    public String getTaxPayerId(){
+        return taxPayerId;
+    }
+
+    public void setTaxPayerId(String taxPayerId){
+        this.taxPayerId = taxPayerId;
+	}
 
 }

@@ -279,6 +279,12 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 多语言. */
     private String                      lang;
+    
+    /**
+     * 纳税人识别码 .
+     * 纳税人识别码是税务登记证上的号，每个企业的识别号都是唯一的
+     * */
+    private String 						taxPayerId;
 
     /**
      * 获得 物流方式 *.
@@ -1699,5 +1705,15 @@ public class SalesOrderCommand extends BaseModel{
     public void setContactId(Long contactId){
         this.contactId = contactId;
     }
+
+	
+	public String getTaxPayerId(){
+		return taxPayerId;
+	}
+	
+	
+	public void setTaxPayerId(String taxPayerId){
+		this.taxPayerId = taxPayerId;
+	}
 
 }

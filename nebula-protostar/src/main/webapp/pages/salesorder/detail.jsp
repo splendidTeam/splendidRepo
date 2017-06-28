@@ -162,6 +162,7 @@
 						      		<div><spring:message code="order.detail.receiptCode"/> : ${orderCommand.salesOrderCommand.receiptCode }</div></br>
 						      		<div><spring:message code="order.detail.receiptType"/> : ${orderCommand.receiptType }</div></br>
 						      		<div><spring:message code="order.detail.receiptTitle"/> : ${orderCommand.salesOrderCommand.receiptTitle }</div></br>
+						      		<div><spring:message code="order.detail.taxPayerId"/> : ${orderCommand.salesOrderCommand.taxPayerId }</div></br>
 						      		<div><spring:message code="order.detail.receiptContent"/> : ${orderCommand.salesOrderCommand.receiptContent }</div>
 						      	</label>
 						    </div>

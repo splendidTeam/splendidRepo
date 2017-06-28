@@ -54,6 +54,31 @@ public class InvoiceInfoSubForm implements Serializable {
 
 	/** 发票内容,比如 明细 办公用品 电脑配件 耗材. */
 	private String invoiceContent;
+	
+	/** 纳税人识别码 . 
+     * @since 5.3.2.18
+     * */
+    private String taxPayerId;
+    
+    /** 公司地址.
+     * @since 5.3.2.18
+     *  */
+    private String             companyAddress;
+    
+    /** 公司电话.
+     * @since 5.3.2.18
+     *  */
+    private String             companyPhone;
+    
+    /** 开户银行名称.
+     * @since 5.3.2.18
+     *  */
+    private String             accountBankName;
+    
+    /** 开户银行账号. 
+     * @since 5.3.2.18
+     * */
+    private String             accountBankNumber;
 
 	// XXX feilong 将来扩展发票类型， 比如 普通发票 增值税发票 电子发票等等
 
@@ -150,4 +175,55 @@ public class InvoiceInfoSubForm implements Serializable {
 		this.isNeedInvoice = isNeedInvoice;
 	}
 
+	
+	public String getTaxPayerId(){
+		return taxPayerId;
+	}
+
+	
+	public void setTaxPayerId(String taxPayerId){
+		this.taxPayerId = taxPayerId;
+	}
+
+	
+	public String getCompanyAddress(){
+		return companyAddress;
+	}
+
+	
+	public void setCompanyAddress(String companyAddress){
+		this.companyAddress = companyAddress;
+	}
+
+	
+	public String getCompanyPhone(){
+		return companyPhone;
+	}
+
+	
+	public void setCompanyPhone(String companyPhone){
+		this.companyPhone = companyPhone;
+	}
+
+	
+	public String getAccountBankName(){
+		return accountBankName;
+	}
+
+	
+	public void setAccountBankName(String accountBankName){
+		this.accountBankName = accountBankName;
+	}
+
+	
+	public String getAccountBankNumber(){
+		return accountBankNumber;
+	}
+
+	
+	public void setAccountBankNumber(String accountBankNumber){
+		this.accountBankNumber = accountBankNumber;
+	}
+
+	
 }

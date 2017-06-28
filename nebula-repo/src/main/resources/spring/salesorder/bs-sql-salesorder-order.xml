@@ -38,6 +38,7 @@
 						o.CREATE_TIME as createTime,
 						o.TRANS_CODE as transCode,
 					    o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
+					    o.TAXPAYER_ID  as taxPayerId,
 						sc.NAME,
 						sc.buyer_name as buyerName,
 						sc.buyer_tel as buyerTel,
@@ -99,6 +100,7 @@
 						o.RECEIPT_TITLE as receiptTitle,
 						o.RECEIPT_CONTENT as receiptCotent,
 						o.REMARK,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.CREATE_TIME as createTime
 						from t_so_salesorder as o 
 						where  o.CODE = :code
@@ -146,7 +148,7 @@
 						o.logistics_provider_code as logisticsProviderCode,
                         o.logistics_provider_name as logisticsProviderName,
                         o.lang as lang,  
-						
+						o.TAXPAYER_ID  as taxPayerId,
 						sc.NAME,
 						sc.buyer_name as buyerName,
 						sc.buyer_tel as buyerTel,
@@ -202,6 +204,7 @@
 						o.REMARK,
 						o.CREATE_TIME as createTime,
 						o.logistics_provider_code as logisticsProviderCode,
+						o.TAXPAYER_ID  as taxPayerId,
                         o.logistics_provider_name as logisticsProviderName
                         
 						from t_so_salesorder as o 
@@ -249,6 +252,7 @@
 					o.CREATE_TIME as createTime,
 					o.TRANS_CODE as transCode,
 					o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
+					o.TAXPAYER_ID  as taxPayerId,
 					sc.NAME,
 					sc.COUNTRY,
 					sc.PROVINCE,
@@ -350,6 +354,7 @@
 					o.RECEIPT_CONTENT as receiptCotent,
 					o.REMARK,
 					o.MODIFY_TIME as modifyTime,
+					o.TAXPAYER_ID  as taxPayerId,
 					o.CREATE_TIME as createTime
 					
 					from t_so_salesorder as o
@@ -423,6 +428,7 @@
 					o.CREATE_TIME as createTime,
 					o.TRANS_CODE as transCode,
 					o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
+					o.TAXPAYER_ID  as taxPayerId,
 					sc.NAME,
 					sc.COUNTRY,
 					sc.PROVINCE,
@@ -532,6 +538,7 @@
 					o.RECEIPT_CONTENT as receiptCotent,
 					o.REMARK,
 					o.MODIFY_TIME as modifyTime,
+					o.TAXPAYER_ID  as taxPayerId,
 					o.CREATE_TIME as createTime
 					
 					from t_so_salesorder as o
@@ -743,6 +750,7 @@
 					o.RECEIPT_CONTENT as receiptContent,
 					o.REMARK,
 					o.CREATE_TIME as createTime,
+					o.TAXPAYER_ID  as taxPayerId,
 					sc.NAME,
 					sc.ORDER_ID,
 					sc.COUNTRY,
@@ -883,6 +891,7 @@
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
 						o.CREATE_TIME as createTime,
+						o.TAXPAYER_ID  as taxPayerId,
 						tsc.name as name,
 						tsc.city as city,
 						tsc.address as address,
@@ -960,6 +969,7 @@
 						o.RECEIPT_CONTENT as receiptCotent,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.CREATE_TIME as createTime
 					from t_so_salesorder as o
 					WHERE (o.FINANCIAL_STATUS = 1
@@ -1008,6 +1018,7 @@
 						o.RECEIPT_CONTENT as receiptCotent,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.CREATE_TIME as createTime
 					from t_so_salesorder as o
 					where o.code in 
@@ -1053,6 +1064,7 @@
 						o.RECEIPT_CONTENT as receiptCotent,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.CREATE_TIME as createTime
 					from t_so_salesorder as o
 					where o.create_time >= :startTime
@@ -1103,6 +1115,7 @@
 						o.RECEIPT_CONTENT as receiptCotent,
 						o.REMARK,
 						o.MODIFY_TIME as modifyTime,
+						o.TAXPAYER_ID  as taxPayerId,
 						o.CREATE_TIME as createTime
 					from t_so_salesorder as o
 					where o.LOGISTICS_STATUS in (

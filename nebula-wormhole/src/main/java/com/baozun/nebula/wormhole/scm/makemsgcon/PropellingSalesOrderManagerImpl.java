@@ -66,6 +66,10 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 
         SalesOrderV5 salesOrderV5 = new SalesOrderV5();
 
+      //纳税人识别码和发票类型
+        salesOrderV5.setBusinessType(salesOrderCommand.getReceiptType());
+        salesOrderV5.setTaxPayerId(salesOrderCommand.getTaxPayerId());
+        
         salesOrderV5.setOrderType(salesOrderCommand.getOrderType());
         salesOrderV5.setBsOrderCode(salesOrderCommand.getCode());
         salesOrderV5.setCreateTime(salesOrderCommand.getCreateTime());
