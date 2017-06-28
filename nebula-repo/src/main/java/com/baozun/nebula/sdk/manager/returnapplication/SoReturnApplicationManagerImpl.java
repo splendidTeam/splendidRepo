@@ -4,10 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +22,11 @@ import com.baozun.nebula.model.salesorder.SoReturnApplication;
 import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.salesorder.SoReturnLine;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
-import com.baozun.nebula.sdk.manager.returnapplication.SoReturnLineManager;
 import com.feilong.core.Validator;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 @Service("soReturnApplicationManager")
 public class SoReturnApplicationManagerImpl implements SoReturnApplicationManager{
@@ -42,6 +41,9 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 
     @Autowired
     private SoReturnLineManager soReturnLineManager;
+    
+    @Autowired(required=false)
+    private ReturnRefundManager  returnRefundManager;
 
     @Autowired
     private SdkSoReturnApplicationDeliveryInfoDao sdkSoReturnApplicationDeliveryInfoDao;
@@ -239,6 +241,11 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
         // 同意
         if (status == 4){
             returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
+            //同意退换货后扩展业务
+            if(null != returnRefundManager){
+                returnRefundManager.processAfterReturn(returnapp);
+            }
+            
         }
         // 拒绝退款
         if (status == 1){
