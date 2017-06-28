@@ -47,7 +47,7 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
     //用于初始化cache的参数及其缺省值    
     private int maximumSize = 100; //最大缓存条数，子类在构造方法中调用setMaximumSize(int size)来更改    
 
-    private int expireAfterWriteDuration = 60; //数据存在时长，子类在构造方法中调用setExpireAfterWriteDuration(int duration)来更改    
+    private int expireAfterWriteDuration = 1; //数据存在时长，子类在构造方法中调用setExpireAfterWriteDuration(int duration)来更改    
 
     private TimeUnit timeUnit = TimeUnit.SECONDS; //时间单位    
 
