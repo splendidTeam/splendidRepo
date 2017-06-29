@@ -135,41 +135,6 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
         return toNebulaReturnResult(shoppingcartResult);
     }
 
-    /**
-     * 批量添加购物车.
-     * 
-     * <p>
-     * 用户购买选定的sku 数组,指定数量加入到购物车
-     * </p>
-     *
-     * @param memberDetails
-     *            the member details
-     * @param skuIds
-     *            指定的skus
-     * @param count
-     *            数量
-     * @param request
-     *            the request
-     * @param response
-     *            the response
-     * @param model
-     *            the model
-     * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
-     * @RequestMapping(value = "/shoppingcart/addbatch", method = RequestMethod.POST)
-     * @see <a href="http://jira.baozun.cn/browse/NB-708">购物车批量添加</a>
-     * @since 5.3.2.18
-     */
-    public NebulaReturnResult addShoppingCartBatch(
-                    @LoginMember MemberDetails memberDetails,
-                    @RequestParam(value = "skuIds",required = true) Long[] skuIds,
-                    @RequestParam(value = "count",required = true) Integer count,
-                    HttpServletRequest request,
-                    HttpServletResponse response,
-                    @SuppressWarnings("unused") Model model){
-        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
-        ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuIds, count, request, response);
-        return toNebulaReturnResult(shoppingcartResult);
-    }
     //**********************************updateShoppingCartCount************************************************
 
     /**

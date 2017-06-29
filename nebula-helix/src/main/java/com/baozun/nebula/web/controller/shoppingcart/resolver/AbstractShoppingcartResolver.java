@@ -23,6 +23,7 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,20 +50,22 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
 import com.baozun.nebula.web.controller.shoppingcart.validator.add.ShoppingcartLineAddValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.update.ShoppingcartLineUpdateValidator;
 import com.feilong.core.util.CollectionsUtil;
+import com.feilong.core.util.MapUtil;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toArray;
 import static com.feilong.core.bean.ConvertUtil.toList;
 import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
 import static com.feilong.core.util.CollectionsUtil.find;
+import static com.feilong.core.util.CollectionsUtil.removeAll;
 import static com.feilong.core.util.CollectionsUtil.select;
 
 /**
- * The Class AbstractShoppingcartResolver.
+ * 所有类型的购物车(会员/游客)操作的 抽象类.
  *
- * @author weihui.tang
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @version 5.3.1 2016年5月3日 下午1:35:48
+ * @author weihui.tang
  * @since 5.3.1
  */
 public abstract class AbstractShoppingcartResolver implements ShoppingcartResolver{
@@ -127,40 +130,100 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public ShoppingcartResult addShoppingCart(MemberDetails memberDetails,Long[] skuIds,Integer count,HttpServletRequest request,HttpServletResponse response){
+    public ShoppingcartBatchAddResult addShoppingCart(MemberDetails memberDetails,Long[] skuIds,Integer count,HttpServletRequest request,HttpServletResponse response){
         Validate.notEmpty(skuIds, "skuIds can't be null/empty!");
         Validate.notNull(count, "count can't be null!");
 
         Validate.noNullElements(skuIds, "skuIds can't has null element");
+        //---------------------------------------------------------------------
+        Map<Long, Integer> skuIdAndCountMap = new LinkedHashMap<>();
+        for (Long skuId : skuIds){
+            Validate.isTrue(skuId > 0, "skuId:[%s] must > 0", skuId);
+            skuIdAndCountMap.put(skuId, count);
+        }
+        return addShoppingCart(memberDetails, skuIdAndCountMap, null, request, response);
+    }
+
+    @Override
+    public ShoppingcartBatchAddResult addShoppingCart(MemberDetails memberDetails,Map<Long, Integer> skuIdAndCountMap,ShoppingcartBatchAddOptions shoppingcartBatchAddOptions,HttpServletRequest request,HttpServletResponse response){
+        Validate.notEmpty(skuIdAndCountMap, "skuIdAndCountMap can't be null/empty!");
+
+        ShoppingcartBatchAddOptions useShoppingcartBatchAddOptions = defaultIfNull(shoppingcartBatchAddOptions, ShoppingcartBatchAddOptions.DEFAULT);
+
+        //---------------------------------------------------------------------
+        //批量添加的时候,如果某条失败了,是否继续.
+        boolean isSkuAddFailContinue = useShoppingcartBatchAddOptions.getIsSkuAddFailContinue();
 
         //TODO 待重构
 
         //********1. 校验************************************
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = defaultIfNullOrEmpty(getShoppingCartLineCommandList(memberDetails, request), new ArrayList<ShoppingCartLineCommand>());
 
-        for (Long skuId : skuIds){
-            ShoppingCartLineAddForm shoppingCartLineAddForm = new ShoppingCartLineAddForm(skuId, count);
-            ShoppingcartResult validatorShoppingcartResult = shoppingcartLineAddValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingCartLineAddForm);
+        //FIXME 保证出错的数据 不能添加到集合
+        Map<Long, ShoppingcartResult> skuIdAndShoppingcartResultFailMap = buildSkuIdAndShoppingcartResultFailMap(memberDetails, shoppingCartLineCommandList, skuIdAndCountMap, isSkuAddFailContinue);
+        //有错误
+        if (isNotNullOrEmpty(skuIdAndShoppingcartResultFailMap)){
+            return doWithHasFailMap(memberDetails, shoppingCartLineCommandList, skuIdAndCountMap, skuIdAndShoppingcartResultFailMap, isSkuAddFailContinue, request, response);
+        }
+        //----没有错误-----------------------------------------------------------------
+        return addShoppingCart(memberDetails, shoppingCartLineCommandList, skuIdAndCountMap, null, request, response);
 
-            if (null != validatorShoppingcartResult){
-                return validatorShoppingcartResult;
-            }
+    }
+
+    /**
+     * @param memberDetails
+     * @param shoppingCartLineCommandList
+     * @param skuIdAndCountMap
+     * @param skuIdAndShoppingcartResultFailMap
+     * @param isSkuAddFailContinue
+     * @param request
+     * @param response
+     * @return
+     * @since 5.3.2.18
+     */
+    private ShoppingcartBatchAddResult doWithHasFailMap(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    Map<Long, Integer> skuIdAndCountMap,
+                    Map<Long, ShoppingcartResult> skuIdAndShoppingcartResultFailMap,
+                    boolean isSkuAddFailContinue,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
+        //如果不继续,那么直接返回
+        if (!isSkuAddFailContinue){
+            return new ShoppingcartBatchAddResult(false, skuIdAndShoppingcartResultFailMap);
         }
 
-        //---------------------------------------------------------------------
-
-        //待操作的购物车行
-        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
-
-        List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList = new ArrayList<>();
-        for (Long skuId : skuIds){
-            ShoppingCartLineAddForm shoppingCartLineAddForm = new ShoppingCartLineAddForm(skuId, count);
-            ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingcartAddDetermineSameLineElementsBuilder.build(shoppingCartLineAddForm));
-            toBeOperatedShoppingCartLineCommandList.add(toBeOperatedShoppingCartLineCommand);
+        //全部出错了
+        if (skuIdAndShoppingcartResultFailMap.size() == skuIdAndCountMap.size()){
+            return new ShoppingcartBatchAddResult(false, skuIdAndShoppingcartResultFailMap);
         }
 
-        //---------------------------------------------------------------------
+        //去除 有毛病的 sku ,其他的sku 继续添加
+        Map<Long, Integer> canAddSkuIdAndCountMap = MapUtil.removeKeys(skuIdAndCountMap, toArray(skuIdAndShoppingcartResultFailMap.keySet(), Long.class));
+        return addShoppingCart(memberDetails, shoppingCartLineCommandList, canAddSkuIdAndCountMap, skuIdAndShoppingcartResultFailMap, request, response);
+    }
 
+    /**
+     * @param memberDetails
+     * @param shoppingCartLineCommandList
+     * @param canAddSkuIdAndCountMap
+     * @param request
+     * @param response
+     * @return
+     * @since 5.3.2.18
+     */
+    private ShoppingcartBatchAddResult addShoppingCart(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    Map<Long, Integer> canAddSkuIdAndCountMap,
+                    Map<Long, ShoppingcartResult> skuIdAndShoppingcartResultFailMap,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
+        //----------------构造需要被操作的购物车行-----------------------------------------------------
+        List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList = buildToBeOperatedShoppingCartLineCommandList(canAddSkuIdAndCountMap, shoppingCartLineCommandList);
+
+        //---------------------------------------------------------------------
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(//
                         memberDetails,
                         shoppingCartLineCommandList,
@@ -168,9 +231,68 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                         request,
                         response);
 
-        //---------------------------------------------------------------------
+        postShoppingcartResult(memberDetails, addShoppingCartShoppingcartResult, shoppingCartLineCommandList, request, response);
 
-        return postShoppingcartResult(memberDetails, addShoppingCartShoppingcartResult, shoppingCartLineCommandList, request, response);
+        //---------------------------------------------------------------------
+        //要没有错误的sku 才返回true
+        boolean isSuccess = isNotNullOrEmpty(skuIdAndShoppingcartResultFailMap);
+        return new ShoppingcartBatchAddResult(isSuccess, skuIdAndShoppingcartResultFailMap);
+    }
+
+    /**
+     * @param memberDetails
+     * @param shoppingCartLineCommandList
+     * @param skuIdAndCountMap
+     * @param useShoppingcartBatchAddOptions
+     * @since 5.3.2.18
+     */
+    private Map<Long, ShoppingcartResult> buildSkuIdAndShoppingcartResultFailMap(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> skuIdAndCountMap,boolean isSkuAddFailContinue){
+        Map<Long, ShoppingcartResult> skuIdAndShoppingcartResultFailMap = new LinkedHashMap<>();
+        for (Map.Entry<Long, Integer> entry : skuIdAndCountMap.entrySet()){
+            Long skuId = entry.getKey();
+            Integer count = entry.getValue();
+
+            ShoppingCartLineAddForm shoppingCartLineAddForm = new ShoppingCartLineAddForm(skuId, count);
+            //FIXME
+            ShoppingcartResult validatorShoppingcartResult = shoppingcartLineAddValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingCartLineAddForm);
+
+            //---------------------------------------------------------------------
+            if (null == validatorShoppingcartResult){
+                continue;
+            }
+            //---------------------------------------------------------------------
+            skuIdAndShoppingcartResultFailMap.put(skuId, validatorShoppingcartResult);
+            if (isSkuAddFailContinue){
+                continue;
+            }
+            break;
+        }
+        return skuIdAndShoppingcartResultFailMap;
+    }
+
+    /**
+     * @param skuIdAndCountMap
+     * @param shoppingCartLineCommandList
+     * @return
+     * @since 5.3.2.18
+     */
+    private List<ShoppingCartLineCommand> buildToBeOperatedShoppingCartLineCommandList(Map<Long, Integer> skuIdAndCountMap,List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        Validate.notEmpty(skuIdAndCountMap, "skuIdAndCountMap can't be null/empty!");
+
+        //待操作的购物车行
+        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+
+        List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList = new ArrayList<>();
+
+        for (Map.Entry<Long, Integer> entry : skuIdAndCountMap.entrySet()){
+            Long skuId = entry.getKey();
+            Integer count = entry.getValue();
+
+            ShoppingCartLineAddForm shoppingCartLineAddForm = new ShoppingCartLineAddForm(skuId, count);
+            ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingcartAddDetermineSameLineElementsBuilder.build(shoppingCartLineAddForm));
+            toBeOperatedShoppingCartLineCommandList.add(toBeOperatedShoppingCartLineCommand);
+        }
+        return toBeOperatedShoppingCartLineCommandList;
     }
 
     /**
@@ -264,7 +386,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         }
 
         //----------------------------------------------------------------------------------------
-        shoppingCartLineCommandList = CollectionsUtil.removeAll(shoppingCartLineCommandList, selectWillDeleteLines);
+        shoppingCartLineCommandList = removeAll(shoppingCartLineCommandList, selectWillDeleteLines);
 
         ShoppingcartResult deleteShoppingCartResult = doDeleteShoppingCartLine(memberDetails, shoppingCartLineCommandList, shoppingcartLineIds, request, response);
 

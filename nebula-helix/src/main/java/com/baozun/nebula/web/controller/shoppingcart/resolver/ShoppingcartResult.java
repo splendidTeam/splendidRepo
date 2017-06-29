@@ -18,13 +18,15 @@ package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
 /**
  * 购物车操作的结果.
- *
- * @author jumbo
+ * 
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
 public enum ShoppingcartResult{
 
     /** 成功. */
     SUCCESS,
+
+    //---------------------------------------------------------------------
 
     /** sku不存在. */
     SKU_NOT_EXIST,
@@ -66,6 +68,8 @@ public enum ShoppingcartResult{
 
     /** 基于 shoppingcart line 查找SHOPPING_CART_LINE_COMMAND 可能已经被删掉了 （比如 打开了双窗口）. */
     SHOPPING_CART_LINE_COMMAND_NOT_FOUND,
+
+    //---------------------------------------------------------------------
 
     /** 数据库层操作失败. */
     OPERATE_ERROR;

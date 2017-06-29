@@ -175,9 +175,8 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * </ol>
  * </blockquote>
  * 
- * @author weihui.tang
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @version 5.3.1 2016年5月3日 下午1:35:48
+ * @author weihui.tang
  * @since 5.3.1
  */
 public interface ShoppingcartResolver{
@@ -241,11 +240,56 @@ public interface ShoppingcartResolver{
      *            the request
      * @param response
      *            the response
-     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
-     *         其他 返回 {@link ShoppingcartResult}其他枚举
+     * @return
+     *         <p>
+     *         仅当全部添加成功了,{@link ShoppingcartBatchAddResult} 的 <b>isSuccess</b> 属性才会是 true; 其他情况都会是false<br>
+     *         </p>
+     * 
+     *         <p>
+     *         {@link ShoppingcartBatchAddResult} 的 <b>skuIdAndShoppingcartResultFailMap</b> 属性存放执行添加失败的sku 和失败的原因;<br>
+     *         由于 {@link ShoppingcartBatchAddOptions} 的 <b>isSkipFail</b> 默认属性是 <b>false</b>, 那么 <b>skuIdAndShoppingcartResultFailMap</b>会放第一条失败的数据<br>
+     *         </p>
+     * @throws NullPointerException
+     *             如果 <code>skuIds</code> 是null<br>
+     *             如果 <code>count</code> 是null<br>
+     * @throws IllegalArgumentException
+     *             如果 <code>skuIds</code> 是empty<br>
+     *             如果 <code>skuIds</code> 是有null 元素<br>
      * @since 5.3.2.18
      */
-    ShoppingcartResult addShoppingCart(MemberDetails memberDetails,Long[] skuIds,Integer count,HttpServletRequest request,HttpServletResponse response);
+    ShoppingcartBatchAddResult addShoppingCart(MemberDetails memberDetails,Long[] skuIds,Integer count,HttpServletRequest request,HttpServletResponse response);
+
+    /**
+     * 将特定的skuid 和 指定的数量count的 map,加入到用户的购物车里面去.
+     *
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param skuIdAndCountMap
+     *            skuid 和数量的map
+     * @param shoppingcartBatchAddOptions
+     *            购物车批量添加时候的参数控制<br>
+     *            可以为null, 如果是null,将会使用 {@link ShoppingcartBatchAddOptions#DEFAULT}
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return
+     *         <p>
+     *         仅当全部添加成功了,{@link ShoppingcartBatchAddResult} 的 <b>isSuccess</b> 属性才会是 true; 其他情况都会是false<br>
+     *         </p>
+     * 
+     *         <p>
+     *         {@link ShoppingcartBatchAddResult} 的 <b>skuIdAndShoppingcartResultFailMap</b> 属性存放执行添加失败的sku 和失败的原因;<br>
+     *         如果 {@link ShoppingcartBatchAddOptions} 的 <b>isSkipFail</b> 属性是 <b>true</b>, 那么 <b>skuIdAndShoppingcartResultFailMap</b>会放所有失败的数据<br>
+     *         如果 {@link ShoppingcartBatchAddOptions} 的 <b>isSkipFail</b> 属性是 <b>false</b>, 那么 <b>skuIdAndShoppingcartResultFailMap</b>会放第一条失败的数据<br>
+     *         </p>
+     * @throws NullPointerException
+     *             如果 <code>skuIdAndCountMap</code> 是null<br>
+     * @throws IllegalArgumentException
+     *             如果 <code>skuIdAndCountMap</code> 是empty<br>
+     * @since 5.3.2.18
+     */
+    ShoppingcartBatchAddResult addShoppingCart(MemberDetails memberDetails,Map<Long, Integer> skuIdAndCountMap,ShoppingcartBatchAddOptions shoppingcartBatchAddOptions,HttpServletRequest request,HttpServletResponse response);
 
     //***************************************************************************************
     /**

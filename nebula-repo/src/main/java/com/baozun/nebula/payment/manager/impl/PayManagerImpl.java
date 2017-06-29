@@ -66,6 +66,8 @@ import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.feilong.core.Validator;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 @Transactional
 @Service("paymentManager")
 public class PayManagerImpl implements PayManager{
@@ -155,33 +157,24 @@ public class PayManagerImpl implements PayManager{
 
     @Override
     public void savePayInfos(SalesOrderCommand so,PaymentRequest paymentRequest,String operator){
-
         savePayLog(new Date(), Constants.PAY_LOG_CALL_AFTER_MESSAGE, operator, MapConvertUtils.transPaymentRequestToString(paymentRequest));
+
         //更新支付相关
         //更新t_so_payinfo
-        //Integer payType = so.getOnLinePaymentCommand().getPayType();
         String subOrdinate = so.getCode();
-        //String payInfoStr = BankCodeConvertUtil.getPayTypeDetail(so.getOnLinePaymentCommand().getBankCode(),so.getOnLinePaymentCommand().getPayType());
         String paymentPeople = operator;
 
-        Map<String, Object> paraMap = new HashMap<String, Object>();
+        Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("subOrdinate", subOrdinate);
         paraMap.put("paySuccessStatusStr", 2);//未付款
+
         //查询订单的需要支付的payInfolog
         List<PayInfoLog> payInfoLogList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
 
-        if (Validator.isNotNullOrEmpty(payInfoLogList)){
+        if (isNotNullOrEmpty(payInfoLogList)){
             for (PayInfoLog payInfoLog : payInfoLogList){
-                //payInfoLog.setThirdPayType(payType);
                 payInfoLog.setPaymentPeople(paymentPeople);
-                //payInfoLog.setPayInfo(payInfoStr);
                 payInfoLogDao.save(payInfoLog);
-
-                /*
-                 * PayInfo payInfo = payInfoDao.getByPrimaryKey(payInfoLog.getPayInfoId());
-                 * payInfo.setPayInfo(payInfoStr);
-                 * payInfoDao.save(payInfo);
-                 */
             }
         }
 

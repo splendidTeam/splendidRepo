@@ -285,30 +285,22 @@ public class PaymentFactory{
     //--------------------------------------------------------------------------------------------------------------
 
     public String getPayType(Integer payType){
-        String type = PaymentFactory.PAY_TYPE_ALIPAY;
         switch (payType) {
             case ALIPAY:
-                type = PaymentFactory.PAY_TYPE_ALIPAY;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY;
             case ALIPAY_BANK:
-                type = PaymentFactory.PAY_TYPE_ALIPAY_BANK;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY_BANK;
             case ALIPAY_CREDIT:
-                type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
             case ALIPAY_CREDIT_INT_V:
-                type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
             case ALIPAY_CREDIT_INT_M:
-                type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
             case WECHAT:
-                type = PaymentFactory.PAY_TYPE_WECHAT;
-                break;
+                return PaymentFactory.PAY_TYPE_WECHAT;
             case UNIONPAY:
-                type = PaymentFactory.PAY_TYPE_UNIONPAY;
-                break;
+                return PaymentFactory.PAY_TYPE_UNIONPAY;
         }
-        return type;
+        throw new IllegalArgumentException("payType:[" + payType + "] not support!");
     }
 }

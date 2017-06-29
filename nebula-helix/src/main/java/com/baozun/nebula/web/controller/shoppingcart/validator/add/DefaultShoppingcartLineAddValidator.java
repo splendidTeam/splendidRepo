@@ -96,6 +96,8 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
         Validate.notNull(skuId, "skuId can't be null!");
         Validate.notNull(count, "count can't be null!");
 
+        //--------------------------------校验包装信息-------------------------------------
+
         shoppingcartLinePackageInfoFormListValidator.validator(shoppingCartLineAddForm.getPackageInfoFormList());
 
         //--------------------1.common 校验--------------------------------------------

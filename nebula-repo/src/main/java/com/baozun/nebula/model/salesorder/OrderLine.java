@@ -48,35 +48,35 @@ public class OrderLine extends BaseModel{
     private static final long serialVersionUID = 2540443429165056436L;
 
     /** PK. */
-    private Long              id;
+    private Long id;
 
     //**************************************************
 
     /** 订单id. */
-    private Long              orderId;
+    private Long orderId;
 
     /** sku表中的id. */
-    private Long              skuId;
+    private Long skuId;
 
     /** UPC. */
-    private String            extentionCode;
+    private String extentionCode;
 
     /** 销售属性信息. */
-    private String            saleProperty;
+    private String saleProperty;
 
     /** 商品数量. */
-    private Integer           count;
+    private Integer count;
 
     //**************************************************
 
     /** 商品id. */
-    private Long              itemId;
+    private Long itemId;
 
     /** 商品名称. */
-    private String            itemName;
+    private String itemName;
 
     /** 商品主图. */
-    private String            itemPic;
+    private String itemPic;
 
     /**
      * 对应关联关系的商品id.
@@ -89,51 +89,53 @@ public class OrderLine extends BaseModel{
      * 
      * @since 5.3.1
      */
-    private Long              relatedItemId;
+    private Long relatedItemId;
 
     //**************************************************
 
     /** 原销售单价,吊牌价. */
-    private BigDecimal        MSRP;
+    private BigDecimal MSRP;
 
     /** 现销售单价. */
-    private BigDecimal        salePrice;
+    private BigDecimal salePrice;
 
     /** 行小计 行小计=现销售单价X数量-折扣. */
-    private BigDecimal        subtotal;
+    private BigDecimal subtotal;
 
     /** 折扣-包含整单优惠分摊. */
-    private BigDecimal        discount;
+    private BigDecimal discount;
 
     /** 折扣单价-不包含整单优惠分摊. */
-    private BigDecimal        discountPrice;
+    private BigDecimal discountPrice;
 
     //**************************************************
 
     /** 行类型. */
-    private Integer           type;
+    private Integer type;
 
     /** 分组号. */
-    private Integer           groupId;
+    private Integer groupId;
 
     /** 评价状态. */
-    private Integer           evaluationStatus;
+    private Integer evaluationStatus;
 
     //**************************************************
 
     /** 商品快照版本. */
-    private Integer           snapshot;
+    private Integer snapshot;
 
     /** version. */
-    private Date              version;
+    private Date version;
 
     //**************************************************
-    
+
     //***************************************************************************************************
 
-    /** 杂项 可以存放商品信息. 
+    /**
+     * 杂项 可以存放商品信息.
+     * 
      * @since 5.3.2.18
-     * */
+     */
     private String misc;
 
     //**********************************************************************************************
@@ -370,7 +372,7 @@ public class OrderLine extends BaseModel{
      *
      * @return the 商品主图
      */
-    @Column(name = "ITEM_PIC",length = 200)
+    @Column(name = "ITEM_PIC",length = 4000)
     public String getItemPic(){
         return itemPic;
     }
@@ -561,24 +563,26 @@ public class OrderLine extends BaseModel{
     public void setRelatedItemId(Long relatedItemId){
         this.relatedItemId = relatedItemId;
     }
-    
+
     /**
      * 获取 杂项信息
+     * 
      * @return String
      * @since 5.3.2.18
      */
-    @Column(name = "MISC",length = 4000,nullable=true,unique=false)
+    @Column(name = "MISC",length = 4000,nullable = true,unique = false)
     public String getMisc(){
         return misc;
     }
 
     /**
      * 设置 杂项信息
+     * 
      * @param String
      * @since 5.3.2.18
      */
     public void setMisc(String misc){
         this.misc = misc;
     }
-    
+
 }
