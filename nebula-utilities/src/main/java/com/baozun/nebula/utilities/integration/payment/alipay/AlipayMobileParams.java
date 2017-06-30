@@ -17,10 +17,12 @@
 package com.baozun.nebula.utilities.integration.payment.alipay;
 
 import java.util.Map;
+import java.util.Properties;
 
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+
+import static com.feilong.core.bean.ConvertUtil.toMap;
 import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
-import static com.feilong.core.util.ResourceBundleUtil.getResourceBundle;
-import static com.feilong.core.util.ResourceBundleUtil.toMap;
 
 /**
  * 封装了 支付宝 mobile 使用的参数值.
@@ -34,8 +36,10 @@ import static com.feilong.core.util.ResourceBundleUtil.toMap;
  */
 public final class AlipayMobileParams{
 
+    private static final Properties ALIPAY_CONFIG_PROPERTIES = ProfileConfigUtil.findCommonPro("config/alipay.properties");
+
     /** <code>{@value}</code> */
-    private static final Map<String, String> ALIPAY_CONFIG_MAP = toMap(getResourceBundle("config/alipay"));
+    private static final Map<String, String> ALIPAY_CONFIG_MAP = toMap(ALIPAY_CONFIG_PROPERTIES);
 
     //---------------------------------------------------------------
 
