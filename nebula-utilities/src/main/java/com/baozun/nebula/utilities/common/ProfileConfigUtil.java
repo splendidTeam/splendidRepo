@@ -130,7 +130,6 @@ public class ProfileConfigUtil{
      */
     @Deprecated
     public static Properties findCommonPro(String source){
-
         String path = source;
 
         Properties pro = proMap.get(path);

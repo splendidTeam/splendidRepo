@@ -55,6 +55,7 @@ import com.baozun.nebula.utilities.integration.payment.exception.PaymentExceptio
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
 import com.baozun.nebula.utilities.io.http.HttpMethodType;
 import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 import com.feilong.tools.slf4j.Slf4jUtil;
 
 public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
@@ -490,9 +491,13 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         String result = HttpClientUtil.getHttpMethodResponseBodyAsStringIgnoreCharSet(paymentRequest.getRequestURL(), HttpMethodType.GET, _INPUT_CHARSET);
         Validate.notBlank(result, "result can't be blank!");
 
+        LOGGER.info("result:{}", result);
+
         try{
             result = java.net.URLDecoder.decode(result, _INPUT_CHARSET);
             String[] params = result.split("&");
+
+            //---------------------------------------------------------------------
 
             Map<String, String> map = new HashMap<>();
             for (String param : params){
@@ -500,6 +505,12 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
                 String val = param.replace(param.split("=")[0].toString() + "=", "");
                 map.put(key, val);
             }
+
+            if (LOGGER.isInfoEnabled()){
+                LOGGER.info("map:{}", JsonUtil.format(map));
+            }
+
+            //---------------------------------------------------------------------
 
             //手机WAP端授权结果
             PaymentResult paymentResult = getPaymentResultForMobileCreateDirect(map);
