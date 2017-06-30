@@ -35,6 +35,8 @@ public abstract class AbstractShoppingcartLineOperateValidator{
     @Autowired
     protected ShoppingCartInventoryValidator shoppingCartInventoryValidator;
 
+    //---------------------------------------------------------------------
+
     /**
      * 如果有配置 {@link #shoppingcartOneLineMaxQuantityValidator},那么使用他;如果没有,那么使用默认的 {@link DefaultShoppingcartOneLineMaxQuantityValidator}.
      *

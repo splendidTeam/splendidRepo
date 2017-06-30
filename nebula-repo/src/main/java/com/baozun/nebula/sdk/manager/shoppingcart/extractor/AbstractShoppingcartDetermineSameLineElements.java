@@ -37,7 +37,7 @@ public abstract class AbstractShoppingcartDetermineSameLineElements implements S
      */
     private List<PackageInfoElement> packageInfoElementList;
 
-    //-------
+    //---------------------------------------------------------------------
 
     /**
      * 获得 skuid.

@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.utils;
 
-import static com.feilong.core.Validator.isNullOrEmpty;
 import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.ZERO;
 
@@ -26,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -42,6 +40,8 @@ import com.feilong.core.lang.ObjectUtil;
 import com.feilong.core.util.AggregateUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPredicateUtil;
+
+import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
  * 购物车工具类.
@@ -66,6 +66,8 @@ public final class ShoppingCartUtil{
         //see 《Effective Java》 2nd
         throw new AssertionError("No " + getClass().getName() + " instances for you!");
     }
+
+    //---------------------------------------------------------------------
 
     /**
      * 计算应付金额.
@@ -127,7 +129,7 @@ public final class ShoppingCartUtil{
     public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         // 主賣品(剔除 促銷行 贈品)
         Predicate<ShoppingCartLineCommand> andPredicate = PredicateUtils.andPredicate(//
-                        BeanPredicateUtil.equalPredicate("captionLine", false), 
+                        BeanPredicateUtil.equalPredicate("captionLine", false),
                         BeanPredicateUtil.equalPredicate("gift", false));
         return CollectionsUtil.select(shoppingCartLineCommandList, andPredicate);
     }
@@ -143,21 +145,19 @@ public final class ShoppingCartUtil{
      */
     public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandListWithCheckStatus(List<ShoppingCartLineCommand> shoppingCartLineCommandList,boolean checkStatus){
         // 主賣品(剔除 促銷行 贈品)
-        Predicate<ShoppingCartLineCommand> allPredicate = PredicateUtils.<ShoppingCartLineCommand> allPredicate(
-                        BeanPredicateUtil.equalPredicate("captionLine", false),
-                        BeanPredicateUtil.equalPredicate("gift", false),
-                        BeanPredicateUtil.equalPredicate("settlementState", checkStatus ? 1 : 0));
+        Predicate<ShoppingCartLineCommand> allPredicate = PredicateUtils
+                        .<ShoppingCartLineCommand> allPredicate(BeanPredicateUtil.equalPredicate("captionLine", false), BeanPredicateUtil.equalPredicate("gift", false), BeanPredicateUtil.equalPredicate("settlementState", checkStatus ? 1 : 0));
         return CollectionsUtil.select(shoppingCartLineCommandList, allPredicate);
     }
 
     /**
-     * 计算整单商品数量.
+     * 统计传入的 <code>shoppingCartLineCommandList</code> ,里面购买的商品数量.
      *
      * @param shoppingCartLineCommandList
      *            the shopping cart lines
-     * @return 如果 <code>shoppingCartLineCommandList</code> 是null或者empty,返回0<br>
-     *         否则累加 每个元素的 quantity属性之和
-     * @see com.feilong.core.util.AggregateUtil#sum(java.util.Collection, String)
+     * @return 如果 <code>shoppingCartLineCommandList</code> 是null或者empty,返回 <b>0</b><br>
+     *         否则累加每个元素的 quantity 属性 之和
+     * @see com.feilong.core.util.AggregateUtil#sum(Iterable, String)
      */
     public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : AggregateUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
