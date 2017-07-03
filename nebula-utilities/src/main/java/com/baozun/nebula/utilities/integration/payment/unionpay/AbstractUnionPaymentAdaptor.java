@@ -167,19 +167,22 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      */
     @Override
     public PaymentResult getPaymentResult(HttpServletRequest request){
-
-        LOGGER.info("FrontRcvResponse前台接收报文返回开始");
-        String encoding = request.getParameter(SDKConstants.param_encoding);
-        LOGGER.info("返回报文中encoding=[" + encoding + "]");
-
         Map<String, String> respParam = getAllRequestParam(request);
         Validate.notEmpty(respParam, "respParam can't be null/empty!");
+
+        //---------------------------------------------------------------------
 
         // 打印请求报文
         LOGGER.info("getAllRequestParam:{}" + JsonUtil.format(respParam));
 
+        //---------------------------------------------------------------------
+
         Map<String, String> valideData = null;
         StringBuffer sb = new StringBuffer();
+
+        LOGGER.debug("FrontRcvResponse前台接收报文返回开始");
+        String encoding = request.getParameter(SDKConstants.param_encoding);
+        LOGGER.info("返回报文中encoding=[" + encoding + "]");
 
         //---------------------------------------------------------------
         PaymentResult paymentResult = new PaymentResult();
@@ -213,15 +216,14 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
             paymentResult.setMessage(valideData.get("respMsg"));
         }else{
             sb.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>成功</td></tr>");
-            LOGGER.info("验证签名结果[成功].");
-            System.out.println(valideData.get("orderId")); // 其他字段也可用类似方式获取
+            LOGGER.info("验证签名结果[成功].[{}]", valideData.get("orderId"));
             paymentResult.setPaymentServiceSatus(PAYMENT_SUCCESS);
             paymentResult.setResponseValue(UNIONSUCCESS);
             paymentResult.setMessage(valideData.get("respMsg"));
         }
 
         //---------------------------------------------------------------
-
+        //TODO
         request.setAttribute("result", sb.toString());
         LOGGER.info("FrontRcvResponse前台接收报文返回结束");
 
@@ -270,29 +272,26 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      */
     @Override
     public PaymentResult getPaymentResultFromNotification(HttpServletRequest request){
-        PaymentResult result = new PaymentResult();
         LOGGER.info("BackRcvResponse接收后台通知开始");
 
         String encoding = request.getParameter(SDKConstants.param_encoding);
         // 获取银联通知服务器发送的后台通知参数
         Map<String, String> reqParam = getAllRequestParam(request);
-
-        LOGGER.info("" + reqParam);
+        Validate.notEmpty(reqParam, "reqParam can't be null/empty!");
 
         Map<String, String> valideData = null;
 
+        PaymentResult result = new PaymentResult();
         try{
-            if (null != reqParam && !reqParam.isEmpty()){
-                Iterator<Entry<String, String>> it = reqParam.entrySet().iterator();
-                valideData = new HashMap<String, String>(reqParam.size());
-                while (it.hasNext()){
-                    Entry<String, String> e = it.next();
-                    String key = e.getKey();
-                    String value = e.getValue();
-                    value = new String(value.getBytes(encoding), encoding);
+            Iterator<Entry<String, String>> it = reqParam.entrySet().iterator();
+            valideData = new HashMap<String, String>(reqParam.size());
+            while (it.hasNext()){
+                Entry<String, String> e = it.next();
+                String key = e.getKey();
+                String value = e.getValue();
+                value = new String(value.getBytes(encoding), encoding);
 
-                    valideData.put(key, value);
-                }
+                valideData.put(key, value);
             }
         }catch (UnsupportedEncodingException e){
             result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
@@ -415,12 +414,14 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
 
     @Override
     public PaymentResult getPaymentResultForMobileAuthAndExecuteSYN(HttpServletRequest request){
-        return null;
+        //since 5.3.2.20
+        return getPaymentResult(request);
     }
 
     @Override
     public PaymentResult getPaymentResultForMobileAuthAndExecuteASY(HttpServletRequest request){
-        return null;
+        //since 5.3.2.20
+        return getPaymentResultFromNotification(request);
     }
 
     /**
@@ -437,6 +438,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
             tree.put(en.getKey(), en.getValue());
         }
         it = tree.entrySet().iterator();
+
         StringBuffer sf = new StringBuffer();
         while (it.hasNext()){
             Entry<String, String> en = it.next();
@@ -456,22 +458,24 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      * @param request
      * @return
      */
-    private static Map<String, String> getAllRequestParam(final HttpServletRequest request){
-        Map<String, String> res = new HashMap<>();
+    private static Map<String, String> getAllRequestParam(HttpServletRequest request){
+        Map<String, String> params = new HashMap<>();
+
         Enumeration<?> temp = request.getParameterNames();
         if (null != temp){
             while (temp.hasMoreElements()){
-                String en = (String) temp.nextElement();
-                String value = request.getParameter(en);
-                res.put(en, value);
+                String key = (String) temp.nextElement();
+                String value = request.getParameter(key);
+                params.put(key, value);
+
                 // 在报文上送时，如果字段的值为空，则不上送<下面的处理为在获取所有参数数据时，判断若值为空，则删除这个字段>
-                LOGGER.debug("支付回调request temp数据，键：{}；值：{}", en, value);
-                if (null == res.get(en) || "".equals(res.get(en))){
-                    res.remove(en);
+                LOGGER.debug("支付回调request temp数据，键：{}；值：{}", key, value);
+                if (null == params.get(key) || "".equals(params.get(key))){
+                    params.remove(key);
                 }
             }
         }
-        return res;
+        return params;
     }
 
     //-------------------------------------------------------------------------------

@@ -257,12 +257,13 @@ public class PayManagerImpl implements PayManager{
         Map<String, Object> paraMap = new HashMap<String, Object>();
         paraMap.put("subOrdinate", subOrdinate);
         paraMap.put("paySuccessStatusStr", 2);//未付款
+
         //查询订单的需要支付的payInfolog
         List<PayInfoLog> payInfoLogList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
 
         if (Validator.isNotNullOrEmpty(payInfoLogList)){
             for (PayInfoLog payInfoLog : payInfoLogList){
-                //				set THIRD_PAY_NO = :thirdPayNo,MODIFY_TIME= :modifyTime,THIRD_PAY_ACCOUNT = :thirdPayAccount,PAY_SUCCESS_STATUS = :paySuccessStatus
+                //	set THIRD_PAY_NO = :thirdPayNo,MODIFY_TIME= :modifyTime,THIRD_PAY_ACCOUNT = :thirdPayAccount,PAY_SUCCESS_STATUS = :paySuccessStatus
                 payInfoLog.setThirdPayAccount(thirdPayAccount);
                 payInfoLog.setThirdPayNo(tradeNo);
                 payInfoLog.setPaySuccessStatus(true);
@@ -282,13 +283,8 @@ public class PayManagerImpl implements PayManager{
                 // 更改订单的财务状态
                 if (salesOrderCommand.getFinancialStatus() != SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT){
 
-                    //此处添加发邮件代码start
-                    /**
-                     * 发邮件
-                     */
+                    //发邮件
                     sdkOrderService.sendEmailOfOrder(salesOrderCommand.getCode(), EmailConstants.PAY_ORDER_SUCCESS);
-
-                    //此处添加发邮件代码end
 
                     sdkOrderService.updateOrderFinancialStatus(salesOrderCommand.getCode(), SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT);
 
