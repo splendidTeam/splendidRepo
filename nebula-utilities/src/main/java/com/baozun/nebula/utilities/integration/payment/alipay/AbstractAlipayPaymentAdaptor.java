@@ -383,7 +383,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             // 如果获得的信息是true，则校验成功；如果获得的信息是其他，则校验失败。
             boolean result = "true".equals(notifyVerifyResult);
 
-            LOGGER.debug("validate notifyId:[{}],result:[{}]", notifyId, result);
+            LOGGER.debug("validate notifyId,result:[{}],[{}]", result, notifyId);
             return result;
         }catch (Exception e){
             LOGGER.error("", e);

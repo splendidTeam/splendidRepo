@@ -219,26 +219,26 @@ public class OrderManagerImpl implements OrderManager{
 
         //---------------------------------------------------------------
         // 订单支付信息
-        LOGGER.debug("begin load order:[{}] pay info~~", code);
+        LOGGER.debug("begin load pay info ,order:[{}]~~", code);
         List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
-        LOGGER.debug("end load order:[{}] pay info~~", code);
+        LOGGER.debug("end load pay info,order:[{}]~~", code);
 
         //---------------------------------------------------------------
         // 订单行信息
-        LOGGER.debug("begin load order:[{}] order lines info~~", code);
+        LOGGER.debug("begin load order lines info,order:[{}]~~", code);
         List<OrderLineCommand> orderLineCommandList = sdkOrderLineDao.findOrderDetailListByOrderIds(toList(salesOrderCommand.getId()));
         for (OrderLineCommand orderLineCommand : orderLineCommandList){
             List<SkuProperty> propList = sdkSkuManager.getSkuPros(orderLineCommand.getSaleProperty());
             orderLineCommand.setSkuPropertys(propList);
         }
 
-        LOGGER.debug("end load order:[{}] order lines info~~", code);
+        LOGGER.debug("end load order lines info,order:[{}]~~", code);
 
         //---------------------------------------------------------------
         // 订单行促销
-        LOGGER.debug("begin load order:[{}] promotion info~~", code);
+        LOGGER.debug("begin load promotion info order:[{}] ~~", code);
         List<OrderPromotionCommand> orderPrm = sdkOrderPromotionDao.findOrderProInfoByOrderId(salesOrderCommand.getId(), 1);
-        LOGGER.debug("end load order:[{}] promotion info~~", code);
+        LOGGER.debug("end load promotion info order:[{}] ~~", code);
         //---------------------------------------------------------------
 
         salesOrderCommand.setPayInfo(payInfos);
