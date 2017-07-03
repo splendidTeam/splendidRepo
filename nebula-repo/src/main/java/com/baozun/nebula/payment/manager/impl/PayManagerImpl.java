@@ -27,7 +27,6 @@ import com.baozun.nebula.constant.EmailConstants;
 import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.dao.payment.PayInfoDao;
 import com.baozun.nebula.dao.payment.PayInfoLogDao;
-import com.baozun.nebula.dao.payment.PayWarnningLogDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderDao;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.event.PayWarnningEvent;
@@ -50,7 +49,6 @@ import com.baozun.nebula.sdk.handler.SalesOrderHandler;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
-import com.baozun.nebula.sdk.manager.SdkPayWarnningLogManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
@@ -72,7 +70,7 @@ import static com.feilong.core.Validator.isNotNullOrEmpty;
 @Service("paymentManager")
 public class PayManagerImpl implements PayManager{
 
-    public static final Logger log = LoggerFactory.getLogger(PayManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PayManagerImpl.class);
 
     @Value("#{meta['page.base']}")
     private String pageUrlBase = "";
@@ -83,6 +81,34 @@ public class PayManagerImpl implements PayManager{
     public static final String MEMEBER_CANCEL = "buy";
 
     public static final String SHOP_CANCEL = "seller";
+
+    public static final String SIGNTYPE = "MD5";
+
+    private static final String SHA_1 = "SHA-1";
+
+    public static final String TRADE_NOT_EXIST = "TRADE_NOT_EXIST";
+
+    public static final String TRADE_STATUS_NOT_AVAILD = "TRADE_STATUS_NOT_AVAILD";
+
+    public static final String TRADE_SUCCESS = "TRADE_SUCCESS";
+
+    public static final String TRADE_REFUSE = "TRADE_REFUSE";//立即支付交易拒绝
+
+    public static final String TRADE_CANCEL = "TRADE_CANCEL";//交易取消
+
+    public static final String TRADE_CLOSED = "TRADE_CLOSED";//交易中途取消
+
+    public static final String DAEMON_CONFIRM_CLOSE = "DAEMON_CONFIRM_CLOSE"; //超时程序因买家不付款关闭交易
+
+    private static final String USERPAYING = "USERPAYING";
+
+    private static final String REVOKED = "REVOKED";
+
+    private static final String SUCCESS = "SUCCESS";
+
+    private static final String ORDERNOTEXIST = "ORDERNOTEXIST";
+
+    //---------------------------------------------------------------------
 
     @Autowired
     private SdkPaymentManager sdkPaymentManager;
@@ -118,69 +144,42 @@ public class PayManagerImpl implements PayManager{
     private SdkOrderDao sdkOrderDao;
 
     @Autowired
-    private PayWarnningLogDao payWarnningLogDao;
-
-    @Autowired
-    private SdkPayWarnningLogManager sdkPayWarnningLogManager;
-
-    @Autowired
     private SdkMataInfoManager sdkMataInfoManager;
 
     @Autowired(required = false)
     private SalesOrderHandler salesOrderHandler;
 
-    public static final String SIGNTYPE = "MD5";
-
-    private static final String SHA_1 = "SHA-1";
-
-    public static final String TRADE_NOT_EXIST = "TRADE_NOT_EXIST";
-
-    public static final String TRADE_STATUS_NOT_AVAILD = "TRADE_STATUS_NOT_AVAILD";
-
-    public static final String TRADE_SUCCESS = "TRADE_SUCCESS";
-
-    public static final String TRADE_REFUSE = "TRADE_REFUSE";//立即支付交易拒绝
-
-    public static final String TRADE_CANCEL = "TRADE_CANCEL";//交易取消
-
-    public static final String TRADE_CLOSED = "TRADE_CLOSED";//交易中途取消
-
-    public static final String DAEMON_CONFIRM_CLOSE = "DAEMON_CONFIRM_CLOSE"; //超时程序因买家不付款关闭交易
-
-    private static final String USERPAYING = "USERPAYING";
-
-    private static final String REVOKED = "REVOKED";
-
-    private static final String SUCCESS = "SUCCESS";
-
-    private static final String ORDERNOTEXIST = "ORDERNOTEXIST";
+    //---------------------------------------------------------------------
 
     @Override
     public void savePayInfos(SalesOrderCommand so,PaymentRequest paymentRequest,String operator){
         savePayLog(new Date(), Constants.PAY_LOG_CALL_AFTER_MESSAGE, operator, MapConvertUtils.transPaymentRequestToString(paymentRequest));
 
+        //---------------------------------------------------------------------
         //更新支付相关
         //更新t_so_payinfo
         String subOrdinate = so.getCode();
-        String paymentPeople = operator;
 
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("subOrdinate", subOrdinate);
         paraMap.put("paySuccessStatusStr", 2);//未付款
+
+        //---------------------------------------------------------------------
 
         //查询订单的需要支付的payInfolog
         List<PayInfoLog> payInfoLogList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
 
         if (isNotNullOrEmpty(payInfoLogList)){
             for (PayInfoLog payInfoLog : payInfoLogList){
-                payInfoLog.setPaymentPeople(paymentPeople);
+                payInfoLog.setPaymentPeople(operator);
                 payInfoLogDao.save(payInfoLog);
             }
         }
 
-        //更新t_so_paycode
-        sdkPaymentManager.updatePayCodeBySubOrdinate(so.getCode(), so.getOnLinePaymentCommand().getPayType());
+        //---------------------------------------------------------------------
 
+        //更新t_so_paycode
+        sdkPaymentManager.updatePayCodeBySubOrdinate(subOrdinate, so.getOnLinePaymentCommand().getPayType());
     }
 
     /**
@@ -252,6 +251,7 @@ public class PayManagerImpl implements PayManager{
         String subOrdinate = paymentStatusInformation.getOrderNo();//支付流水号
         String tradeNo = paymentStatusInformation.getTradeNo();// 支付宝交易号
         String thirdPayAccount = paymentStatusInformation.getBuyer();//买家账号
+
         // 更改支付信息
         //payinfolog
         Map<String, Object> paraMap = new HashMap<String, Object>();
@@ -259,6 +259,7 @@ public class PayManagerImpl implements PayManager{
         paraMap.put("paySuccessStatusStr", 2);//未付款
         //查询订单的需要支付的payInfolog
         List<PayInfoLog> payInfoLogList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
+
         if (Validator.isNotNullOrEmpty(payInfoLogList)){
             for (PayInfoLog payInfoLog : payInfoLogList){
                 //				set THIRD_PAY_NO = :thirdPayNo,MODIFY_TIME= :modifyTime,THIRD_PAY_ACCOUNT = :thirdPayAccount,PAY_SUCCESS_STATUS = :paySuccessStatus
@@ -532,7 +533,7 @@ public class PayManagerImpl implements PayManager{
 
             if (isNeedClosePay){
                 PaymentResult paymentResult = paymentManager.cancelPayment(so);
-                log.info("close payment request return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+                LOGGER.info("close payment request return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 
                 if (payType.equals(ReservedPaymentType.WECHAT) || payType.equals(ReservedPaymentType.UNIONPAY)){
                     if (ORDERNOTEXIST.equals(paymentResult.getMessage())){

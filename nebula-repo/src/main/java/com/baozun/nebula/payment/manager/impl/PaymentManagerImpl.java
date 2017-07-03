@@ -39,10 +39,11 @@ public class PaymentManagerImpl implements PaymentManager{
 
     @Deprecated
     @Override
-    public PaymentRequest createPayment(SalesOrderCommand order){
-        Map<String, Object> additionParams = PropertyUtil.describe(order);
-        additionParams.putAll(PropertyUtil.describe(order.getOnLinePaymentCommand()));
-        PaymentRequest paymentRequest = createPayment(additionParams, order.getOnLinePaymentCommand().getPayType());
+    public PaymentRequest createPayment(SalesOrderCommand salesOrderCommand){
+        Map<String, Object> additionParams = PropertyUtil.describe(salesOrderCommand);
+        additionParams.putAll(PropertyUtil.describe(salesOrderCommand.getOnLinePaymentCommand()));
+
+        PaymentRequest paymentRequest = createPayment(additionParams, salesOrderCommand.getOnLinePaymentCommand().getPayType());
         return paymentRequest;
     }
 
@@ -70,18 +71,22 @@ public class PaymentManagerImpl implements PaymentManager{
         try{
             PaymentFactory paymentFactory = PaymentFactory.getInstance();
             String type = paymentFactory.getPayType(payType);
+
             PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
             payParamCommandAdaptor.setSalesOrderCommand(null);
             payParamCommandAdaptor.setRequestParams(orderParams);
+
             // 获得对应的参数转换器
             PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(type);
             Map<String, String> params = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);
             // 將支付所需的定制参数赋值给addition
             payParamConvertorAdaptor.extendCommandConvertorMap(params, orderParams);
+
             LOGGER.info("RequestParams has : {}", orderParams);
             // 获得支付适配器
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
             paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, params);
+
         }catch (Exception ex){
             LOGGER.error("CreatePayment error: " + ex.toString(), ex);
             return paymentRequest;
