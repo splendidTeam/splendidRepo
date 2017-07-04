@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.baozun.hub.sdk.api.SmsService;
 import com.baozun.hub.sdk.command.invoice2notice.SmsCommand;
 import com.baozun.nebula.command.SMSCommand;
@@ -56,7 +57,7 @@ public class SdkSMSManagerImpl implements SdkSMSManager {
 		//构建hub接口需要的SmsCommand
 		SmsCommand sms=buildSmsCommand(smsCommand);
 		//TODO mobile没有mask
-		LOG.info("[SEND_SMS_BEGIN]  param : {}" ,JsonUtil.format(sms));
+		LOG.debug("[SEND_SMS_BEGIN]  param : {}" ,JsonUtil.format(sms));
 		String result=SmsService.send(sms);
 		LOG.info("[SEND_SMS_END]  result : {}" ,result);
 	         Map<String, Object> map = JsonUtil.toMap(result);

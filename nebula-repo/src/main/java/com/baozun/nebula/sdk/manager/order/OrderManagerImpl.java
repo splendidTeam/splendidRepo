@@ -211,7 +211,7 @@ public class OrderManagerImpl implements OrderManager{
         String code = salesOrderCommand.getCode();
         //---------------------------------------------------------------
         if (Objects.equals(1, type)){//since 5.3.2.18
-            LOGGER.debug("begin decrypt order:[{}] ~~", code);
+            LOGGER.trace("begin decrypt order:[{}] ~~", code);
             //type为1时将查处收货人信息，此时解密
             decryptSalesOrderCommand(salesOrderCommand);
             LOGGER.debug("end decrypt order:[{}]~~", code);
@@ -219,13 +219,13 @@ public class OrderManagerImpl implements OrderManager{
 
         //---------------------------------------------------------------
         // 订单支付信息
-        LOGGER.debug("begin load pay info ,order:[{}]~~", code);
+        LOGGER.trace("begin load pay info ,order:[{}]~~", code);
         List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
         LOGGER.debug("end load pay info,order:[{}]~~", code);
 
         //---------------------------------------------------------------
         // 订单行信息
-        LOGGER.debug("begin load order lines info,order:[{}]~~", code);
+        LOGGER.trace("begin load order lines info,order:[{}]~~", code);
         List<OrderLineCommand> orderLineCommandList = sdkOrderLineDao.findOrderDetailListByOrderIds(toList(salesOrderCommand.getId()));
         for (OrderLineCommand orderLineCommand : orderLineCommandList){
             List<SkuProperty> propList = sdkSkuManager.getSkuPros(orderLineCommand.getSaleProperty());
@@ -236,7 +236,7 @@ public class OrderManagerImpl implements OrderManager{
 
         //---------------------------------------------------------------
         // 订单行促销
-        LOGGER.debug("begin load promotion info order:[{}] ~~", code);
+        LOGGER.trace("begin load promotion info order:[{}] ~~", code);
         List<OrderPromotionCommand> orderPrm = sdkOrderPromotionDao.findOrderProInfoByOrderId(salesOrderCommand.getId(), 1);
         LOGGER.debug("end load promotion info order:[{}] ~~", code);
         //---------------------------------------------------------------
