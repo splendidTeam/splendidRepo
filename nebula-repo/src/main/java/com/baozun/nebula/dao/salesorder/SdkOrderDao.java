@@ -136,9 +136,9 @@ public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
 	Pagination<ReturnOrderCommand> findReturnedOrderList(Page page, @QueryParam("memberId") Long memberId);
 
 	/**
-	 * 如果该订单行没有促销活动但是所在订单有促销活动则返回订单信息和该订单行信息
+	 * 如果该订单行所在订单有促销信息则查询出该订单的具体信息（包括基本信息，促销信息和收货人信息）
 	 * @param orderLineId
-	 * @return
+	 * @return SalesOrderCommand
 	 */
 	@NativeQuery(model = SalesOrderCommand.class)
 	SalesOrderCommand findOrderByLineId(@QueryParam("lineId") Long orderLineId);
