@@ -42,7 +42,12 @@ import com.baozun.nebula.sdk.command.SimpleOrderCommand;
  */
 
 public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
-
+    /**
+     * 根据参数和code查询订单信息,如果参数为1则查询订单的详细信息（包括收货人信息和促销信息,分别对应Consignee表和OrderPromotion表）,否则查询订单概要信息（对应SalesOrder表）
+     * @param code
+     * @param type
+     * @return SalesOrderCommand
+     */
 	@NativeQuery(model = SalesOrderCommand.class)
 	SalesOrderCommand findOrderByCode(@QueryParam("code") String code,@QueryParam("sdkQueryType") Integer type);
 	
@@ -131,7 +136,7 @@ public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
 	Pagination<ReturnOrderCommand> findReturnedOrderList(Page page, @QueryParam("memberId") Long memberId);
 
 	/**
-	 * 根据订单行ID查询订单
+	 * 如果该订单行没有促销活动但是所在订单有促销活动则返回订单信息和该订单行信息
 	 * @param orderLineId
 	 * @return
 	 */
