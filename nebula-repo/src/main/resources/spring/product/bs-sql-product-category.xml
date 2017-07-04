@@ -452,6 +452,7 @@
 						SELECT id
 						FROM t_pd_category
 						WHERE code = '$code'
+						AND lifecycle = 1
 						)
 					AND lifecycle = 1
 				ORDER BY sort_no ASC
