@@ -43,7 +43,7 @@ import com.baozun.nebula.sdk.command.SimpleOrderCommand;
 
 public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
     /**
-     * 根据参数和code查询订单信息,如果参数为1则查询订单的详细信息（包括收货人信息和促销信息,分别对应Consignee表和OrderPromotion表）,否则查询订单概要信息（对应SalesOrder表）
+     * 根据参数和code查询订单信息,如果参数为1则查询订单的详细信息（除了订单概要信息还包括收货人信息和促销信息,分别对应Consignee表和OrderPromotion表）,否则查询订单概要信息（对应SalesOrder表）
      * @param code
      * @param type
      * @return SalesOrderCommand
