@@ -1,7 +1,9 @@
 package com.baozun.nebula.sdk.manager.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -107,30 +109,48 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager{
     }
 
     private Map<String, Map<String, String>> findAllSubDeliveryAreaByParentDeliveryArea(List<DeliveryArea> parentDeliveryArea){
-        Map<String, Map<String, String>> map = null;
-        if (Validator.isNotNullOrEmpty(parentDeliveryArea)){
-            map = new HashMap<String, Map<String, String>>();
-            Map<String, String> countryMap = new HashMap<String, String>();
-            for (DeliveryArea area : parentDeliveryArea){
-                findAllSubDeliveryAreaByParentId(area, map);
-                countryMap.put(area.getCode(), area.getArea());
-            }
-            map.put("0", countryMap);
-        }
-        return map;
+	Map<String, Map<String, String>> map = null;
+	if (Validator.isNotNullOrEmpty(parentDeliveryArea)) {
+	    map = new HashMap<String, Map<String, String>>();
+	    Map<String, String> countryMap = new HashMap<String, String>();
+	    Map<String, List<DeliveryArea>> parentMap = buildParentCodeAndAreaCode(parentDeliveryArea);
+	    for (DeliveryArea area : parentDeliveryArea) {
+		findAllSubDeliveryAreaByParentId(area,parentMap,map);
+		countryMap.put(area.getCode(), area.getArea());
+	    }
+	    map.put("0", countryMap);
+	}
+	return map;
     }
 
-    private void findAllSubDeliveryAreaByParentId(DeliveryArea parentDeliveryArea,Map<String, Map<String, String>> areaMap){
-        List<DeliveryArea> areaList = deliveryAreaDao.findDeliveryAreaByParentId(parentDeliveryArea.getId());
-        if (Validator.isNotNullOrEmpty(areaList)){
-            Map<String, String> map = new HashMap<String, String>();
-            for (DeliveryArea area : areaList){
-                map.put(area.getCode(), area.getArea());
-                findAllSubDeliveryAreaByParentId(area, areaMap);
-            }
-            areaMap.put(parentDeliveryArea.getCode(), map);
-        }
-        return;
+    private Map<String, List<DeliveryArea>> buildParentCodeAndAreaCode(List<DeliveryArea> parentDeliveryArea) {
+	Map<String, List<DeliveryArea>> parentMap = new HashMap<String, List<DeliveryArea>>();
+	List<DeliveryArea> deliveryAreas = new LinkedList<DeliveryArea>();
+	deliveryAreas.addAll(parentDeliveryArea);
+	for (DeliveryArea parentArea : parentDeliveryArea) {
+	    List<DeliveryArea> childs = new ArrayList<DeliveryArea>();
+	    deliveryAreas.remove(parentArea);
+	    for (DeliveryArea childArea : deliveryAreas) {
+		if (parentArea.getId().equals(childArea.getParentId())) {
+		    childs.add(childArea);
+		}
+	    }
+	    parentMap.put(parentArea.getCode(), childs);
+	}
+	return parentMap;
+    }
+
+    private void findAllSubDeliveryAreaByParentId(DeliveryArea parentDeliveryArea,Map<String, List<DeliveryArea>> parentMap,Map<String, Map<String, String>> areaMap) {
+	List<DeliveryArea> areaList = parentMap.get(parentDeliveryArea.getCode());
+	if (Validator.isNotNullOrEmpty(areaList)) {
+	    Map<String, String> map = new HashMap<String, String>();
+	    for (DeliveryArea area : areaList) {
+		map.put(area.getCode(), area.getArea());
+		findAllSubDeliveryAreaByParentId(area,parentMap,areaMap);
+	    }
+	    areaMap.put(parentDeliveryArea.getCode(), map);
+	}
+	return;
     }
 
     @Override
