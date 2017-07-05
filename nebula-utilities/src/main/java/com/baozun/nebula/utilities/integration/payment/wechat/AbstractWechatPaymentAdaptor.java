@@ -38,6 +38,8 @@ import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.PaymentUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
+import static com.feilong.core.util.SortUtil.sortMapByKeyAsc;
+
 public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractWechatPaymentAdaptor.class);
@@ -58,7 +60,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         Validate.notEmpty(responseMap, "responseMap can't be null/empty!");
 
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug(JsonUtil.format(responseMap));
+            LOGGER.debug(JsonUtil.format(sortMapByKeyAsc(responseMap)));
         }
 
         PaymentResult paymentResult = new PaymentResult();
@@ -134,7 +136,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         Validate.notEmpty(parm, "parm can't be null/empty!");
 
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug(JsonUtil.format(parm));
+            LOGGER.debug(JsonUtil.format(sortMapByKeyAsc(parm)));
         }
 
         //---------------------------------------------------------------------
@@ -190,7 +192,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         Validate.notEmpty(addition, "addition can't be null/empty!");
 
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug(JsonUtil.format(addition));
+            LOGGER.debug(JsonUtil.format(sortMapByKeyAsc(addition)));
         }
 
         //---------------------------------------------------------------------
@@ -252,7 +254,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         Validate.notEmpty(addition, "addition can't be null/empty!");
 
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug(JsonUtil.format(addition));
+            LOGGER.debug("addition info:{}", JsonUtil.format(sortMapByKeyAsc(addition)));
         }
 
         //---------------------------------------------------------------------
@@ -263,12 +265,12 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         // 调用微信的统一下单接口
         // @see http://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
         String response = WechatUtil.post(WechatConfig.PAY_UNIFIED_ORDER_URL, xmlInfo);
-        LOGGER.debug("response xml info is [{}]", response);
+        LOGGER.debug("response xml info: [{}]", response);
 
         //---------------------------------------------------------------------
         Map<String, String> responseMap = XMLUtils.parserXml(response);
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("responseMap:[{}]", JsonUtil.format(responseMap));
+            LOGGER.debug("responseMap:[{}]", JsonUtil.format(sortMapByKeyAsc(responseMap)));
         }
 
         Set<String> excludes = new HashSet<String>();

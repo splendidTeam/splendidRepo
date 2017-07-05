@@ -83,7 +83,7 @@ public class DefaultCheckStatusShoppingCartLineListValidator extends AbstractSho
         for (ShoppingCartLineCommand shoppingCartLineCommand : checkedStatusShoppingCartLineCommandList){
             ShoppingcartResult shoppingcartResult = validate(memberDetails, shoppingCartLineCommand, checkedStatusShoppingCartLineCommandList);
             if (ShoppingcartResultUtil.isSuccess(shoppingcartResult)){
-                LOGGER.debug("line [{}] validate success,continue", shoppingCartLineCommand.getId());
+                LOGGER.debug("line [{}],item:[{}] validate success,continue", shoppingCartLineCommand.getId(), shoppingCartLineCommand.getItemId());
                 continue;
             }
             //---------------------------------------------------------------------
