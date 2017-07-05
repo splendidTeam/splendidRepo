@@ -121,6 +121,8 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
             return ITEM_IS_GIFT;
         }
 
+        //---------------⑦ 自定义校验-------------------------------------------------
+
         if (null != shoppingcartLineOperateCustomValidator){
             ShoppingcartResult customShoppingcartResult = shoppingcartLineOperateCustomValidator.validate(sku, itemCommand, count);
             if (ShoppingcartResultUtil.isNotSuccess(customShoppingcartResult)){

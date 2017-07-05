@@ -40,6 +40,7 @@ public interface ShoppingcartLineOperateCommonValidator{
      * <li>itemCommand.getLifecycle() 必须是 {@link com.baozun.nebula.sdk.constants.Constants#ITEM_ADDED_VALID_STATUS ITEM_ADDED_VALID_STATUS}</li>
      * <li>判断 <code>checkActiveBeginTime</code> 激活时间</li>
      * <li>判断商品是非赠品</li>
+     * <li>自定义校验 (since 5.3.2.20)</li>
      * </ol>
      * </blockquote>
      *
