@@ -27,8 +27,9 @@ import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvert
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
-import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 @Service("PaymentManager")
 public class PaymentManagerImpl implements PaymentManager{
@@ -241,7 +242,8 @@ public class PaymentManagerImpl implements PaymentManager{
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(paymentFactory.getPayType(Integer.valueOf(paymentType)));
             Map<String, String> addition = new HashMap<String, String>();
             getUnifiedOrderParaMap(wechatPayParamCommand, addition);
-            paymentResult = paymentAdaptor.unifiedOrder(addition);
+            return paymentAdaptor.unifiedOrder(addition);
+
         }catch (PaymentParamErrorException e){
             LOGGER.error("unifiedOrder error: " + e.toString());
             paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
@@ -260,60 +262,60 @@ public class PaymentManagerImpl implements PaymentManager{
         addition.put("nonce_str", WechatUtil.generateRandomString());
         addition.put("notify_url", WechatConfig.JS_API_PAYMENT_CALLBACK_URL);
 
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getDevice_info())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getDevice_info())){
             addition.put("device_info", wechatPayParamCommand.getDevice_info());
         }
 
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getBody())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getBody())){
             addition.put("body", wechatPayParamCommand.getBody());
         }else{
             throw new PaymentParamErrorException("unifiedOrder parameter error: body can't be null/empty!");
         }
 
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getDetail())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getDetail())){
             addition.put("detail", wechatPayParamCommand.getDetail());
         }
 
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getOut_trade_no())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getOut_trade_no())){
             addition.put("out_trade_no", wechatPayParamCommand.getOut_trade_no());
         }else{
             throw new PaymentParamErrorException("unifiedOrder parameter error: out_trade_no can't be null/empty!");
         }
 
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getFee_type())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getFee_type())){
             addition.put("fee_type", wechatPayParamCommand.getFee_type());
         }
 
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getAttach())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getAttach())){
             addition.put("attach", wechatPayParamCommand.getAttach());
         }
 
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getTotal_fee())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getTotal_fee())){
             addition.put("total_fee", wechatPayParamCommand.getTotal_fee().toString());
         }else{
             throw new PaymentParamErrorException("unifiedOrder parameter error: total_fee can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getSpbill_create_ip())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getSpbill_create_ip())){
             addition.put("spbill_create_ip", wechatPayParamCommand.getSpbill_create_ip());
         }else{
             throw new PaymentParamErrorException("unifiedOrder parameter error: spbill_create_ip can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getTime_start())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getTime_start())){
             addition.put("time_start", wechatPayParamCommand.getTime_start());
         }
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getTime_expire())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getTime_expire())){
             addition.put("time_expire", wechatPayParamCommand.getTime_expire());
         }
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getTrade_type())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getTrade_type())){
             addition.put("trade_type", wechatPayParamCommand.getTrade_type());
         }else{
             throw new PaymentParamErrorException("unifiedOrder parameter error: trade_type can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getGoods_tag())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getGoods_tag())){
             addition.put("goods_tag", wechatPayParamCommand.getGoods_tag());
         }
 
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getProduct_id())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getProduct_id())){
             addition.put("product_id", wechatPayParamCommand.getProduct_id());
         }else{
             if (wechatPayParamCommand.getTrade_type().equals(WechatResponseKeyConstants.TRADE_TYPE_NATIVE)){
@@ -321,7 +323,7 @@ public class PaymentManagerImpl implements PaymentManager{
             }
         }
 
-        if (Validator.isNotNullOrEmpty(wechatPayParamCommand.getOpenid())){
+        if (isNotNullOrEmpty(wechatPayParamCommand.getOpenid())){
             addition.put("openid", wechatPayParamCommand.getOpenid());
         }else{
             if (wechatPayParamCommand.getTrade_type().equals(WechatResponseKeyConstants.TRADE_TYPE_JSAPI)){

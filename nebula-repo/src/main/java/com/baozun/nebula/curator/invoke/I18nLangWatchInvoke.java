@@ -85,8 +85,8 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
         // 顺序 ,一般先有父 再有 子
         Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
         for (String language : languageList){
-            if (LOGGER.isInfoEnabled()){
-                LOGGER.info("begin load language:[{}] address", language);
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("begin load language:[{}] address", language);
             }
 
             Date beginDate = new Date();

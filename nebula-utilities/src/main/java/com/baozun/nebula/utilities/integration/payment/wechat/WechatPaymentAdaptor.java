@@ -15,11 +15,6 @@
  */
 package com.baozun.nebula.utilities.integration.payment.wechat;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class WechatPaymentAdaptor extends AbstractWechatPaymentAdaptor {
-
-	private static final Logger	log	= LoggerFactory.getLogger(WechatPaymentAdaptor.class);
+public class WechatPaymentAdaptor extends AbstractWechatPaymentAdaptor{
 
 }
