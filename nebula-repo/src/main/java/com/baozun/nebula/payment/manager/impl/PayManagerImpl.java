@@ -167,7 +167,7 @@ public class PayManagerImpl implements PayManager{
         //---------------------------------------------------------------------
 
         //查询订单的需要支付的payInfolog
-        List<PayInfoLog> payInfoLogList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
+        List<PayInfoLog> payInfoLogList = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
 
         if (isNotNullOrEmpty(payInfoLogList)){
             for (PayInfoLog payInfoLog : payInfoLogList){
@@ -259,7 +259,7 @@ public class PayManagerImpl implements PayManager{
         paraMap.put("paySuccessStatusStr", 2);//未付款
 
         //查询订单的需要支付的payInfolog
-        List<PayInfoLog> payInfoLogList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
+        List<PayInfoLog> payInfoLogList = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
 
         if (Validator.isNotNullOrEmpty(payInfoLogList)){
             for (PayInfoLog payInfoLog : payInfoLogList){

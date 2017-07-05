@@ -31,7 +31,7 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.common.Validator;
+import com.feilong.core.Validator;
 
 /**
  * 
@@ -42,28 +42,29 @@ import com.baozun.nebula.utilities.common.Validator;
 @Service("sdkPaymentManager")
 public class SdkPaymentManagerImpl implements SdkPaymentManager{
 
-    public static final Logger      log                  = LoggerFactory.getLogger(SdkPaymentManagerImpl.class);
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SdkPaymentManagerImpl.class);
 
     @Autowired
-    private PaymentLogDao           paymentLogDao;
+    private PaymentLogDao paymentLogDao;
 
     @Autowired
-    private PayInfoDao              payInfoDao;
+    private PayInfoDao payInfoDao;
 
     private OrderCodeCreatorManager creator;
 
     @Autowired
-    private PayCodeDao              payCodeDao;
+    private PayCodeDao payCodeDao;
 
     @Autowired
-    private PayInfoLogDao           payInfoLogDao;
+    private PayInfoLogDao payInfoLogDao;
 
     /** The sdk pay code manager. */
     @Autowired
-    private SdkPayCodeManager       sdkPayCodeManager;
+    private SdkPayCodeManager sdkPayCodeManager;
 
     @Value("#{meta['orderCodeCreator']}")
-    private String                  orderCodeCreatorPath = "com.baozun.nebula.api.salesorder.DefaultOrderCodeCreatorManager";
+    private String orderCodeCreatorPath = "com.baozun.nebula.api.salesorder.DefaultOrderCodeCreatorManager";
 
     public SdkPaymentManagerImpl(){
         creator = this.getOrderCodeCreator();
@@ -79,8 +80,8 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
         Map<String, Object> paraMap = new HashMap<String, Object>();
         paraMap.put("orderId", orderId);
         paraMap.put("paySuccessStatusStr", 2);
-        List<PayInfoLog> payInfoList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
-        if (payInfoList != null&&payInfoList.size()!=0){
+        List<PayInfoLog> payInfoList = findPayInfoLogListByQueryMap(paraMap);
+        if (payInfoList != null && payInfoList.size() != 0){
             //根据createTime 降序排列 取第一个
             PayInfoLog payInfoLog = payInfoList.get(0);
             payInfoLog.setCallCloseStatus(true);
@@ -93,7 +94,7 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
     public String savePayCodeInfo(List<SalesOrderCommand> sos){
         String subOrdinate = creator.createOrderSerialNO();
         if (StringUtils.isBlank(subOrdinate)){
-            log.info("generate orderCode failure");
+            LOGGER.info("generate orderCode failure");
             throw new BusinessException(ErrorCodes.SYSTEM_ERROR);
         }
 
@@ -154,7 +155,7 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
             Class<OrderCodeCreatorManager> cls = (Class<OrderCodeCreatorManager>) Class.forName(className);
             creator = cls.newInstance();
         }catch (Exception e){
-            log.error("getDefined Creator error" + e.getMessage());
+            LOGGER.error("getDefined Creator error" + e.getMessage());
             e.printStackTrace();
         }
         return creator;
