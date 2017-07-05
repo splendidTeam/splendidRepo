@@ -20,6 +20,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import loxia.dao.Pagination;
 import loxia.utils.PropListCopyable;
 import loxia.utils.PropertyUtil;
@@ -37,6 +40,8 @@ import loxia.utils.PropertyUtil;
  */
 public abstract class BaseConverter<T extends BaseViewCommand> implements Serializable{
 
+/** The Constant log. */
+private static final Logger LOGGER = LoggerFactory.getLogger(BaseConverter.class);
 	/**
 	 * 
 	 */

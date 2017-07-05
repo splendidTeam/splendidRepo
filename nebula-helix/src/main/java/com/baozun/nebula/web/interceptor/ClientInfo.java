@@ -18,6 +18,9 @@ package com.baozun.nebula.web.interceptor;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 /**
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
@@ -87,6 +90,16 @@ public class ClientInfo implements Serializable{
      */
     public void setFingerPrint(String fingerPrint){
         this.fingerPrint = fingerPrint;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString(){
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
 
 }

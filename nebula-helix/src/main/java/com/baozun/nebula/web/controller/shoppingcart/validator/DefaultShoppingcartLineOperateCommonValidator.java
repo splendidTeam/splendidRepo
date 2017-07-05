@@ -36,6 +36,7 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.feilong.core.date.DateUtil;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
@@ -59,6 +60,12 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
     /** The sdk item manager. */
     @Autowired
     private SdkItemManager sdkItemManager;
+
+    /**
+     * @since 5.3.2.20
+     */
+    @Autowired(required = false)
+    private ShoppingcartLineOperateCustomValidator shoppingcartLineOperateCustomValidator;
 
     /*
      * (non-Javadoc)
@@ -113,6 +120,15 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
             LOGGER.warn("item:[{}] is gift don't need operate,return [ITEM_IS_GIFT]", itemCode);
             return ITEM_IS_GIFT;
         }
+
+        if (null != shoppingcartLineOperateCustomValidator){
+            ShoppingcartResult customShoppingcartResult = shoppingcartLineOperateCustomValidator.validate(sku, itemCommand, count);
+            if (ShoppingcartResultUtil.isNotSuccess(customShoppingcartResult)){
+                return customShoppingcartResult;
+            }
+        }
+
         return null;
     }
+
 }
