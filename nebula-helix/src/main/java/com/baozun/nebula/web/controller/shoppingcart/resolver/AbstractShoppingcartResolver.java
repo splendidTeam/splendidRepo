@@ -152,7 +152,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         //---------------------------------------------------------------------
         //批量添加的时候,如果某条失败了,是否继续.
-        boolean isSkuAddFailContinue = useShoppingcartBatchAddOptions.getIsSkuAddFailContinue();
+        boolean isSkuAddFailContinue = useShoppingcartBatchAddOptions.isFailContinue();
 
         //TODO 待重构
 

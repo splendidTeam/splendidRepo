@@ -37,6 +37,10 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartCommandCheckedBuilderHandler;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartBatchOptions;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartBatchResult;
+import com.baozun.nebula.web.controller.shoppingcart.validator.CheckStatusShoppingCartLineListValidator;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toList;
@@ -59,6 +63,12 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
 
     @Autowired
     private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
+
+    /**
+     * @since 5.3.2.20
+     */
+    @Autowired
+    private CheckStatusShoppingCartLineListValidator checkStatusShoppingCartLineListValidator;
 
     @Autowired(required = false)
     private ShoppingCartCommandCheckedBuilderHandler shoppingCartCommandCheckedBuilderHandler;
@@ -96,6 +106,15 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
         //---------------------------------------------------------------
         List<ShoppingCartLineCommand> shoppingCartLineCommandListWithCheckStatus = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
         Validate.notEmpty(shoppingCartLineCommandListWithCheckStatus, "shoppingCartLineCommandList [is not] null/empty,but checkStatus shoppingCartLineCommandList is null/empty");
+
+        //--------------------------------since 5.3.2.20-------------------------------------
+        ShoppingcartBatchResult shoppingcartBatchResult = checkStatusShoppingCartLineListValidator.validate(memberDetails, shoppingCartLineCommandListWithCheckStatus, ShoppingcartBatchOptions.DEFAULT);
+        Validate.notNull(shoppingcartBatchResult, "shoppingcartBatchResult can't be null!");
+
+        //FIXME 抽取
+        if (!shoppingcartBatchResult.getIsSuccess()){
+            throw new RuntimeException("validate shoppingCartLineCommandListWithCheckStatus error," + JsonUtil.format(shoppingcartBatchResult));
+        }
 
         //---------------------------------------------------------------
         if (null != shoppingCartCommandCheckedBuilderHandler){

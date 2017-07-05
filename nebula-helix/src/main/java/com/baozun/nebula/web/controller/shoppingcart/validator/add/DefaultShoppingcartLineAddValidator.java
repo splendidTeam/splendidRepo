@@ -114,17 +114,19 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
         }
 
         //---------------------------------------------------------------------
-
         return validatorAdd(memberDetails, shoppingCartLineCommandList, shoppingCartLineAddForm, sku);
     }
 
     /**
-     * 
+     * add 校验.
      *
      * @param memberDetails
      * @param shoppingCartLineCommandList
+     *            用户对应的购物车行
      * @param shoppingCartLineAddForm
+     *            购物车添加的 form
      * @param sku
+     *            对应的sku
      * @return
      * @since 5.3.2.18
      */
@@ -223,7 +225,7 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     }
 
     /**
-     * 构造指定skuid 总购买量
+     * 构造指定skuid 总购买量.
      *
      * @param shoppingCartLineCommandList
      *            原来的购物车

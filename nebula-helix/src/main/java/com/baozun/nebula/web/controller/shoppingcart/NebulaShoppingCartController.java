@@ -253,7 +253,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      *            the model
      * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
      * 
-     * @see <a href="http://jira.baozun.cn/browse/NB-367">NB-367</a>
+     * @see <a href="http://jira.baozun.cn/browse/NB-367">购物车添加修改商品尺码的功能</a>
      * @since 5.3.2.3
      * @RequestMapping(value = "/shoppingcart/updateline", method = RequestMethod.POST)
      */
