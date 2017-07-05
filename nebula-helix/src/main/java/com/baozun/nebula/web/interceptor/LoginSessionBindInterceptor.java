@@ -147,7 +147,7 @@ public class LoginSessionBindInterceptor extends HandlerInterceptorAdapter{
             return goToError(request, response);
         }
 
-        LOGGER.debug("sessionBindValue :[{}],equals cookieBindValue,return true", sessionBindValue);
+        LOGGER.debug("sessionBindValue :[{}],equals cookieBindValue,return [true]", sessionBindValue);
         return true;
     }
 
