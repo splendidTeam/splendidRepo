@@ -202,7 +202,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
     }
 
     /**
-     * 设置收获信息.
+     * 设置收货信息.
      *
      * @param salesOrderCommand
      *            the sales order command

@@ -44,6 +44,7 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResolver;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderReturnObject;
+import com.baozun.nebula.web.controller.order.resolver.SalesOrderTypeResolver;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
 import com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidator;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
@@ -155,6 +156,12 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
 
     @Autowired
     private SalesOrderCreateValidator salesOrderCreateValidator;
+    /**
+     * 订单类型处理器
+     * @since 5.3.2.20
+     */
+    @Autowired(required = false)
+    private SalesOrderTypeResolver salesOrderTypeResolver;
 
     /**
      * @Description 创建订单.
@@ -224,6 +231,10 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
         //----------------------新建订单-----------------------------------------------------
         // 封装订单信息
         SalesOrderCommand salesOrderCommand = salesOrderResolver.toSalesOrderCommand(memberDetails, orderForm, request);
+        //是否需要判断订单类型  @since 5.3.2.20
+        if(null != salesOrderTypeResolver){
+            salesOrderCommand.setOrderType(salesOrderTypeResolver.resolverOrderType(salesOrderCommand,shoppingCartCommand));
+        }
         String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memCombos, salesOrderCreateOptions);
 
         //---------------------------------------------------------------------------------

@@ -90,7 +90,8 @@ public class OrderSaveManagerImpl implements OrderSaveManager{
         salesOrder.setDiscount(shopCartCommandByShop.getOffersTotal());//设置 整单折扣 整单折扣-sum（行折扣）= 由于整单促销/商城积分形成的未分摊到行上的折扣总额.
         salesOrder.setPayableFreight(originShoppingFee);
         salesOrder.setActualFreight(actualFreight);
-
+        // @since5.3.2.20  设置订单类型（OrderType）
+        salesOrder.setOrderType(salesOrderCommand.getOrderType());
         //*******************************************************************************
 
         salesOrder.setQuantity(shopCartCommandByShop.getQty());
