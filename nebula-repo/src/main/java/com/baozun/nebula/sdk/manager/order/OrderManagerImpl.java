@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,6 +76,7 @@ import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.feilong.core.Validator;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toList;
 
 import loxia.dao.Page;
@@ -519,45 +522,77 @@ public class OrderManagerImpl implements OrderManager{
     /**
      * Send email.
      *
-     * @param code
+     * @param soCode
      *            the code
      * @param emailTemplete
      *            the email templete
      */
-    private void sendEmail(String code,String emailTemplete){
-
-        SalesOrderCommand salesOrderCommand = findOrderByCode(code, 1);
+    private void sendEmail(String soCode,String emailTemplete){
+        SalesOrderCommand salesOrderCommand = findOrderByCode(soCode, 1);
 
         MemberPersonalData memberPersonalData = null;
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getMemberId())){
-            memberPersonalData = sdkMemberManager.findMemberPersonData(salesOrderCommand.getMemberId());
+        Long memberId = salesOrderCommand.getMemberId();
+        if (isNotNullOrEmpty(memberId)){
+            LOGGER.debug("salesOrderCommand 's memberid is not null or empty,will load memberPersonalData by memberid:[{}]", memberId);
+            memberPersonalData = sdkMemberManager.findMemberPersonData(memberId);
         }
 
-        String nickName = "";
-
-        String email = salesOrderCommand.getEmail();
-
-        if (null != memberPersonalData){
-            nickName = memberPersonalData.getNickname();
-            if (Validator.isNullOrEmpty(email)){
-                email = memberPersonalData.getEmail();
-            }
-        }
-
-        if (Validator.isNullOrEmpty(email)){
+        //---------------------------------------------------------------------
+        String email = buildEmail(salesOrderCommand, memberPersonalData);
+        if (isNullOrEmpty(email)){
+            LOGGER.debug("email is null or empty,don't need send email");
             return;
         }
 
-        if (Validator.isNullOrEmpty(nickName))
-            nickName = salesOrderCommand.getMemberName();
-
-        // 游客用收货人
-        if (Validator.isNullOrEmpty(nickName)){
-            nickName = salesOrderCommand.getName();
-        }
+        String nickName = buildNickName(salesOrderCommand, memberPersonalData);
 
         Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMap(emailTemplete, salesOrderCommand, nickName);
         sdkOrderEmailManager.sendEmail(emailTemplete, email, dataMap);
+    }
+
+    /**
+     * @param salesOrderCommand
+     * @param memberPersonalData
+     * @return
+     * @since 5.3.2.20
+     */
+    private String buildNickName(SalesOrderCommand salesOrderCommand,MemberPersonalData memberPersonalData){
+        String nickName = "";
+        if (null != memberPersonalData){
+            nickName = memberPersonalData.getNickname();
+        }
+        //---------------------------------------------------------------------
+        if (isNullOrEmpty(nickName)){
+            nickName = salesOrderCommand.getMemberName();
+        }
+
+        // 游客用收货人
+        if (isNullOrEmpty(nickName)){
+            nickName = salesOrderCommand.getName();
+        }
+        return nickName;
+    }
+
+    /**
+     * @param salesOrderCommand
+     * @param memberPersonalData
+     * @return
+     * @since 5.3.2.20
+     */
+    private String buildEmail(SalesOrderCommand salesOrderCommand,MemberPersonalData memberPersonalData){
+        String email = salesOrderCommand.getEmail();//t_so_consignee email
+        if (null != memberPersonalData){
+            if (isNullOrEmpty(email)){
+                LOGGER.debug("salesOrderCommand's email is null or empty");
+                email = memberPersonalData.getEmail();//T_MEM_PERSONAL_DATA email
+            }
+        }
+
+        //---------------------------------------------------------------------
+        if (isNullOrEmpty(email)){
+            return EMPTY;
+        }
+        return email;
     }
 
     /*

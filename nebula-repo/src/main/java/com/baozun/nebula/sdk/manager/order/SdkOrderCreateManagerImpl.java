@@ -19,6 +19,7 @@ package com.baozun.nebula.sdk.manager.order;
 import static org.apache.commons.collections4.CollectionUtils.addIgnoreNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,9 +55,10 @@ import com.baozun.nebula.sdk.manager.payment.PayMoneyBuilder;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponCodeManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
-import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.MapUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 /**
  * 提取出来,专注于创建订单.
@@ -264,12 +266,13 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
         //*************************************************************************************
         // 保存支付流水
-        sdkPayCodeManager.savaPayCode(subOrdinate, payMoneyBuilder.build(salesOrderCommand, shoppingCartCommand));
+        BigDecimal payMoney = payMoneyBuilder.build(salesOrderCommand, shoppingCartCommand);
+        sdkPayCodeManager.savaPayCode(subOrdinate, payMoney);
 
         //*************************************************************************************
         // 优惠券状体置为已使用 isUsed = 1
         List<CouponCodeCommand> couponCodes = salesOrderCommand.getCouponCodes();
-        if (Validator.isNotNullOrEmpty(couponCodes)){
+        if (isNotNullOrEmpty(couponCodes)){
             sdkPromotionCouponCodeManager.batchUseCouponCode(couponCodes);
         }
 

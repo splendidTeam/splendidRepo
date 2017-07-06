@@ -51,11 +51,12 @@ public class SdkPayCodeManagerImpl implements SdkPayCodeManager{
     public void savaPayCode(String subOrdinate,BigDecimal payMoney){
         PayCode payCode = new PayCode();
 
+        payCode.setSubOrdinate(subOrdinate);
+
         payCode.setPayMoney(payMoney);
         payCode.setPayNumerical(payMoney);
 
         payCode.setPaySuccessStatus(false);
-        payCode.setSubOrdinate(subOrdinate);
 
         payCode.setCreateTime(new Date());
 

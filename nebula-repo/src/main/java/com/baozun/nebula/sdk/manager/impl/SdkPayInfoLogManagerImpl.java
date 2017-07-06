@@ -17,8 +17,6 @@
 package com.baozun.nebula.sdk.manager.impl;
 
 import java.util.Date;
-import java.util.Properties;
-import java.util.ResourceBundle;
 
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +29,10 @@ import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPayInfoLogManager;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;
-import com.feilong.core.util.ResourceBundleUtil;
+
+import static com.feilong.core.util.ResourceBundleUtil.getResourceBundle;
+import static com.feilong.core.util.ResourceBundleUtil.getValue;
 
 /**
  * The Class SdkPayInfoLogManagerImpl.
@@ -60,7 +58,9 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
      */
     @Override
     public void savePayInfoLogOfPayMain(String subOrdinate,SalesOrderCommand salesOrderCommand,PayInfo payInfo){
-        boolean paySuccessStatus = salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD);
+        Integer payment = salesOrderCommand.getPayment();
+
+        boolean paySuccessStatus = payment.toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD);
         String payInfoStr = salesOrderCommand.getPaymentStr();
 
         Validate.notBlank(payInfoStr, "payInfoStr can't be blank!");
@@ -71,7 +71,7 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
         payInfoLog.setPaySuccessStatus(paySuccessStatus);
         payInfoLog.setCallCloseStatus(false);
 
-        payInfoLog.setPayType(salesOrderCommand.getPayment());
+        payInfoLog.setPayType(payment);
         payInfoLog.setPayMoney(payInfo.getPayMoney());
         payInfoLog.setPayNumerical(payInfo.getPayNumerical());
         // 用于保存银行
@@ -93,6 +93,6 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
      * @return the pay type
      */
     private Integer getThirdPayType(String payInfoStr){
-        return ConvertUtil.toInteger(ResourceBundleUtil.getValue(ResourceBundleUtil.getResourceBundle("config.payMentInfo"), payInfoStr + ".payType"));
+        return ConvertUtil.toInteger(getValue(getResourceBundle("config.payMentInfo"), payInfoStr + ".payType"));
     }
 }

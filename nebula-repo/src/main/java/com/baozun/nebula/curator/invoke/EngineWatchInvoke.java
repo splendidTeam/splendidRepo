@@ -11,6 +11,7 @@ import com.baozun.nebula.curator.watcher.IWatcherInvoke;
 import com.baozun.nebula.sdk.manager.SdkLimitManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
 
+import static com.feilong.core.date.DateExtensionUtil.formatDuration;
 
 /**
  * 引擎相关的Watch,在invoke方法中用于调用引擎初始化方法
@@ -20,28 +21,48 @@ import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
  * @author chengchao
  *
  */
-public class EngineWatchInvoke implements IWatcherInvoke {
-	
-	private Logger LOG = LoggerFactory.getLogger(EngineWatchInvoke.class);
-	
-	@Autowired
-	private SdkPromotionManager sdkPromotionManager;
-	
-	@Autowired
-	private SdkLimitManager sdkLimitManager;
-	
-	@Override
-	public void invoke(String path, byte[] data) {
-		LOG.info(path+":invoke");
-		try {
-			TimeUnit.SECONDS.sleep(3);
-		} catch (InterruptedException e) {
-			LOG.error(e.getMessage());
-		}
-		//促销规则
-		sdkPromotionManager.publishPromotion(new Date());
-		//限购规则
-		sdkLimitManager.publishLimit(new Date());
-	}
+public class EngineWatchInvoke implements IWatcherInvoke{
+
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(EngineWatchInvoke.class);
+
+    @Autowired
+    private SdkPromotionManager sdkPromotionManager;
+
+    @Autowired
+    private SdkLimitManager sdkLimitManager;
+
+    //---------------------------------------------------------------------
+
+    @Override
+    public void invoke(String path,byte[] data){
+        LOGGER.info(path + ":invoke");
+        try{
+            TimeUnit.SECONDS.sleep(3);
+        }catch (InterruptedException e){
+            LOGGER.error(e.getMessage());
+        }
+
+        Date beginDate = new Date();
+
+        //促销规则
+        sdkPromotionManager.publishPromotion(beginDate);
+
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info("sdkPromotionManager publishPromotion use time: [{}]", formatDuration(beginDate));
+        }
+
+        //---------------------------------------------------------------------
+
+        beginDate = new Date();
+
+        //限购规则
+        sdkLimitManager.publishLimit(beginDate);
+
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info("sdkLimitManager publishLimit use time: [{}]", formatDuration(beginDate));
+        }
+
+    }
 
 }

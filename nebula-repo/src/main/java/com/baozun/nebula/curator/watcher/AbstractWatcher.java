@@ -52,193 +52,191 @@ import com.baozun.nebula.curator.ZkOperator;
  * @author yue.ch
  * @time 2016年5月21日 下午12:49:45
  */
-public abstract class AbstractWatcher implements IWatcher {
+public abstract class AbstractWatcher implements IWatcher{
 
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractWatcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractWatcher.class);
 
-	protected AtomicBoolean isWatched = new AtomicBoolean(false);
+    protected AtomicBoolean isWatched = new AtomicBoolean(false);
 
-	private String listenerPath;
+    private String listenerPath;
 
-	private IWatcherInvoke watcherInvoke;
+    private IWatcherInvoke watcherInvoke;
 
-	@Autowired
-	protected ZkOperator zkOperator;
+    @Autowired
+    protected ZkOperator zkOperator;
 
-	/**
-	 * 默认的Watcher初使化注册方法
-	 * 
-	 * <p>
-	 * 如果注册Watcher的节点当前不存在，则默认按指定的CreateMode、ACL创建一个空节点；
-	 * </p>
-	 */
-	public void initListen() throws Exception {
-		Assert.notNull(getListenerPath(), "listenerPath can not be null!");
-		Assert.notNull("watcherInvoke", "watcherInvoke can not be null!");
+    //---------------------------------------------------------------------
 
-		String path = getListenerPath();
+    /**
+     * 默认的Watcher初使化注册方法
+     * 
+     * <p>
+     * 如果注册Watcher的节点当前不存在，则默认按指定的CreateMode、ACL创建一个空节点；
+     * </p>
+     */
+    @Override
+    public void initListen() throws Exception{
+        String path = getListenerPath();
 
-		// 如果当前节点不存在，创建之
-		Stat stat = getZkOperator().checkExists(path);
-		if (stat == null) {
-			getZkOperator().create(path, getCreateMode(), getAcl());
-		}
+        Assert.notNull(path, "listenerPath can not be null!");
+        Assert.notNull(watcherInvoke, "watcherInvoke can not be null!");
 
-		// 注册watcher
-		usingWatcher(path);
+        // 如果当前节点不存在，创建之
+        ZkOperator zkOperator2 = getZkOperator();
 
-		// 注册session失效的监听器，以便session重置后重新注册watcher
-		registerWatcherAfterReconnected();
-		
-		// 初使化后无条件触发watcher invoke
-		watcherInvoke.invoke(getListenerPath(), getZkOperator().getData(getListenerPath()));
-	}
+        Stat stat = zkOperator2.checkExists(path);
+        if (stat == null){
+            zkOperator2.create(path, getCreateMode(), getAcl());
+        }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.curator.framework.api.CuratorWatcher#process(org.apache.
-	 * zookeeper.WatchedEvent)
-	 */
-	@Override
-	public boolean isMatch(EventType type) {
-		return getEventType().equals(type);
-	}
+        // 注册watcher
+        usingWatcher(path);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.curator.framework.api.CuratorWatcher#process(org.apache.
-	 * zookeeper.WatchedEvent)
-	 */
-	@Override
-	public void watchAgain() throws Exception {
-		if (needContinueWatch()) {
-			usingWatcher(getListenerPath());
-		}
-	}
+        // 注册session失效的监听器，以便session重置后重新注册watcher
+        registerWatcherAfterReconnected();
 
-	/**
-	 * 默认的Watcher回调方法
-	 * 
-	 * <p>
-	 * 这里有一点需要注意，由于回调是异步执行的，所以会存在节点数据的瞬时状态问题。
-	 * 即从服务端节点发生了相关的事件到通知客户端触发Watcher回调执行这期间，服务端节点的数据可能会被更改，
-	 * 这个时候回调方法中获取的数据可能已经不是触发本次回调事件瞬间的真实节点数据了。
-	 * </p>
-	 */
-	@Override
-	public void process(WatchedEvent event) throws Exception {
-		if (isMatch(event.getType())) {
-			watcherInvoke.invoke(getListenerPath(), getZkOperator().getData(getListenerPath()));
-			isWatched.set(true);
-		}
+        // 初使化后无条件触发watcher invoke
+        watcherInvoke.invoke(path, zkOperator2.getData(path));
+    }
 
-		if (event.getState() == KeeperState.SyncConnected) {
-			watchAgain();
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.curator.framework.api.CuratorWatcher#process(org.apache.
+     * zookeeper.WatchedEvent)
+     */
+    @Override
+    public boolean isMatch(EventType type){
+        return getEventType().equals(type);
+    }
 
-	@SuppressWarnings("static-access")
-	private void usingWatcher(String path) throws Exception {
-		CuratorFrameworkState currentState = getZkOperator().getZkClient().getState();
-		while (!CuratorFrameworkState.STARTED.equals(currentState)) {
-			Thread.currentThread().sleep(1000);
-		}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.curator.framework.api.CuratorWatcher#process(org.apache.
+     * zookeeper.WatchedEvent)
+     */
+    @Override
+    public void watchAgain() throws Exception{
+        if (needContinueWatch()){
+            usingWatcher(getListenerPath());
+        }
+    }
 
-		LOG.info("[zookeeper] Using watcher: path = '{}', eventType = {}, class = {}", path, getEventType(),
-				this.getClass().getName());
+    /**
+     * 默认的Watcher回调方法
+     * 
+     * <p>
+     * 这里有一点需要注意，由于回调是异步执行的，所以会存在节点数据的瞬时状态问题。
+     * 即从服务端节点发生了相关的事件到通知客户端触发Watcher回调执行这期间，服务端节点的数据可能会被更改，
+     * 这个时候回调方法中获取的数据可能已经不是触发本次回调事件瞬间的真实节点数据了。
+     * </p>
+     */
+    @Override
+    public void process(WatchedEvent event) throws Exception{
+        if (isMatch(event.getType())){
+            watcherInvoke.invoke(getListenerPath(), getZkOperator().getData(getListenerPath()));
+            isWatched.set(true);
+        }
 
-		if (EventType.NodeChildrenChanged.equals(getEventType())) {
-			getZkOperator().getChildren(path, this);
-		} else {
-			getZkOperator().checkExists(path, this);
-		}
+        if (event.getState() == KeeperState.SyncConnected){
+            watchAgain();
+        }
+    }
 
-		isWatched.set(false);
-	}
+    @SuppressWarnings("static-access")
+    private void usingWatcher(String path) throws Exception{
+        CuratorFrameworkState currentState = getZkOperator().getZkClient().getState();
+        while (!CuratorFrameworkState.STARTED.equals(currentState)){
+            Thread.currentThread().sleep(1000);
+        }
 
-	/**
-	 * session失效后的Watcher重新注册
-	 * 
-	 * @param path
-	 */
-	private void registerWatcherAfterReconnected() {
-		getZkOperator().addConnectionStateListener(new ConnectionStateListener() {
-			@Override
-			public void stateChanged(CuratorFramework client, ConnectionState newState) {
-				// 当session恢复时，重新注册watcher
-				if (newState == ConnectionState.RECONNECTED) {
-					try {
-						// // 如果是临时节点，session超时会被server端删除，所以session重置后需要重新创建
-						// if (CreateMode.EPHEMERAL.equals(getCreateMode())
-						// ||
-						// CreateMode.EPHEMERAL_SEQUENTIAL.equals(getCreateMode()))
-						// {
-						// Stat stat = zkClient.checkExists().forPath(path);
-						// if (stat != null) {
-						// zkClient.delete().forPath(path);
-						// }
-						// zkClient.create().creatingParentsIfNeeded().withMode(getCreateMode()).withACL(getAcl())
-						// .forPath(path);
-						// }
+        //---------------------------------------------------------------------
 
-						if (needContinueWatch()) {
-							String path = getListenerPath();
-							LOG.info(
-									"[zookeeper] Prepare to reusing watcher after client reconnected: path={}, eventType={}",
-									path, getEventType());
+        LOGGER.info("[zookeeper] Using watcher: path = '{}', eventType = {}, class = {}", path, getEventType(), this.getClass().getName());
 
-							usingWatcher(path);
+        if (EventType.NodeChildrenChanged.equals(getEventType())){
+            getZkOperator().getChildren(path, this);
+        }else{
+            getZkOperator().checkExists(path, this);
+        }
 
-							LOG.info("[zookeeper] Reusing watcher successed: path={}, eventType={}", path,
-									getEventType());
-						}
+        isWatched.set(false);
+    }
 
-					} catch (Exception e) {
-						LOG.error("[zookeeper] Using watcher error after client reconnected!", e);
-					}
-				}
-			}
-		});
-	}
+    /**
+     * session失效后的Watcher重新注册
+     * 
+     * @param path
+     */
+    private void registerWatcherAfterReconnected(){
+        ConnectionStateListener listener = new ConnectionStateListener(){
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.curator.framework.api.CuratorWatcher#process(org.apache.
-	 * zookeeper.WatchedEvent)
-	 */
-	@Override
-	public boolean isWatched() {
-		return isWatched.get();
-	}
+            @Override
+            public void stateChanged(CuratorFramework client,ConnectionState newState){
+                // 当session恢复时，重新注册watcher
+                if (newState != ConnectionState.RECONNECTED){
+                    return;
+                }
 
-	public IWatcherInvoke getWatcherInvoke() {
-		return watcherInvoke;
-	}
+                //---------------------------------------------------------------------
 
-	public void setWatcherInvoke(IWatcherInvoke watcherInvoke) {
-		this.watcherInvoke = watcherInvoke;
-	}
+                try{
+                    // // 如果是临时节点，session超时会被server端删除，所以session重置后需要重新创建
+                    if (needContinueWatch()){
+                        String path = getListenerPath();
+                        LOGGER.info("[zookeeper] Prepare to reusing watcher after client reconnected: path={}, eventType={}", path, getEventType());
 
-	public void setListenerPath(String listenerPath) {
-		this.listenerPath = listenerPath;
-	}
+                        usingWatcher(path);
 
-	public String getListenerPath() {
-		String rootpath = zkOperator.getLifeCycleNode();
-		LOG.info("listenerpath:root="+rootpath + ",listenerpath="+listenerPath);
-		return  rootpath + listenerPath;
-	}
+                        LOGGER.info("[zookeeper] Reusing watcher successed: path={}, eventType={}", path, getEventType());
+                    }
+                }catch (Exception e){
+                    LOGGER.error("[zookeeper] Using watcher error after client reconnected!", e);
+                }
+            }
+        };
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.curator.watcher.IWatcher#getZkOperator()
-	 */
-	@Override
-	public ZkOperator getZkOperator() {
-		return zkOperator;
-	}
+        getZkOperator().addConnectionStateListener(listener);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.curator.framework.api.CuratorWatcher#process(org.apache.
+     * zookeeper.WatchedEvent)
+     */
+    @Override
+    public boolean isWatched(){
+        return isWatched.get();
+    }
+
+    public IWatcherInvoke getWatcherInvoke(){
+        return watcherInvoke;
+    }
+
+    public void setWatcherInvoke(IWatcherInvoke watcherInvoke){
+        this.watcherInvoke = watcherInvoke;
+    }
+
+    public void setListenerPath(String listenerPath){
+        this.listenerPath = listenerPath;
+    }
+
+    @Override
+    public String getListenerPath(){
+        String rootpath = zkOperator.getLifeCycleNode();
+        LOGGER.debug("listenerpath:root=[{}],listenerpath=[{}]", rootpath, listenerPath);
+        return rootpath + listenerPath;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.curator.watcher.IWatcher#getZkOperator()
+     */
+    @Override
+    public ZkOperator getZkOperator(){
+        return zkOperator;
+    }
 }

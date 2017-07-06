@@ -50,6 +50,7 @@ import com.baozun.nebula.utilities.integration.payment.param.PaymentRequestParam
 import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.util.SortUtil.sortMapByKeyAsc;
 
 public class AlipayPaymentRequest implements PaymentRequest,Serializable{
 
@@ -396,7 +397,7 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
         Map<String, String> paymentParameters2 = this.getPaymentParameters();
         String encodedUrl = URIUtil.getEncodedUrl(paymentParameters2, _input_charset);
         if (LOGGER.isInfoEnabled()){
-            LOGGER.info("encodedUrl:[{}],paymentParameters2:{}", encodedUrl, JsonUtil.format(paymentParameters2));
+            LOGGER.info("encodedUrl:[{}],paymentParameters2:{}", encodedUrl, JsonUtil.format(sortMapByKeyAsc(paymentParameters2)));
         }
         return encodedUrl;
     }

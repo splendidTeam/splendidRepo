@@ -28,6 +28,7 @@ import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErr
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
 import com.feilong.core.bean.PropertyUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 
@@ -45,6 +46,8 @@ public class PaymentManagerImpl implements PaymentManager{
         additionParams.putAll(PropertyUtil.describe(salesOrderCommand.getOnLinePaymentCommand()));
 
         PaymentRequest paymentRequest = createPayment(additionParams, salesOrderCommand.getOnLinePaymentCommand().getPayType());
+        Validate.notNull(paymentRequest, "paymentRequest can't be null!");
+
         return paymentRequest;
     }
 
@@ -68,31 +71,41 @@ public class PaymentManagerImpl implements PaymentManager{
      */
     @Override
     public PaymentRequest createPayment(Map<String, Object> orderParams,Integer payType){
-        PaymentRequest paymentRequest = null;
+        Validate.notEmpty(orderParams, "orderParams can't be null/empty!");
+        Validate.notNull(payType, "payType can't be null!");
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("orderParams:{}", JsonUtil.format(orderParams));
+        }
+
+        //---------------------------------------------------------------------
+
+        PaymentFactory paymentFactory = PaymentFactory.getInstance();
+        String type = paymentFactory.getPayType(payType);
+
+        PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
+        payParamCommandAdaptor.setSalesOrderCommand(null);
+        payParamCommandAdaptor.setRequestParams(orderParams);
+
+        // 获得对应的参数转换器
+        PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(type);
+
         try{
-            PaymentFactory paymentFactory = PaymentFactory.getInstance();
-            String type = paymentFactory.getPayType(payType);
 
-            PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
-            payParamCommandAdaptor.setSalesOrderCommand(null);
-            payParamCommandAdaptor.setRequestParams(orderParams);
-
-            // 获得对应的参数转换器
-            PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(type);
             Map<String, String> params = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);
             // 將支付所需的定制参数赋值给addition
             payParamConvertorAdaptor.extendCommandConvertorMap(params, orderParams);
 
             LOGGER.info("RequestParams has : {}", orderParams);
+
             // 获得支付适配器
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
-            paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, params);
+            return paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, params);
 
         }catch (Exception ex){
             LOGGER.error("CreatePayment error: " + ex.toString(), ex);
-            return paymentRequest;
+            return null;
         }
-        return paymentRequest;
     }
 
     @Override

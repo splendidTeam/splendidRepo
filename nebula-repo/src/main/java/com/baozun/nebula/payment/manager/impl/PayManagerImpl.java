@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,6 +154,11 @@ public class PayManagerImpl implements PayManager{
 
     @Override
     public void savePayInfos(SalesOrderCommand so,PaymentRequest paymentRequest,String operator){
+        Validate.notNull(so, "so can't be null!");
+        Validate.notNull(paymentRequest, "paymentRequest can't be null!");
+
+        //---------------------------------------------------------------------
+
         savePayLog(new Date(), Constants.PAY_LOG_CALL_AFTER_MESSAGE, operator, MapConvertUtils.transPaymentRequestToString(paymentRequest));
 
         //---------------------------------------------------------------------
