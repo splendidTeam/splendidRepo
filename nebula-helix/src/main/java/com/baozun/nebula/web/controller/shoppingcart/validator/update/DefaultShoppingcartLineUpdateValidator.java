@@ -40,6 +40,7 @@ import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartUpdateD
 import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.baozun.nebula.web.controller.shoppingcart.validator.AbstractShoppingcartLineOperateValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLinePackageInfoFormListValidator;
@@ -123,7 +124,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
         //订单行最终修改的全量数量(必填).
         Integer count = shoppingCartLineUpdateSkuForm.getCount();
         ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(targetSku, count);
-        if (null != commonValidateShoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(commonValidateShoppingcartResult)){
             return commonValidateShoppingcartResult;
         }
 

@@ -40,6 +40,7 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ImmediatelyBuyShoppingCartLineCommandListFactory;
 import com.baozun.nebula.web.controller.shoppingcart.form.CommonImmediatelyBuyForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.baozun.nebula.web.controller.shoppingcart.validator.CommonImmediatelyBuyFormValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 
@@ -107,11 +108,11 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
 
         ShoppingcartResult shoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, commonImmediatelyBuyForm.getCount());
 
-        if (null != shoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(shoppingcartResult)){
             return toNebulaReturnResult(shoppingcartResult);
         }
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(commonImmediatelyBuyForm,request);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(commonImmediatelyBuyForm, request);
         String key = saveToAccessor(shoppingCartLineCommandList, request);
 
         // 跳转到订单确认页面的地址

@@ -37,6 +37,7 @@ import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartLineCom
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartAddDetermineSameLineElementsBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.baozun.nebula.web.controller.shoppingcart.validator.AbstractShoppingcartLineOperateValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.DefaultShoppingcartTotalLineMaxSizeValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
@@ -109,7 +110,7 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
         Sku sku = sdkSkuManager.findSkuById(skuId);
         ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
 
-        if (null != commonValidateShoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(commonValidateShoppingcartResult)){
             return commonValidateShoppingcartResult;
         }
 
