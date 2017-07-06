@@ -16,34 +16,25 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart.behaviour.pack;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.baozun.nebula.command.ItemImageCommand;
 import com.baozun.nebula.command.ShopCommand;
 import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.dao.product.ItemTagRelationDao;
 import com.baozun.nebula.dao.product.ShopDao;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
-import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemInfo;
-import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemTagRelation;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
-import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartLineImageManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
-import com.baozun.store.manager.order.split.ShoppingCartLineSubViewCommand;
-import com.feilong.core.Validator;
-import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
 
 /**
@@ -111,7 +102,7 @@ public abstract class AbstractShoppingCartLineCommandPackBehaviour implements Sh
     protected void packShopAndIndustry(ShoppingCartLineCommand shoppingCartLineCommand,Item item){
         Long shopId = item.getShopId();
         ShopCommand shopCommand = shopDao.findShopById(shopId);
-        // 店铺信息
+		// 店铺信息
         shoppingCartLineCommand.setShopId(shopId);
         shoppingCartLineCommand.setShopName(shopCommand.getShopname());
         shoppingCartLineCommand.setStoreId(shopId);
