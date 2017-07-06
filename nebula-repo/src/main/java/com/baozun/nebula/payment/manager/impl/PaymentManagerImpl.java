@@ -96,8 +96,6 @@ public class PaymentManagerImpl implements PaymentManager{
             // 將支付所需的定制参数赋值给addition
             payParamConvertorAdaptor.extendCommandConvertorMap(params, orderParams);
 
-            LOGGER.info("RequestParams has : {}", orderParams);
-
             // 获得支付适配器
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
             return paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, params);
