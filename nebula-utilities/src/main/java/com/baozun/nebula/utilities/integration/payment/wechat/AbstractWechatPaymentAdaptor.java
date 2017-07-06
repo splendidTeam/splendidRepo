@@ -59,8 +59,8 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         Map<String, String> responseMap = XMLUtils.parserXml(requestBody);
         Validate.notEmpty(responseMap, "responseMap can't be null/empty!");
 
-        if (LOGGER.isDebugEnabled()){
-            LOGGER.debug(JsonUtil.format(sortMapByKeyAsc(responseMap)));
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info(JsonUtil.format(sortMapByKeyAsc(responseMap)));
         }
 
         PaymentResult paymentResult = new PaymentResult();
@@ -135,8 +135,8 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
     public PaymentResult closePaymentRequest(Map<String, String> parm){
         Validate.notEmpty(parm, "parm can't be null/empty!");
 
-        if (LOGGER.isDebugEnabled()){
-            LOGGER.debug(JsonUtil.format(sortMapByKeyAsc(parm)));
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info(JsonUtil.format(sortMapByKeyAsc(parm)));
         }
 
         //---------------------------------------------------------------------
@@ -149,6 +149,9 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         excludes.add(WechatResponseKeyConstants.SIGN);
         Map<String, String> responseMap = XMLUtils.parserXml(response);
 
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info(JsonUtil.format(sortMapByKeyAsc(responseMap)));
+        }
         //---------------------------------------------------------------------
 
         PaymentResult paymentResult = new PaymentResult();
@@ -207,6 +210,10 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         excludes.add(WechatResponseKeyConstants.SIGN);
 
         Map<String, String> responseMap = XMLUtils.parserXml(response);
+
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info(JsonUtil.format(sortMapByKeyAsc(responseMap)));
+        }
 
         //---------------------------------------------------------------------
 
@@ -269,8 +276,8 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
 
         //---------------------------------------------------------------------
         Map<String, String> responseMap = XMLUtils.parserXml(response);
-        if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("responseMap:[{}]", JsonUtil.format(sortMapByKeyAsc(responseMap)));
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info("responseMap:[{}]", JsonUtil.format(sortMapByKeyAsc(responseMap)));
         }
 
         Set<String> excludes = new HashSet<String>();

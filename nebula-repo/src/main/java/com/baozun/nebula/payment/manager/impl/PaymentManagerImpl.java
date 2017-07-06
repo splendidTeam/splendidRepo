@@ -151,6 +151,11 @@ public class PaymentManagerImpl implements PaymentManager{
             result.setMessage(ex.toString());
             result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
         }
+
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info(JsonUtil.format(result));
+        }
+
         return result;
     }
 
