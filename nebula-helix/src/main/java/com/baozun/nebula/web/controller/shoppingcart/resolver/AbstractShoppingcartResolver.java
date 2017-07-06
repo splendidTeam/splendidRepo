@@ -257,7 +257,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             ShoppingcartResult validatorShoppingcartResult = shoppingcartLineAddValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingCartLineAddForm);
 
             //---------------------------------------------------------------------
-            if (null == validatorShoppingcartResult){
+            if (ShoppingcartResultUtil.isSuccess(validatorShoppingcartResult)){
                 continue;
             }
             //---------------------------------------------------------------------
@@ -333,7 +333,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = defaultIfNullOrEmpty(getShoppingCartLineCommandList(memberDetails, request), new ArrayList<ShoppingCartLineCommand>());
         ShoppingcartResult validatorShoppingcartResult = shoppingcartLineAddValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingCartLineAddForm);
 
-        if (null != validatorShoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(validatorShoppingcartResult)){
             return validatorShoppingcartResult;
         }
 
@@ -452,7 +452,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             ShoppingCartLineUpdateSkuForm shoppingCartLineUpdateSkuForm = new ShoppingCartLineUpdateSkuForm();
             shoppingCartLineUpdateSkuForm.setCount(count);
             ShoppingcartResult validatorShoppingcartResult = shoppingcartLineUpdateValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, shoppingCartLineUpdateSkuForm);
-            if (null != validatorShoppingcartResult){
+            if (ShoppingcartResultUtil.isNotSuccess(validatorShoppingcartResult)){
                 return validatorShoppingcartResult;
             }
         }
@@ -477,7 +477,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         //2.校验****************************************************************
         //2.1 校验 shoppingcartLineId
         ShoppingcartResult validatorShoppingcartResult = shoppingcartLineUpdateValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, shoppingCartLineUpdateSkuForm);
-        if (null != validatorShoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(validatorShoppingcartResult)){
             return validatorShoppingcartResult;
         }
 
@@ -566,7 +566,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             //公共校验
             ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
 
-            if (null != commonValidateShoppingcartResult){
+            if (ShoppingcartResultUtil.isNotSuccess(commonValidateShoppingcartResult)){
                 return commonValidateShoppingcartResult;
             }
 
@@ -769,7 +769,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * @since 5.3.2.18
      */
     private ShoppingcartResult postShoppingcartResult(MemberDetails memberDetails,ShoppingcartResult shoppingcartResult,List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
-        if (null != shoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(shoppingcartResult)){
             return shoppingcartResult;
         }
         afterOperateShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
