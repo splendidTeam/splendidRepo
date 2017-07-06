@@ -135,7 +135,9 @@ public abstract class AbstractWatcher implements IWatcher{
     @Override
     public void process(WatchedEvent event) throws Exception{
         if (isMatch(event.getType())){
-            watcherInvoke.invoke(getListenerPath(), getZkOperator().getData(getListenerPath()));
+            String listenerPath2 = getListenerPath();
+
+            watcherInvoke.invoke(listenerPath2, getZkOperator().getData(listenerPath2));
             isWatched.set(true);
         }
 
