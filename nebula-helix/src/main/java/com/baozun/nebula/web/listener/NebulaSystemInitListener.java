@@ -72,16 +72,17 @@ public class NebulaSystemInitListener implements ServletContextListener{
 
         for (IWatcher watcher : watchers){
             try{
+                String listenerPath = watcher.getListenerPath();
 
                 Date beginDate = new Date();
                 if (LOGGER.isDebugEnabled()){
-                    LOGGER.debug("begin watcher :[{}]", watcher.getListenerPath());
+                    LOGGER.debug("begin watcher :[{}]", listenerPath);
                 }
 
                 watcher.initListen();
 
                 if (LOGGER.isInfoEnabled()){
-                    LOGGER.info("watcher:[{}],use time: [{}]", watcher.getListenerPath(), formatDuration(beginDate));
+                    LOGGER.info("watcher:[{}],use time: [{}]", listenerPath, formatDuration(beginDate));
                 }
             }catch (Exception e){
                 LOGGER.error("[zookeeper] Zookeeper watcher init error!", e);
