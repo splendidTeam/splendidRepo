@@ -99,8 +99,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(BaseConverter.class
 			PropertyUtil.copyProperties(pageData, resultPageData, 
 					new PropListCopyable("count","currentPage","totalPages","start","size","sortStr"));
 		} catch (Exception e) {
-			//TODO should not occur
-			e.printStackTrace();
+		    LOGGER.error("",e);
 		}
 		resultPageData.setItems(convert(pageData.getItems()));
 		return resultPageData;
