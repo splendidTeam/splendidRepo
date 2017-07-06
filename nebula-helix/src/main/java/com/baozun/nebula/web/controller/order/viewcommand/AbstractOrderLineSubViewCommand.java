@@ -133,7 +133,15 @@ abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
     private String misc;
 
     //**********************************************************************************************
-
+    
+  //***********************评价信息*****************************************************
+    /** 评价状态.
+     * @since 5.3.2.20
+     *  */
+    private Integer evaluationStatus;
+    
+    
+  //**********************************************************************************************
     /**
      * 获得 orderline行的唯一标识,那么此处的id={@link OrderLine#id}.
      *
@@ -478,4 +486,25 @@ abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
     public void setMisc(String misc){
         this.misc = misc;
     }
+
+    /**
+     * 获取评价状态
+     * @return Integer
+     * @since 5.3.2.20
+     */
+    public Integer getEvaluationStatus(){
+        return evaluationStatus;
+    }
+
+    /**
+     * 设置 评价状态
+     * @param Integer
+     *          the evaluationStatus to set
+     * @since 5.3.2.20
+     */
+    public void setEvaluationStatus(Integer evaluationStatus){
+        this.evaluationStatus = evaluationStatus;
+    }
+    
+    
 }
