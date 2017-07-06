@@ -96,7 +96,7 @@ public class SdkShoppingCartLineImageManagerImpl implements SdkShoppingCartLineI
 		List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(sku.getProperties());
 		for (SkuProperty skuPro : skuPros) {
 			if (skuPro.getIsColorProp()) {
-				colorItemPropertiesID = Long.valueOf(skuPro.getId());
+				colorItemPropertiesID = skuPro.getItemProperties().getId();
 				break;
 			}
 		}
