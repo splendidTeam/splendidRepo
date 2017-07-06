@@ -5,4 +5,6 @@ import com.baozun.nebula.manager.BaseManager;
 public interface SdkShoppingCartLineImageManager extends BaseManager{
 
     String getItemPicUrl(Long itemId);
+    
+    String getSkuPicUrl(Long skuId);
 }

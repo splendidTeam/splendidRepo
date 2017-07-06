@@ -17,6 +17,7 @@
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -26,8 +27,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.ItemImageCommand;
+import com.baozun.nebula.dao.product.ItemPropertiesDao;
+import com.baozun.nebula.dao.product.PropertyDao;
+import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.model.product.ItemImage;
+import com.baozun.nebula.model.product.Sku;
+import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.feilong.core.Validator;
 
 /**
@@ -44,6 +51,18 @@ public class SdkShoppingCartLineImageManagerImpl implements SdkShoppingCartLineI
 
     @Autowired
     private SdkItemManager      sdkItemManager;
+    
+    @Autowired
+    private PropertyDao			propertyDao;
+    
+    @Autowired
+    private ItemPropertiesDao   itemPropertiesDao;
+    
+    @Autowired
+    private SkuDao				skuDao;
+    
+    @Autowired
+    private SdkSkuManager		sdkSkuManager;
 
     /*
      * (non-Javadoc)
@@ -69,4 +88,30 @@ public class SdkShoppingCartLineImageManagerImpl implements SdkShoppingCartLineI
         }
         return null;
     }
+    
+    @Override
+	public String getSkuPicUrl(Long skuId) {
+		Sku sku = skuDao.findSkuById(skuId);
+		long colorItemPropertiesID = 0;
+		List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(sku.getProperties());
+		for (SkuProperty skuPro : skuPros) {
+			if (skuPro.getIsColorProp()) {
+				colorItemPropertiesID = Long.valueOf(skuPro.getId());
+				break;
+			}
+		}
+
+		// 取该颜色的商品的图片
+		List<ItemImageCommand> itemImageCommandList = sdkItemManager.findItemImagesByItemIds(Arrays.asList(sku.getItemId()),
+				ItemImage.IMG_TYPE_LIST);
+				
+		for (ItemImageCommand itemImageCommand : itemImageCommandList) {
+			for (ItemImage itemImage : itemImageCommand.getItemIamgeList()) {
+				if (colorItemPropertiesID ==  itemImage.getItemProperties()) {
+					return itemImage.getPicUrl();
+				}
+			}
+		}
+		return "";
+	}
 }
