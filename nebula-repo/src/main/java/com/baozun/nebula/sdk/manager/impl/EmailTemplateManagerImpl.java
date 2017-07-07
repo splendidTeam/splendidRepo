@@ -100,7 +100,7 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager{
         //---------------------------------------------------------------------
         List<EmailTemplate> emailTemplateList = emailTemplateDao.findEmailTemplateListByQueryMap(paramMap);
         if (isNullOrEmpty(emailTemplateList)){
-            LOGGER.warn("when code is :[{}], can not find EmailTemplate", code);
+            LOGGER.warn("when code is :[{}], can not find EmailTemplate,will return", code);
             return;
         }
 
@@ -110,7 +110,7 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager{
         //如果当前模板的lifecycle不为1,则不发送邮件
         Integer lifecycle = emailTemplate.getLifecycle();
         if (!lifecycle.equals(EmailTemplate.LIFECYCLE_ENABLE)){
-            LOGGER.warn("when code is :[{}], emailTemplate.getLifecycle() is :[{}]", code, lifecycle);
+            LOGGER.warn("when code is :[{}], emailTemplate.getLifecycle() is :[{}],will return", code, lifecycle);
             return;
         }
 
