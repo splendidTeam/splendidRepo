@@ -2,6 +2,9 @@ package com.baozun.nebula.search.command;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.solr.client.solrj.response.FieldStatsInfo;
 
 import com.baozun.nebula.search.FacetGroup;
 
@@ -24,6 +27,11 @@ public class SearchResultPage<T> implements Serializable{
 	/** Facet Group */
 	private List<FacetGroup>	facetGroups;
 
+	 /**
+     * solr stats统计问题
+     */
+    private Map<String, FieldStatsInfo>    fieldStatsInfo;
+    
 	/**
 	 * get facetGroups
 	 * 
@@ -77,5 +85,21 @@ public class SearchResultPage<T> implements Serializable{
 	public void setItemsListWithGroup(Pagination<List<T>> itemsListWithGroup){
 		this.itemsListWithGroup = itemsListWithGroup;
 	}
+
+    
+    /**
+     * @return the fieldStatsInfo
+     */
+    public Map<String, FieldStatsInfo> getFieldStatsInfo(){
+        return fieldStatsInfo;
+    }
+
+    
+    /**
+     * @param fieldStatsInfo the fieldStatsInfo to set
+     */
+    public void setFieldStatsInfo(Map<String, FieldStatsInfo> fieldStatsInfo){
+        this.fieldStatsInfo = fieldStatsInfo;
+    }
 
 }

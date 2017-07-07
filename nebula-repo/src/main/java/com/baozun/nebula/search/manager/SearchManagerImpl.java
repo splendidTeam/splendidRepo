@@ -214,7 +214,7 @@ public class SearchManagerImpl implements SearchManager{
 		SearchResultPage<ItemForSolrCommand> searchResultPage = new SearchResultPage<ItemForSolrCommand>();
 		searchResultPage.setItemsListWithGroup(pagination);
 		searchResultPage.setFacetGroups(facetGroups);
-
+		searchResultPage.setFieldStatsInfo(solrGroupData.getFieldStatsInfo());
 		return searchResultPage;
 
 	}
@@ -253,7 +253,7 @@ public class SearchManagerImpl implements SearchManager{
 		SearchResultPage<ItemForSolrCommand> searchResultPage = new SearchResultPage<ItemForSolrCommand>();
 		searchResultPage.setItemsListWithOutGroup(pagination);
 		searchResultPage.setFacetGroups(facetGroups);
-
+		searchResultPage.setFieldStatsInfo(solrGroupData.getFieldStatsInfo());
 		return searchResultPage;
 	}
 
