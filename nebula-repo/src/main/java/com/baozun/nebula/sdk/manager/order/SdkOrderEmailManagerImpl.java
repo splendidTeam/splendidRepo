@@ -16,14 +16,10 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
-import static com.baozun.nebula.model.salesorder.SalesOrder.SO_PAYMENT_TYPE_ALIPAY;
 import static com.baozun.nebula.model.salesorder.SalesOrder.SO_PAYMENT_TYPE_COD;
-import static com.baozun.nebula.model.salesorder.SalesOrder.SO_PAYMENT_TYPE_NETPAY;
 import static com.baozun.nebula.model.system.MataInfo.PAY_URL_PREFIX;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,10 +45,13 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.handler.SalesOrderHandler;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.feilong.core.Validator;
+import com.baozun.nebula.sdk.manager.payment.PaymentNameBuilder;
+import com.feilong.core.date.DateUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.Validator.isNullOrEmpty;
+
+import static com.feilong.core.DatePattern.CHINESE_COMMON_DATE;
 
 /**
  * The Class SdkOrderCreateEmailManagerImpl.
@@ -84,6 +83,10 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
     @Autowired
     private SdkMataInfoManager sdkMataInfoManager;
 
+    /** The payment name builder. */
+    @Autowired
+    private PaymentNameBuilder paymentNameBuilder;
+
     /** The sdk member manager. */
     @Autowired
     private SdkMemberManager sdkMemberManager;
@@ -103,13 +106,14 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
      */
     @Override
     public void sendEmailOfCreateOrder(List<Map<String, Object>> dataMapList){
-        if (isNotNullOrEmpty(dataMapList)){
-            String createOrderSuccess = EmailConstants.CREATE_ORDER_SUCCESS;
-            for (Map<String, Object> dataMap : dataMapList){
-                String email = dataMap.get("email").toString();
-                EmailEvent emailEvent = new EmailEvent(this, email, createOrderSuccess, dataMap);
-                eventPublisher.publish(emailEvent);
-            }
+        if (isNullOrEmpty(dataMapList)){
+            return;
+        }
+
+        for (Map<String, Object> dataMap : dataMapList){
+            String email = dataMap.get("email").toString();
+
+            sendEmail(EmailConstants.CREATE_ORDER_SUCCESS, email, dataMap);
         }
     }
 
@@ -162,10 +166,6 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
             return null;
         }
 
-        //***************************************************************************************
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH点mm分");
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy年MM月dd日");
-
         //--------------
 
         Map<String, Object> dataMap = new HashMap<>();
@@ -182,19 +182,8 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
             dataMap.put("isShowPayButton", false);
             dataMap.put("payUrl", "#");
         }
-        Date createTime = salesOrder.getCreateTime();
-        dataMap.put("createDateOfAll", sdf.format(createTime));
-        dataMap.put("createDateOfSfm", sdf1.format(createTime));
 
-        dataMap.put("receiveName", salesOrderCommand.getName());
-        dataMap.put("orderCode", salesOrder.getCode());
-        dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
-
-        dataMap.put("address", salesOrderCommand.getAddress());
-        String mobile = salesOrderCommand.getMobile();
-        dataMap.put("mobile", isNotNullOrEmpty(mobile) ? mobile : salesOrderCommand.getTel());
-
-        dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
+        packCommandInfo(salesOrder.getCode(), salesOrderCommand, nickName, salesOrder.getCreateTime(), dataMap);
 
         BigDecimal total = salesOrder.getTotal();
         dataMap.put("sumItemFee", total.add(salesOrder.getDiscount()));
@@ -204,8 +193,6 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
         dataMap.put("offersTotal", salesOrder.getDiscount());
 
         dataMap.put("itemLines", shoppingCartLineCommandList);
-        dataMap.put("pageUrlBase", pageUrlBase);
-        dataMap.put("imgDomainUrl", imgDomainUrl);
 
         //---------------------
 
@@ -216,25 +203,6 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
         return dataMap;
     }
 
-    /**
-     * 返回支付方式.
-     *
-     * @param payment
-     *            the payment
-     * @return the payment name
-     */
-    private String getPaymentName(Integer payment){
-        String name = "支付宝";
-        if (payment == Integer.parseInt(SO_PAYMENT_TYPE_COD)){
-            name = "货到付款";
-        }else if (payment == Integer.parseInt(SO_PAYMENT_TYPE_NETPAY)){
-            name = "网银在线";
-        }else if (payment == Integer.parseInt(SO_PAYMENT_TYPE_ALIPAY)){
-            name = "支付宝";
-        }
-        return name;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -243,39 +211,58 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
      */
     @Override
     public Map<String, Object> buildDataMap(String emailTemplete,SalesOrderCommand salesOrderCommand,String nickName){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH点mm分");
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy年MM月dd日");
-        Calendar calendar = Calendar.getInstance();
+        Map<String, Object> dataMap = new HashMap<>();
 
-        Map<String, Object> dataMap = new HashMap<String, Object>();
-        dataMap.put("nickName", nickName);
-        dataMap.put("createDateOfAll", sdf.format(salesOrderCommand.getCreateTime()));
-        dataMap.put("createDateOfSfm", sdf1.format(salesOrderCommand.getCreateTime()));
-        dataMap.put("orderCode", salesOrderCommand.getCode());
-        dataMap.put("receiveName", salesOrderCommand.getName());
-        dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
-        dataMap.put("address", salesOrderCommand.getAddress());
-
-        dataMap.put("mobile", Validator.isNotNullOrEmpty(salesOrderCommand.getMobile()) ? salesOrderCommand.getMobile() : salesOrderCommand.getTel());
+        packCommandInfo(salesOrderCommand.getCode(), salesOrderCommand, nickName, salesOrderCommand.getCreateTime(), dataMap);
 
         dataMap.put("sumItemFee", salesOrderCommand.getTotal().add(salesOrderCommand.getDiscount()));
         dataMap.put("shipFee", salesOrderCommand.getActualFreight());
         dataMap.put("offersTotal", salesOrderCommand.getDiscount());
         dataMap.put("sumPay", salesOrderCommand.getTotal().add(salesOrderCommand.getActualFreight()));
         dataMap.put("itemLines", salesOrderCommand.getOrderLines());
-        dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
 
-        dataMap.put("pageUrlBase", pageUrlBase);
-        dataMap.put("imgDomainUrl", imgDomainUrl);
         dataMap.put("logisticsProvider", salesOrderCommand.getLogisticsProviderName());
         dataMap.put("transCode", salesOrderCommand.getTransCode());
-        dataMap.put("nowDay", sdf1.format(calendar.getTime()));
+        dataMap.put("nowDay", DateUtil.toString(new Date(), CHINESE_COMMON_DATE));
 
         //扩展点 如 商城需要需要加入特殊字段 各自实现 **/
         if (null != salesOrderHandler){
             dataMap = salesOrderHandler.getEmailData(salesOrderCommand, dataMap, emailTemplete);
         }
         return dataMap;
+    }
+
+    /**
+     * Pack command info.
+     * 
+     * @param code
+     *            the code
+     * @param salesOrderCommand
+     *            the sales order command
+     * @param nickName
+     *            the nick name
+     * @param createTime
+     *            the create time
+     * @param dataMap
+     *            the data map
+     * @since 5.3.2.20
+     */
+    private void packCommandInfo(String code,SalesOrderCommand salesOrderCommand,String nickName,Date createTime,Map<String, Object> dataMap){
+        dataMap.put("nickName", nickName);
+        dataMap.put("orderCode", code);
+
+        dataMap.put("receiveName", salesOrderCommand.getName());
+        dataMap.put("address", salesOrderCommand.getAddress());
+        dataMap.put("payment", paymentNameBuilder.build(salesOrderCommand.getPayment()));
+        dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
+
+        dataMap.put("mobile", isNotNullOrEmpty(salesOrderCommand.getMobile()) ? salesOrderCommand.getMobile() : salesOrderCommand.getTel());
+
+        dataMap.put("createDateOfAll", DateUtil.toString(createTime, "yyyy年MM月dd日HH点mm分"));
+        dataMap.put("createDateOfSfm", DateUtil.toString(createTime, CHINESE_COMMON_DATE));
+
+        dataMap.put("pageUrlBase", pageUrlBase);
+        dataMap.put("imgDomainUrl", imgDomainUrl);
     }
 
 }
