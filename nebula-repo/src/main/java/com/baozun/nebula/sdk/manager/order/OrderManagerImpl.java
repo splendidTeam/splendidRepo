@@ -533,7 +533,7 @@ public class OrderManagerImpl implements OrderManager{
         MemberPersonalData memberPersonalData = null;
         Long memberId = salesOrderCommand.getMemberId();
         if (isNotNullOrEmpty(memberId)){
-            LOGGER.debug("salesOrderCommand 's memberid is not null or empty,will load memberPersonalData by memberid:[{}]", memberId);
+            LOGGER.debug("salesOrderCommand 's memberid is not null,will load memberPersonalData by memberid:[{}]", memberId);
             memberPersonalData = sdkMemberManager.findMemberPersonData(memberId);
         }
 

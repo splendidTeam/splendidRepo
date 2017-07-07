@@ -30,20 +30,29 @@ import com.baozun.nebula.sdk.manager.EmailTemplateManager;
  */
 @Service
 @Scope("singleton")
-public class EmailEventListener implements ApplicationListener<EmailEvent> {
-	private final Logger logger = LoggerFactory.getLogger(getClass());
-	@Autowired
-	private EmailTemplateManager emailTemplateManager;
-	@Override
-	public void onApplicationEvent(EmailEvent event) {
-		//mailService.sendMail(event.getEmail());
-		//logger.debug("to [{}], subject [{}], content [{}].", event.getEmail().getAddress(), event.getEmail().getSubject(), event.getEmail().getContent());
-		try{
-			emailTemplateManager.sendEmail(event.getReceiverEmail(), event.getCode(), event.getDataMap(),event.getAttachmentList());
-		} 
-		catch(Exception e){
-			logger.error("email send error:"+event.getReceiverEmail());
-		}
-	}
+public class EmailEventListener implements ApplicationListener<EmailEvent>{
+
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private EmailTemplateManager emailTemplateManager;
+
+    @Override
+    public void onApplicationEvent(EmailEvent event){
+        String receiverEmail = event.getReceiverEmail();
+        String code = event.getCode();
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("will send email,receiverEmail:[{}],code:[{}]", receiverEmail, code);
+        }
+
+        //logger.debug("to [{}], subject [{}], content [{}].", event.getEmail().getAddress(), event.getEmail().getSubject(), event.getEmail().getContent());
+        try{
+            emailTemplateManager.sendEmail(receiverEmail, code, event.getDataMap(), event.getAttachmentList());
+            
+        }catch (Exception e){
+            LOGGER.error("email send error:" + receiverEmail);
+        }
+    }
 
 }
