@@ -69,7 +69,7 @@ public class EncryptUtil{
 
     public static final String DEFAULT_HASHSALT_ALGORITHM = "PBKDF2WithHmacSHA1";
 
-    private static EncryptUtil instance = null;
+    private static EncryptUtil instance = new EncryptUtil();
 
     private Map<String, Encryptor> encryptors = new HashMap<String, Encryptor>();
 
@@ -120,9 +120,7 @@ public class EncryptUtil{
 
     }
 
-    public static synchronized EncryptUtil getInstance(){
-        if (instance == null)
-            instance = new EncryptUtil();
+    public static EncryptUtil getInstance(){
         return instance;
     }
 
