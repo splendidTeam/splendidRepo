@@ -305,7 +305,11 @@ public class Sku extends BaseModel{
      */
     @Column(name = "SALE_PRICE")
     public BigDecimal getSalePrice(){
+        if(null == salePrice){
+            return null;
+        } 
         salePrice = salePrice.setScale(2, BigDecimal.ROUND_HALF_UP);
+        
         return salePrice;
     }
 
