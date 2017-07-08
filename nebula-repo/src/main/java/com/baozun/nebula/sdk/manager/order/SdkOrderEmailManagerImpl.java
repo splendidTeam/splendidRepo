@@ -16,9 +16,6 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
-import static com.baozun.nebula.model.salesorder.SalesOrder.SO_PAYMENT_TYPE_COD;
-import static com.baozun.nebula.model.system.MataInfo.PAY_URL_PREFIX;
-
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,8 +40,9 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.handler.SalesOrderHandler;
-import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.payment.OrderCreateEmailIsShowPayLinkBuilder;
+import com.baozun.nebula.sdk.manager.payment.OrderCreateEmailPayUrlBuilder;
 import com.baozun.nebula.sdk.manager.payment.PaymentNameBuilder;
 import com.feilong.core.date.DateUtil;
 
@@ -75,14 +73,6 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
     @Value("#{meta['upload.img.domain.base']}")
     private String imgDomainUrl;
 
-    /** The frontend base url. */
-    @Value("#{meta['frontend.url']}")
-    private String frontendBaseUrl;
-
-    /** The sdk mata info manager. */
-    @Autowired
-    private SdkMataInfoManager sdkMataInfoManager;
-
     /** The payment name builder. */
     @Autowired
     private PaymentNameBuilder paymentNameBuilder;
@@ -90,6 +80,12 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
     /** The sdk member manager. */
     @Autowired
     private SdkMemberManager sdkMemberManager;
+
+    @Autowired
+    private OrderCreateEmailIsShowPayLinkBuilder orderCreateEmailIsShowPayLinkBuilder;
+
+    @Autowired
+    private OrderCreateEmailPayUrlBuilder orderCreateEmailPayUrlBuilder;
 
     /** The sales order handler. */
     @Autowired(required = false)
@@ -99,6 +95,8 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
     @Autowired
     private EventPublisher eventPublisher;
 
+    //---------------------------------------------------------------------
+
     /*
      * (non-Javadoc)
      * 
@@ -107,12 +105,12 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
     @Override
     public void sendEmailOfCreateOrder(List<Map<String, Object>> dataMapList){
         if (isNullOrEmpty(dataMapList)){
+            LOGGER.debug("dataMapList is null or emtpy,will not send email,just return");
             return;
         }
 
         for (Map<String, Object> dataMap : dataMapList){
             String email = dataMap.get("email").toString();
-
             sendEmail(EmailConstants.CREATE_ORDER_SUCCESS, email, dataMap);
         }
     }
@@ -172,16 +170,13 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
         dataMap.put("nickName", nickName);
         dataMap.put("email", email);
 
-        // 获取付款地址
-        if (salesOrderCreateOptions.getIsBackCreateOrder() && !salesOrderCommand.getPayment().toString().equals(SO_PAYMENT_TYPE_COD)){
-            String payUrlPrefix = sdkMataInfoManager.findValue(PAY_URL_PREFIX);
-            String payUrl = frontendBaseUrl + payUrlPrefix + "?code=" + subOrdinate;
-            dataMap.put("isShowPayButton", true);
-            dataMap.put("payUrl", payUrl);
-        }else{
-            dataMap.put("isShowPayButton", false);
-            dataMap.put("payUrl", "#");
-        }
+        boolean isShowPayLink = orderCreateEmailIsShowPayLinkBuilder.build(salesOrderCommand, salesOrderCreateOptions);
+        String payUrl = orderCreateEmailPayUrlBuilder.build(subOrdinate, isShowPayLink);
+
+        dataMap.put("isShowPayButton", isShowPayLink);
+        dataMap.put("payUrl", payUrl);
+
+        //---------------------------------------------------------------------
 
         packCommandInfo(salesOrder.getCode(), salesOrderCommand, nickName, salesOrder.getCreateTime(), dataMap);
 
