@@ -53,11 +53,14 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
 
     private Date resetTime; //Cache初始化或被重置的时间    
 
-    private long highestSize = 0; //历史最高记录数    
-
-    private Date highestTime; //创造历史记录的时间    
-
     private LoadingCache<K, V> cache;
+    
+    public GuavaAbstractLoadingCache() {};
+    
+    public  GuavaAbstractLoadingCache(int maximumSize,  int expireAfterWriteDuration) {
+        this.expireAfterWriteDuration = expireAfterWriteDuration;
+        this.maximumSize = maximumSize;
+    };
 
     /**
      * 通过调用getCache().get(key)来获取数据
@@ -69,17 +72,13 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
             synchronized (this){
                 if (cache == null){
                     cache = CacheBuilder.newBuilder().maximumSize(maximumSize) //缓存数据的最大条目，也可以使用.maximumWeight(weight)代替    
-                                    .expireAfterWrite(expireAfterWriteDuration, timeUnit) //数据被创建多久后被移除    
-                                    //.recordStats() //启用统计    
-                                    .expireAfterAccess(expireAfterWriteDuration, timeUnit)
+                                    .refreshAfterWrite(expireAfterWriteDuration, timeUnit)
                                     .build(new CacheLoader<K, V>() {
                                         @Override
                                         public V load(K key) throws Exception {
                                             return fetchData(key);
                                         }
                                     });
-                    this.resetTime = new Date();
-                    this.highestTime = new Date();
                     logger.debug("本地缓存{}初始化成功", this.getClass().getSimpleName());
                 }
             }
@@ -105,20 +104,7 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
      */
     public V getValue(K key) throws ExecutionException {
         V result = getCache().get(key);
-        if (getCache().size() > highestSize){
-            highestSize = getCache().size();
-            highestTime = new Date();
-        }
-
         return result;
-    }
-
-    public long getHighestSize() {
-        return highestSize;
-    }
-
-    public Date getHighestTime() {
-        return highestTime;
     }
 
     public Date getResetTime() {
