@@ -357,6 +357,9 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         if (StringUtils.isNotBlank(resMap.get(WechatResponseKeyConstants.CODE_URL))){
             paymentServiceReturnCommand.setCodeUrl(resMap.get(WechatResponseKeyConstants.CODE_URL));
         }
+        if(StringUtils.isNotBlank(resMap.get(WechatResponseKeyConstants.MWEB_URL))){
+            paymentServiceReturnCommand.setMwebUrl(resMap.get(WechatResponseKeyConstants.MWEB_URL));
+        }
         paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);
     }
 

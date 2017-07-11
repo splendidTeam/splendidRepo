@@ -63,6 +63,9 @@ public class WechatResponseKeyConstants{
 
     /** 二维码链接 **/
     public static final String CODE_URL = "code_url";
+    
+    /** H5支付链接 **/
+    public static final String MWEB_URL = "mweb_url";
 
     /** 交易类型JSAPI **/
     public static final String TRADE_TYPE_JSAPI = "JSAPI";
@@ -75,5 +78,8 @@ public class WechatResponseKeyConstants{
 
     /** 交易类型WAP **/
     public static final String TRADE_TYPE_WAP = "WAP";
+    
+    /** 交易类型H5 **/
+    public static final String TRADE_TYPE_MWEB = "MWEB";
 
 }
