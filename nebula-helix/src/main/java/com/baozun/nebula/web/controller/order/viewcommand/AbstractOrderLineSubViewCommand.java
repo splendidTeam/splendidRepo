@@ -45,7 +45,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.13
  */
-abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
+public abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
 
     /**  */
     private static final long serialVersionUID = -8855859594846278253L;
