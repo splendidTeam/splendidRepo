@@ -40,7 +40,7 @@ public class OrderBaseInfoSubViewCommand extends AbstractOrderViewCommand{
     private BigDecimal discount;
     
     /**
-     * 最近一次物流状态修改时间（可以用来判断订单收货时间）
+     * 修改时间
      * @since 5.3.2.20
      */
     private Date modifyTime;
@@ -63,7 +63,7 @@ public class OrderBaseInfoSubViewCommand extends AbstractOrderViewCommand{
     }
 
     /**
-     * 获得 最近一次物流状态修改时间.
+     * 获得 修改时间.
      *
      * @return the 修改时间
      * @since 5.3.2.20
@@ -73,7 +73,7 @@ public class OrderBaseInfoSubViewCommand extends AbstractOrderViewCommand{
     }
 
     /**
-     * 设置 最近一次物流状态修改时间.
+     * 设置 修改时间.
      *
      * @param modifyTime
      *            the new 修改时间
