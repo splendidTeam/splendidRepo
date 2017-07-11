@@ -1,12 +1,10 @@
 package com.baozun.nebula.manager.salesorder;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
-import com.baozun.nebula.calculateEngine.common.EngineManager;
 import com.baozun.nebula.command.ItemPropertiesCommand;
 import com.baozun.nebula.dao.member.MemberDao;
 import com.baozun.nebula.dao.product.ItemDao;
@@ -26,7 +23,6 @@ import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderLogDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderStatusLogDao;
-import com.baozun.nebula.dao.salesorder.SdkPayNoDao;
 import com.baozun.nebula.dao.system.ChooseOptionDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
@@ -42,18 +38,14 @@ import com.baozun.nebula.model.salesorder.OrderLog;
 import com.baozun.nebula.model.salesorder.OrderStatusLog;
 import com.baozun.nebula.model.system.ChooseOption;
 import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
-import com.baozun.nebula.sdk.command.EngineMemberCommand;
 import com.baozun.nebula.sdk.command.ExCodeProp;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.ItemSkuCommand;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
-import com.baozun.nebula.sdk.command.PayNoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
@@ -91,9 +83,6 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 
 	@Autowired
 	private MemberDao				memberDao;
-
-	@Autowired
-	private SdkPayNoDao				sdkPayNoDao;
 
 	@Autowired
 	private SdkOrderLogDao			sdkOrderLogDao;
@@ -349,17 +338,6 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 		}
 	}
 
-	@Override
-	public List<PayNoCommand> findPayNoList(Long payInfoId){
-		List<PayNoCommand> payNoCommands = null;
-		try{
-			payNoCommands = sdkPayNoDao.findPayNosByPayInfoId(payInfoId);
-		}catch (Exception e){
-			e.printStackTrace();
-			payNoCommands = new ArrayList<PayNoCommand>();
-		}
-		return payNoCommands;
-	}
 
 	/**
 	 * 查询订单列表

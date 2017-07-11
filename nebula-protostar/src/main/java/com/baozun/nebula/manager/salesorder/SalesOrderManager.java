@@ -5,23 +5,20 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.ExCodeProp;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.ItemSkuCommand;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
-import com.baozun.nebula.sdk.command.PayNoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.command.OrderCommand;
 import com.baozun.nebula.web.command.PtsSalesOrderCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * 订单相关操作
@@ -47,10 +44,6 @@ public interface SalesOrderManager extends BaseManager{
 	 */
 	public OrderCommand findOrderById(Long orderId);
 
-	/**
-	 * 根据支付ID 查询支付流水列表
-	 */
-	public List<PayNoCommand> findPayNoList(Long payInfoId);
 
 	/**
 	 * 获取带分页订单列表
