@@ -53,6 +53,12 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
 
     /** 创建时间. */
     private Date createTime;
+    
+    /**
+     * 修改时间
+     * @since 5.3.2.20
+     */
+    private Date modifyTime;
 
     /** 物流状态. */
     private Integer logisticsStatus;
@@ -138,6 +144,27 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
      */
     public void setCreateTime(Date createTime){
         this.createTime = createTime;
+    }
+    
+    /**
+     * 获得 修改时间.
+     *
+     * @return the 修改时间
+     * @since 5.3.2.20
+     */
+    public Date getModifyTime(){
+        return modifyTime;
+    }
+
+    /**
+     * 设置 修改时间.
+     *
+     * @param modifyTime
+     *            the new 修改时间
+     * @since 5.3.2.20
+     */
+    public void setModifyTime(Date modifyTime){
+        this.modifyTime = modifyTime;
     }
 
     /**

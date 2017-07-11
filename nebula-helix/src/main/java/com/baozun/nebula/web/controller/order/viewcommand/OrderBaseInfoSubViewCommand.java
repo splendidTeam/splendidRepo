@@ -17,7 +17,6 @@
 package com.baozun.nebula.web.controller.order.viewcommand;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 订单的基本信息.
@@ -39,13 +38,6 @@ public class OrderBaseInfoSubViewCommand extends AbstractOrderViewCommand{
      */
     private BigDecimal discount;
     
-    /**
-     * 修改时间
-     * @since 5.3.2.20
-     */
-    private Date modifyTime;
-    
-    
     public BigDecimal getPayableFreight(){
         return payableFreight;
     }
@@ -61,28 +53,5 @@ public class OrderBaseInfoSubViewCommand extends AbstractOrderViewCommand{
     public void setDiscount(BigDecimal discount){
         this.discount = discount;
     }
-
-    /**
-     * 获得 修改时间.
-     *
-     * @return the 修改时间
-     * @since 5.3.2.20
-     */
-    public Date getModifyTime(){
-        return modifyTime;
-    }
-
-    /**
-     * 设置 修改时间.
-     *
-     * @param modifyTime
-     *            the new 修改时间
-     * @since 5.3.2.20
-     */
-    public void setModifyTime(Date modifyTime){
-        this.modifyTime = modifyTime;
-    }
-    
-    
 
 }
