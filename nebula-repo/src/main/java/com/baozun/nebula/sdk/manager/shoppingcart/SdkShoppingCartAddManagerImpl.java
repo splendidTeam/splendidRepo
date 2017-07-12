@@ -148,7 +148,10 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         shoppingCartLine.setGift(shoppingCartLineCommand.isGift());
         //shoppingCartLine.setItemId(itemId);
 
-        shoppingCartLine.setLineGroup(String.valueOf(shoppingCartLineCommand.getLineGroup()));
+        Long lineGroup = shoppingCartLineCommand.getLineGroup();
+        if (null != lineGroup){
+            shoppingCartLine.setLineGroup(String.valueOf(lineGroup));
+        }
 
         shoppingCartLine.setMemberId(memberId);
         shoppingCartLine.setPromotionId(shoppingCartLineCommand.getPromotionId());
