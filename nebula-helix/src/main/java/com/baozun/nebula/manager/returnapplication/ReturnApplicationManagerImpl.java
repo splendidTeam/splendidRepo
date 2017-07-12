@@ -16,7 +16,7 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.web.controller.order.viewcommand.ReturnApplicationViewCommand;
+import com.baozun.nebula.web.controller.returnapplication.viewcommand.ReturnApplicationViewCommand;
 import com.feilong.core.Validator;
 
 /**

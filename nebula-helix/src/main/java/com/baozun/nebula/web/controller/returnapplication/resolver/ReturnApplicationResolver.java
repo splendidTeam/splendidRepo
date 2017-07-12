@@ -1,4 +1,4 @@
-package com.baozun.nebula.web.controller.order.resolver;
+package com.baozun.nebula.web.controller.returnapplication.resolver;
 
 import java.util.List;
 
@@ -6,12 +6,12 @@ import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
-import com.baozun.nebula.web.controller.order.viewcommand.ReturnLineViewCommand;
+import com.baozun.nebula.web.controller.returnapplication.viewcommand.ReturnLineViewCommand;
 
 public interface ReturnApplicationResolver {
 	
 	  ReturnApplicationCommand toReturnApplicationCommand(MemberDetails memberDetails,
 														  ReturnOrderForm returnOrderForm,SalesOrderCommand salesOrder);
 	  
-	   List<ReturnLineViewCommand> toReturnLineViewCommand(List<Long> orderLineIds);
+	  List<ReturnLineViewCommand> toReturnLineViewCommand(List<Long> orderLineIds);
 }

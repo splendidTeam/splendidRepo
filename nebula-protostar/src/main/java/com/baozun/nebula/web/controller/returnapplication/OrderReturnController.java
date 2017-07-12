@@ -1,4 +1,4 @@
-package com.baozun.nebula.web.controller.salesorder;
+package com.baozun.nebula.web.controller.returnapplication;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -66,7 +66,7 @@ import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.PtsReturnOrderCommand;
 import com.baozun.nebula.web.command.ReturnLineViewCommand;
 import com.baozun.nebula.web.controller.BaseController;
-import com.baozun.nebula.web.controller.salesorder.form.ReturnOderForm;
+import com.baozun.nebula.web.controller.returnapplication.form.ReturnOderForm;
 import com.feilong.core.Validator;
 
 @Controller

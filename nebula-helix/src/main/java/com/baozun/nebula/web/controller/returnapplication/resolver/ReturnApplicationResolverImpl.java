@@ -1,4 +1,4 @@
-package com.baozun.nebula.web.controller.order.resolver;
+package com.baozun.nebula.web.controller.returnapplication.resolver;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationLineM
 import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
-import com.baozun.nebula.web.controller.order.viewcommand.ReturnLineViewCommand;
+import com.baozun.nebula.web.controller.returnapplication.viewcommand.ReturnLineViewCommand;
 
 @Service("returnApplicationResolver")
 public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{

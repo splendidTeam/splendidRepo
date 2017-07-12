@@ -17,7 +17,7 @@ import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationManager;
-import com.baozun.nebula.web.controller.order.viewcommand.ReturnLineViewCommand;
+import com.baozun.nebula.web.controller.returnapplication.viewcommand.ReturnLineViewCommand;
 
 /**
  * @author yaohua.wang@baozun.cn

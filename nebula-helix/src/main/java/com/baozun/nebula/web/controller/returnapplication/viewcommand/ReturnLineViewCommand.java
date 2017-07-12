@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.baozun.nebula.web.controller.order.viewcommand;
+package com.baozun.nebula.web.controller.returnapplication.viewcommand;
 
 import java.util.List;
 

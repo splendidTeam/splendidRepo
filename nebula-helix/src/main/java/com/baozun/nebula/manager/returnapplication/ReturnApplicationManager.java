@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.web.controller.order.viewcommand.ReturnApplicationViewCommand;
+import com.baozun.nebula.web.controller.returnapplication.viewcommand.ReturnApplicationViewCommand;
 
 /**
  * @author yaohua.wang@baozun.cn
