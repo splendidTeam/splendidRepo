@@ -41,15 +41,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.command.ReturnLineCommand;
-import com.baozun.nebula.constant.SoReturnConstants;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.manager.salesorder.ReturnOrderAppManager;
 import com.baozun.nebula.model.product.Sku;
+import com.baozun.nebula.model.returnapplication.ReturnApplication;
+import com.baozun.nebula.model.returnapplication.ReturnApplicationDeliveryInfo;
+import com.baozun.nebula.model.returnapplication.ReturnApplicationLine;
 import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.model.salesorder.SalesOrder;
-import com.baozun.nebula.model.salesorder.SoReturnApplication;
-import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
-import com.baozun.nebula.model.salesorder.SoReturnLine;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
@@ -57,9 +56,9 @@ import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.order.SdkOrderLineManager;
-import com.baozun.nebula.sdk.manager.returnapplication.SoReturnApplicationDeliveryManager;
-import com.baozun.nebula.sdk.manager.returnapplication.SoReturnApplicationManager;
-import com.baozun.nebula.sdk.manager.returnapplication.SoReturnLineManager;
+import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationDeliveryManager;
+import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationLineManager;
+import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.UserDetails;
@@ -68,6 +67,7 @@ import com.baozun.nebula.web.command.PtsReturnOrderCommand;
 import com.baozun.nebula.web.command.ReturnLineViewCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.salesorder.form.ReturnOderForm;
+import com.feilong.core.Validator;
 
 @Controller
 public class OrderReturnController extends BaseController{
@@ -79,7 +79,7 @@ public class OrderReturnController extends BaseController{
     private Logger logger = LoggerFactory.getLogger(OrderReturnController.class);
 
     @Autowired
-    private SoReturnLineManager line;
+    private SdkReturnApplicationLineManager sdkReturnLineManager;
 
     @Autowired
     private OrderManager orderManager;
@@ -94,10 +94,10 @@ public class OrderReturnController extends BaseController{
     private SdkOrderLineManager sdkOrderLineManager;
 
     @Autowired
-    private SoReturnApplicationManager soReturnApplicationManager;
+    private SdkReturnApplicationManager sdkReturnApplicationManager;
 
     @Autowired
-    private SoReturnApplicationDeliveryManager soReturnApplicationDeliveryManager;
+    private SdkReturnApplicationDeliveryManager returnApplicationDeliveryManager;
 
     @Autowired
     private ReturnOrderAppManager returnOrderAppManager;
@@ -128,7 +128,7 @@ public class OrderReturnController extends BaseController{
      */
     @RequestMapping({ "/saleOrder/returnOrderList.json" })
     @ResponseBody
-    public Pagination<SoReturnApplication> returnOrderJson(Model model,@QueryBeanParam QueryBean queryBean){
+    public Pagination<ReturnApplication> returnOrderJson(Model model,@QueryBeanParam QueryBean queryBean){
         logger.info("==========returnOrderJson============");
         Sort[] sorts = queryBean.getSorts();
         if ((sorts == null) || (sorts.length == 0)){
@@ -136,7 +136,7 @@ public class OrderReturnController extends BaseController{
             sorts = new Sort[1];
             sorts[0] = sort;
         }
-        Pagination<SoReturnApplication> result = soReturnApplicationManager.findReturnByQueryMapWithPage(queryBean.getPage(), sorts, queryBean.getParaMap());
+        Pagination<ReturnApplication> result = sdkReturnApplicationManager.findReturnByQueryMapWithPage(queryBean.getPage(), sorts, queryBean.getParaMap());
         return result;
     }
 
@@ -148,11 +148,11 @@ public class OrderReturnController extends BaseController{
         // 查询退货单关联的订单行
         List<Long> ids = new ArrayList<Long>();
         ids.add(id);
-        List<ReturnLineCommand> soLine = line.findSoReturnLinesByReturnOrderIds(ids);
-        SoReturnApplication app = soReturnApplicationManager.findByApplicationId(id);
+        List<ReturnLineCommand> soLine = sdkReturnLineManager.findSoReturnLinesByReturnOrderIds(ids);
+        ReturnApplication app = sdkReturnApplicationManager.findByApplicationId(id);
         //如果是换货，查询换货物流
-        if (SoReturnConstants.TYPE_EXCHANGE == app.getType()){
-            SoReturnApplicationDeliveryInfo returnDeliveryInfo = soReturnApplicationDeliveryManager.findDeliveryInfoByReturnId(app.getId());
+        if (ReturnApplication.SO_RETURN_TYPE_EXCHANGE.equals(app.getType())){
+            ReturnApplicationDeliveryInfo returnDeliveryInfo = returnApplicationDeliveryManager.findDeliveryInfoByReturnId(app.getId());
             model.addAttribute("deliveryInfo", returnDeliveryInfo);
         }
         model.addAttribute("SoReturnLine", soLine);
@@ -186,7 +186,7 @@ public class OrderReturnController extends BaseController{
         try{
             UserDetails userDetails = this.getUserDetails();
             String lastModifier = userDetails.getUsername();
-            soReturnApplicationManager.updateRefundType(returnOrderCode, lastModifier, state);
+            sdkReturnApplicationManager.updateRefundType(returnOrderCode, lastModifier, state);
         }catch (Exception e){
             logger.error("==========修改退款状态失败===============");
             FAILTRUE.setDescription("退款审核状态失败");
@@ -210,7 +210,7 @@ public class OrderReturnController extends BaseController{
         logger.info("============exaim=========");
         UserDetails use = this.getUserDetails();
         try{
-            SoReturnApplication returnapp = soReturnApplicationManager.auditSoReturnApplication(orderCode, status, description, use.getUsername(), omsCode, returnAddress);
+            ReturnApplication returnapp = sdkReturnApplicationManager.auditReturnApplication(orderCode, status, description, use.getUsername(), omsCode, returnAddress);
             if (returnapp != null){
                 return SUCCESS;
             }
@@ -245,7 +245,7 @@ public class OrderReturnController extends BaseController{
             sorts[0] = sort;
         }
 
-        List<OrderReturnCommand> returnCommand = soReturnApplicationManager.findExpInfo(sorts, queryBean.getParaMap());
+        List<OrderReturnCommand> returnCommand = sdkReturnApplicationManager.findExpInfo(sorts, queryBean.getParaMap());
         XSSFWorkbook wb = this.setReturnWorkbook(returnCommand);
         if (null == wb){
             model.addAttribute("errorMsg", "数据异常!");
@@ -354,22 +354,22 @@ public class OrderReturnController extends BaseController{
 
             // STATUS
             String returnStatus = null;
-            if (returnCommand.getStatus() == SoReturnConstants.AUDITING){
+            if (ReturnApplication.SO_RETURN_STATUS_AUDITING.equals(returnCommand.getStatus())){
                 returnStatus = "待审核";
             }
-            if (returnCommand.getStatus() == SoReturnConstants.REFUS_RETURN){
+            if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(returnCommand.getStatus())){
                 returnStatus = "拒绝退货";
             }
-            if (returnCommand.getStatus() == SoReturnConstants.TO_DELIVERY){
+            if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(returnCommand.getStatus())){
                 returnStatus = "待发货";
             }
-            if (returnCommand.getStatus() == SoReturnConstants.DELIVERIED){
+            if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED.equals(returnCommand.getStatus())){
                 returnStatus = "已发货";
             }
-            if (returnCommand.getStatus() == SoReturnConstants.AGREE_REFUND){
+            if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(returnCommand.getStatus())){
                 returnStatus = "同意退款";
             }
-            if (returnCommand.getStatus() == SoReturnConstants.RETURN_COMPLETE){
+            if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(returnCommand.getStatus())){
                 returnStatus = "已完成";
             }
             createCell(row, 7, returnStatus, centerStyleLeft);
@@ -387,22 +387,22 @@ public class OrderReturnController extends BaseController{
             // Etransname
             createCell(row, 12, returnCommand.getTransName(), centerStyleLeft);
             // Etransname
-            if (returnCommand.getReturnReason().equals(SoReturnConstants.CHEANGE_MIND)){
+            if (ReturnApplication.SO_RETURN_REASON_CHEANGE_MIND.equals(returnCommand.getReturnReason())){
                 createCell(row, 13, "我改变主意了", centerStyleLeft);
             }
-            if (returnCommand.getReturnReason().equals(SoReturnConstants.DAMAGED_GOOD)){
+            if (ReturnApplication.SO_RETURN_REASON_DAMAGED_GOOD.equals(returnCommand.getReturnReason())){
                 createCell(row, 13, "商品质量问题", centerStyleLeft);
             }
-            if (returnCommand.getReturnReason().equals(SoReturnConstants.DAMAGED_PACKAGE)){
+            if (ReturnApplication.SO_RETURN_REASON_DAMAGED_PACKAGE.equals(returnCommand.getReturnReason())){
                 createCell(row, 13, "包装商品破损", centerStyleLeft);
             }
-            if (returnCommand.getReturnReason().equals(SoReturnConstants.SIZE_UNMATCH)){
+            if (ReturnApplication.SO_RETURN_REASON_SIZE_UNMATCH.equals(returnCommand.getReturnReason())){
                 createCell(row, 13, "尺码与商品描述不符", centerStyleLeft);
             }
-            if (returnCommand.getReturnReason().equals(SoReturnConstants.PRODUCT_UNMATCH)){
+            if (ReturnApplication.SO_RETURN_REASON_PRODUCT_UNMATCH.equals(returnCommand.getReturnReason())){
                 createCell(row, 13, "颜色/款式与商品描述不符", centerStyleLeft);
             }
-            if (returnCommand.getReturnReason().equals(SoReturnConstants.OTHER_REASON)){
+            if (ReturnApplication.SO_RETURN_REASON_OTHER_REASON.equals(returnCommand.getReturnReason())){
                 createCell(row, 13, "其它原因", centerStyleLeft);
             }
             createCell(row, 14, returnCommand.getType() == 1 ? "退货" : "换货", centerStyleLeft);
@@ -518,7 +518,7 @@ public class OrderReturnController extends BaseController{
         // 查到订单对应的退货数量，set进mkMemberOrders对象中
         for (OrderLineCommand line : saleOrder.getOrderLines()){
             // 根据订单行查询退货单数量
-            num += soReturnApplicationManager.countCompletedAppsByPrimaryLineId(line.getId());
+            num += sdkReturnApplicationManager.countCompletedAppsByPrimaryLineId(line.getId());
         }
         if (num >= saleOrder.getQuantity()){
             model.addAttribute("errorMsg", "订单中无可退商品！");
@@ -529,7 +529,7 @@ public class OrderReturnController extends BaseController{
         List<OrderLineCommand> lineCommandList = saleOrder.getOrderLines();
 
         for (OrderLineCommand line : lineCommandList){
-            SoReturnApplication app = soReturnApplicationManager.findLastApplicationByOrderLineId(line.getId());
+            ReturnApplication app = sdkReturnApplicationManager.findLastApplicationByOrderLineId(line.getId());
             if (null != app && app.getStatus() != 5 && app.getStatus() != 1){
                 model.addAttribute("errorMsg", "当前订单尚有一笔未完成的退货单！无法再次申请！");
                 return "order/return-errorMsg";
@@ -557,7 +557,7 @@ public class OrderReturnController extends BaseController{
                 }
                 lineVo.setChgSkuCommandList(skuCommandList);
                 // 查询 当前订单行 已经退过货的商品个数（退换货状态为已完成)
-                Integer count = soReturnApplicationManager.countCompletedAppsByPrimaryLineId(line.getId());
+                Integer count = sdkReturnApplicationManager.countCompletedAppsByPrimaryLineId(line.getId());
                 lineVo.setCount(count);
                 lineVo.setOrderLineCommand(line);
                 soReturnLineVoList.add(lineVo);
@@ -604,8 +604,8 @@ public class OrderReturnController extends BaseController{
         List<OrderLineCommand> lineCommandList = saleOrder.getOrderLines();
 
         for (OrderLineCommand line : lineCommandList){
-            SoReturnApplication app = soReturnApplicationManager.findLastApplicationByOrderLineId(line.getId());
-            if (null != app && app.getStatus() != SoReturnConstants.RETURN_COMPLETE && app.getStatus() != SoReturnConstants.REFUS_RETURN){
+            ReturnApplication app = sdkReturnApplicationManager.findLastApplicationByOrderLineId(line.getId());
+            if (Validator.isNotNullOrEmpty(app) && !ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(app.getStatus()) && !ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(app.getStatus())){
                 // 信息
                 FAILTRUE.setDescription("操作失败！当前订单尚有一笔未完成的退货单！无法再次申请！");
                 return FAILTRUE;
@@ -636,7 +636,7 @@ public class OrderReturnController extends BaseController{
         // 查到订单对应的退货数量
         for (OrderLineCommand line : saleOrder.getOrderLines()){
             // 根据订单行查询退货单数量
-            count += soReturnApplicationManager.countCompletedAppsByPrimaryLineId(line.getId());
+            count += sdkReturnApplicationManager.countCompletedAppsByPrimaryLineId(line.getId());
         }
         // 如果原始订单中商品数量减去已退掉的商品数量小于本次需要退的商品数量，退货失败
         if (saleOrder.getQuantity() - count < returnTotalNum){
@@ -645,7 +645,7 @@ public class OrderReturnController extends BaseController{
             return FAILTRUE;
         }
         //保存退货单 
-        SoReturnApplication soReturnApp = new SoReturnApplication();
+        ReturnApplication soReturnApp = new ReturnApplication();
         soReturnApp.setCreateTime(date);
         soReturnApp.setMemberId(saleOrder.getMemberId());
         soReturnApp.setRemark(returnOrderForm.getMemo());
@@ -653,12 +653,12 @@ public class OrderReturnController extends BaseController{
         soReturnApp.setVersion(date);
         soReturnApp.setRefundBankBranch(returnOrderForm.getBranch());
         soReturnApp.setRefundBank(returnOrderForm.getBank());
-        soReturnApp.setType(SoReturnConstants.TYPE_RETURN);
+        soReturnApp.setType(ReturnApplication.SO_RETURN_TYPE_RETURN);
         soReturnApp.setSoOrderCode(returnOrderForm.getOrderCode());
         soReturnApp.setSoOrderId(Long.parseLong(returnOrderForm.getOrderId()));
         soReturnApp.setReturnApplicationCode("VR" + new Date().getTime());
         soReturnApp.setRefundType(saleOrder.getPayment().toString());// 退款方式
-        soReturnApp.setIsNeededReturnInvoice(SoReturnConstants.NEEDED_RETURNINVOICE);
+        soReturnApp.setIsNeededReturnInvoice(ReturnApplication.SO_RETURN_NEEDED_RETURNINVOICE);
         soReturnApp.setReturnReason("");
         soReturnApp.setStatus(0);
         if (saleOrder.getMemberId() != null){// 如果是会员 非游客
@@ -666,14 +666,14 @@ public class OrderReturnController extends BaseController{
         }else{// 游客下单把下单 邮箱 作冗余过来
             soReturnApp.setMemberId(-1L);// 游客
         }
-        List<SoReturnLine> returnLineList = new ArrayList<SoReturnLine>();
+        List<ReturnApplicationLine> returnLineList = new ArrayList<ReturnApplicationLine>();
 
         // 总共的退款金额 
         BigDecimal returnTotalMoney = new BigDecimal(0);
         String[] linedIdSelected = returnOrderForm.getLineIdSelected().split(",");
         String[] reasonSelected = returnOrderForm.getReasonSelected().split(",");
         for (int i = 0; i < linedIdSelected.length; i++){
-            SoReturnLine returnLine = new SoReturnLine();
+            ReturnApplicationLine returnLine = new ReturnApplicationLine();
             Long lineId = Long.parseLong(linedIdSelected[i]);
             OrderLine line = sdkOrderLineManager.findByPk(lineId);
 
@@ -695,7 +695,7 @@ public class OrderReturnController extends BaseController{
         ReturnApplicationCommand command = new ReturnApplicationCommand();
         command.setReturnApplication(soReturnApp);
         try{
-            soReturnApplicationManager.createReturnApplication(command, saleOrder);
+            sdkReturnApplicationManager.createReturnApplication(command, saleOrder);
             return SUCCESS;
         }catch (Exception e){
             e.printStackTrace();

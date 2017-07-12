@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baozun.nebula.command.ReturnApplicationCommand;
-import com.baozun.nebula.model.salesorder.SoReturnApplication;
+import com.baozun.nebula.model.returnapplication.ReturnApplication;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
@@ -38,7 +38,7 @@ public class ReturnApplicationManagerImpl implements ReturnApplicationManager{
 
         for (ReturnApplicationCommand returnApp : returnApplications){
             ReturnApplicationViewCommand viewCommand = new ReturnApplicationViewCommand();
-            SoReturnApplication returnApplication = returnApp.getReturnApplication();
+            ReturnApplication returnApplication = returnApp.getReturnApplication();
             if (Validator.isNotNullOrEmpty(returnApplication)){
                 SalesOrderCommand salesOrder = orderManager.findOrderById(Long.valueOf(returnApp.getReturnApplication().getSoOrderId()), null);
                 for (OrderLineCommand line : salesOrder.getOrderLines()){

@@ -1,4 +1,5 @@
-package com.baozun.nebula.model.salesorder;
+package com.baozun.nebula.model.returnapplication;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -19,9 +20,9 @@ import com.baozun.nebula.model.BaseModel;
  * 
  */
 @Entity
-@Table(name = "T_SO_RETURN_LINE")
+@Table(name = "T_SO_RETURN_APPLICATION_LINE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
-public class SoReturnLine extends BaseModel {
+public class ReturnApplicationLine extends BaseModel {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -3411890079966239231L;

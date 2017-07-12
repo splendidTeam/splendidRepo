@@ -12,7 +12,7 @@ import com.baozun.nebula.web.controller.order.viewcommand.ReturnLineViewCommand;
  * @author yaohua.wang@baozun.cn
  *
  */
-public interface ReturnLineManager extends BaseManager{
+public interface ReturnApplicationLineManager extends BaseManager{
 
     public List<ReturnLineViewCommand> findReturnLineViewCommandByLineIds(List<Long> orderLineIds);
 }

@@ -1,4 +1,4 @@
-package com.baozun.nebula.model.salesorder;
+package com.baozun.nebula.model.returnapplication;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -22,11 +23,110 @@ import com.baozun.nebula.model.BaseModel;
 @Entity
 @Table(name = "T_SO_RETURN_APPLICATION")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
-public class SoReturnApplication extends BaseModel{
-
+public class ReturnApplication extends BaseModel{
+    
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -3411890079966352309L;
+    
+    /**
+     * returnReason属性值域: 退换货申请原因<br>
+     */
+    /**不想买了*/
+    public static final String SO_RETURN_REASON_CHEANGE_MIND="R001A";
+    /** 商品质量问题 */
+    public static final String SO_RETURN_REASON_DAMAGED_GOOD = "R002A";
+    /** 包装破损 */
+    public static final String SO_RETURN_REASON_DAMAGED_PACKAGE = "R003A";
+    /** 尺码与商品描述不符*/
+    public static final String SO_RETURN_REASON_SIZE_UNMATCH = "R004A";
+    /** 颜色、图案、款式与商品描述不符*/
+    public static final String SO_RETURN_REASON_PRODUCT_UNMATCH = "R005A";
+    /** 其他原因*/
+    public static final String SO_RETURN_REASON_OTHER_REASON = "R006A";
 
+    /**
+     * isNeededReturnInvoice属性值域<br>
+     * 是否退货发票<br>
+     * Y表示需要退回发票:RETURN_APPLICATION_NEEDEDRETURNINVOICE<br>
+     * N表示不需要退回发票:RETURN_APPLICATION_NOTNEEDEDRETURNINVOICE(已过期)<br>
+     * 不在使用此值域<br>
+     * 现在实际情况用户无论选不选需要发票，官网商城都会开据发票，所以现在统一值域为：Y<br>
+     */
+    /**
+     * Y表示需要退回发票:RETURN_APPLICATION_NEEDEDRETURNINVOICE<br>
+     */
+    public static final String SO_RETURN_NEEDED_RETURNINVOICE = "Y";
+    /**
+     * N表示不需要退回发票:RETURN_APPLICATION_NOTNEEDEDRETURNINVOICE<br>
+     */
+    public static final String SO_RETURN_NOTNEEDED_RETURNINVOICE = "N";
+    
+    /** 
+     * type属性值域<br>
+     * 退换货申请类型<br>
+     */
+    /** 退货申请 */
+    public static final Integer SO_RETURN_TYPE_RETURN = 1;
+    /** 换货申请 */
+    public static final Integer SO_RETURN_TYPE_EXCHANGE = 2;
+    
+    /**
+     * status属性值域<br>
+     * 退换货申请状态<br>
+    */
+    /** 待审核  （即新建）*/
+    public static final Integer SO_RETURN_STATUS_AUDITING = 0;
+    /** 拒绝退货  */
+    public static final Integer SO_RETURN_STATUS_REFUS_RETURN = 1;
+    /** 待发货 （即客服审核通过） */
+    public static final Integer SO_RETURN_STATUS_TO_DELIVERY  = 2;
+    /** 已发货 */
+    public static final Integer SO_RETURN_STATUS_DELIVERIED = 3;
+    /** 同意退款 */
+    public static final Integer SO_RETURN_STATUS_AGREE_REFUND = 4;
+    /** 已完成 */
+    public static final Integer SO_RETURN_STATUS_RETURN_COMPLETE = 5;
+    /** 取消退货*/
+    public static final Integer SO_RETURN_STATUS_RETURN_CANCEL = 6;
+    
+    /**
+     * refundStatus属性值域<br>
+     * 退款状态<br>
+     */
+    /**
+     * 待处理:REFUND_TYPE_WAIT
+     */
+    public static final Integer SO_RETURN_REFUNDSTATUS_REFUND_TYPE_WAIT = 0;
+    /**
+     * 同意退款:REFUND_TYPE_HANDLING
+     */
+    public static final Integer SO_RETURN_REFUNDSTATUS_REFUND_TYPE_HANDLING = 1;
+    /**
+     * 拒绝退款退换:REFUND_TYPE_SUCCESS
+     */
+    public static final Integer SO_RETURN_REFUNDSTATUS_REFUND_TYPE_SUCCESS = 2;
+    /**
+     * 待处理:REFUND_TYPE_WAIT
+     */
+    public static final Integer SO_RETURN_REFUNDSTATUS_REFUND_TYPE_FAIL = 3;
+    
+    /**
+     * synType属性值域<br>
+     * MQ状态<br>
+     */
+    /**
+     * 未发送MQ:IS_NOT_SEND_MQ<br>
+     */
+    public static final Integer SO_RETURN_SYNTYPE_IS_NOT_SEND_MQ = 0;
+    /**
+     * 发送MQ:IS_SEND_MQ
+     */
+    public static final Integer SO_RETURN_SYNTYPE_IS_SEND_MQ = 1;
+    /**
+     * 发送异常:SEND_MQ_ERROR
+     */
+    public static final Integer SO_RETURN_SYNTYPE_SEND_MQ_ERROR = 2;
+    
     /**
      * PK
      */
@@ -45,7 +145,7 @@ public class SoReturnApplication extends BaseModel{
     /**
      * 退换货申请类型 <br>
      */
-    private int type;
+    private Integer type;
 
     /**
      * 平台订单ID
@@ -119,17 +219,17 @@ public class SoReturnApplication extends BaseModel{
     /**
      * 退换货申请状态<br>
      */
-    private int status;
+    private Integer status;
 
     /**
      * 后端处理状态
      */
-    private int omsStatus;
+    private Integer omsStatus;
 
     /**
      * 退款状态<br>
      */
-    private int refundStatus;
+    private Integer refundStatus;
 
     /**
      * 审批人
@@ -206,6 +306,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the soOrderCode
      */
     @Column(name = "SO_ORDER_CODE")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_SO_ORDER_CODE")
     public String getSoOrderCode(){
         return soOrderCode;
     }
@@ -222,6 +323,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the returnApplicationCode
      */
     @Column(name = "RETURN_APPLICATION_CODE")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_RETURN_APPLICATION_CODE")
     public String getReturnApplicationCode(){
         return returnApplicationCode;
     }
@@ -238,6 +340,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the type
      */
     @Column(name = "TYPE")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_TYPE")
     public int getType(){
         return type;
     }
@@ -254,6 +357,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the soOrderId
      */
     @Column(name = "SO_ORDER_ID")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_SO_ORDER_ID")
     public Long getSoOrderId(){
         return soOrderId;
     }
@@ -270,6 +374,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the soOrderLineId
      */
     @Column(name = "SO_ORDER_LINE_ID")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_SO_ORDER_LINE_ID")
     public Long getSoOrderLineId(){
         return soOrderLineId;
     }
@@ -318,6 +423,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the source
      */
     @Column(name = "SOURCE")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_SOURCE")
     public String getSource(){
         return source;
     }
@@ -334,6 +440,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the refundType
      */
     @Column(name = "REFUND_TYPE")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_REFUND_TYPE")
     public String getRefundType(){
         return refundType;
     }
@@ -397,7 +504,8 @@ public class SoReturnApplication extends BaseModel{
     /**
      * @return the isNeededReturnInvoice
      */
-    @Column(name = "ISNEEDEDRETURNINVOICE")
+    @Column(name = "IS_NEEDED_RETURN_INVOICE")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_IS_NEEDED_RETURN_INVOICE")
     public String getIsNeededReturnInvoice(){
         return isNeededReturnInvoice;
     }
@@ -446,6 +554,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the status
      */
     @Column(name = "STATUS")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_STATUS")
     public int getStatus(){
         return status;
     }
@@ -462,6 +571,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the omsStatus
      */
     @Column(name = "OMS_STATUS")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_OMS_STATUS")
     public int getOmsStatus(){
         return omsStatus;
     }
@@ -478,6 +588,7 @@ public class SoReturnApplication extends BaseModel{
      * @return the refundStatus
      */
     @Column(name = "REFUND_STATUS")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_REFUND_STATUS")
     public int getRefundStatus(){
         return refundStatus;
     }
@@ -525,7 +636,7 @@ public class SoReturnApplication extends BaseModel{
     /**
      * @return the lastModifyUser
      */
-    @Column(name = "LASTMODIFYUSER")
+    @Column(name = "LAST_MODIFY_USER")
     public String getLastModifyUser(){
         return lastModifyUser;
     }
@@ -541,7 +652,8 @@ public class SoReturnApplication extends BaseModel{
     /**
      * @return the memberId
      */
-    @Column(name = "MEMBERID")
+    @Column(name = "MEMBER_ID")
+    @Index(name = "IDX_SO_RETURN_APPLICATION_MEMBER_ID")
     public Long getMemberId(){
         return memberId;
     }

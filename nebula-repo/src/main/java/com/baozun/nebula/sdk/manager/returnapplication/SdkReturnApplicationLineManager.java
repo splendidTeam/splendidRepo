@@ -3,19 +3,19 @@ package com.baozun.nebula.sdk.manager.returnapplication;
 import java.util.List;
 
 import com.baozun.nebula.command.ReturnLineCommand;
-import com.baozun.nebula.model.salesorder.SoReturnLine;
+import com.baozun.nebula.model.returnapplication.ReturnApplicationLine;
 
 
 /**
  * 退换货申请单行管理接口
  *
  */
-public interface SoReturnLineManager  {
+public interface SdkReturnApplicationLineManager  {
 	
 
 	
 	//保存退货订单行
-	public List<SoReturnLine> saveReturnLine(List<SoReturnLine> soReturnLine);
+	public List<ReturnApplicationLine> saveReturnLine(List<ReturnApplicationLine> soReturnLine);
 	
 	/**
 	 * 通过退货单编号查询退货订单行

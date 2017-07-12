@@ -11,13 +11,14 @@ import org.springframework.validation.ValidationUtils;
 
 import com.baozun.nebula.constant.SoReturnConstants;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
+import com.baozun.nebula.model.returnapplication.ReturnApplication;
 import com.baozun.nebula.model.salesorder.SalesOrder;
-import com.baozun.nebula.model.salesorder.SoReturnApplication;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.sdk.manager.returnapplication.SoReturnApplicationManager;
+import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationManager;
 import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
+import com.feilong.core.Validator;
 
 
 public  class ReturnApplicationNormalValidator extends ReturnApplicationValidator{
@@ -29,7 +30,7 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
     private SdkOrderLineDao sdkOrderLineDao;
 	
 	@Autowired
-	private SoReturnApplicationManager soReturnApplicationManager;
+	private SdkReturnApplicationManager sdkReturnApplicationManager;
 
 	@Override
 	public void processValidate(Object target, Errors errors) {
@@ -67,7 +68,7 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 				Long selected=Long.parseLong(selectedLineId[i]);
 				if(line.getId().longValue()==selected.longValue()){
 					//通过订单行id查询该订单行已经完成的退货数量
-					Integer returnedCount=	soReturnApplicationManager.countCompletedAppsByPrimaryLineId(Long.parseLong(selectedLineId[i]));
+					Integer returnedCount=	sdkReturnApplicationManager.countCompletedAppsByPrimaryLineId(Long.parseLong(selectedLineId[i]));
 					Integer count=line.getCount();
 					if(count-Integer.parseInt(form.getSumSelected()[i])<returnedCount){
 						// 退货数量超出限制。
@@ -77,12 +78,12 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 				}
 			}
 			
-			SoReturnApplication app = soReturnApplicationManager.findLastApplicationByOrderLineId(line.getId());
-			if (null != app && app.getStatus() != SoReturnConstants.RETURN_COMPLETE&&app.getStatus()!=SoReturnConstants.REFUS_RETURN) {
+			ReturnApplication app = sdkReturnApplicationManager.findLastApplicationByOrderLineId(line.getId());
+			if (Validator.isNotNullOrEmpty(app) && !ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(app.getStatus()) && !ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(app.getStatus())) {
 				// 当前订单尚有一笔未完成的退货单！无法再次申请
 				errors.rejectValue("orderCode", "return.unfinish");
 			}
-			Boolean isOutDayOrder = soReturnApplicationManager
+			Boolean isOutDayOrder = sdkReturnApplicationManager
 					.isFinishedAndOutDayOrderById(saleOrder.getId());
 			if (BooleanUtils.isTrue(isOutDayOrder)) {
 				// 如果是 超过收货14天的订单则不能 申请退货

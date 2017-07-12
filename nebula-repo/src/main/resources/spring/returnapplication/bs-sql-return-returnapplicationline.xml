@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SdkReturnApplicationLineDao.findSoReturnLinesByReturnOrderIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过退货单编号查询退货订单行</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+					DISTINCT
+					 soline.return_orderid as RETURNORDERID,
+					 soline.rtn_extentioncode as RTNEXTENTIONCODE,
+					 soline.chg_extentioncode as CHGEXTENTIONCODE,
+					 soline.qty as QTY,
+					 soline.so_lineid as SOLINEID,
+					 soline.package_line_id as PACKAGELINEID,
+					 soline.return_reason as RETURNREASON,
+					 soline.create_time as CREATETIME,
+					 soline.imgname as  IMGNAME,
+				     soline.memo as MEMO,
+					 soline.return_price as RETURNPRICE,
+				     soline.type as TYPE,
+				     iteminfo.title as productName,
+				     item.code as itemCode
+				  from t_so_return_line soline 
+				  left join t_pd_sku sku
+			    	on soline.rtn_extentioncode=sku.out_id
+			      left join t_pd_iteminfo iteminfo 
+			     	on sku.item_id=iteminfo.item_id 
+			     left join t_pd_item item
+			     on sku.item_id=item.id
+			     	where  soline.return_orderid in(
+					#foreach($return_orderid in $returnOrderIds)
+    					$return_orderid,
+					 #end
+		       		 -1)
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

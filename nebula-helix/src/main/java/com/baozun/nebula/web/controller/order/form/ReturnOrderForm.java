@@ -1,7 +1,7 @@
 
 package com.baozun.nebula.web.controller.order.form;
 
-import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
+import com.baozun.nebula.model.returnapplication.ReturnApplicationDeliveryInfo;
 import com.baozun.nebula.web.controller.BaseForm;
 
 /**
@@ -143,15 +143,14 @@ public class ReturnOrderForm  extends BaseForm{
 	private String[] returnType;
 	
 	/**以下部分为returnDelivery信息*/
-	
-	private SoReturnApplicationDeliveryInfo returnDeliveryInfo;
+	private ReturnApplicationDeliveryInfo returnDeliveryInfo;
 
-	public SoReturnApplicationDeliveryInfo getReturnDeliveryInfo() {
+	public ReturnApplicationDeliveryInfo getReturnDeliveryInfo() {
 		return returnDeliveryInfo;
 	}
 
 	public void setReturnDeliveryInfo(
-			SoReturnApplicationDeliveryInfo returnDeliveryInfo) {
+			ReturnApplicationDeliveryInfo returnDeliveryInfo) {
 		this.returnDeliveryInfo = returnDeliveryInfo;
 	}
 

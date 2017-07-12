@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.manager.returnapplication.ReturnApplicationManager;
-import com.baozun.nebula.manager.returnapplication.ReturnLineManager;
+import com.baozun.nebula.manager.returnapplication.ReturnApplicationLineManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.sdk.manager.returnapplication.SoReturnApplicationManager;
-import com.baozun.nebula.sdk.manager.returnapplication.SoReturnLineManager;
+import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationLineManager;
+import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
@@ -78,19 +78,19 @@ public class NebulaOrderReturnController extends BaseController{
     private OrderManager orderManager;
 
     @Autowired
-    private SoReturnApplicationManager soReturnApplicationManager;
-
-    @Autowired
-    private SoReturnLineManager soReturnLineManager;
+    private SdkReturnApplicationLineManager soReturnLineManager;
 
     @Autowired
     private SdkOrderLineDao sdkOrderLineDao;
 
     @Autowired
     private ReturnApplicationManager returnApplicationManager;
+    
+    @Autowired
+    private SdkReturnApplicationManager sdkReturnApplicationManager;
 
     @Autowired
-    private ReturnLineManager returnLineManager;
+    private ReturnApplicationLineManager returnLineManager;
 
     /**
      * 
@@ -137,7 +137,7 @@ public class NebulaOrderReturnController extends BaseController{
         // 如果是换货，需要处理换货物流对象
         ReturnApplicationCommand returnCommand = returnApplicationResolver.toReturnApplicationCommand(memberDetails, returnOrderForm, salesOrder);
 
-        returnCommand = soReturnApplicationManager.createReturnApplication(returnCommand, salesOrder);
+        returnCommand = sdkReturnApplicationManager.createReturnApplication(returnCommand, salesOrder);
         defaultReturnResult.setReturnObject(returnCommand);
         if (Validator.isNullOrEmpty(returnCommand)){
             LOGGER.error("[returnOrder] {} [{}] returnOrder save error. \"\"");
@@ -201,7 +201,7 @@ public class NebulaOrderReturnController extends BaseController{
         Validate.notNull(memberDetails, "memberDetails can't be null!");
 
         // 判断memberDetails和order id关系
-        List<ReturnApplicationCommand> returnApplications = soReturnApplicationManager.findReturnApplicationCommandsByIds(returnIds);
+        List<ReturnApplicationCommand> returnApplications = sdkReturnApplicationManager.findReturnApplicationCommandsByIds(returnIds);
         if (Validator.isNotNullOrEmpty(returnApplications)){
             for (ReturnApplicationCommand returnCommand : returnApplications){
                 if (Validator.isNotNullOrEmpty(returnCommand.getReturnApplication())){

@@ -10,17 +10,17 @@ import loxia.dao.Sort;
 
 import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
-import com.baozun.nebula.model.salesorder.SoReturnApplication;
+import com.baozun.nebula.model.returnapplication.ReturnApplication;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
-public interface SoReturnApplicationManager {
+public interface SdkReturnApplicationManager {
 
 	/** 查询 当前订单行 已经退换过货的商品个数（退换货状态为已完成) <br/>
 	 *  primaryLineId:orderlineid 或者packageOrderLineId*/
 	public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId);
 	
 	/** 根据orderLineId  查询退换货单(时间最近的一个) */
-	public SoReturnApplication findLastApplicationByOrderLineId(Long orderLineId);
+	public ReturnApplication findLastApplicationByOrderLineId(Long orderLineId);
 	
 	
 	/** 根据订单id判断是不是 已经超过14天收货的订单*/
@@ -35,15 +35,15 @@ public interface SoReturnApplicationManager {
 	 * @param orderId
 	 * @return
 	 */
-	public SoReturnApplication findLastApplicationByOrderId(Long orderId);
+	public ReturnApplication findLastApplicationByOrderId(Long orderId);
 	
-	public Pagination<SoReturnApplication> findReturnByQueryMapWithPage(Page page, Sort[] sorts,@QueryParam Map<String, Object> paraMap);
+	public Pagination<ReturnApplication> findReturnByQueryMapWithPage(Page page, Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 	
 	/** 查询退换货申请单  退换货applicationid */
-	public SoReturnApplication findByApplicationId(Long id);
+	public ReturnApplication findByApplicationId(Long id);
 	
 	  /** 客服审核  Status==1退回 ； Status==2 通过 */
-	public SoReturnApplication auditSoReturnApplication(String returnCode,Integer Status,String description,String modifier,String omsCode,String returnAddress) throws Exception ;
+	public ReturnApplication auditReturnApplication(String returnCode,Integer Status,String description,String modifier,String omsCode,String returnAddress) throws Exception ;
 	
 	/**
 	 * 退货信息导出
@@ -52,7 +52,7 @@ public interface SoReturnApplicationManager {
 	 */
 	public List<OrderReturnCommand> findExpInfo(Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 	
-	public SoReturnApplication  findApplicationByCode(String code);
+	public ReturnApplication  findApplicationByCode(String code);
     
     /**
      * 更改退款状态

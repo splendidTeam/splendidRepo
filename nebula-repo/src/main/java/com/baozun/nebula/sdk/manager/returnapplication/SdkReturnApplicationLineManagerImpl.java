@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.ReturnLineCommand;
-import com.baozun.nebula.dao.salesorder.SoReturnLineDao;
-import com.baozun.nebula.model.salesorder.SoReturnLine;
+import com.baozun.nebula.dao.returnapplication.SdkReturnApplicationLineDao;
+import com.baozun.nebula.model.returnapplication.ReturnApplicationLine;
 
 
 
@@ -21,16 +21,16 @@ import com.baozun.nebula.model.salesorder.SoReturnLine;
  */
 @Transactional
 @Service("soReturnLineManager")
-public class SoReturnLineManagerImpl implements SoReturnLineManager {
+public class SdkReturnApplicationLineManagerImpl implements SdkReturnApplicationLineManager {
 
-	private static final Logger	log	= LoggerFactory.getLogger(SoReturnLineManagerImpl.class);
+	private static final Logger	log	= LoggerFactory.getLogger(SdkReturnApplicationLineManagerImpl.class);
 	@Autowired
-	private SoReturnLineDao soReturnLineDao;
+	private SdkReturnApplicationLineDao soReturnLineDao;
 	@Override
-	public List<SoReturnLine> saveReturnLine(List<SoReturnLine> soReturnLine) {
-		List<SoReturnLine> returnLines=new ArrayList<SoReturnLine>();
-		for(SoReturnLine so:soReturnLine){
-			SoReturnLine returnLine=soReturnLineDao.save(so);
+	public List<ReturnApplicationLine> saveReturnLine(List<ReturnApplicationLine> soReturnLine) {
+		List<ReturnApplicationLine> returnLines=new ArrayList<ReturnApplicationLine>();
+		for(ReturnApplicationLine so:soReturnLine){
+		    ReturnApplicationLine returnLine=soReturnLineDao.save(so);
 			returnLines.add(returnLine);
 		}
 		return returnLines;

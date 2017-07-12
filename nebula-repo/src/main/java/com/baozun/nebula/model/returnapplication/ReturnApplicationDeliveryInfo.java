@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.baozun.nebula.model.salesorder;
+package com.baozun.nebula.model.returnapplication;
 
 import java.util.Date;
 
@@ -25,7 +25,7 @@ import com.baozun.nebula.model.BaseModel;
 @Entity
 @Table(name = "T_SO_RETURN_APPLICATION_DELIVERYINFO")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
-public class SoReturnApplicationDeliveryInfo extends BaseModel{
+public class ReturnApplicationDeliveryInfo extends BaseModel{
 
     /**
      * 

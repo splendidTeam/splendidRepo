@@ -2,45 +2,45 @@ package com.baozun.nebula.command;
 
 import java.util.List;
 
-import com.baozun.nebula.model.salesorder.SoReturnApplication;
-import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
-import com.baozun.nebula.model.salesorder.SoReturnLine;
+import com.baozun.nebula.model.returnapplication.ReturnApplication;
+import com.baozun.nebula.model.returnapplication.ReturnApplicationDeliveryInfo;
+import com.baozun.nebula.model.returnapplication.ReturnApplicationLine;
 
 public class ReturnApplicationCommand {
 	
-	private SoReturnApplication returnApplication;
+	private ReturnApplication returnApplication;
 
-	private List<SoReturnLine> returnLineList;
+	private List<ReturnApplicationLine> returnLineList;
 	
-	private SoReturnApplicationDeliveryInfo soReturnApplicationDeliveryInfo;
+	private ReturnApplicationDeliveryInfo returnApplicationDeliveryInfo;
 
-	public SoReturnApplicationDeliveryInfo getSoReturnApplicationDeliveryInfo() {
-		return soReturnApplicationDeliveryInfo;
+	public ReturnApplicationDeliveryInfo getSoReturnApplicationDeliveryInfo() {
+		return returnApplicationDeliveryInfo;
 	}
 
 
 	public void setSoReturnApplicationDeliveryInfo(
-			SoReturnApplicationDeliveryInfo soReturnApplicationDeliveryInfo) {
-		this.soReturnApplicationDeliveryInfo = soReturnApplicationDeliveryInfo;
+			ReturnApplicationDeliveryInfo soReturnApplicationDeliveryInfo) {
+		this.returnApplicationDeliveryInfo = soReturnApplicationDeliveryInfo;
 	}
 
 
-	public SoReturnApplication getReturnApplication() {
+	public ReturnApplication getReturnApplication() {
 		return returnApplication;
 	}
 
 
-	public void setReturnApplication(SoReturnApplication returnApplication) {
+	public void setReturnApplication(ReturnApplication returnApplication) {
 		this.returnApplication = returnApplication;
 	}
 
 
-	public List<SoReturnLine> getReturnLineList() {
+	public List<ReturnApplicationLine> getReturnLineList() {
 		return returnLineList;
 	}
 
 
-	public void setReturnLineList(List<SoReturnLine> returnLineList) {
+	public void setReturnLineList(List<ReturnApplicationLine> returnLineList) {
 		this.returnLineList = returnLineList;
 	}
 
