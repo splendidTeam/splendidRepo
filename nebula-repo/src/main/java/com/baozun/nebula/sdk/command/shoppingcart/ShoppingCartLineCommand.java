@@ -243,8 +243,15 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 商城自定义参数，nebula不控制. */
     private Map<String, Object> customParamMap;
 
+    /**
+     * 杂项 可以存放商品信息.
+     * 
+     * @since 5.3.2.18
+     */
+    private String misc;
+
     //**********************************************************************************************
-    
+
     /**
      * 是否可见 1可见 /0不可见 *.
      * 
@@ -252,14 +259,6 @@ public class ShoppingCartLineCommand extends BaseModel{
      */
     @Deprecated
     private Integer visibleMark;
-
-    /**
-     * 是否有库存 1有库存 0无库存 *.
-     * 
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private Integer stockMark;
 
     /**
      * 折扣单价-不包含整单优惠分摊.
@@ -280,58 +279,12 @@ public class ShoppingCartLineCommand extends BaseModel{
     private List<Long> lableIds;
 
     /**
-     * The brand id.
-     * 
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private String brandId;
-
-    /**
-     * The store id.
-     * 
-     * @deprecated 目前值就＝ {@link #shopId},重复了,而且没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private long storeId;
-
-    /**
      * The indstry id.
      * 
      * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
      */
     @Deprecated
     private Long indstryId;
-
-    /**
-     * The state.
-     * 
-     * @deprecated 没有用到, by feilong 2016-07-13
-     */
-    private String state;
-
-    //***************************************************************************************************
-
-    /**
-     * 库房id .
-     * 
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    private Long wareHoseId;
-
-    /**
-     * 库房名称 .
-     * 
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    private String wareHoseName;
-    
-  //***************************************************************************************************
-
-    /** 杂项 可以存放商品信息. 
-     * @since 5.3.2.18
-     * */
-    private String misc;
 
     //**********************************************************************************************
     /**
@@ -665,29 +618,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 brand id.
-     *
-     * @return the brand id
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public String getBrandId(){
-        return brandId;
-    }
-
-    /**
-     * 设置 brand id.
-     *
-     * @param brandId
-     *            the brand id
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public void setBrandId(String brandId){
-        this.brandId = brandId;
-    }
-
-    /**
      * 获得 category list.
      *
      * @return the category list
@@ -704,29 +634,6 @@ public class ShoppingCartLineCommand extends BaseModel{
      */
     public void setCategoryList(List<Long> categoryList){
         this.categoryList = categoryList;
-    }
-
-    /**
-     * 获得 store id.
-     *
-     * @return the store id
-     * @deprecated 目前值就＝ {@link #getShopId()},重复了,而且没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public long getStoreId(){
-        return storeId;
-    }
-
-    /**
-     * 设置 store id.
-     *
-     * @param storeId
-     *            the store id
-     * @deprecated 目前值就＝ {@link #getShopId()},重复了,而且没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public void setStoreId(long storeId){
-        this.storeId = storeId;
     }
 
     /**
@@ -750,27 +657,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     @Deprecated
     public void setIndstryId(Long indstryId){
         this.indstryId = indstryId;
-    }
-
-    /**
-     * 获得 state.
-     *
-     * @return the state
-     * @deprecated 没有用到, by feilong 2016-07-13
-     */
-    public String getState(){
-        return state;
-    }
-
-    /**
-     * 设置 state.
-     *
-     * @param state
-     *            the state
-     * @deprecated 没有用到, by feilong 2016-07-13
-     */
-    public void setState(String state){
-        this.state = state;
     }
 
     /**
@@ -833,48 +719,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 库房id.
-     *
-     * @return the 库房id
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    public Long getWareHoseId(){
-        return wareHoseId;
-    }
-
-    /**
-     * 设置 库房id .
-     *
-     * @param wareHoseId
-     *            the new 库房id
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    public void setWareHoseId(Long wareHoseId){
-        this.wareHoseId = wareHoseId;
-    }
-
-    /**
-     * 获得 库房名称 .
-     *
-     * @return the 库房名称
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    public String getWareHoseName(){
-        return wareHoseName;
-    }
-
-    /**
-     * 设置 库房名称 .
-     *
-     * @param wareHoseName
-     *            the new 库房名称
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    public void setWareHoseName(String wareHoseName){
-        this.wareHoseName = wareHoseName;
-    }
-
-    /**
      * 获得 是否可见 1可见 /0不可见 *.
      *
      * @return the 是否可见 1可见 /0不可见 *
@@ -914,29 +758,6 @@ public class ShoppingCartLineCommand extends BaseModel{
      */
     public void setLimitMark(Integer limitMark){
         this.limitMark = limitMark;
-    }
-
-    /**
-     * 获得 是否有库存 1有库存 0无库存 *.
-     *
-     * @return the 是否有库存 1有库存 0无库存 *
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public Integer getStockMark(){
-        return stockMark;
-    }
-
-    /**
-     * 设置 是否有库存 1有库存 0无库存 *.
-     *
-     * @param stockMark
-     *            the new 是否有库存 1有库存 0无库存 *
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public void setStockMark(Integer stockMark){
-        this.stockMark = stockMark;
     }
 
     /**
@@ -1445,6 +1266,7 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     /**
      * 获取 杂项信息
+     * 
      * @return String
      * @since 5.3.2.18
      */
@@ -1454,11 +1276,12 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     /**
      * 设置 杂项信息
+     * 
      * @param String
      * @since 5.3.2.18
      */
     public void setMisc(String misc){
         this.misc = misc;
     }
-    
+
 }

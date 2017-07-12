@@ -35,7 +35,6 @@ import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartLineImageManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
-import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
 
 /**
@@ -48,23 +47,23 @@ public abstract class AbstractShoppingCartLineCommandPackBehaviour implements Sh
 
     /** The shop dao. */
     @Autowired
-    private ShopDao                         shopDao;
+    private ShopDao shopDao;
 
     /** The sdk item manager. */
     @Autowired
-    private SdkItemManager                  sdkItemManager;
+    private SdkItemManager sdkItemManager;
 
     /** The item category dao. */
     @Autowired
-    private ItemCategoryDao                 itemCategoryDao;
+    private ItemCategoryDao itemCategoryDao;
 
     /** The item tag relation dao. */
     @Autowired
-    private ItemTagRelationDao              itemTagRelationDao;
+    private ItemTagRelationDao itemTagRelationDao;
 
     /** The sdk engine manager. */
     @Autowired
-    private SdkEngineManager                sdkEngineManager;
+    private SdkEngineManager sdkEngineManager;
 
     /** The sdk shopping cart line image manager. */
     @Autowired
@@ -106,7 +105,6 @@ public abstract class AbstractShoppingCartLineCommandPackBehaviour implements Sh
         // 店铺信息
         shoppingCartLineCommand.setShopId(shopId);
         shoppingCartLineCommand.setShopName(shopCommand.getShopname());
-        shoppingCartLineCommand.setStoreId(shopId);
         shoppingCartLineCommand.setIndstryId(item.getIndustryId());
     }
 
