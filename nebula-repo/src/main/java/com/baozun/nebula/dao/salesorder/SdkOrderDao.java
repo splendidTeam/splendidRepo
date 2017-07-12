@@ -239,15 +239,4 @@ public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
   	@NativeQuery(model = SalesOrder.class)
   	SalesOrder findFinishedOrderById(@QueryParam("orderId") Long orderId,@QueryParam("logisticsStatus") Integer logisticsStatus);
   	
-	/**
-	 * 
-	 * @Description 根据订单号或者下单时下单者手机号查询订单信息
-	 * @param code
-	 * @param mobile
-	 * @return
-	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
-	 * @version 2016-9-13
-	 */
-	@NativeQuery(model = SalesOrderCommand.class)
-	List<SalesOrderCommand> findOrderByMobileOrCode(@QueryParam("code") String code, @QueryParam("mobile") String mobile);
 }

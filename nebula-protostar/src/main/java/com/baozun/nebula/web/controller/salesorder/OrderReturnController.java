@@ -496,12 +496,11 @@ public class OrderReturnController extends BaseController{
     @RequestMapping(value = "/order/findOrder.json")
     public String returnOrder(@RequestParam(value = "code") String code,@RequestParam(value = "type") int type,Model model){
         // 查询订单,订单code唯一，因此只需获取第一个元素即可
-        List<SalesOrderCommand> saleOrderList = orderManager.findOrderByMobileOrCode(null, code);
-        if (saleOrderList.size() <= 0 || saleOrderList == null){
+        SalesOrderCommand saleOrder = orderManager.findOrderByCode(code, 1);
+        if (Validator.isNullOrEmpty(saleOrder)){
             model.addAttribute("errorMsg", "订单不存在！");
             return "order/return-errorMsg";
         }
-        SalesOrderCommand saleOrder = saleOrderList.get(0);
         //未发货无法申请
         if (saleOrder.getLogisticsStatus() != SalesOrder.SALES_ORDER_STATUS_FINISHED && saleOrder.getLogisticsStatus() != SalesOrder.SALES_ORDER_STATUS_DELIVERIED && saleOrder.getLogisticsStatus() != SalesOrder.SALES_ORDER_STATUS_CANCELED
                         && saleOrder.getLogisticsStatus() != SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED){

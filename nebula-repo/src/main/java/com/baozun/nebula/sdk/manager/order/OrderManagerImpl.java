@@ -961,24 +961,5 @@ public class OrderManagerImpl implements OrderManager{
     private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
         sdkSecretManager.decrypt(salesOrderCommand, new String[] { "name", "buyerName", "country", "province", "city", "area", "town", "address", "postcode", "tel", "buyerTel", "mobile", "email" });
     }
-    
-	@Override
-	public List<SalesOrderCommand> findOrderByMobileOrCode(String mobile,
-			String code) {
-		List<SalesOrderCommand> orderCommands = orderDao.findOrderByMobileOrCode(code, mobile);
-		for(SalesOrderCommand command : orderCommands){
-			List<OrderLineCommand> orderLineCommands = sdkOrderLineDao.findOrderDetailList(command.getId());
-			command.setOrderLines(orderLineCommands);
-	        for (OrderLineCommand line : orderLineCommands) {
-	            String properties = line.getSaleProperty();
-	            List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-	            line.setSkuPropertys(propList);
-		    }
-			// 订单支付信息
-			List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(command.getId());
-			command.setPayInfo(payInfos);
-			
-		}
-		return orderCommands;
-	}
+
 }
