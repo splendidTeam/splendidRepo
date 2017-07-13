@@ -16,8 +16,8 @@
 			       	#if($id)
 						and t.id = :id
 					#end
-					#if($itemId)
-						and t.item_id = :itemId
+					#if($targetId)
+						and t.target_id = :targetId
 					#end
 					#if($optId)
 						and t.opt_id = :optId

@@ -12,6 +12,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.OptimisticLockType;
+import org.hibernate.annotations.Type;
 
 import com.baozun.nebula.model.BaseModel;
 
@@ -21,9 +22,9 @@ import com.baozun.nebula.model.BaseModel;
  *
  */
 @Entity
-@Table(name = "T_SYS_ITEM_OPERATE_LOG")
+@Table(name = "T_SYS_OPERATE_LOG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
-public class SysItemOperateLog extends BaseModel{
+public class SystemOperateLog extends BaseModel{
 
 	private static final long serialVersionUID = -7129217516762310008L;
 	
@@ -34,8 +35,8 @@ public class SysItemOperateLog extends BaseModel{
 	private Long optId;
 	/** 1.单个操作，2.系统推送，3.导入 */
 	private Long optType;
-	/** 商品ID */
-	private Long itemId;
+	/** 操作数据类型关联键 */
+	private String targetId;
 	/** 操作时间 */
 	private Date createTime;
 	
@@ -52,7 +53,7 @@ public class SysItemOperateLog extends BaseModel{
 	}
 	
 	@Column(name = "CONTEXT")
-	@Lob
+	@Type(type="TEXT")
 	public String getContext() {
 		return context;
 	}
@@ -79,15 +80,6 @@ public class SysItemOperateLog extends BaseModel{
 		this.optType = optType;
 	}
 	
-	@Column(name = "ITEM_ID")
-	public Long getItemId() {
-		return itemId;
-	}
-	
-	public void setItemId(Long itemId) {
-		this.itemId = itemId;
-	}
-	
 	@Column(name = "CREATE_TIME")
 	public Date getCreateTime() {
 		return createTime;
@@ -96,5 +88,20 @@ public class SysItemOperateLog extends BaseModel{
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
+
+    /**
+     * @return the targetId
+     */
+	@Column(name = "TARGET_ID")
+    public String getTargetId(){
+        return targetId;
+    }
+
+    /**
+     * @param targetId the targetId to set
+     */
+    public void setTargetId(String targetId){
+        this.targetId = targetId;
+    }
 
 }

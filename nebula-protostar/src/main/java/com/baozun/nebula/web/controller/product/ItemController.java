@@ -100,7 +100,6 @@ import com.baozun.nebula.manager.product.ItemLangManager;
 import com.baozun.nebula.manager.product.ItemManager;
 import com.baozun.nebula.manager.product.ItemPresaleInfoManager;
 import com.baozun.nebula.manager.product.PropertyManager;
-import com.baozun.nebula.manager.promotion.SaveSysItemOperateLog;
 import com.baozun.nebula.manager.system.ChooseOptionManager;
 import com.baozun.nebula.model.bundle.Bundle;
 import com.baozun.nebula.model.i18n.I18nLang;
@@ -121,6 +120,7 @@ import com.baozun.nebula.sdk.manager.SdkItemSortScoreManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
+import com.baozun.nebula.sdk.manager.system.SysItemOperateLogManager;
 import com.baozun.nebula.solr.manager.ItemSolrManager;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utils.InputStreamCacher;
@@ -208,7 +208,7 @@ public class ItemController extends BaseController {
 	private ChooseOptionManager	chooseOptionManager;
 	
 	@Autowired
-	private SaveSysItemOperateLog saveSysItemOperateLog;
+	private SysItemOperateLogManager saveSysItemOperateLog;
 
 	/**
 	 * 上传图片的域名
@@ -1709,7 +1709,7 @@ public class ItemController extends BaseController {
 		
 		try{
 			//记录商品修改日志
-			saveSysItemOperateLog.SaveSysItemOperateLog(itemId,userDetails.getUserId(), 1l);
+			saveSysItemOperateLog.saveSysOperateLog(itemId,userDetails.getUserId(), 1l);
 		}catch(Exception e){
 			log.debug("记录修改操作日志失败,商品Id:" + itemId);
 		}
@@ -1757,7 +1757,7 @@ public class ItemController extends BaseController {
 				
 				try{
 					
-					saveSysItemOperateLog.SaveSysItemOperateLog(itemId,userDetails.getUserId(), 1l);
+					saveSysItemOperateLog.saveSysOperateLog(itemId,userDetails.getUserId(), 1l);
 					
 				}catch(Exception e){
 					
@@ -1825,7 +1825,7 @@ public class ItemController extends BaseController {
 			for (Long itemId : ids) {
 				
 				try{
-					saveSysItemOperateLog.SaveSysItemOperateLog(itemId,userId, 1l);
+					saveSysItemOperateLog.saveSysOperateLog(itemId,userId, 1l);
 				}catch(Exception e){
 					
 					log.debug("记录修改操作日志失败,商品Id:" + itemId);
@@ -2696,7 +2696,7 @@ public class ItemController extends BaseController {
 
 		try{
 			//记录商品修改日志
-			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
 		}catch(Exception e){
 			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
 		}
@@ -2748,7 +2748,7 @@ public class ItemController extends BaseController {
 		
 		try{
 			//记录商品修改日志
-			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
 		}catch(Exception e){
 			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
 		}
@@ -2799,7 +2799,7 @@ public class ItemController extends BaseController {
 		
 		try{
 			//记录商品修改日志
-			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
 		}catch(Exception e){
 			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
 		}
@@ -2854,7 +2854,7 @@ public class ItemController extends BaseController {
 
 		try{
 			//记录商品修改日志
-			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
 		}catch(Exception e){
 			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
 		}
@@ -2899,7 +2899,7 @@ public class ItemController extends BaseController {
 		
 		try{
 			//记录商品修改日志
-			saveSysItemOperateLog.SaveSysItemOperateLog(item.getId(),userDetails.getUserId(), 1l);
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
 		}catch(Exception e){
 			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
 		}

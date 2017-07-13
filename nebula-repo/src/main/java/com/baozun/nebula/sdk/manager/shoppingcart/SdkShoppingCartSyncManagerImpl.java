@@ -85,12 +85,12 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
         if(null!=careIds && careIds.size()>0){
     		sdkShoppingCartUpdateManager.updateCartLineSettlementState(memberId, careIds, false);
         }
-	for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-	    if (shoppingCartLineCommand.isGift()){ // 不同步赠品数据
-		continue;
-	    }
-	    syncShoppingCart(memberId, shoppingCartLineCommand, shoppingCartLineCommandListInDB);
-	}
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
+            if (shoppingCartLineCommand.isGift()){ // 不同步赠品数据
+                continue;
+            }
+            syncShoppingCart(memberId, shoppingCartLineCommand, shoppingCartLineCommandListInDB);
+        }
        
     }
 

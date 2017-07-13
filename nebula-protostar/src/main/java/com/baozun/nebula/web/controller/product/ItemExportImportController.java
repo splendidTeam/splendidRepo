@@ -36,9 +36,9 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.baseinfo.ShopManager;
 import com.baozun.nebula.manager.product.ItemExportImportManager;
-import com.baozun.nebula.manager.promotion.SaveSysItemOperateLog;
 import com.baozun.nebula.model.product.Industry;
 import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.sdk.manager.system.SysItemOperateLogManager;
 import com.baozun.nebula.solr.manager.ItemSolrManager;
 import com.baozun.nebula.utils.InputStreamCacher;
 import com.baozun.nebula.web.UserDetails;
@@ -69,7 +69,7 @@ public class ItemExportImportController extends BaseController {
 	private PropertyDao propertyDao;
 	
 	@Autowired
-	private SaveSysItemOperateLog saveSysItemOperateLog;
+	private SysItemOperateLogManager saveSysItemOperateLog;
 
 	/**
 	 * 转到商品导出和导入页面
@@ -207,7 +207,7 @@ public class ItemExportImportController extends BaseController {
 				for (Long itemId : itemIdsForSolr) {
 					try{
 						//记录商品修改日志
-						saveSysItemOperateLog.SaveSysItemOperateLog(itemId,userId, 3l);
+						saveSysItemOperateLog.saveSysOperateLog(itemId,userId, 3l);
 					}catch(Exception e){
 						log.debug("记录修改操作日志失败,商品Id:" + itemId);
 					}
