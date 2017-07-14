@@ -42,6 +42,7 @@
 						o.ACCOUNT_BANK_NUMBER as accountBankNumber,
 						o.REMARK,
 						o.CREATE_TIME as createTime,
+						o.MODIFY_TIME as modifyTime,
 						o.TRANS_CODE as transCode,
 					    o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
 						sc.NAME,
@@ -111,7 +112,8 @@
 						o.ACCOUNT_BANK_NAME as accountBankName,
 						o.ACCOUNT_BANK_NUMBER as accountBankNumber,
 						o.REMARK,
-						o.CREATE_TIME as createTime
+						o.CREATE_TIME as createTime,
+						o.MODIFY_TIME as modifyTime
 						from t_so_salesorder as o 
 						where  o.CODE = :code
 					#end
@@ -796,6 +798,7 @@
 					o.ACCOUNT_BANK_NUMBER as accountBankNumber,
 					o.REMARK,
 					o.CREATE_TIME as createTime,
+					o.MODIFY_TIME as modifyTime,
 					sc.NAME,
 					sc.ORDER_ID,
 					sc.COUNTRY,
