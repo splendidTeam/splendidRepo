@@ -44,7 +44,7 @@ import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcart
  */
 @Component("guestShoppingcartResolver")
 public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
-    private Logger  logger  = LoggerFactory.getLogger(GuestShoppingcartResolver.class);
+    private static final Logger LOGGER  = LoggerFactory.getLogger(GuestShoppingcartResolver.class);
  
     /** The cookie shoppingcart. */
     @Autowired
@@ -64,7 +64,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
         try{
             return guestShoppingcartPersister.load(request);
         }catch(IllegalArgumentException e){
-            logger.error("",e);
+            LOGGER.error("",e);
         }
         //如果捕捉到异常则返回null
         return null;

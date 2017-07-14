@@ -36,6 +36,7 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
+import com.feilong.accessor.cookie.CookieAccessor;
 
 /**
  * The Class DefaultShoppingcartLoginSuccessHandler.
@@ -46,7 +47,10 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolv
  */
 @Component("shoppingcartLoginSuccessHandler")
 public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLoginSuccessHandler{
-    private Logger  logger  = LoggerFactory.getLogger(DefaultShoppingcartLoginSuccessHandler.class);
+    private static final Logger LOGGER  = LoggerFactory.getLogger(DefaultShoppingcartLoginSuccessHandler.class);
+    
+    /** cookie寄存器. */
+    private CookieAccessor      cookieAccessor;
 
     /** The guest shoppingcart persister. */
     @Autowired
@@ -63,6 +67,8 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
     /** The shoppingcart count persister. */
     @Autowired
     private ShoppingcartCountPersister shoppingcartCountPersister;
+    
+    
 
     /*
      * (non-Javadoc)
@@ -75,14 +81,8 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
         Validate.notNull(memberDetails, "memberDetails can't be null!");
 
         Long memberId = memberDetails.getGroupId();
-        List<ShoppingCartLineCommand> guestShoppingCartLineCommandList = null;
-        try{
-            // 若解析正常则获取cookie中游客购物车数据
-            guestShoppingCartLineCommandList = guestShoppingcartPersister.load(request);
-        }catch(IllegalArgumentException e){
-            logger.error("",e);
-        }
-        
+        //获取cookie中游客购物车数据
+        List<ShoppingCartLineCommand> guestShoppingCartLineCommandList = getGuestShoppingCartLineCommandList(request, response);
         boolean hasGuestShoppingcart = isNotNullOrEmpty(guestShoppingCartLineCommandList);
         if (hasGuestShoppingcart){
             //同步
@@ -94,5 +94,19 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
         //获得DB购物车总数量 设置count cookie 
         List<ShoppingCartLineCommand> memberShoppingCartLineCommandList = memberShoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
         shoppingcartCountPersister.save(memberShoppingCartLineCommandList, request, response);
+    }
+
+
+
+    private List<ShoppingCartLineCommand> getGuestShoppingCartLineCommandList(HttpServletRequest request,HttpServletResponse response){
+        try{
+            // 若解析正常则获取cookie中游客购物车数据
+            return guestShoppingcartPersister.load(request);
+        }catch(IllegalArgumentException e){
+            LOGGER.error("",e);
+            //删除cookie中保存的内容
+            cookieAccessor.remove(response);
+        }
+        return null;
     }
 }
