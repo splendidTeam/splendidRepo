@@ -16,12 +16,16 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
+import static com.feilong.core.util.CollectionsUtil.find;
+
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,8 +33,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
-
-import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
  * 游客操作购物车.
@@ -42,10 +44,13 @@ import static com.feilong.core.util.CollectionsUtil.find;
  */
 @Component("guestShoppingcartResolver")
 public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
+    private Logger  logger  = LoggerFactory.getLogger(GuestShoppingcartResolver.class);
  
     /** The cookie shoppingcart. */
     @Autowired
     private GuestShoppingcartPersister guestShoppingcartPersister;
+    
+    
 
     //---------------------------------------------------------------------
 
@@ -57,13 +62,13 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request){
         try{
-            guestShoppingcartPersister.load(request);
+            return guestShoppingcartPersister.load(request);
         }catch(IllegalArgumentException e){
-            //如果捕捉到异常则返回null
-            return null;
+            logger.error("",e);
         }
-        //没有异常则返回cookie中的购物车集合
-        return guestShoppingcartPersister.load(request);
+        //如果捕捉到异常则返回null
+        return null;
+        
     }
 
     /*

@@ -16,12 +16,16 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.handler;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -33,8 +37,6 @@ import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcart
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-
 /**
  * The Class DefaultShoppingcartLoginSuccessHandler.
  *
@@ -44,6 +46,7 @@ import static com.feilong.core.Validator.isNotNullOrEmpty;
  */
 @Component("shoppingcartLoginSuccessHandler")
 public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLoginSuccessHandler{
+    private Logger  logger  = LoggerFactory.getLogger(DefaultShoppingcartLoginSuccessHandler.class);
 
     /** The guest shoppingcart persister. */
     @Autowired
@@ -72,9 +75,14 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
         Validate.notNull(memberDetails, "memberDetails can't be null!");
 
         Long memberId = memberDetails.getGroupId();
-
-        // 获取游客购物车数据
-        List<ShoppingCartLineCommand> guestShoppingCartLineCommandList = guestShoppingcartPersister.load(request);
+        List<ShoppingCartLineCommand> guestShoppingCartLineCommandList = null;
+        try{
+            // 若解析正常则获取cookie中游客购物车数据
+            guestShoppingCartLineCommandList = guestShoppingcartPersister.load(request);
+        }catch(IllegalArgumentException e){
+            logger.error("",e);
+        }
+        
         boolean hasGuestShoppingcart = isNotNullOrEmpty(guestShoppingCartLineCommandList);
         if (hasGuestShoppingcart){
             //同步
