@@ -1,11 +1,11 @@
 package com.baozun.nebula.web.controller.returnapplication;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,7 +59,6 @@ import com.baozun.nebula.sdk.manager.order.SdkOrderLineManager;
 import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationDeliveryManager;
 import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationLineManager;
 import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationManager;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.bind.QueryBeanParam;
@@ -72,7 +71,6 @@ import com.feilong.core.Validator;
 @Controller
 public class OrderReturnController extends BaseController{
 
-    private static final String IMPORT_FILE_XLSX_TYPE = ".xlsx";
 
     private static final String FORMAT_DATE_MIDST = "yyyyMMdd";
 
@@ -237,77 +235,48 @@ public class OrderReturnController extends BaseController{
      * @throws IllegalAccessException
      */
     @RequestMapping(value = "/salesorder/return/exportReturn.htm",method = RequestMethod.POST)
-    public String exportQuasiVip(Model model,HttpServletRequest request,HttpServletResponse response,@QueryBeanParam QueryBean queryBean) throws SecurityException,NoSuchFieldException,IllegalArgumentException,IllegalAccessException{
-        Sort[] sorts = queryBean.getSorts();
-        if ((sorts == null) || (sorts.length == 0)){
-            Sort sort = new Sort("application.create_time", "desc");
-            sorts = new Sort[1];
-            sorts[0] = sort;
-        }
+    @ResponseBody
+    public String exportReturn(Model model,HttpServletRequest request,HttpServletResponse response,@QueryBeanParam QueryBean queryBean){
+        String path = "excel/tplt-item-export-import.xls";
+        File file = new File(Thread.currentThread().getContextClassLoader().getResource(path).getPath());
+        String fileName = file.getName();
+        OutputStream outputStream = null;
 
-        List<OrderReturnCommand> returnCommand = sdkReturnApplicationManager.findExpInfo(sorts, queryBean.getParaMap());
-        XSSFWorkbook wb = this.setReturnWorkbook(returnCommand);
-        if (null == wb){
-            model.addAttribute("errorMsg", "数据异常!");
-            return "order/order-return";
-        }
-        try{
-            String format = formatDate(new Date(), FORMAT_DATE_MIDST);
-            String filename = "orderReturn_export_" + format;
-            // 导出到指定路径
-            String uploadPath = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("upload.export.path");
-            File dic = new File(uploadPath);
-            if (!dic.exists()){
-                dic.mkdirs();
+        // HttpServletResponse Header设置
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", -1);
+        
+        try {
+            response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
+            outputStream = response.getOutputStream();
+            Sort[] sorts = queryBean.getSorts();
+            if ((sorts == null) || (sorts.length == 0)){
+                Sort sort = new Sort("application.create_time", "desc");
+                sorts = new Sort[1];
+                sorts[0] = sort;
             }
-            // 文件存放路径
-            String name = filename + IMPORT_FILE_XLSX_TYPE;
-            // 在指定路径新建文件
-            File fileStore = new File(dic, name);
-            fileStore.createNewFile();
-            FileOutputStream os = new FileOutputStream(fileStore);
-            wb.write(os);
-
-            response.setContentType("application/vnd.ms-excel");
-            response.setHeader("Content-disposition", "attachment;filename=" + filename + IMPORT_FILE_XLSX_TYPE);
-            downloadFile(fileStore, response.getOutputStream());
-        }catch (IOException e){
-            logger.error("returnOrder export fail ", e);
-            model.addAttribute("errorMsg", "导出失败!");
-            return "order/order-return";
-        }
-        return null;
-    }
-
-    /**
-     * @author jinhui.huang
-     * @param file
-     * @param outputStream
-     */
-    private void downloadFile(File file,OutputStream outputStream){
-        if (file.exists()){
-            FileInputStream in = null;
-            try{
-                in = new FileInputStream(file);
-                byte[] b = new byte[1024];
-                int i = 0;
-                while ((i = in.read(b)) > 0){
-                    outputStream.write(b, 0, i);
-                }
-                outputStream.flush();
-            }catch (Exception e){
-                logger.error("returnOrder export fail error ", e);
-            }finally{
-                if (outputStream != null){
-                    try{
-                        in.close();
-                        outputStream.close();
-                    }catch (IOException e){
-                        logger.error("Close outputStream error ", e);
-                    }
+            List<OrderReturnCommand> returnCommand = sdkReturnApplicationManager.findExpInfo(sorts, queryBean.getParaMap());
+            XSSFWorkbook wb = this.setReturnWorkbook(returnCommand);
+            if(wb != null){
+                wb.write(outputStream);
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally{
+            if(outputStream != null){
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
+        
+        return "json";
+    
     }
 
     /**
@@ -367,7 +336,7 @@ public class OrderReturnController extends BaseController{
                 returnStatus = "已发货";
             }
             if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(returnCommand.getStatus())){
-                returnStatus = "同意退款";
+                returnStatus = "同意退换货";
             }
             if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(returnCommand.getStatus())){
                 returnStatus = "已完成";
@@ -387,24 +356,8 @@ public class OrderReturnController extends BaseController{
             // Etransname
             createCell(row, 12, returnCommand.getTransName(), centerStyleLeft);
             // Etransname
-            if (ReturnApplication.SO_RETURN_REASON_CHEANGE_MIND.equals(returnCommand.getReturnReason())){
-                createCell(row, 13, "我改变主意了", centerStyleLeft);
-            }
-            if (ReturnApplication.SO_RETURN_REASON_DAMAGED_GOOD.equals(returnCommand.getReturnReason())){
-                createCell(row, 13, "商品质量问题", centerStyleLeft);
-            }
-            if (ReturnApplication.SO_RETURN_REASON_DAMAGED_PACKAGE.equals(returnCommand.getReturnReason())){
-                createCell(row, 13, "包装商品破损", centerStyleLeft);
-            }
-            if (ReturnApplication.SO_RETURN_REASON_SIZE_UNMATCH.equals(returnCommand.getReturnReason())){
-                createCell(row, 13, "尺码与商品描述不符", centerStyleLeft);
-            }
-            if (ReturnApplication.SO_RETURN_REASON_PRODUCT_UNMATCH.equals(returnCommand.getReturnReason())){
-                createCell(row, 13, "颜色/款式与商品描述不符", centerStyleLeft);
-            }
-            if (ReturnApplication.SO_RETURN_REASON_OTHER_REASON.equals(returnCommand.getReturnReason())){
-                createCell(row, 13, "其它原因", centerStyleLeft);
-            }
+            createCell(row, 13, returnCommand.getReturnReason(), centerStyleLeft);
+             
             createCell(row, 14, returnCommand.getType() == 1 ? "退货" : "换货", centerStyleLeft);
             i++;
         }
@@ -447,7 +400,8 @@ public class OrderReturnController extends BaseController{
         createCell(row1, 10, "退货创建时间", style);
         createCell(row1, 11, "退货快递单号", style);
         createCell(row1, 12, "退货物流公司", style);
-        createCell(row1, 13, "退货原因", style);
+        createCell(row1, 13, "退换货原因", style);
+        createCell(row1, 14, "退换货类型", style);
 
     }
 
@@ -472,6 +426,7 @@ public class OrderReturnController extends BaseController{
         sheet.setColumnWidth(11, (short) (5000));
         sheet.setColumnWidth(12, (short) (5000));
         sheet.setColumnWidth(13, (short) (5000));
+        sheet.setColumnWidth(14, (short) (5000));
 
     }
 
@@ -542,7 +497,6 @@ public class OrderReturnController extends BaseController{
             List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
             line.setSkuPropertys(propList);
 
-            String size = propList.get(0).getValue();
             ReturnLineViewCommand lineVo = new ReturnLineViewCommand();
             if (null != line.getType() && line.getType() != 0){
                 Long itemId = line.getItemId();
