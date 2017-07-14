@@ -36,7 +36,6 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
-import com.feilong.accessor.cookie.CookieAccessor;
 
 /**
  * The Class DefaultShoppingcartLoginSuccessHandler.
@@ -49,9 +48,6 @@ import com.feilong.accessor.cookie.CookieAccessor;
 public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLoginSuccessHandler{
     private static final Logger LOGGER  = LoggerFactory.getLogger(DefaultShoppingcartLoginSuccessHandler.class);
     
-    /** cookie寄存器. */
-    private CookieAccessor      cookieAccessor;
-
     /** The guest shoppingcart persister. */
     @Autowired
     private GuestShoppingcartPersister guestShoppingcartPersister;
@@ -105,7 +101,7 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
         }catch(IllegalArgumentException e){
             LOGGER.error("",e);
             //删除cookie中保存的内容
-            cookieAccessor.remove(response);
+            guestShoppingcartPersister.clear(request, response);
         }
         return null;
     }
