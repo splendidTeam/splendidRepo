@@ -26,6 +26,9 @@ public class CacheManagerImpl extends AbstractCacheManager{
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheManagerImpl.class);
 
+    /**
+     * @since 5.3.2.18 使用 Pool 属性 替代 JedisSentinelPool 属性
+     */
     @Autowired(required = false)
     private Pool<Jedis> pool;
 

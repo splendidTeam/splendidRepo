@@ -53,9 +53,9 @@ public class EncryptUtil{
 
     public static final String ENCRYPTORS = "encryptors";
 
-    public static final int DEFAULT_ITERATIONS = 1024;
+    public static int DEFAULT_ITERATIONS = 1024;
 
-    public static final int DEFAULT_KEYLENGTH = 512;
+    public static int DEFAULT_KEYLENGTH = 512;
 
     public static final String DEFAULT_ENCRYPT_ALGORITHM = "AES";
 
