@@ -42,7 +42,7 @@ import static com.feilong.core.util.CollectionsUtil.find;
  */
 @Component("guestShoppingcartResolver")
 public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
-
+ 
     /** The cookie shoppingcart. */
     @Autowired
     private GuestShoppingcartPersister guestShoppingcartPersister;
@@ -56,6 +56,13 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
      */
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request){
+        try{
+            guestShoppingcartPersister.load(request);
+        }catch(IllegalArgumentException e){
+            //如果捕捉到异常则返回null
+            return null;
+        }
+        //没有异常则返回cookie中的购物车集合
         return guestShoppingcartPersister.load(request);
     }
 
