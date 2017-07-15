@@ -231,6 +231,7 @@ public class NebulaMemberAddressController extends BaseController {
 		LOG.debug("[MEM_DEFAULT_ADDRESS] 校验更新的地址是否属于这个会员  --start");
 		if(null == command) {
 			LOG.debug("[MEM_UPDATE_ADDRESS] 校验更新的地址是否属于这个会员  --error");
+			defaultReturnResult = new DefaultReturnResult();
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
