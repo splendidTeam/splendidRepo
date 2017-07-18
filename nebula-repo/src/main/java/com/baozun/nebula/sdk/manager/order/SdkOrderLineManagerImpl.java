@@ -17,7 +17,12 @@
 
 package com.baozun.nebula.sdk.manager.order;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +52,17 @@ public class SdkOrderLineManagerImpl implements SdkOrderLineManager{
     @Transactional(readOnly = true)
     public List<OrderLineCommand> findOrderLinesByOrderId(Long orderId){
         return sdkOrderLineDao.findOrderLinesByOrderId(orderId);
+    }
+    
+    /**
+     * @author yaohua.wang@baozun.cn 
+     * @since Nebula 5.3.2.20
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderLineCommand> findOrderLinesByLineIds(List<Long> lineIds){
+        List<OrderLineCommand> orderLineCommands = sdkOrderLineDao.findOrderDetailListByIds(lineIds);
+        return orderLineCommands;
     }
 
 }

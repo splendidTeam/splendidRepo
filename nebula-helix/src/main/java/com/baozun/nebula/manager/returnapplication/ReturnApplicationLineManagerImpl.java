@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.model.product.Sku;
+import com.baozun.nebula.model.returnapplication.ReturnApplication;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
@@ -59,7 +60,7 @@ public class ReturnApplicationLineManagerImpl implements ReturnApplicationLineMa
             lineView.setChgSkuCommandList(skuCommandList);
             if (null != line.getType() && line.getType() != 0){
                 // 查询 当前订单行 已经退过货的商品个数（退换货状态为已完成)
-                Integer count = sdkReturnApplicationManager.countCompletedAppsByPrimaryLineId(line.getId());
+                Integer count = sdkReturnApplicationManager.countCompletedAppsByPrimaryLineId(line.getId(),new Integer[]{ ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE });
                 //剩余可退数量
                 lineView.setCount(line.getCount() - count);
                 lineView.setOrderLineCommand(line);

@@ -12,9 +12,12 @@ import com.baozun.nebula.model.returnapplication.ReturnApplicationLine;
  */
 public interface SdkReturnApplicationLineManager  {
 	
-
-	
-	//保存退货订单行
+    /**
+     * 保存退货订单行
+     * 
+     * @param soReturnLine
+     * @return
+     */
 	public List<ReturnApplicationLine> saveReturnLine(List<ReturnApplicationLine> soReturnLine);
 	
 	/**
@@ -23,5 +26,13 @@ public interface SdkReturnApplicationLineManager  {
 	 * @return
 	 */
 	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderIds(List<Long> returnOrderIds);
+
+	/**
+	 * 按退换货行ID集合查询
+	 * 
+	 * @param returnLinesIds
+	 * @return
+	 */
+	public List<ReturnLineCommand> findReturnLinesByIds(List<Long> returnLinesIds);
 	
 }

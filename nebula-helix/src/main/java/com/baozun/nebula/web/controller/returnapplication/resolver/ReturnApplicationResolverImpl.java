@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baozun.nebula.api.returnapplication.ReturnApplicationCodeCreatorManager;
+import com.baozun.nebula.api.salesorder.OrderCodeCreatorManager;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.returnapplication.SdkReturnApplicationDao;
@@ -26,6 +28,7 @@ import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationManag
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
 import com.baozun.nebula.web.controller.returnapplication.viewcommand.ReturnLineViewCommand;
+import com.feilong.core.Validator;
 
 @Service("returnApplicationResolver")
 public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
@@ -53,13 +56,17 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 	
 	@Autowired
 	private OrderManager OrderManager;
+	
+    /** The ReturnApplication code creator. */
+    @Autowired(required = false)
+    private ReturnApplicationCodeCreatorManager returnApplicationCodeCreatorManager;
 
 	@Override
 	public ReturnApplicationCommand toReturnApplicationCommand(
 			MemberDetails memberDetails,ReturnOrderForm returnOrderForm, SalesOrderCommand salesOrder) {
-		ReturnApplicationCommand appCommand=new ReturnApplicationCommand();
-		ReturnApplication returnApplication=new ReturnApplication();
-		Date date=new Date();
+		ReturnApplicationCommand appCommand = new ReturnApplicationCommand();
+		ReturnApplication returnApplication = new ReturnApplication();
+		Date date = new Date();
 		returnApplication.setCreateTime(date);
 		returnApplication.setMemberId(memberDetails.getMemberId());
 		returnApplication.setRemark(returnOrderForm.getMemo());
@@ -69,9 +76,8 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 		returnApplication.setRefundBank(returnOrderForm.getBank());
 		returnApplication.setType(Integer.parseInt(returnOrderForm.getReturnType()[0]));
 		returnApplication.setSoOrderCode(returnOrderForm.getOrderCode());
-		returnApplication.setSoOrderId(Long.parseLong(returnOrderForm.getOrderId()));
-		returnApplication.setReturnApplicationCode("VR" + new Date().getTime());
-		returnApplication.setRefundType(salesOrder.getPayment().toString());// 退款方式
+		returnApplication.setSoOrderId(returnOrderForm.getOrderId());
+		returnApplication.setRefundType(String.valueOf(salesOrder.getPayment()));// 退款方式
 		returnApplication.setIsNeededReturnInvoice(ReturnApplication.SO_RETURN_NEEDED_RETURNINVOICE);
 		returnApplication.setReturnReason(returnOrderForm.getRetrunReason());
 		returnApplication.setStatus(ReturnApplication.SO_RETURN_STATUS_AUDITING);
@@ -79,16 +85,16 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 
 		// 总共的退款金额 
 		BigDecimal returnTotalMoney = new BigDecimal(0);
-		String[] linedIdSelected=returnOrderForm.getLineIdSelected();
-		String[] reasonSelected=returnOrderForm.getReasonSelected();
-		String[] sumSelected=returnOrderForm.getSumSelected();
+		Long[] linedIdSelected = returnOrderForm.getLineIdSelected();
+		String[] reasonSelected = returnOrderForm.getReasonSelected();
+		Integer[] sumSelected = returnOrderForm.getSumSelected();
 		for (int i = 0; i < linedIdSelected.length; i++) {
 		    ReturnApplicationLine returnLine = new ReturnApplicationLine();
-			Long lineId = Long.parseLong(linedIdSelected[i]);
+			Long lineId = linedIdSelected[i];
 			OrderLine line = sdkOrderLineDao.getByPrimaryKey(lineId);
 			String returnReason = reasonSelected[i].trim();
 			returnLine.setReturnReason(returnReason);
-			returnLine.setQty(Integer.parseInt(sumSelected[i]));
+			returnLine.setQty(sumSelected[i]);
 			returnLine.setSoLineId(lineId);
 			returnLine.setMemo(returnOrderForm.getMemo());
 			returnLine.setType(Integer.parseInt(returnOrderForm.getReturnType()[i]));
@@ -98,10 +104,9 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 				returnLine.setRtnExtentionCode(line.getExtentionCode());
 				returnLine.setChgExtentionCode(null);
 				returnTotalMoney = returnTotalMoney.add(line.getSubtotal().divide(new BigDecimal(line.getCount()))
-						.multiply(
-								new BigDecimal(Integer.parseInt(sumSelected[i]))));
+						.multiply(new BigDecimal(sumSelected[i])));
 				returnLine.setReturnPrice(line.getSubtotal().divide(new BigDecimal(line.getCount()))
-						.multiply(new BigDecimal(Integer.parseInt(sumSelected[i]))));
+						.multiply(new BigDecimal(sumSelected[i])));
 			}
 			//换货，不涉及到金额
 			else if(ReturnApplication.SO_RETURN_TYPE_EXCHANGE.equals(returnOrderForm.getReturnType()[i])){
@@ -111,16 +116,20 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 			returnLineList.add(returnLine);
 		}
 		returnApplication.setReturnPrice(returnTotalMoney);
-		ReturnApplicationDeliveryInfo	delivery=returnOrderForm.getReturnDeliveryInfo();
+		ReturnApplicationDeliveryInfo delivery = returnOrderForm.getReturnDeliveryInfo();
 		appCommand.setReturnLineList(returnLineList);
 		appCommand.setSoReturnApplicationDeliveryInfo(delivery);
 		appCommand.setReturnApplication(returnApplication);
+		String code = returnApplicationCodeCreatorManager.createReturnApplicationCodeBySource(appCommand);
+        if(Validator.isNotNullOrEmpty(appCommand)&&Validator.isNotNullOrEmpty(appCommand.getReturnApplication())){
+            appCommand.getReturnApplication().setReturnApplicationCode(code);
+        }
 		return appCommand;
 	}
 
 	@Override
     public List<ReturnLineViewCommand> toReturnLineViewCommand(List<Long> orderLineIds) {
-        List<OrderLineCommand>  orderLineCommands=sdkOrderLineDao.findOrderDetailListByIds(orderLineIds);
+        List<OrderLineCommand>  orderLineCommands = sdkOrderLineDao.findOrderDetailListByIds(orderLineIds);
         List<ReturnLineViewCommand> soReturnLineViews = new ArrayList<ReturnLineViewCommand>();
         for (OrderLineCommand line : orderLineCommands) {
             String properties = line.getSaleProperty();
@@ -129,8 +138,7 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
             ReturnLineViewCommand lineView = new ReturnLineViewCommand();
             if (null != line.getType() && line.getType() != 0) {
                 // 查询 当前订单行 已经退过货的商品个数（退换货状态为已完成)
-                Integer count = sdkReturnApplicationManager
-                        .countCompletedAppsByPrimaryLineId(line.getId());
+                Integer count = sdkReturnApplicationManager.countCompletedAppsByPrimaryLineId(line.getId(), new Integer[]{ ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE });
                 //剩余可退数量
                 lineView.setCount(line.getCount()-count);
                 lineView.setOrderLineCommand(line);

@@ -23,6 +23,15 @@ public interface SdkReturnApplicationLineDao extends GenericEntityDao<ReturnAppl
 	 */
 	@NativeQuery(model = ReturnLineCommand.class,value = "SdkReturnApplicationLineDao.findSoReturnLinesByReturnOrderIds")
 	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderIds(@QueryParam("returnOrderIds")List<Long> returnOrderIds);
+	
+	/**
+	 * 按退换货行ID集合查询
+	 * 
+	 * @param returnLinesIds
+	 * @return
+	 */
+	@NativeQuery(model = ReturnLineCommand.class, value = "SdkReturnApplicationLineDao.findReturnLinesByIds")
+	public List<ReturnLineCommand> findReturnLinesByIds(@QueryParam("returnLinesIds")List<Long> returnLinesIds);
 
 
 }

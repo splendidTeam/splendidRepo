@@ -43,4 +43,10 @@ public class SdkReturnApplicationLineManagerImpl implements SdkReturnApplication
 		return soReturnLines;
 	}
 	
+	@Override
+	public List<ReturnLineCommand> findReturnLinesByIds(List<Long> returnLinesIds){
+	    List<ReturnLineCommand> soReturnLines = soReturnLineDao.findReturnLinesByIds(returnLinesIds);
+	    return soReturnLines;
+	}
+	
 }

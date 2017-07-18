@@ -122,15 +122,15 @@ public class ReturnOrderForm  extends BaseForm{
 	private static final long serialVersionUID = -9020507259783914085L;
 	
 	//js '[1,2,3,4]'
-	private String[] lineIdSelected;
-	private String[] sumSelected;
+	private Long[] lineIdSelected;
+	private Integer[] sumSelected;
 	/**退货单行退货理由*/
 	private String[] reasonSelected;
 	private String bank;
 	private String branch;
 	private String account;
 	private String userName;
-	private String orderId;
+	private Long orderId;
 	private String orderCode;
 	private String memo;
 	private String[] extentionCode;
@@ -173,19 +173,6 @@ public class ReturnOrderForm  extends BaseForm{
         this.returnType = returnType;
     }
 
-    public String[] getLineIdSelected() {
-		return lineIdSelected;
-	}
-	public void setLineIdSelected(String[] lineIdSelected) {
-		this.lineIdSelected = lineIdSelected;
-	}
-	public String[] getSumSelected() {
-		return sumSelected;
-	}
-	public void setSumSelected(String[] sumSelected) {
-		this.sumSelected = sumSelected;
-	}
-
 	public String[] getReasonSelected() {
 		return reasonSelected;
 	}
@@ -218,14 +205,6 @@ public class ReturnOrderForm  extends BaseForm{
 		this.userName = userName;
 	}
 
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
-
 	public String getOrderCode() {
 		return orderCode;
 	}
@@ -255,6 +234,50 @@ public class ReturnOrderForm  extends BaseForm{
     public ReturnOrderForm() {
 		super();
 	}
+
+    /**
+     * @return the orderId
+     */
+    public Long getOrderId(){
+        return orderId;
+    }
+
+    /**
+     * @param orderId the orderId to set
+     */
+    public void setOrderId(Long orderId){
+        this.orderId = orderId;
+    }
+
+    /**
+     * @return the lineIdSelected
+     */
+    public Long[] getLineIdSelected(){
+        return lineIdSelected;
+    }
+
+    /**
+     * @param lineIdSelected the lineIdSelected to set
+     */
+    public void setLineIdSelected(Long[] lineIdSelected){
+        this.lineIdSelected = lineIdSelected;
+    }
+
+    /**
+     * @return the sumSelected
+     */
+    public Integer[] getSumSelected(){
+        return sumSelected;
+    }
+
+    /**
+     * @param sumSelected the sumSelected to set
+     */
+    public void setSumSelected(Integer[] sumSelected){
+        this.sumSelected = sumSelected;
+    }
+
+
 
 	
 }

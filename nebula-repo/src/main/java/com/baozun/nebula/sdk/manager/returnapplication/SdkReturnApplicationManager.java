@@ -17,14 +17,10 @@ public interface SdkReturnApplicationManager {
 
 	/** 查询 当前订单行 已经退换过货的商品个数（退换货状态为已完成) <br/>
 	 *  primaryLineId:orderlineid 或者packageOrderLineId*/
-	public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId);
+    public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId, Integer[] status);
 	
 	/** 根据orderLineId  查询退换货单(时间最近的一个) */
 	public ReturnApplication findLastApplicationByOrderLineId(Long orderLineId);
-	
-	
-	/** 根据订单id判断是不是 已经超过14天收货的订单*/
-	public Boolean isFinishedAndOutDayOrderById(Long orderId);
 	
 	/** 新增退换货申请单
 	 * @return */

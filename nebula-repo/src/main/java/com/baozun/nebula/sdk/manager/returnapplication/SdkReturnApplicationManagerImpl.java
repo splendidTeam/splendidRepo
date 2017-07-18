@@ -16,6 +16,7 @@ import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.dao.returnapplication.SdkReturnApplicationDao;
 import com.baozun.nebula.dao.returnapplication.SdkSoReturnApplicationDeliveryInfoDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderDao;
+import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.returnapplication.ReturnApplication;
 import com.baozun.nebula.model.returnapplication.ReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.returnapplication.ReturnApplicationLine;
@@ -33,7 +34,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     private static final Logger log = LoggerFactory.getLogger(SdkReturnApplicationManagerImpl.class);
 
     @Autowired
-    private SdkReturnApplicationDao ReturnApplicationDao;
+    private SdkReturnApplicationDao returnApplicationDao;
 
     @Autowired
     private SdkOrderDao sdkOrderDao;
@@ -47,13 +48,10 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     @Autowired
     private SdkSoReturnApplicationDeliveryInfoDao sdkReturnApplicationDeliveryInfoDao;
 
-
-    public final static Integer[] statusArr = { ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE };
-
     @Override
-    public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId){
+    public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId, Integer[] status){
         Integer count = 0;
-        count = ReturnApplicationDao.countItemByOrderLineIdAndStatus(primaryLineId, statusArr);
+        count = returnApplicationDao.countItemByOrderLineIdAndStatus(primaryLineId, status);
         return count;
     }
 
@@ -63,23 +61,12 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
             log.info("===orderLineId is null ==");
             return null;
         }
-        List<ReturnApplication> returnApplications = ReturnApplicationDao.findLastApplicationByOrderLineId(orderLineId);
+        List<ReturnApplication> returnApplications = returnApplicationDao.findLastApplicationByOrderLineId(orderLineId);
         //获得的returnApplication是根据创建时间倒序排列，因此取第一个就是最新的一笔退货
         if (Validator.isNotNullOrEmpty(returnApplications)){
             return returnApplications.get(0);
         }
         return null;
-
-    }
-
-    @Override
-    public Boolean isFinishedAndOutDayOrderById(Long orderId){
-        if (orderId == null){
-            log.error("==orderId is null==");
-            return false;
-        }
-        SalesOrder salesOrder = sdkOrderDao.findFinishedOrderById(orderId, SalesOrder.SALES_ORDER_STATUS_FINISHED);
-        return null != salesOrder;
 
     }
 
@@ -116,13 +103,13 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
      * @author yinglong.xu
      */
     private ReturnApplication saveReturnApplication(ReturnApplication ReturnApplication){
-        ReturnApplication = ReturnApplicationDao.save(ReturnApplication);
+        ReturnApplication = returnApplicationDao.save(ReturnApplication);
         return ReturnApplication;
     }
 
     @Override
     public ReturnApplication findLastApplicationByOrderId(Long orderId){
-        List<ReturnApplication> returnApplication = ReturnApplicationDao.findLastApplicationByOrderId(orderId);
+        List<ReturnApplication> returnApplication = returnApplicationDao.findLastApplicationByOrderId(orderId);
         if(Validator.isNotNullOrEmpty(returnApplication)){
           //获得的returnApplication是根据创建时间倒序排序，因此取第一个就是最新的一笔退货
             return returnApplication.get(0);
@@ -133,12 +120,12 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
 
     @Override
     public Pagination<ReturnApplication> findReturnByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
-        return ReturnApplicationDao.findReturnByQueryMapWithPage(page, sorts, paraMap);
+        return returnApplicationDao.findReturnByQueryMapWithPage(page, sorts, paraMap);
     }
 
     @Override
     public ReturnApplication findByApplicationId(Long id){
-        return ReturnApplicationDao.getByPrimaryKey(id);
+        return returnApplicationDao.getByPrimaryKey(id);
     }
 
     // 退货申请
@@ -150,7 +137,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         Assert.notNull(description, "审核备注不能为空");
         // 当审核通过时，允许客户退回商品，同时将退款状态改为待处理
         Date now = new Date();
-        ReturnApplication returnapp = ReturnApplicationDao.findApplicationByCode(returnCode);
+        ReturnApplication returnapp = returnApplicationDao.findApplicationByCode(returnCode);
         if (returnapp == null){
             throw new Exception("对应的申请单不存在");
         }
@@ -168,7 +155,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(status.intValue()) && ReturnApplication.SO_RETURN_STATUS_AUDITING.equals(returnapp.getStatus())){// 审核通过
             // status为2时，表示已进行审核操作，需要判断当前退货单是否已审核过
             if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(returnapp.getStatus()) || ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(returnapp.getStatus())){
-                throw new Exception("对应的申请单已审核，请刷新页面 ");
+                throw new BusinessException("对应的申请单已审核，请刷新页面 ");
             }else{
                 returnapp.setStatus(ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY);// 审核通过
             }
@@ -176,7 +163,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(status) && returnapp.getStatus() == ReturnApplication.SO_RETURN_STATUS_AUDITING){// 审核退回
             // status为1时，表示已进行审核操作，需要判断当前退货单是否已审核过
             if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(returnapp.getStatus()) || returnapp.getStatus() == ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN){
-                throw new Exception("对应的申请单已审核，请刷新页面 ");
+                throw new BusinessException("对应的申请单已审核，请刷新页面 ");
             }else{
                 returnapp.setStatus(ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN);
             }
@@ -199,32 +186,32 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         returnapp.setApproveTime(now);
         returnapp.setVersion(now);
         returnapp.setReturnReason("");
-        returnapp = ReturnApplicationDao.save(returnapp);
+        returnapp = returnApplicationDao.save(returnapp);
         return returnapp;
     }
 
     @Override
     public List<OrderReturnCommand> findExpInfo(Sort[] sorts,Map<String, Object> paraMap){
-        List<OrderReturnCommand> orderReturn = ReturnApplicationDao.findExpInfo(sorts, paraMap);
+        List<OrderReturnCommand> orderReturn = returnApplicationDao.findExpInfo(sorts, paraMap);
         return orderReturn;
     }
 
     @Override
     public List<ReturnApplicationCommand> findReturnApplicationCommandsByIds(List<Long> ids){
-        List<ReturnApplicationCommand> returnApplicationCommands = ReturnApplicationDao.findReturnApplicationCommandByIds(ids);
+        List<ReturnApplicationCommand> returnApplicationCommands = returnApplicationDao.findReturnApplicationCommandByIds(ids);
         return returnApplicationCommands;
     }
 
     @Override
     public ReturnApplication findApplicationByCode(String code){
-        return ReturnApplicationDao.findApplicationByCode(code);
+        return returnApplicationDao.findApplicationByCode(code);
     }
 
     @Override
     public void updateRefundType(String returnCode,String lastModifier,Integer status) throws Exception{
 
         Date now = new Date();
-        ReturnApplication returnapp = ReturnApplicationDao.findApplicationByCode(returnCode);
+        ReturnApplication returnapp = returnApplicationDao.findApplicationByCode(returnCode);
         if (returnapp == null){
             throw new Exception("对应的申请单不存在");
         }
@@ -253,8 +240,8 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
                 returnapp.setStatus(ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE);
             }
         }else{
-            throw new Exception("物流状态异常！");
+            throw new BusinessException("物流状态异常！");
         }
-        ReturnApplicationDao.save(returnapp);
+        returnApplicationDao.save(returnapp);
     }
 }
