@@ -16,10 +16,6 @@
  */
 package com.baozun.nebula.web.controller.order.resolver;
 
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-import static com.feilong.core.Validator.isNullOrEmpty;
-import static com.feilong.core.bean.ConvertUtil.toLong;
-import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.util.ArrayList;
@@ -58,6 +54,11 @@ import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toLong;
+import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
+
 /**
  * The Class AbstractShoppingcartResolver.
  *
@@ -89,8 +90,8 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
     private OrderManager orderManager;
 
     /** The sales order source resolver. */
-    @Autowired
-    private SalesOrderSourceResolver salesOrderSourceResolver;
+    @Autowired(required = false)
+    private SalesOrderSourceResolver salesOrderSourceResolver = new DefaultSalesOrderSourceResolver();
 
     /*
      * (non-Javadoc)
@@ -198,7 +199,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         salesOrderCommand.setBuyerName(shippingInfoSubForm.getBuyerName());
         salesOrderCommand.setBuyerTel(shippingInfoSubForm.getBuyerTel());
         //5.3.2.18增加对客户端识别码属性设置
-        salesOrderCommand.setClientIdentificationMechanisms((String)request.getAttribute(NebulaOrderCreateController.CLIENT_IDENTIFICATION_MECHANISMS));
+        salesOrderCommand.setClientIdentificationMechanisms((String) request.getAttribute(NebulaOrderCreateController.CLIENT_IDENTIFICATION_MECHANISMS));
     }
 
     /**
