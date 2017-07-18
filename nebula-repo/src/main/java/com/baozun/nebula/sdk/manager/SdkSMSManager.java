@@ -19,4 +19,6 @@ public interface SdkSMSManager extends BaseManager{
 	enum SendResult {
 		SUCESS, FAILURE, ERROR, INVALIDATE_PARAM;
 	}
+
+    boolean send(SMSCommand smsCommand,String captcha);
 }

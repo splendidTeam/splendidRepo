@@ -25,8 +25,11 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.baozun.hub.sdk.api.SmsManager;
 import com.baozun.hub.sdk.api.SmsService;
 import com.baozun.hub.sdk.command.invoice2notice.SmsCommand;
 import com.baozun.nebula.command.SMSCommand;
@@ -34,8 +37,11 @@ import com.baozun.nebula.dao.system.SmsSendLogDao;
 import com.baozun.nebula.model.system.SmsSendLog;
 import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.feilong.core.RegexPattern;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
+import com.feilong.core.util.RandomUtil;
+import com.feilong.core.util.RegexUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
@@ -48,6 +54,9 @@ public class SdkSMSManagerImpl implements SdkSMSManager {
 	
 	private static final Logger	LOG= LoggerFactory.getLogger(SdkSMSManagerImpl.class);
 	
+	@Value("#{meta['sms.secret']}")
+	private String secret;
+	
 	@Autowired
 	private SmsSendLogDao smsSendLogDao;
 
@@ -57,7 +66,12 @@ public class SdkSMSManagerImpl implements SdkSMSManager {
 		SmsCommand sms=buildSmsCommand(smsCommand);
 		//TODO mobile没有mask
 		LOG.info("[SEND_SMS_BEGIN]  param : {}" ,JsonUtil.format(sms));
-		String result=SmsService.send(sms);
+		String result = null;
+		if(Validator.isNotNullOrEmpty(secret)){
+		    result = SmsManager.send(sms);
+		}else{
+		    result = SmsService.send(sms);
+		}
 		LOG.info("[SEND_SMS_END]  result : {}" ,result);
 	         Map<String, Object> map = JsonUtil.toMap(result);
 		Map<String, String> resultMap=new HashMap<String, String>();
@@ -70,6 +84,26 @@ public class SdkSMSManagerImpl implements SdkSMSManager {
 		
 		return getSendResult(resultMap);
 	}
+	
+    @Override
+    public boolean send(SMSCommand smsCommand,String captcha){
+
+        // 验证手机号码格式
+        String mobile = smsCommand.getMobile();
+        if (!RegexUtil.matches(RegexPattern.MOBILEPHONE, mobile)){
+            return false;
+        }
+
+        smsCommand.addVar("captcha", captcha);
+        // 发送短信
+        SendResult sendResult = send(smsCommand);
+        // 发送短信成功，保存captcha到redies
+        if (sendResult.equals(SendResult.SUCESS)){
+            return true;
+        }else{
+            return false;
+        }
+    }
 	
 	/**
 	 * 构建hub接口的入参SmsCommand
@@ -141,4 +175,6 @@ public class SdkSMSManagerImpl implements SdkSMSManager {
 		
 		return sendResult;
 	}
+	
+
 }
