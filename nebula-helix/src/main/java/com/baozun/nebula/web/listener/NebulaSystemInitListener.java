@@ -13,9 +13,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.baozun.nebula.curator.watcher.IWatcher;
 import com.baozun.nebula.curator.watcher.ZkWatcherControl;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.date.DateExtensionUtil.formatDuration;
+import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
 
 /**
  * 系统初始化时的listener
@@ -64,8 +66,8 @@ public class NebulaSystemInitListener implements ServletContextListener{
 
         //---------------------------------------------------------------------
 
-        if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("watchers.size:[{}]", watchers.size());
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info("watchers.size:[{}],list:[{}]", watchers.size(), JsonUtil.format(getPropertyValueList(watchers, "listenerPath")));
         }
 
         //---------------------------------------------------------------------
