@@ -31,7 +31,7 @@ public class OrderReturnCommand {
 	 * 退换货申请状态<br>
 	 * 值域参见SoReturnApplicationConstants
 	 */
-	private String status ; //退货状态
+	private int status = -1; //退货状态
 	
 	private String approver; // 审批人
 	
@@ -45,6 +45,7 @@ public class OrderReturnCommand {
 	 */
 	private String transCode;
 	
+	
 	/**
 	 * 退换货申请原因<br>
 	 * 7天无理由：R001A<br>
@@ -53,6 +54,11 @@ public class OrderReturnCommand {
 	 */
 	private String returnReason;
 	
+	/**
+	 * 退换货状态(进行过业务处理后的例如：审核通过、审核拒绝等等)
+	 */
+	private String businessStatus;
+	
 
 	/**
 	 * 用户 退货时候填写 
@@ -60,20 +66,28 @@ public class OrderReturnCommand {
 	 */
 	private String transName;
 	
-	private String type;
-
-
+	private Integer type;
 	
-    public String getType(){
+	/**
+	 * 退换货类型(进行过业务处理后的例如：退货、换货)
+	 */
+	private String businessType;
+
+    public String getBusinessType(){
+        return businessType;
+    }
+    
+    public void setBusinessType(String businessType){
+        this.businessType = businessType;
+    }
+
+    public Integer getType(){
         return type;
     }
 
-
-    
-    public void setType(String type){
+    public void setType(Integer type){
         this.type = type;
     }
-
 
     public String getPlatformOMSCode() {
 		return platformOMSCode;
@@ -145,12 +159,12 @@ public class OrderReturnCommand {
 	}
 
 
-	public String getStatus() {
+	public int getStatus() {
 		return status;
 	}
 
 
-	public void setStatus(String status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 
@@ -213,6 +227,13 @@ public class OrderReturnCommand {
 	public void setTransName(String transName) {
 		this.transName = transName;
 	}
-	
+    
+    public String getBusinessStatus(){
+        return businessStatus;
+    }
+    
+    public void setBusinessStatus(String businessStatus){
+        this.businessStatus = businessStatus;
+    }
 
 }

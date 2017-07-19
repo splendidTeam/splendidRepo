@@ -195,31 +195,29 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     public List<OrderReturnCommand> findExpInfo(Sort[] sorts,Map<String, Object> paraMap){
         List<OrderReturnCommand> orderReturn = returnApplicationDao.findExpInfo(sorts, paraMap);
         for(OrderReturnCommand returnCommand :orderReturn){
-            String status=null;
             if("1".equals(returnCommand.getType())){
-                returnCommand.setType("退货");
+                returnCommand.setBusinessType("退货");
             }else{
-                returnCommand.setType("换货");
+                returnCommand.setBusinessType("换货");
             }
-            if (ReturnApplication.SO_RETURN_STATUS_AUDITING.equals((Integer.parseInt(returnCommand.getStatus())))){
-                status="待审核";
+            if (ReturnApplication.SO_RETURN_STATUS_AUDITING.equals(returnCommand.getStatus())){
+                returnCommand.setBusinessStatus("待审核");
             }
-            if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(Integer.parseInt(returnCommand.getStatus()))){
-                status="拒绝退货";
+            if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(returnCommand.getStatus())){
+                returnCommand.setBusinessStatus("拒绝退货");
             }
-            if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(Integer.parseInt(returnCommand.getStatus()))){
-                status="待发货";
+            if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(returnCommand.getStatus())){
+                returnCommand.setBusinessStatus("待发货");
             }
-            if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED.equals(Integer.parseInt(returnCommand.getStatus()))){
-                status="已发货";
+            if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED.equals(returnCommand.getStatus())){
+                returnCommand.setBusinessStatus("已发货");
             }
-            if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(Integer.parseInt(returnCommand.getStatus()))){
-                status="同意退换货";
+            if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(returnCommand.getStatus())){
+                returnCommand.setBusinessStatus("同意退换货");
             }
-            if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(Integer.parseInt(returnCommand.getStatus()))){
-                status="已完成";
+            if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(returnCommand.getStatus())){
+                returnCommand.setBusinessStatus("已完成");
             }
-            returnCommand.setStatus(status);
         }
         return orderReturn;
     }
