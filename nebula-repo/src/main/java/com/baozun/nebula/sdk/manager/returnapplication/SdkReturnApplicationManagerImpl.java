@@ -201,22 +201,22 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
             }else{
                 returnCommand.setType("换货");
             }
-            if (ReturnApplication.SO_RETURN_STATUS_AUDITING==(Integer.parseInt(returnCommand.getStatus()))){
+            if (ReturnApplication.SO_RETURN_STATUS_AUDITING.equals((Integer.parseInt(returnCommand.getStatus())))){
                 status="待审核";
             }
-            if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN==(Integer.parseInt(returnCommand.getStatus()))){
+            if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(Integer.parseInt(returnCommand.getStatus()))){
                 status="拒绝退货";
             }
-            if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY==(Integer.parseInt(returnCommand.getStatus()))){
+            if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(Integer.parseInt(returnCommand.getStatus()))){
                 status="待发货";
             }
-            if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED==(Integer.parseInt(returnCommand.getStatus()))){
+            if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED.equals(Integer.parseInt(returnCommand.getStatus()))){
                 status="已发货";
             }
-            if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND==(Integer.parseInt(returnCommand.getStatus()))){
+            if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(Integer.parseInt(returnCommand.getStatus()))){
                 status="同意退换货";
             }
-            if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE==(Integer.parseInt(returnCommand.getStatus()))){
+            if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(Integer.parseInt(returnCommand.getStatus()))){
                 status="已完成";
             }
             returnCommand.setStatus(status);

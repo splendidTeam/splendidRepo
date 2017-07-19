@@ -99,7 +99,7 @@ public class OrderReturnController extends BaseController{
     private ExcelWriter returnOrderWriter;
 
     private static final String     DEFAULT_PATH                            = "excel/";
-    private static final String     FILE_NAME                               = "return_order_list_import.xlsx";
+    private static final String     FILE_NAME                               = "return_order_list_export.xlsx";
 
     /** 前台地址 */
     @Value("#{meta['frontend.url']}")

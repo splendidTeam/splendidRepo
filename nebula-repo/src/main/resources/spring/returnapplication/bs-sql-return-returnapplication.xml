@@ -108,22 +108,22 @@
 			    from t_so_return_application application 
 			     where 1=1 
 			        #if($code)
-					AND application.return_application_code LIKE '%$code%'
+					AND application.return_application_code =:code
 					#end
 					#if($loginName)
-					AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '%$loginName%' AND member.id=application.memberid)
+					AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name =:loginName AND member.id=application.memberid)
 					#end
 					#if($soOrderCode)
-					AND application.so_order_code LIKE '%$soOrderCode%'
+					AND application.so_order_code =:soOrderCode
 					#end
 					#if($status)
-					AND application.status = $status
+					AND application.status =:status
 					#end
 					#if($refundStatus)
-					AND application.refund_status = $refundStatus
+					AND application.refund_status =:refundStatus
 					#end
 					#if($type)
-					AND application.type = $type
+					AND application.type =:type
 					#end
 				ORDER BY application.id desc
 			 ]]>
@@ -142,22 +142,22 @@
 			    from t_so_return_application application
 			     where 1=1 
 			     	#if($returnOrderCode)
-			     		AND application.return_application_code  LIKE '%$returnOrderCode%'
+			     		AND application.return_application_code =:returnOrderCode
 			     	#end
 			     	#if($loginName)
-					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '%$loginName%' AND member.id=application.memberid)
+					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name =:loginName AND member.id=application.memberid)
 					#end
 			        #if($returnCode)
-						AND application.return_application_code LIKE '%$returnCode%'
+						AND application.return_application_code =:returnCode
 					#end
 					#if($oderCode)
-						AND application.so_order_code LIKE '%$oderCode%'
+						AND application.so_order_code =:oderCode
 					#end
 					#if($Logname)
-						AND application.transname LIKE '%$Logname%'
+						AND application.transname =:Logname
 					#end
 					#if($LogCode)
-						AND application.transcode LIKE '%$LogCode%'
+						AND application.transcode =:LogCode
 					#end
 					#if($status)
 						AND application.status =:status
@@ -205,22 +205,22 @@
 			     	on sku.item_id=iteminfo.item_id
 			     where 1=1 
 			     	#if($returnOrderCode)
-			     		AND application.return_application_code  LIKE '%$returnOrderCode%'
+			     		AND application.return_application_code  =:returnOrderCode
 			     	#end
 			     	#if($loginName)
-					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '%$loginName%' AND member.id=application.memberid)
+					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name =:loginName AND member.id=application.memberid)
 					#end
 			        #if($returnCode)
-						AND application.oms_code LIKE '%$returnCode%'
+						AND application.oms_code =:returnCode
 					#end
 					#if($oderCode)
-						AND application.so_order_code LIKE '%$oderCode%'
+						AND application.so_order_code =:oderCode
 					#end
 					#if($Logname)
-						AND application.transname LIKE '%$Logname%'
+						AND application.transname =:Logname
 					#end
 					#if($LogCode)
-						AND application.transcode LIKE '%$LogCode%'
+						AND application.transcode =:LogCode
 					#end
 					#if($status)
 						AND application.status =:status
@@ -266,10 +266,10 @@
 						AND application.so_order_code = :orderCode
 					#end
 					#if($Logname)
-						AND application.transname = '%':Logname'%'
+						AND application.transname =:Logname
 					#end
 					#if($LogCode)
-						AND application.transcode = :LogCode
+						AND application.transcode =:LogCode
 					#end
 					#if($status)
 						AND application.status =:status
