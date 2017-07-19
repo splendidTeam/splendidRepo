@@ -25,13 +25,13 @@ public class OrderReturnCommand {
 	 */
 	private BigDecimal returnPrice;
 	
-	private int qty; // 退换货商品数量
+	private Integer qty; // 退换货商品数量
 	
 	/**
 	 * 退换货申请状态<br>
 	 * 值域参见SoReturnApplicationConstants
 	 */
-	private int status = -1; //退货状态
+	private Integer status = -1; //退货状态
 	
 	private String approver; // 审批人
 	
@@ -149,22 +149,22 @@ public class OrderReturnCommand {
 	}
 
 
-	public int getQty() {
+	public Integer getQty() {
 		return qty;
 	}
 
 
-	public void setQty(int qty) {
+	public void setQty(Integer qty) {
 		this.qty = qty;
 	}
 
 
-	public int getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
 
-	public void setStatus(int status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 
