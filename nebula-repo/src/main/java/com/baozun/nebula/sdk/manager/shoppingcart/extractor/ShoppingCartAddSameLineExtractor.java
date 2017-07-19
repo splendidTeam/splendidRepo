@@ -31,11 +31,16 @@ public interface ShoppingCartAddSameLineExtractor{
     /**
      * 从主行list中提取相同行.
      * 
+     * <h3>场景:</h3>
+     * <blockquote>
+     * 
      * <p>
-     * <b>场景:</b> 在添加购物车行的时候,如果发现已经有相同的行(比如SKUid 相同,并且包装信息相同,那么后续流程可能需要合并数量,而不是无脑的增加行);<br>
+     * 添加购物车行时,如果已经有相同的行(SKUid 相同,且包装信息相同),那么后续流程可能需要合并数量,而<b>不是无脑的增加行</b>;<br>
      * 如果找不到相同的行,那么后续流程可能就是新增一行了.
      * </p>
-     *
+     * 
+     * </blockquote>
+     * 
      * @param mainLines
      *            已有的购物车主行
      * @param shoppingcartAddDetermineSameLineElements

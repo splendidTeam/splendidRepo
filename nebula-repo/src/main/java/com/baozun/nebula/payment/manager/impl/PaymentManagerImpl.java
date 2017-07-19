@@ -5,10 +5,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.baozun.nebula.command.OnLinePaymentCommand;
 import com.baozun.nebula.payment.convert.PayParamCommandAdaptor;
 import com.baozun.nebula.payment.convert.PaymentConvertFactory;
 import com.baozun.nebula.payment.manager.PaymentManager;
@@ -31,7 +33,9 @@ import com.feilong.core.bean.PropertyUtil;
 @Service("PaymentManager")
 public class PaymentManagerImpl implements PaymentManager{
 
-    private static final Logger log = LoggerFactory.getLogger(PaymentManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentManagerImpl.class);
+
+    //---------------------------------------------------------------------
 
     @Deprecated
     @Override
@@ -74,12 +78,12 @@ public class PaymentManagerImpl implements PaymentManager{
             Map<String, String> params = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);
             // 將支付所需的定制参数赋值给addition
             payParamConvertorAdaptor.extendCommandConvertorMap(params, orderParams);
-            log.info("RequestParams has : {}", orderParams);
+            LOGGER.info("RequestParams has : {}", orderParams);
             // 获得支付适配器
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
             paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, params);
         }catch (Exception ex){
-            log.error("CreatePayment error: " + ex.toString(), ex);
+            LOGGER.error("CreatePayment error: " + ex.toString(), ex);
             return paymentRequest;
         }
         return paymentRequest;
@@ -89,18 +93,14 @@ public class PaymentManagerImpl implements PaymentManager{
     public PaymentResult getPaymentResultForSyn(HttpServletRequest request,String paymentType){
         PaymentFactory paymentFactory = PaymentFactory.getInstance();
         PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(paymentType);// 获得支付适配器
-        PaymentResult result = new PaymentResult();
-        result = paymentAdaptor.getPaymentResult(request);
-        return result;
+        return paymentAdaptor.getPaymentResult(request);
     }
 
     @Override
     public PaymentResult getPaymentResultForAsy(HttpServletRequest request,String paymentType){
         PaymentFactory paymentFactory = PaymentFactory.getInstance();
         PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(paymentType);// 获得支付适配器
-        PaymentResult result = new PaymentResult();
-        result = paymentAdaptor.getPaymentResultFromNotification(request);
-        return result;
+        return paymentAdaptor.getPaymentResultFromNotification(request);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class PaymentManagerImpl implements PaymentManager{
                 result.setPaymentServiceSatus(PaymentServiceStatus.NOT_SUPPORT);
             }
         }catch (Exception ex){
-            log.error("cancelPayment error: {}", ex);
+            LOGGER.error("cancelPayment error: {}", ex);
             result.setMessage(ex.toString());
             result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
         }
@@ -156,40 +156,55 @@ public class PaymentManagerImpl implements PaymentManager{
             payParamConvertorAdaptor.extendCommandConvertorMap(params, orderParams);
             result = paymentAdaptor.getOrderInfo(params);
         }catch (Exception ex){
-            log.error("getOrderInfo error: " + ex.toString(), ex);
+            LOGGER.error("getOrderInfo error: " + ex.toString(), ex);
             result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             result.setMessage(ex.toString());
         }
         return result;
     }
 
+    //---------------------------------------------------------------------
+
     @Override
-    public PaymentRequest createPaymentForWap(SalesOrderCommand order){
-        PaymentRequest paymentRequest = null;
+    public PaymentRequest createPaymentForWap(SalesOrderCommand salesOrderCommand){
+        Validate.notNull(salesOrderCommand, "salesOrderCommand can't be null!");
+
+        OnLinePaymentCommand onLinePaymentCommand = salesOrderCommand.getOnLinePaymentCommand();
+        Validate.notNull(onLinePaymentCommand, "onLinePaymentCommand can't be null!");
+
+        Integer payType = onLinePaymentCommand.getPayType();
+        Validate.notNull(payType, "payType can't be null!");
+
+        //---------------------------------------------------------------------
+
+        PaymentFactory paymentFactory = PaymentFactory.getInstance();
+        PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
+        String payType2 = paymentFactory.getPayType(payType);
+
+        PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(payType2);
+        payParamCommandAdaptor.setSalesOrderCommand(salesOrderCommand);
+
+        //---------------------------------------------------------------------
+
+        // 获得支付适配器
+        PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());
+        payParamCommandAdaptor.setRequestParams(PropertyUtil.describe(salesOrderCommand));
+        // 获得对应的参数转换器
+        PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());
+
+        //---------------------------------------------------------------------
         try{
-            PaymentFactory paymentFactory = PaymentFactory.getInstance();
-            PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
-            PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(paymentFactory.getPayType(order.getOnLinePaymentCommand().getPayType()));
-            payParamCommandAdaptor.setSalesOrderCommand(order);
-            // 获得支付适配器
-            PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());
-            payParamCommandAdaptor.setRequestParams(PropertyUtil.describe(order));
-            // 获得对应的参数转换器
-            PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());
             Map<String, String> addition = payParamConvertorAdaptor.commandConvertorToMapForMobileCreatUrl(payParamCommandAdaptor);
             // 创建一个新的MOBILE端授权请求
-            paymentRequest = paymentAdaptor.newPaymentRequestForMobileCreateDirect(addition);
-            log.info("RequestForMobileCreateDirect:{}", paymentRequest.getRequestURL());
+            PaymentRequest paymentRequest = paymentAdaptor.newPaymentRequestForMobileCreateDirect(addition);
+            LOGGER.info("RequestForMobileCreateDirect:{}", paymentRequest.getRequestURL());
 
             // Alipay WAP 支付需要拼接完参数之后，再获取一次token
-            paymentRequest = paymentAdaptor.getCreateResponseToken(paymentRequest);
-
+            return paymentAdaptor.getCreateResponseToken(paymentRequest);
         }catch (Exception ex){
-            log.error("CreatePayment error: " + ex.toString(), ex);
-            return null;
+            LOGGER.error("CreatePayment error: " + ex.toString(), ex);
+            throw new RuntimeException(ex);
         }
-        // 返回交易请求url
-        return paymentRequest;
     }
 
     @Override
@@ -223,11 +238,11 @@ public class PaymentManagerImpl implements PaymentManager{
             getUnifiedOrderParaMap(wechatPayParamCommand, addition);
             paymentResult = paymentAdaptor.unifiedOrder(addition);
         }catch (PaymentParamErrorException e){
-            log.error("unifiedOrder error: " + e.toString());
+            LOGGER.error("unifiedOrder error: " + e.toString());
             paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             paymentResult.setMessage(e.toString());
         }catch (Exception ex){
-            log.error("unifiedOrder error: " + ex.toString());
+            LOGGER.error("unifiedOrder error: " + ex.toString());
             paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
             paymentResult.setMessage(ex.toString());
         }

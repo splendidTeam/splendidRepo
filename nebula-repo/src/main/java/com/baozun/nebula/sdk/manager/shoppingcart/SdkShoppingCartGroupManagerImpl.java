@@ -16,9 +16,6 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-import static com.feilong.core.Validator.isNullOrEmpty;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,8 +60,11 @@ import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.feilong.core.Validator;
-import com.feilong.core.date.DateExtensionUtil;
 import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.date.DateExtensionUtil.formatDuration;
 
 @Transactional
 @Service("sdkShoppingCartGroupManager")
@@ -191,7 +191,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         returnList = setShoppingCartLineOutOfStockBySKUId(returnList, promotionCommandList);
         logLines(returnList);
 
-        LOGGER.info("use time:{}", DateExtensionUtil.formatDuration(beginDate, new Date()));
+        LOGGER.info("use time:[{}]", formatDuration(beginDate));
         return returnList;
     }
 

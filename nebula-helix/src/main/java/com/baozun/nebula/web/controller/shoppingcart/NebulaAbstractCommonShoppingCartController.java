@@ -134,6 +134,7 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
         ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
+
     //**********************************updateShoppingCartCount************************************************
 
     /**

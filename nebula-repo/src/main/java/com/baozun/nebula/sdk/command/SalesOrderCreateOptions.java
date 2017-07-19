@@ -52,10 +52,10 @@ public class SalesOrderCreateOptions extends BaseModel{
     private static final long serialVersionUID = -2790187147863846666L;
 
     /** 是否是立即购买的订单 *. */
-    private boolean           isImmediatelyBuy;
+    private boolean isImmediatelyBuy;
 
     /** 是否是后台下单 *. */
-    private boolean           isBackCreateOrder;
+    private boolean isBackCreateOrder;
 
     /**
      * 是否qs.
@@ -63,7 +63,9 @@ public class SalesOrderCreateOptions extends BaseModel{
      * @deprecated 没有用到
      */
     @Deprecated
-    private boolean           isQs;
+    private boolean isQs;
+
+    //---------------------------------------------------------------------
 
     /**
      * 获得 是否是立即购买的订单 *.

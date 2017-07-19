@@ -363,6 +363,8 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		String clientIp = RequestUtil.getClientIp(request);
 
 		MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
+		//5.3.2.18增加对注册客户端识别码属性设置
+		conductCommand.setRegisterClientIdentificationMechanisms((String)request.getAttribute(NebulaAbstractLoginController.REGISTER_CLIENT_IDENTIFICATION_MECHANISMS));
 
 		memberFrontendCommand.setMemberConductCommand(conductCommand);
 	}

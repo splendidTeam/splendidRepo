@@ -37,7 +37,9 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
     private ShoppingCartCountHandler shoppingCartCountHandler;
 
     /** cookie寄存器. */
-    private CookieAccessor           cookieAccessor;
+    private CookieAccessor cookieAccessor;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -61,6 +63,8 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
     public void clear(HttpServletRequest request,HttpServletResponse response){
         cookieAccessor.remove(response);
     }
+
+    //---------------------------------------------------------------------
 
     /**
      * 设置 cookie寄存器.

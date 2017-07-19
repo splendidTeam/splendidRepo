@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.OnLinePaymentCancelCommand;
 import com.baozun.nebula.command.OnLinePaymentCommand;
 import com.baozun.nebula.model.BaseModel;
@@ -176,6 +177,13 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 下单ip. */
     private String                      ip;
+    
+    /** 
+     * 客户端识别码.
+     * 类似用户ip地址
+     * @since 5.3.2.18
+     *  */
+    private String             clientIdentificationMechanisms ;
 
     /** 应付运费. */
     private BigDecimal                  payableFreight;
@@ -852,6 +860,24 @@ public class SalesOrderCommand extends BaseModel{
      */
     public void setIp(String ip){
         this.ip = ip;
+    }
+    
+    /**
+     * 获得 客户端识别码
+     * @return clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public String getClientIdentificationMechanisms(){
+        return clientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 客户端识别码
+     * @param clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setClientIdentificationMechanisms(String clientIdentificationMechanisms){
+        this.clientIdentificationMechanisms = clientIdentificationMechanisms;
     }
 
     /**

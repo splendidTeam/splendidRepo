@@ -36,7 +36,11 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * 
  * <blockquote>
  * 
- * <table border="1" cellspacing="0" cellpadding="4">
+ * <p>
+ * 1.查询篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
  * <tr style="background-color:#ccccff">
  * <th align="left">字段</th>
  * <th align="left">说明</th>
@@ -46,11 +50,45 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * <td>{@link #getShoppingCartLineCommandList(MemberDetails,HttpServletRequest ) getShoppingCartLineCommandList}</td>
  * <td>获得指定用户的购物车list(所有的包括选中的及没有选中的).</td>
  * </tr>
- * <tr valign="top" style="background-color:#eeeeff">
+ * 
+ * </table>
+ * 
+ * <p>
+ * 2.添加篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
+ * 
+ * <tr style="background-color:#ccccff">
+ * <th align="left">字段</th>
+ * <th align="left">说明</th>
+ * </tr>
+ * 
+ * <tr valign="top">
  * <td>{@link #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse) addShoppingCart}</td>
  * <td>将特定的skuid,指定的数量count,加入到用户的购物车里面去.</td>
  * </tr>
  * 
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>{@link #addShoppingCart(MemberDetails, ShoppingCartLineAddForm, HttpServletRequest, HttpServletResponse) addShoppingCart(use ShoppingCartLineAddForm)}</td>
+ * <td>将特定的shoppingCartLineAddForm,加入到用户的购物车里面去.since 5.3.2.13</td>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #addShoppingCart(MemberDetails, Long[], Integer, HttpServletRequest, HttpServletResponse) addShoppingCart(batch)}</td>
+ * <td>将特定的skuids,指定的数量count,加入到用户的购物车里面去.</td>
+ * </tr>
+ * </table>
+ * 
+ * <p>
+ * 3.修改篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
+ * <tr style="background-color:#ccccff">
+ * <th align="left">字段</th>
+ * <th align="left">说明</th>
+ * </tr>
  * 
  * <tr valign="top">
  * <td>{@link #updateShoppingCartCount(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse) updateShoppingCartCount}</td>
@@ -61,16 +99,20 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * <td>批量更新购物车行shoppingcartLineId的数量count.(since 5.3.1.9)</td>
  * </tr>
  * 
- * 
  * <tr valign="top">
- * <td>{@link #toggleShoppingCartLineCheckStatus(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse)
- * toggleShoppingCartLineCheckStatus}</td>
- * <td>切换指定购物车行的选中状态.</td>
+ * <td>{@link #updateShoppingCartLine(MemberDetails, Long, ShoppingCartLineUpdateSkuForm, HttpServletRequest, HttpServletResponse) updateShoppingCartLine}</td>
+ * <td>更新指定的购物车行shoppingcartLineId的相关参数.(since 5.3.2.3)</td>
  * </tr>
- * <tr valign="top" style="background-color:#eeeeff">
- * <td>{@link #toggleAllShoppingCartLineCheckStatus(MemberDetails, boolean, HttpServletRequest, HttpServletResponse)
- * toggleAllShoppingCartLineCheckStatus}</td>
- * <td>切换所有购物车行的选中状态.</td>
+ * </table>
+ * 
+ * <p>
+ * 4.删除篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
+ * <tr style="background-color:#ccccff">
+ * <th align="left">字段</th>
+ * <th align="left">说明</th>
  * </tr>
  * 
  * <tr valign="top">
@@ -78,7 +120,46 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * <td>删除某个用户的某个特定 shoppingcartLineId 的购物车行.</td>
  * </tr>
  * 
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>{@link #deleteShoppingCartLine(MemberDetails, Long[], HttpServletRequest, HttpServletResponse) deleteShoppingCartLine(with batch)}</td>
+ * <td>删除某个用户的某个特定 shoppingcartLineIds 的一批购物车行.(since 5.3.2.14)</td>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #clearShoppingCartLine(MemberDetails, HttpServletRequest, HttpServletResponse) clearShoppingCartLine}</td>
+ * <td>清空购物车. (since 5.3.2.14)</td>
+ * </tr>
  * </table>
+ * 
+ * 
+ * <p>
+ * 5.选中/不选中篇
+ * </p>
+ * 
+ * <table border="1" cellspacing="0" cellpadding="4" summary="">
+ * <tr style="background-color:#ccccff">
+ * <th align="left">字段</th>
+ * <th align="left">说明</th>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #toggleShoppingCartLineCheckStatus(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse) toggleShoppingCartLineCheckStatus}</td>
+ * <td>切换指定购物车行的选中状态.</td>
+ * </tr>
+ * 
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>{@link #toggleAllShoppingCartLineCheckStatus(MemberDetails, boolean, HttpServletRequest, HttpServletResponse) toggleAllShoppingCartLineCheckStatus}</td>
+ * <td>切换所有购物车行的选中状态.</td>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #uncheckShoppingCartLines(MemberDetails, List, HttpServletRequest, HttpServletResponse) uncheckShoppingCartLines}</td>
+ * <td>将指定的购物车行不选中.(since 5.3.2.6)</td>
+ * </tr>
+ * 
+ * </table>
+ * 
+ * 
  * </blockquote>
  * 
  * <h3>缺少的功能:</h3>
@@ -90,19 +171,17 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  * </p>
  * 
  * <ol>
- * <li>批量删除用户购物车行</li>
- * <li>清空用户购物车行</li>
+ * <li>暂无</li>
  * </ol>
  * </blockquote>
  * 
- * @author weihui.tang
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @version 5.3.1 2016年5月3日 下午1:35:48
+ * @author weihui.tang
  * @since 5.3.1
  */
 public interface ShoppingcartResolver{
 
-    //------------------------------------------------------------------------------------------
+    //-----------------------------get-------------------------------------------------------------
 
     /**
      * 获得指定用户的购物车list(所有的包括选中的及没有选中的).
@@ -115,7 +194,8 @@ public interface ShoppingcartResolver{
      */
     List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request);
 
-    //***************************************************************************************
+    //----------------------------add-----------------------------------
+
     /**
      * 将特定的<code>skuid</code>,指定的数量<code>count</code>,加入到用户的购物车里面去.
      * 
@@ -145,6 +225,71 @@ public interface ShoppingcartResolver{
      *             如果 <code>skuId</code> 是null,或者 <code>count</code>是null
      */
     ShoppingcartResult addShoppingCart(MemberDetails memberDetails,Long skuId,Integer count,HttpServletRequest request,HttpServletResponse response);
+
+    /**
+     * 将特定的skuids,指定的数量count,加入到用户的购物车里面去.
+     *
+     * 
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param skuIds
+     *            几个skuIds
+     * @param count
+     *            数量
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return
+     *         <p>
+     *         仅当全部添加成功了,{@link ShoppingcartBatchAddResult} 的 <b>isSuccess</b> 属性才会是 true; 其他情况都会是false<br>
+     *         </p>
+     * 
+     *         <p>
+     *         {@link ShoppingcartBatchAddResult} 的 <b>skuIdAndShoppingcartResultFailMap</b> 属性存放执行添加失败的sku 和失败的原因;<br>
+     *         由于 {@link ShoppingcartBatchAddOptions} 的 <b>isSkipFail</b> 默认属性是 <b>false</b>, 那么 <b>skuIdAndShoppingcartResultFailMap</b>会放第一条失败的数据<br>
+     *         </p>
+     * @throws NullPointerException
+     *             如果 <code>skuIds</code> 是null<br>
+     *             如果 <code>count</code> 是null<br>
+     * @throws IllegalArgumentException
+     *             如果 <code>skuIds</code> 是empty<br>
+     *             如果 <code>skuIds</code> 是有null 元素<br>
+     * @since 5.3.2.18
+     */
+    ShoppingcartBatchAddResult addShoppingCart(MemberDetails memberDetails,Long[] skuIds,Integer count,HttpServletRequest request,HttpServletResponse response);
+
+    /**
+     * 将特定的skuid 和 指定的数量count的 map,加入到用户的购物车里面去.
+     *
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param skuIdAndCountMap
+     *            skuid 和数量的map
+     * @param shoppingcartBatchAddOptions
+     *            购物车批量添加时候的参数控制<br>
+     *            可以为null, 如果是null,将会使用 {@link ShoppingcartBatchAddOptions#DEFAULT}
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return
+     *         <p>
+     *         仅当全部添加成功了,{@link ShoppingcartBatchAddResult} 的 <b>isSuccess</b> 属性才会是 true; 其他情况都会是false<br>
+     *         </p>
+     * 
+     *         <p>
+     *         {@link ShoppingcartBatchAddResult} 的 <b>skuIdAndShoppingcartResultFailMap</b> 属性存放执行添加失败的sku 和失败的原因;<br>
+     *         如果 {@link ShoppingcartBatchAddOptions} 的 <b>isSkipFail</b> 属性是 <b>true</b>, 那么 <b>skuIdAndShoppingcartResultFailMap</b>会放所有失败的数据<br>
+     *         如果 {@link ShoppingcartBatchAddOptions} 的 <b>isSkipFail</b> 属性是 <b>false</b>, 那么 <b>skuIdAndShoppingcartResultFailMap</b>会放第一条失败的数据<br>
+     *         </p>
+     * @throws NullPointerException
+     *             如果 <code>skuIdAndCountMap</code> 是null<br>
+     * @throws IllegalArgumentException
+     *             如果 <code>skuIdAndCountMap</code> 是empty<br>
+     * @since 5.3.2.18
+     */
+    ShoppingcartBatchAddResult addShoppingCart(MemberDetails memberDetails,Map<Long, Integer> skuIdAndCountMap,ShoppingcartBatchAddOptions shoppingcartBatchAddOptions,HttpServletRequest request,HttpServletResponse response);
 
     //***************************************************************************************
     /**
@@ -176,7 +321,7 @@ public interface ShoppingcartResolver{
      */
     ShoppingcartResult addShoppingCart(MemberDetails memberDetails,ShoppingCartLineAddForm shoppingCartLineAddForm,HttpServletRequest request,HttpServletResponse response);
 
-    //------------------------------------------------------------------------------------------
+    //---------------------------update---------------------------------------------------------------
 
     /**
      * 更新指定的购物车行<code>shoppingcartLineId</code>的数量<code>count</code>.
@@ -368,7 +513,8 @@ public interface ShoppingcartResolver{
      * @param memberDetails
      * @param request
      * @param response
-     * @return
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
      * @since 5.3.2.14
      */
     ShoppingcartResult clearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response);

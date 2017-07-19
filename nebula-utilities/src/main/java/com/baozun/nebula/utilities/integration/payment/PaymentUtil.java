@@ -25,7 +25,7 @@ import static com.feilong.core.bean.ConvertUtil.toBigDecimal;
  * 和支付相关的工具类.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @since 5.3.2.17
+ * @since 5.3.2.18
  */
 public final class PaymentUtil{
 

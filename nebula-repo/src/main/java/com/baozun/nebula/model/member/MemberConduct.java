@@ -89,6 +89,19 @@ public class MemberConduct extends BaseModel {
 	 */
 	private BigDecimal cumulativeConAmount;
 	
+	/**
+	 * 登录客户端识别码
+	 * 类似ip一样的信息
+	 * @since 5.3.2.18
+	 */
+	private String clientIdentificationMechanisms;
+	
+	/**
+     * 注册客户端识别码
+     * 类似ip一样的信息
+     * @since 5.3.2.18
+     */
+    private String registerClientIdentificationMechanisms;
 	
 
 	
@@ -176,6 +189,45 @@ public class MemberConduct extends BaseModel {
 	public void setVersion(Date version) {
 		this.version = version;
 	}
+	/**
+	 * 获得 登录客户端识别码
+	 * @return clientIdentificationMechanisms
+	 * @since 5.3.2.18
+	 */
+	@Column(name = "CLIENT_IDENTIFICATION_MECHANISMS",nullable=true,unique=false)
+    public String getClientIdentificationMechanisms(){
+        return clientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 登录客户端识别码
+     * @param clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setClientIdentificationMechanisms(String clientIdentificationMechanisms){
+        this.clientIdentificationMechanisms = clientIdentificationMechanisms;
+    }
+	
+    /**
+     * 获得 注册客户端识别码
+     *      类似ip一样的信息
+     * @return registerClientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    @Column(name = "REGISTER_CLIENT_IDENTIFICATION_MECHANISMS",nullable=true,unique=false)
+    public String getRegisterClientIdentificationMechanisms(){
+        return registerClientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 注册客户端识别码
+     *      类似ip一样的信息
+     * @param registerClientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setRegisterClientIdentificationMechanisms(String registerClientIdentificationMechanisms){
+        this.registerClientIdentificationMechanisms = registerClientIdentificationMechanisms;
+    }
 	
 	
 }

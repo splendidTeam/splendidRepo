@@ -65,8 +65,6 @@ import com.feilong.core.Validator;
 @Controller
 public class OrderReturnController extends BaseController{
 
-
-
     private Logger logger = LoggerFactory.getLogger(OrderReturnController.class);
 
     @Autowired
@@ -99,12 +97,9 @@ public class OrderReturnController extends BaseController{
     @Autowired
     @Qualifier("returnOrderWriter")
     private ExcelWriter returnOrderWriter;
-    
 
     private static final String     DEFAULT_PATH                            = "excel/";
     private static final String     FILE_NAME                               = "return_order_list_import.xlsx";
-
-    /* public static String[] returnBank={"中国工商银行","中国农业银行","中国银行","中国建设银行","交通银行","中信银行","中国光大银行","华夏银行","中国民生银行","广发银行股份有限公司","平安银行","招商银行","兴业银行","上海浦东发展银行"}; */
 
     /** 前台地址 */
     @Value("#{meta['frontend.url']}")

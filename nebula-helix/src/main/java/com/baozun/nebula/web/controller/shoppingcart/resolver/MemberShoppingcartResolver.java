@@ -32,6 +32,7 @@ import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartQueryManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager;
 import com.baozun.nebula.web.MemberDetails;
 
+import static com.feilong.core.util.CollectionsUtil.forEach;
 import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
 
 /**
@@ -44,6 +45,8 @@ import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
  */
 @Component("memberShoppingcartResolver")
 public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
+
+    //---------------------------------------------------------------------
 
     /**  */
     @Autowired
@@ -60,6 +63,8 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     /**  */
     @Autowired
     private SdkShoppingCartQueryManager sdkShoppingCartQueryManager;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -84,6 +89,27 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     protected ShoppingcartResult doAddShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
         currentLine.setMemberId(memberDetails.getGroupId());
         sdkShoppingCartAddManager.addOrUpdateCartLine(memberDetails.getGroupId(), currentLine);
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doAddShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, java.util.List, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    protected ShoppingcartResult doAddShoppingCart(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
+
+        //设置 memberid
+        forEach(toBeOperatedShoppingCartLineCommandList, "memberId", memberDetails.getGroupId());
+
+        sdkShoppingCartAddManager.addOrUpdateCartLine(memberDetails.getGroupId(), toBeOperatedShoppingCartLineCommandList);
         return null;
     }
 
@@ -155,4 +181,5 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
         sdkShoppingCartDeleteManager.clearShoppingCart(memberDetails.getGroupId());
         return null;
     }
+
 }

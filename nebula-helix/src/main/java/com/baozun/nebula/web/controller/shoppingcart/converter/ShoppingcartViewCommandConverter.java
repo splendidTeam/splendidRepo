@@ -36,10 +36,10 @@ import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartLineSub
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShopSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLineSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
-import com.feilong.core.util.CollectionsUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toList;
+import static com.feilong.core.util.CollectionsUtil.groupOne;
 
 /**
  * 购物车convert.
@@ -128,7 +128,7 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
 
         List<ShopCommand> shopCommandList = shopManager.findByShopIds(shopIds);
         // 店铺信息转成map形式 key是shopId
-        Map<Long, ShopCommand> shopMap = CollectionsUtil.groupOne(shopCommandList, "shopid");
+        Map<Long, ShopCommand> shopMap = groupOne(shopCommandList, "shopid");
 
         //********************************************************************************************************
         Map<ShopSubViewCommand, List<ShoppingCartLineSubViewCommand>> shopAndShoppingCartLineSubViewCommandListMap = new HashMap<>();

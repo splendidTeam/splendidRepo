@@ -330,7 +330,13 @@ public class SalesOrder extends BaseModel{
 
     /** 下单ip. */
     private String             ip;
-
+    
+    /** 
+     * 客户端识别码.
+     * 类似用户ip地址
+     * @since 5.3.2.18
+     *  */
+    private String             clientIdentificationMechanisms ;
     //**********************************************************************
 
     /** 创建时间. */
@@ -1160,6 +1166,25 @@ public class SalesOrder extends BaseModel{
 
     public void setReceiptAddress(String receiptAddress){
         this.receiptAddress = receiptAddress;
+    }
+    
+    /**
+     * 获得 客户端识别码
+     * @return clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    @Column(name = "CLIENT_IDENTIFICATION_MECHANISMS",nullable=true,unique=false)
+    public String getClientIdentificationMechanisms(){
+        return clientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 客户端识别码
+     * @param clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setClientIdentificationMechanisms(String clientIdentificationMechanisms){
+        this.clientIdentificationMechanisms = clientIdentificationMechanisms;
     }
 
 }

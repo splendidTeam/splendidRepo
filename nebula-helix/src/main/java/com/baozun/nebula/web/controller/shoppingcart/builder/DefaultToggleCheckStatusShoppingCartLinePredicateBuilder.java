@@ -63,6 +63,8 @@ public class DefaultToggleCheckStatusShoppingCartLinePredicateBuilder implements
         if (!checkStatus){//如果全不选,那么我们找到选中的购物车行
             return settlementStatePredicate;
         }
+
+        //---------------------------------------------------------------------
         //如果是全选, 那么异常状态的就不需要选中了
         return PredicateUtils.allPredicate(//
                         settlementStatePredicate,

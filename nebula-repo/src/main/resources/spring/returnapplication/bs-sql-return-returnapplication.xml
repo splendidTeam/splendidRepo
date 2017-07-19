@@ -185,8 +185,6 @@
 		</constructor-arg>
 	</bean>
 	
-	
-	
 	<!-- pts分页条件查询管理退换货 -->
 	<bean id="SdkReturnApplicationDao.findExpInfo" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据查询条件查询orderReturnCommand信息（用于导出excel表）</description>

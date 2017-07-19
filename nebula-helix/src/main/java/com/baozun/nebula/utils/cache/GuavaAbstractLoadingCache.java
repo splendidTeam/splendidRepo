@@ -47,9 +47,9 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
     //用于初始化cache的参数及其缺省值    
     private int maximumSize = 100; //最大缓存条数，子类在构造方法中调用setMaximumSize(int size)来更改    
 
-    private int expireAfterWriteDuration = 60; //数据存在时长，子类在构造方法中调用setExpireAfterWriteDuration(int duration)来更改    
+    private int expireAfterWriteDuration = 1; //数据存在时长，子类在构造方法中调用setExpireAfterWriteDuration(int duration)来更改    
 
-    private TimeUnit timeUnit = TimeUnit.MINUTES; //时间单位（分钟）    
+    private TimeUnit timeUnit = TimeUnit.SECONDS; //时间单位    
 
     private Date resetTime; //Cache初始化或被重置的时间    
 
@@ -71,6 +71,7 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
                     cache = CacheBuilder.newBuilder().maximumSize(maximumSize) //缓存数据的最大条目，也可以使用.maximumWeight(weight)代替    
                                     .expireAfterWrite(expireAfterWriteDuration, timeUnit) //数据被创建多久后被移除    
                                     //.recordStats() //启用统计    
+                                    .expireAfterAccess(expireAfterWriteDuration, timeUnit)
                                     .build(new CacheLoader<K, V>() {
                                         @Override
                                         public V load(K key) throws Exception {

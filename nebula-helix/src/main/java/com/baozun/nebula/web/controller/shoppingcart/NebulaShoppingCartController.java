@@ -142,6 +142,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      *            the member details
      * @param request
      *            the request
+     * @param response
      * @param model
      *            the model
      * @return the string
@@ -151,7 +152,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
         ShoppingCartViewCommand shoppingCartViewCommand = buildShoppingCartViewCommand(memberDetails, request);
 
         //将状态不对的 选中状态的订单行 变成不选中. 
-        uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand,request,response);
+        uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand, request, response);
 
         model.addAttribute("shoppingCartViewCommand", shoppingCartViewCommand);
         return "shoppingcart.shoppingcart";
@@ -195,7 +196,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      * <li>通常而言不同的商城其实包装信息不同</li>
      * <li>价格等因子理论上都是内部计算(不可以通过url传输)</li>
      * </ol>
-     * 所以此处设置为 protected 作用域, 此方法一般不直接mapping url 地址, 而是url地址解析到mapping方法,再调用这个方法
+     * 此方法一般不直接mapping url 地址, 而是url地址解析到mapping方法,再调用这个方法
      * </blockquote>
      *
      * @param memberDetails
@@ -209,7 +210,8 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      * @param model
      *            the model
      * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
-     * 
+     * @see #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse, Model)
+     * @see #addShoppingCartBatch(MemberDetails, Long[], Integer, HttpServletRequest, HttpServletResponse, Model)
      * @since 5.3.2.13
      * @RequestMapping(value = "/shoppingcart/addcart", method = RequestMethod.POST)
      */

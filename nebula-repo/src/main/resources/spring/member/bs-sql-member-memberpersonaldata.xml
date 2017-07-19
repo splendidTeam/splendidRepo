@@ -59,6 +59,8 @@
 		       		c.cumulative_con_amount as cumulativeConAmount,
 		       		c.login_count as loginCount,
 		       		c.login_ip as loginIp,
+		       		c.client_identification_mechanisms as clientIdentificationMechanisms,
+		       		c.register_client_identification_mechanisms as registerClientIdentificationMechanisms,
 		       		c.login_time as loginTime,
 		       		c.pay_time as payTime,
 		       		c.register_ip as registerIp,

@@ -27,7 +27,7 @@ public class WechatResponseKeyConstants{
     /**
      * 订单金额 total_fee 是 Int 100 订单总金额，单位为分.
      * 
-     * @since 5.3.2.17
+     * @since 5.3.2.18
      */
     public static final String TOTAL_FEE = "total_fee";
 

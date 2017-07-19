@@ -95,7 +95,7 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
             AddressUtil.initDeliveryArea(map, language, jsPath);
 
             if (LOGGER.isInfoEnabled()){
-                LOGGER.info("load:[{}] use time:{}", language, formatDuration(beginDate));
+                LOGGER.info("load:[{}] use time:[{}]", language, formatDuration(beginDate));
             }
         }
     }

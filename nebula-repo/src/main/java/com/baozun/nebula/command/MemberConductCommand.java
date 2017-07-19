@@ -3,6 +3,7 @@ package com.baozun.nebula.command;
 import java.math.BigDecimal;
 import java.util.Date;
 
+
 public class MemberConductCommand implements Command{
 
 	/**
@@ -49,6 +50,20 @@ public class MemberConductCommand implements Command{
 	 * 累积消费金额
 	 */
 	private BigDecimal			cumulativeConAmount;
+	
+	/**
+     * 登录客户端识别码
+     * 类似ip一样的信息
+     * @since 5.3.2.18
+     */
+    private String clientIdentificationMechanisms;
+    
+    /**
+     * 注册客户端识别码
+     * 类似ip一样的信息
+     * @since 5.3.2.18
+     */
+    private String registerClientIdentificationMechanisms;
 
 	public MemberConductCommand(){
 		super();
@@ -140,5 +155,47 @@ public class MemberConductCommand implements Command{
 	public void setCumulativeConAmount(BigDecimal cumulativeConAmount){
 		this.cumulativeConAmount = cumulativeConAmount;
 	}
+	
+	/**
+     * 获得 登录客户端识别码
+     *       类似ip一样的信息
+     * @return clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public String getClientIdentificationMechanisms(){
+        return clientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 登录客户端识别码
+     *       类似ip一样的信息
+     * @param clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setClientIdentificationMechanisms(String clientIdentificationMechanisms){
+        this.clientIdentificationMechanisms = clientIdentificationMechanisms;
+    }
+
+    /**
+     * 获得 注册客户端识别码
+     *      类似ip一样的信息
+     * @return registerClientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public String getRegisterClientIdentificationMechanisms(){
+        return registerClientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 注册客户端识别码
+     *      类似ip一样的信息
+     * @param registerClientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setRegisterClientIdentificationMechanisms(String registerClientIdentificationMechanisms){
+        this.registerClientIdentificationMechanisms = registerClientIdentificationMechanisms;
+    }
+    
+    
 
 }

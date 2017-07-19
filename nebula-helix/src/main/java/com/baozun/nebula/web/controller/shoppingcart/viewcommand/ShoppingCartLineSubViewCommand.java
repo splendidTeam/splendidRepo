@@ -16,10 +16,14 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.viewcommand;
 
+import static java.math.BigDecimal.ZERO;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -27,7 +31,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
 import com.baozun.nebula.sdk.command.SkuProperty;
+import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.BaseViewCommand;
+import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 
 /**
  * 购物车里面的每行明细.
@@ -45,13 +51,17 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -6308223304441399376L;
 
+    //---------------------------------------------------------------
+
     /**
-     * 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以遍对这个id进行删除/修改.
+     * 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以便对这个id进行删除/修改.
      */
     private Long id;
 
     /** 状态. */
     private Status status;
+
+    //---------------------------------------------------------------
 
     /** 添加时间,此处的时间通常用于页面购物车行的排序,仅此而已. */
     private Date addTime;
@@ -65,7 +75,7 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
      */
     private Integer group;
 
-    //**************************************************************
+    //---------------------------------------------------------------
 
     /** 买的什么商品id. */
     private Long itemId;
@@ -83,7 +93,7 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
     private String extentionCode;
 
     //XXX feilong 销售属性map 是什么,此处应该可以和 PDP 骨架里面的相关view Command 通用 
-    //参见 stander架构里面的  Map<PropertySubViewCommand, List<PropertyValueSubViewCommand>> salesPropertiesMap  
+    //参见 标准架构里面的  Map<PropertySubViewCommand, List<PropertyValueSubViewCommand>> salesPropertiesMap  
     //但是可能的结构是  Map<PropertySubViewCommand, PropertyValueSubViewCommand> salesPropertiesMap  
     //也可能的结构是  Map<String, String> salesPropertiesMap  
     /** The map. */
@@ -104,7 +114,8 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
 
     /** 商品图片. */
     private String itemPic;
-    //**************************************************************
+
+    //---------------------------------------------------------------
 
     /**
      * 是否选中,主要用来渲染view里面的checkbox checked状态.
@@ -124,7 +135,7 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
      */
     private boolean isGift;
 
-    //***********************价格信息*****************************************************
+    //------------------------价格信息---------------------------------------
 
     /** 销售价. */
     private BigDecimal salePrice;
@@ -133,9 +144,9 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
     private BigDecimal listPrice;
 
     /** 购物车行 金额小计 *. */
-    private BigDecimal subTotalAmt = BigDecimal.ZERO;
+    private BigDecimal subTotalAmt = ZERO;
 
-    //***********************************************************************************
+    //---------------------------------------------------------------
 
     /**
      * 对应的包装信息.
@@ -143,6 +154,24 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
      * @since 5.3.2.13
      */
     private List<ShoppingCartLinePackageInfoViewCommand> shoppingCartLinePackageInfoViewCommandList;
+
+    //---------------------------------------------------------------
+    /**
+     * 自定义用于显示的 属性map.
+     * 
+     * <p>
+     * 一般情况下,上述参数完全够用了, <br>
+     * 但是二班情况,比如渲染购物车的时候,需要显示行的某个非销售属性,或者判断个分类之类的,
+     * 
+     * <br>
+     * 商城 可以自定义 {@link ShoppingcartViewCommandConverter} 实现类, 重写 {@link com.baozun.nebula.web.controller.shoppingcart.NebulaShoppingCartController#buildShoppingCartViewCommand(MemberDetails, HttpServletRequest)
+     * buildShoppingCartViewCommand}
+     * 方法,再批量去设置每行属性,性能也不会太差
+     * </p>
+     * 
+     * @since 5.3.2.18
+     */
+    private Map<String, Object> customViewParamMap;
 
     /**
      * 获得 购物车行 金额小计 *.
@@ -164,7 +193,7 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
     }
 
     /**
-     * 获得 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以遍对这个id进行删除/修改.
+     * 获得 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以便对这个id进行删除/修改.
      *
      * @return the id
      */
@@ -173,7 +202,7 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
     }
 
     /**
-     * 设置 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以遍对这个id进行删除/修改.
+     * 设置 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以便对这个id进行删除/修改.
      *
      * @param id
      *            the id to set
@@ -525,5 +554,46 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
      */
     public void setShoppingCartLinePackageInfoViewCommandList(List<ShoppingCartLinePackageInfoViewCommand> shoppingCartLinePackageInfoViewCommandList){
         this.shoppingCartLinePackageInfoViewCommandList = shoppingCartLinePackageInfoViewCommandList;
+    }
+
+    /**
+     * 自定义用于显示的 属性map.
+     * 
+     * <p>
+     * 一般情况下,上述参数完全够用了, <br>
+     * 但是二班情况,比如渲染购物车的时候,需要显示行的某个非销售属性,或者判断个分类之类的,
+     * 
+     * <br>
+     * 商城 可以自定义 {@link ShoppingcartViewCommandConverter} 实现类, 重写 {@link com.baozun.nebula.web.controller.shoppingcart.NebulaShoppingCartController#buildShoppingCartViewCommand(MemberDetails, HttpServletRequest)
+     * buildShoppingCartViewCommand}
+     * 方法,再批量去设置每行属性,性能也不会太差
+     * </p>
+     *
+     * @return the 自定义用于显示的 属性map
+     * @since 5.3.2.18
+     */
+    public Map<String, Object> getCustomViewParamMap(){
+        return customViewParamMap;
+    }
+
+    /**
+     * 自定义用于显示的 属性map.
+     * 
+     * <p>
+     * 一般情况下,上述参数完全够用了, <br>
+     * 但是二班情况,比如渲染购物车的时候,需要显示行的某个非销售属性,或者判断个分类之类的,
+     * 
+     * <br>
+     * 商城 可以自定义 {@link ShoppingcartViewCommandConverter} 实现类, 重写 {@link com.baozun.nebula.web.controller.shoppingcart.NebulaShoppingCartController#buildShoppingCartViewCommand(MemberDetails, HttpServletRequest)
+     * buildShoppingCartViewCommand}
+     * 方法,再批量去设置每行属性,性能也不会太差
+     * </p>
+     *
+     * @param customViewParamMap
+     *            the new 自定义用于显示的 属性map
+     * @since 5.3.2.18
+     */
+    public void setCustomViewParamMap(Map<String, Object> customViewParamMap){
+        this.customViewParamMap = customViewParamMap;
     }
 }

@@ -50,11 +50,11 @@ public class ShoppingCartLineCommandPackCommonBehaviour extends AbstractShopping
 
     /** The item dao. */
     @Autowired
-    private ItemDao       itemDao;
+    private ItemDao itemDao;
 
     /** The sku dao. */
     @Autowired
-    private SkuDao        skuDao;
+    private SkuDao skuDao;
 
     /** The sdk sku manager. */
     @Autowired
@@ -62,7 +62,7 @@ public class ShoppingCartLineCommandPackCommonBehaviour extends AbstractShopping
 
     /** The item info dao. */
     @Autowired
-    private ItemInfoDao   itemInfoDao;
+    private ItemInfoDao itemInfoDao;
 
     /*
      * (non-Javadoc)
@@ -185,9 +185,10 @@ public class ShoppingCartLineCommandPackCommonBehaviour extends AbstractShopping
         // 销售属性
         String skuProperties = sku.getProperties();
         shoppingCartLineCommand.setSaleProperty(skuProperties);
-        List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(skuProperties);
-        if (Validator.isNotNullOrEmpty(skuPros)){
-            shoppingCartLineCommand.setSkuPropertys(skuPros);
+
+        List<SkuProperty> skuPropertyList = sdkSkuManager.getSkuPros(skuProperties);
+        if (Validator.isNotNullOrEmpty(skuPropertyList)){
+            shoppingCartLineCommand.setSkuPropertys(skuPropertyList);
         }
     }
 

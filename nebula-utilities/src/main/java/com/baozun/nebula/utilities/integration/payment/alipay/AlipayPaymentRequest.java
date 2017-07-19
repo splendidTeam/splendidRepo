@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import com.baozun.nebula.utilities.common.Md5Encrypt;
 import com.baozun.nebula.utilities.common.ReflectionUtil;
 import com.baozun.nebula.utilities.common.URIUtil;
-import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
 import com.baozun.nebula.utilities.common.convertor.MapAndStringConvertor;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
@@ -50,11 +49,13 @@ import com.baozun.nebula.utilities.integration.payment.exception.RequestTypeNotS
 import com.baozun.nebula.utilities.integration.payment.param.PaymentRequestParam;
 import com.feilong.tools.jsonlib.JsonUtil;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 public class AlipayPaymentRequest implements PaymentRequest,Serializable{
 
     private static final long serialVersionUID = -7441188005486354584L;
 
-    private static final Logger logger = LoggerFactory.getLogger(AlipayPaymentRequest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlipayPaymentRequest.class);
 
     public static final String PAYMENT_PARAM_PREFIX = "param.";
 
@@ -321,7 +322,7 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
     @Override
     public void prepare() throws PaymentException{
         if (anti_phishing_key_service_name == null){
-            logger.info("No anti_phishing_key_service defined, so this parameter will be ignored.");
+            LOGGER.info("No anti_phishing_key_service defined, so this parameter will be ignored.");
             return;
         }
 
@@ -348,15 +349,15 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
         if (url == null || doc == null)
             throw new PaymentInitialFailureException("Read service response error.");
 
-        if (logger.isDebugEnabled()){
-            logger.debug("Invoke anti_phishing_key_service with url: {}", url.toString());
-            logger.debug("==================== Result ====================");
-            logger.debug(doc.toString());
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("Invoke anti_phishing_key_service with url: {}", url.toString());
+            LOGGER.debug("==================== Result ====================");
+            LOGGER.debug(doc.toString());
         }
 
         List<Node> resultNodes = doc.selectNodes("/alipay/is_success");
         if (resultNodes == null || resultNodes.size() == 0){
-            logger.error("Get anti_phishing_key_service failure.");
+            LOGGER.error("Get anti_phishing_key_service failure.");
             throw new PaymentInitialFailureException("Get anti_phishing_key_service failure.");
         }
         if (resultNodes.iterator().next().getText().equalsIgnoreCase("T")){
@@ -366,11 +367,11 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
             for (Node key : keys){
                 result.append(key.getText());
             }
-            logger.info("anti_phishing_key is {}", result.toString());
+            LOGGER.info("anti_phishing_key is {}", result.toString());
             this.anti_phishing_key = result.toString();
         }else{
             // false
-            logger.error("Get anti_phishing_key_service failure with return message: " + doc.toString());
+            LOGGER.error("Get anti_phishing_key_service failure with return message: " + doc.toString());
             throw new PaymentInitialFailureException("Get anti_phishing_key_service failure.");
         }
     }
@@ -394,15 +395,14 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
     public String getRequestURL(){
         Map<String, String> paymentParameters2 = this.getPaymentParameters();
         String encodedUrl = URIUtil.getEncodedUrl(paymentParameters2, _input_charset);
-        if (logger.isInfoEnabled()){
-            logger.info("encodedUrl:[{}],paymentParameters2:{}", encodedUrl, JsonUtil.format(paymentParameters2));
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info("encodedUrl:[{}],paymentParameters2:{}", encodedUrl, JsonUtil.format(paymentParameters2));
         }
         return encodedUrl;
     }
 
     @Override
     public Map<String, String> getPaymentParameters(){
-        // TODO Auto-generated method stub
         return paymentParameters;
     }
 
@@ -433,6 +433,7 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
         this.paymentParameters = addition;
     }
 
+    //---------------------------------------------------------------
     /**
      * 只设置MD5加密的字段(sign与sign_type不在加密范围内)
      * 该设置只转换配置文件中的参数
@@ -442,109 +443,109 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
      * @throws PaymentParamErrorException
      */
     public void setParamMap(Map<String, String> addition) throws PaymentParamErrorException{
-        if (Validator.isNotNullOrEmpty(service)){
+        if (isNotNullOrEmpty(service)){
             addition.put("service", service);// 服务名称(不可为空)
         }else{
             throw new PaymentParamErrorException("service can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(payment_type)){
+        if (isNotNullOrEmpty(payment_type)){
             addition.put("payment_type", payment_type);// 支付类型(不可为空)
         }else{
             throw new PaymentParamErrorException("service can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(_input_charset)){
+        if (isNotNullOrEmpty(_input_charset)){
             addition.put("_input_charset", _input_charset);// 字符串编码(不可为空)
         }else{
             throw new PaymentParamErrorException("_input_charset can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(subject)){
+        if (isNotNullOrEmpty(subject)){
             addition.put("subject", subject);// 商品名称(不可为空)
         }else{
             throw new PaymentParamErrorException("subject can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(return_url)){//支付宝参数中虽然可以为空，但业务需求允许为空
+        if (isNotNullOrEmpty(return_url)){//支付宝参数中虽然可以为空，但业务需求允许为空
             addition.put("return_url", return_url);
         }else{
             throw new PaymentParamErrorException("return_url can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(notify_url)){
+        if (isNotNullOrEmpty(notify_url)){
             addition.put("notify_url", notify_url);//支付宝参数中虽然可以为空，但业务需求允许为空
         }else{
             throw new PaymentParamErrorException("notify_url can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(error_notify_url)){
+        if (isNotNullOrEmpty(error_notify_url)){
             addition.put("error_notify_url", error_notify_url);
         }
-        if (Validator.isNotNullOrEmpty(partner)){
+        if (isNotNullOrEmpty(partner)){
             addition.put("partner", partner);// 合作方(不可为空)
         }else{
             throw new PaymentParamErrorException("partner can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(seller_email)){
+        if (isNotNullOrEmpty(seller_email)){
             addition.put("seller_email", seller_email);// 卖家支付宝账号(可为空)
         }
-        if (Validator.isNotNullOrEmpty(buyer_email)){
+        if (isNotNullOrEmpty(buyer_email)){
             addition.put("buyer_email", buyer_email);// 买家支付宝账号(可为空)
         }
-        if (Validator.isNotNullOrEmpty(seller_id)){
+        if (isNotNullOrEmpty(seller_id)){
             addition.put("seller_id", seller_id);// 卖家支付宝账户号(可为空)
         }
-        if (Validator.isNotNullOrEmpty(buyer_id)){
+        if (isNotNullOrEmpty(buyer_id)){
             addition.put("buyer_id", buyer_id);// 买家支付宝账户号(可为空)
         }
-        if (Validator.isNotNullOrEmpty(seller_account_name)){
+        if (isNotNullOrEmpty(seller_account_name)){
             addition.put("seller_account_name", seller_account_name);// 卖家别名支付宝账号(可为空)
         }
-        if (Validator.isNotNullOrEmpty(buyer_account_name)){
+        if (isNotNullOrEmpty(buyer_account_name)){
             addition.put("buyer_account_name", buyer_account_name);// 买家别名支付宝账号(可为空)
         }
-        if (Validator.isNotNullOrEmpty(enable_paymethod)){
+        if (isNotNullOrEmpty(enable_paymethod)){
             addition.put("enable_paymethod", enable_paymethod);// 支付渠道(可为空)(例：directPay^bankPay^cartoon^cash)
         }
-        if (Validator.isNotNullOrEmpty(paymethod)){
+        if (isNotNullOrEmpty(paymethod)){
             addition.put("paymethod", paymethod);// 支付方式
         }
-        if (Validator.isNotNullOrEmpty(need_ctu_check)){
+        if (isNotNullOrEmpty(need_ctu_check)){
             addition.put("need_ctu_check", need_ctu_check);// 网银支付时是否做CTU校验(可为空)
         }
-        if (Validator.isNotNullOrEmpty(royalty_type)){
+        if (isNotNullOrEmpty(royalty_type)){
             addition.put("royalty_type", royalty_type);// 提成类型(可为空)一旦传递了这个参数则值不能为空
         }
-        if (Validator.isNotNullOrEmpty(royalty_parameters)){
+        if (isNotNullOrEmpty(royalty_parameters)){
             addition.put("royalty_parameters", royalty_parameters);// 分润账号集(可为空)
         }
-        if (Validator.isNotNullOrEmpty(anti_phishing_key)){
+        if (isNotNullOrEmpty(anti_phishing_key)){
             addition.put("anti_phishing_key", anti_phishing_key);// 防钓鱼时间戳(可为空)
         }
-        if (Validator.isNotNullOrEmpty(exter_invoke_ip)){
+        if (isNotNullOrEmpty(exter_invoke_ip)){
             addition.put("exter_invoke_ip", exter_invoke_ip);// 客户端IP(可为空)
         }
-        if (Validator.isNotNullOrEmpty(extra_common_param)){
+        if (isNotNullOrEmpty(extra_common_param)){
             addition.put("extra_common_param", extra_common_param);// 公用回传参数(可为空)
         }
-        if (Validator.isNotNullOrEmpty(extend_param)){
+        if (isNotNullOrEmpty(extend_param)){
             addition.put("extend_param", extend_param);// 公用业务扩展参数(可为空)
         }
-        if (Validator.isNotNullOrEmpty(it_b_pay)){
+        if (isNotNullOrEmpty(it_b_pay)){
             addition.put("it_b_pay", it_b_pay);// 超时时间(可为空)参数不接受小数点
         }
-        if (Validator.isNotNullOrEmpty(qr_pay_mode)){
+        if (isNotNullOrEmpty(qr_pay_mode)){
             addition.put("qr_pay_mode", qr_pay_mode);// 支付宝扫描支付方式
         }
-        if (Validator.isNotNullOrEmpty(product_type)){
+        if (isNotNullOrEmpty(product_type)){
             addition.put("product_type", product_type);// 商户申请的产品类型(可为空)
         }
-        if (Validator.isNotNullOrEmpty(token)){
+        if (isNotNullOrEmpty(token)){
             addition.put("token", token);// 快捷登录授权令牌(可为空)
         }
-        if (Validator.isNotNullOrEmpty(item_orders_info)){
+        if (isNotNullOrEmpty(item_orders_info)){
             addition.put("item_orders_info", item_orders_info);// 商户回传业务参数(可为空)
         }
-        if (Validator.isNotNullOrEmpty(sign_id_ext)){
+        if (isNotNullOrEmpty(sign_id_ext)){
             addition.put("sign_id_ext", sign_id_ext);// 商户买家签约号(可为空)
         }
-        if (Validator.isNotNullOrEmpty(sign_id_ext)){
-            if (Validator.isNotNullOrEmpty(sign_name_ext)){
+        if (isNotNullOrEmpty(sign_id_ext)){
+            if (isNotNullOrEmpty(sign_name_ext)){
                 addition.put("sign_name_ext", sign_name_ext);// 商户买家签约名(可为空)注：如果sign_id_ext不为空则该参数不为空
             }else{
                 throw new PaymentParamErrorException("sign_id_ext has value!sign_name_ext can't be null/empty!");
@@ -562,17 +563,19 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
      * @throws PaymentException
      */
     public void initPaymentRequestParamsForMobileCreateDirect(Properties prop,Map<String, String> addition,String call_back_url,String notifyUrl,String merchant_url) throws PaymentException{
-        this.payment_gateway = prop.getProperty("payment_gateway_mobile");
         this.call_back_url = call_back_url;
         this.notify_url = notifyUrl;
         this.merchant_url = merchant_url;
         loadRequestParams(prop);
+        reInitMobileParams();
+
         this.service = prop.getProperty(PAYMENT_GATEWAY_MOBILE_C);
         String requestStr = PaymentRequestParam.MOBILE_CREATE_DIRECT_STR;
         setParamMapForMobileC(addition, requestStr, prop);
+
         String toBeSignedString = MapAndStringConvertor.getToBeSignedString(addition);
-        String sign = Md5Encrypt.md5(toBeSignedString + key, _input_charset);
-        addition.put("sign", sign);
+
+        addition.put("sign", Md5Encrypt.md5(toBeSignedString + key, _input_charset));
         addition.put("action", payment_gateway);
         this.paymentParameters = addition;
     }
@@ -587,84 +590,86 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
      */
     public void setParamMapForMobileC(Map<String, String> addition,String requestStr,Properties prop) throws PaymentParamErrorException{
         String reqStr = "";
-        if (Validator.isNotNullOrEmpty(service)){
+        if (isNotNullOrEmpty(service)){
             addition.put("service", service);// 服务名称(不可为空)
         }else{
             throw new PaymentParamErrorException("service can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(prop.get("format"))){
+        if (isNotNullOrEmpty(prop.get("format"))){
             addition.put("format", prop.get("format").toString());// 请求参数格式(不可为空)
         }else{
             throw new PaymentParamErrorException("format can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(prop.get("v"))){
+        if (isNotNullOrEmpty(prop.get("v"))){
             addition.put("v", prop.get("v").toString());// 接口版本号(不可为空)
         }else{
             throw new PaymentParamErrorException("v can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(prop.get("sec_id"))){
+        if (isNotNullOrEmpty(prop.get("sec_id"))){
             addition.put("sec_id", prop.get("sec_id").toString());// 签名方式(不可为空)
         }else{
             throw new PaymentParamErrorException("service can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(addition.get("req_id"))){
+        if (isNotNullOrEmpty(addition.get("req_id"))){
             addition.put("req_id", addition.get("req_id"));// 用于关联请求与响应，防止请求重播。支付宝限制来自同一个partner的请求号必须唯一。(不可为空)
         }else{
             throw new PaymentParamErrorException("req_id can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(subject)){
+        if (isNotNullOrEmpty(subject)){
             reqStr = requestStr.replace("${subject}", subject);// 商品名称(不可为空)
         }else{
             throw new PaymentParamErrorException("subject can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(addition.get("out_trade_no"))){
+        if (isNotNullOrEmpty(addition.get("out_trade_no"))){
             reqStr = reqStr.replace("${out_trade_no}", addition.get("out_trade_no"));// 支付宝合作商户网站唯一订单号(不可为空)
         }else{
             throw new PaymentParamErrorException("out_trade_no can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(addition.get("total_fee"))){
+        if (isNotNullOrEmpty(addition.get("total_fee"))){
             reqStr = reqStr.replace("${total_fee}", addition.get("total_fee").toString());// 交易金额(不可为空)
             addition.remove("total_fee");
         }else{
             throw new PaymentParamErrorException("total_fee can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(seller_email)){
+        if (isNotNullOrEmpty(seller_email)){
             reqStr = reqStr.replace("${seller_account_name}", seller_email);// 卖家支付宝账号(不可为空)
         }else{
             throw new PaymentParamErrorException("seller_account_name can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(call_back_url)){//支付宝参数不可为空
+        if (isNotNullOrEmpty(call_back_url)){//支付宝参数不可为空
             reqStr = reqStr.replace("${call_back_url}", call_back_url);
         }else{
             throw new PaymentParamErrorException("call_back_url can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(notify_url)){
+        if (isNotNullOrEmpty(notify_url)){
             reqStr = reqStr.replace("${notify_url}", notify_url);//支付宝参数中虽然可以为空，但业务需求允许为空
         }else{
             throw new PaymentParamErrorException("notify_url can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(merchant_url)){
+        if (isNotNullOrEmpty(merchant_url)){
             reqStr = reqStr.replace("${merchant_url}", merchant_url);
         }else{
             throw new PaymentParamErrorException("merchant_url can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(addition.get("pay_expire"))){//交易自动关闭时间
+        if (isNotNullOrEmpty(addition.get("pay_expire"))){//交易自动关闭时间
             reqStr = reqStr.replace("${pay_expire}", addition.get("pay_expire"));
         }else{
             reqStr = reqStr.replace("${pay_expire}", "21600");
         }
-        if (Validator.isNotNullOrEmpty(partner)){
+        if (isNotNullOrEmpty(partner)){
             addition.put("partner", partner);// 合作方(不可为空)
         }else{
             throw new PaymentParamErrorException("partner can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(addition.get("out_user"))){
+        if (isNotNullOrEmpty(addition.get("out_user"))){
             reqStr = reqStr.replace("${out_user}", addition.get("out_user"));
         }else{
             reqStr = reqStr.replace("<out_user>${out_user}</out_user>", "");
         }
         addition.put("req_data", reqStr);
     }
+
+    //---------------------------------------------------------------
 
     /**
      * 设置MOBILE端交易初始化参数并检查
@@ -676,16 +681,30 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
      * @throws PaymentException
      */
     public void initPaymentRequestParamsForMobileAuthAndExecute(Properties prop,Map<String, String> addition) throws PaymentException{
-        this.payment_gateway = prop.getProperty("payment_gateway_mobile");
         loadRequestParams(prop);
+        reInitMobileParams();
+
         this.service = prop.getProperty(PAYMENT_GATEWAY_MOBILE_P);
         String requestStr = PaymentRequestParam.MOBILE_AUTH_EXECUTE_STR;
         setParamMapForMobileP(addition, requestStr, prop);
+
         String toBeSignedString = MapAndStringConvertor.getToBeSignedString(addition);
-        String sign = Md5Encrypt.md5(toBeSignedString + key, _input_charset);
-        addition.put("sign", sign);
+
+        addition.put("sign", Md5Encrypt.md5(toBeSignedString + key, _input_charset));
+        addition.put("sign_type", sign_type);
         addition.put("action", payment_gateway);
+
         this.paymentParameters = addition;
+    }
+
+    private void reInitMobileParams(){
+        this.payment_gateway = AlipayMobileParams.GATEWAY;
+        this.partner = AlipayMobileParams.PARTNER;
+        this.key = AlipayMobileParams.KEY;
+        this.seller_email = AlipayMobileParams.SELLER_EMAIL;
+
+        LOGGER.debug("re-init mobile param over");
+
     }
 
     /**
@@ -698,39 +717,44 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
      */
     public void setParamMapForMobileP(Map<String, String> addition,String requestStr,Properties prop) throws PaymentParamErrorException{
         String reqStr = "";
-        if (Validator.isNotNullOrEmpty(service)){
+        if (isNotNullOrEmpty(service)){
             addition.put("service", service);// 服务名称(不可为空)
         }else{
             throw new PaymentParamErrorException("service can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(prop.get("format"))){
+        if (isNotNullOrEmpty(prop.get("format"))){
             addition.put("format", prop.get("format").toString());// 请求参数格式(不可为空)
         }else{
             throw new PaymentParamErrorException("format can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(prop.get("v"))){
+        if (isNotNullOrEmpty(prop.get("v"))){
             addition.put("v", prop.get("v").toString());// 接口版本号(不可为空)
         }else{
             throw new PaymentParamErrorException("service can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(prop.get("sec_id"))){
+        if (isNotNullOrEmpty(prop.get("sec_id"))){
             addition.put("sec_id", prop.get("sec_id").toString());// 签名方式(不可为空)
         }else{
             throw new PaymentParamErrorException("service can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(partner)){
+        if (isNotNullOrEmpty(partner)){
             addition.put("partner", partner);// 合作方(不可为空)
         }else{
             throw new PaymentParamErrorException("partner can't be null/empty!");
         }
-        if (Validator.isNotNullOrEmpty(addition.get("request_token"))){
+        if (isNotNullOrEmpty(addition.get("request_token"))){
             reqStr = requestStr.replace("${request_token}", addition.get("request_token"));
-            ;// 请求业务参数(不可为空)
+            // 请求业务参数(不可为空)
         }else{
             throw new PaymentParamErrorException("request_token can't be null/empty!");
         }
         addition.put("req_data", reqStr);
+
+        //TODO 有乱码  需要测试
+        //addition.put("app_pay", "Y");
     }
+
+    //---------------------------------------------------------------
 
     /**
      * 初始化退单参数
@@ -754,6 +778,8 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
         addition.put("action", payment_gateway);
     }
 
+    //---------------------------------------------------------------
+
     /**
      * 初始化订单查询参数
      * 
@@ -776,9 +802,11 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
         addition.put("action", payment_gateway);
     }
 
+    //---------------------------------------------------------------
+
     private void loadRequestParams(Properties prop) throws PaymentParamErrorException{
         if (prop == null){
-            logger.warn("No Payment Configuration File found for Alipay");
+            LOGGER.warn("No Payment Configuration File found for Alipay");
             return;
         }
         Enumeration<?> e = prop.propertyNames();
@@ -804,6 +832,8 @@ public class AlipayPaymentRequest implements PaymentRequest,Serializable{
             throw new PaymentParamErrorException("Error when setting Param " + key + "'s value with " + value, e);
         }
     }
+
+    //---------------------------------------------------------------
 
     @Override
     public String getRequestType(){

@@ -42,6 +42,8 @@ public class ShoppingCartLinePackageInfoPredicate implements Predicate<List<Shop
 
     private List<PackageInfoElement> packageInfoElementList;
 
+    //---------------------------------------------------------------------
+
     /**
      * @param packageInfoElementList
      */

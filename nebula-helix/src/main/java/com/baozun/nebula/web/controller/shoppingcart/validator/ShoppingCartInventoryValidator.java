@@ -18,6 +18,7 @@ package com.baozun.nebula.web.controller.shoppingcart.validator;
 
 import java.util.List;
 
+import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
@@ -40,4 +41,18 @@ public interface ShoppingCartInventoryValidator{
      * @since 5.3.2.13 change method ,remove extentionCode param
      */
     boolean isMoreThanInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId);
+
+    /**
+     * 买了 某个 <code>skuId</code>,和总购买量 <code>sumBuyCount</code>,判断是否超过库存量
+     *
+     * @param skuId
+     *            指定的sku id
+     * @param sumBuyCount
+     *            总购买量
+     * @return 如果超过库存量,返回true;否则返回false<br>
+     *         如果 {@code sumBuyCount <= 0},抛出 {@link IllegalArgumentException}<br>
+     *         如果 skuId 找不到 {@link SkuInventory},抛出 {@link NullPointerException}<br>
+     * @since 5.3.2.18
+     */
+    boolean isMoreThanInventory(long skuId,int sumBuyCount);
 }
