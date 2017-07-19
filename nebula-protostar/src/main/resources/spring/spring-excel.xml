@@ -49,5 +49,10 @@
         </constructor-arg>
     </bean>
 
-
+	<!-- 退货单导出 -->
+    <bean id="returnOrderWriter" factory-bean="excelManipulatorFactory" factory-method="createExcelWriter">
+        <constructor-arg>
+        	<value>exportReturn</value>
+        </constructor-arg>
+    </bean>
 </beans>

@@ -1,15 +1,11 @@
 package com.baozun.nebula.web.controller.returnapplication;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,17 +14,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
+import loxia.support.excel.ExcelManipulatorFactory;
+import loxia.support.excel.ExcelWriter;
 
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,6 +34,8 @@ import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.command.ReturnLineCommand;
 import com.baozun.nebula.dao.product.SkuDao;
+import com.baozun.nebula.exception.BusinessException;
+import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.salesorder.ReturnOrderAppManager;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.returnapplication.ReturnApplication;
@@ -72,7 +66,6 @@ import com.feilong.core.Validator;
 public class OrderReturnController extends BaseController{
 
 
-    private static final String FORMAT_DATE_MIDST = "yyyyMMdd";
 
     private Logger logger = LoggerFactory.getLogger(OrderReturnController.class);
 
@@ -99,6 +92,17 @@ public class OrderReturnController extends BaseController{
 
     @Autowired
     private ReturnOrderAppManager returnOrderAppManager;
+    
+    @Autowired
+    private ExcelManipulatorFactory excelFactory;
+    
+    @Autowired
+    @Qualifier("returnOrderWriter")
+    private ExcelWriter returnOrderWriter;
+    
+
+    private static final String     DEFAULT_PATH                            = "excel/";
+    private static final String     FILE_NAME                               = "return_order_list_import.xlsx";
 
     /* public static String[] returnBank={"中国工商银行","中国农业银行","中国银行","中国建设银行","交通银行","中信银行","中国光大银行","华夏银行","中国民生银行","广发银行股份有限公司","平安银行","招商银行","兴业银行","上海浦东发展银行"}; */
 
@@ -219,7 +223,7 @@ public class OrderReturnController extends BaseController{
         return FAILTRUE;
 
     }
-
+    
     /**
      * 退货单导出
      * 
@@ -237,214 +241,31 @@ public class OrderReturnController extends BaseController{
     @RequestMapping(value = "/salesorder/return/exportReturn.htm",method = RequestMethod.POST)
     @ResponseBody
     public String exportReturn(Model model,HttpServletRequest request,HttpServletResponse response,@QueryBeanParam QueryBean queryBean){
-        String path = "excel/tplt-item-export-import.xls";
-        File file = new File(Thread.currentThread().getContextClassLoader().getResource(path).getPath());
-        String fileName = file.getName();
-        OutputStream outputStream = null;
-
-        // HttpServletResponse Header设置
-        response.setHeader("Cache-Control", "no-cache");
-        response.setHeader("Pragma", "no-cache");
-        response.setDateHeader("Expires", -1);
-        
+        String path = DEFAULT_PATH + FILE_NAME;
+        Sort[] sorts = queryBean.getSorts();
+        if ((sorts == null) || (sorts.length == 0)){
+            Sort sort = new Sort("application.create_time", "desc");
+            sorts = new Sort[1];
+            sorts[0] = sort;
+        }
+        List<OrderReturnCommand> returnCommandList = sdkReturnApplicationManager.findExpInfo(sorts, queryBean.getParaMap());
+        ExcelWriter writer = excelFactory.createExcelWriter("exportReturn");
+        Map<String, Object> beans = new HashMap<String, Object>();
+        beans.put("expReturnList", returnCommandList);
         try {
-            response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
-            outputStream = response.getOutputStream();
-            Sort[] sorts = queryBean.getSorts();
-            if ((sorts == null) || (sorts.length == 0)){
-                Sort sort = new Sort("application.create_time", "desc");
-                sorts = new Sort[1];
-                sorts[0] = sort;
-            }
-            List<OrderReturnCommand> returnCommand = sdkReturnApplicationManager.findExpInfo(sorts, queryBean.getParaMap());
-            XSSFWorkbook wb = this.setReturnWorkbook(returnCommand);
-            if(wb != null){
-                wb.write(outputStream);
-            }
-        } catch (UnsupportedEncodingException e) {
+            response.setHeader("Content-type", "application/force-download");
+            response.setHeader("Content-Transfer-Encoding", "Binary");
+            response.setHeader("Content-Type", "application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=\""
+                    + FILE_NAME+"\"");
+            writer.write(path, response.getOutputStream(), beans);
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally{
-            if(outputStream != null){
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            throw  new BusinessException(ErrorCodes.SYSTEM_ERROR);
         }
         
         return "json";
     
-    }
-
-    /**
-     * 导出退货信息，封装XSSFWorkbook数据
-     * 
-     * @author jinhui.huang
-     * 
-     */
-    private XSSFWorkbook setReturnWorkbook(List<OrderReturnCommand> orderReturnCommandList){
-
-        XSSFWorkbook wb = new XSSFWorkbook();
-        XSSFSheet sheet = wb.createSheet("Sheet1");
-        initSheet(sheet);// 初始化sheet，设置列数和每列宽度
-
-        XSSFCellStyle centerStyle = wb.createCellStyle();// 设置为水平居中
-        centerStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-        centerStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-        XSSFFont headerFont = (XSSFFont) wb.createFont(); // 创建字体样式
-        headerFont.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD); // 字体加粗
-        centerStyle.setFont(headerFont);
-        initInputHeader(sheet, centerStyle);
-
-        XSSFCellStyle centerStyleLeft = wb.createCellStyle();// 设置为水平居左
-        centerStyleLeft.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-        centerStyleLeft.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-
-        int i = 1;
-        for (OrderReturnCommand returnCommand : orderReturnCommandList){
-            XSSFRow row = sheet.createRow((short) i);
-
-            createCell(row, 0, returnCommand.getPlatformOMSCode(), centerStyleLeft);
-
-            createCell(row, 1, returnCommand.getRefundPayee(), centerStyleLeft);
-
-            createCell(row, 2, returnCommand.getSoOrderCode(), centerStyleLeft);
-
-            createCell(row, 3, returnCommand.getProductName(), centerStyleLeft);
-
-            createCell(row, 4, returnCommand.getCode(), centerStyleLeft);
-
-            createCell(row, 5, returnCommand.getReturnPrice(), centerStyleLeft);
-
-            createCell(row, 6, returnCommand.getQty(), centerStyleLeft);
-
-            // STATUS
-            String returnStatus = null;
-            if (ReturnApplication.SO_RETURN_STATUS_AUDITING.equals(returnCommand.getStatus())){
-                returnStatus = "待审核";
-            }
-            if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(returnCommand.getStatus())){
-                returnStatus = "拒绝退货";
-            }
-            if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(returnCommand.getStatus())){
-                returnStatus = "待发货";
-            }
-            if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED.equals(returnCommand.getStatus())){
-                returnStatus = "已发货";
-            }
-            if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(returnCommand.getStatus())){
-                returnStatus = "同意退换货";
-            }
-            if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(returnCommand.getStatus())){
-                returnStatus = "已完成";
-            }
-            createCell(row, 7, returnStatus, centerStyleLeft);
-
-            // APPROVER
-            createCell(row, 8, returnCommand.getApprover(), centerStyleLeft);
-            // APPROVERTIME(YYYYMMDD)
-            createCell(row, 9, formatDate(returnCommand.getApproveTime(), FORMAT_DATE_MIDST), centerStyleLeft);
-            // CREATETIME
-            createCell(row, 10, formatDate(returnCommand.getCreateTime(), FORMAT_DATE_MIDST), centerStyleLeft);
-
-            // TRANSCODE
-            createCell(row, 11, returnCommand.getTransCode(), centerStyleLeft);
-
-            // Etransname
-            createCell(row, 12, returnCommand.getTransName(), centerStyleLeft);
-            // Etransname
-            createCell(row, 13, returnCommand.getReturnReason(), centerStyleLeft);
-             
-            createCell(row, 14, returnCommand.getType() == 1 ? "退货" : "换货", centerStyleLeft);
-            i++;
-        }
-
-        return wb;
-    }
-
-    /**
-     * 创建单元格
-     * 
-     * @param row行
-     * @param column列位置
-     * @param value值
-     * @param style样式
-     * @author Huang
-     */
-    private void createCell(XSSFRow row,int column,Object value,XSSFCellStyle style){
-        XSSFCell cell = row.createCell(column);
-        cell.setCellValue(String.valueOf(value));
-        cell.setCellStyle(style);
-    }
-
-    /**
-     * 
-     * @param sheet
-     * @param style
-     */
-    private void initInputHeader(XSSFSheet sheet,XSSFCellStyle style){
-        XSSFRow row1 = sheet.createRow((short) 0);
-        createCell(row1, 0, "OMS退货编号", style);
-        createCell(row1, 1, "登录名", style);
-        createCell(row1, 2, "退换货订单平台订单编码", style);
-        createCell(row1, 3, "商品名称", style);
-        createCell(row1, 4, "商品款号", style);
-        createCell(row1, 5, "退款金额", style);
-        createCell(row1, 6, "数量", style);
-        createCell(row1, 7, "订单状态", style);
-        createCell(row1, 8, "审批人", style);
-        createCell(row1, 9, "审批时间", style);
-        createCell(row1, 10, "退货创建时间", style);
-        createCell(row1, 11, "退货快递单号", style);
-        createCell(row1, 12, "退货物流公司", style);
-        createCell(row1, 13, "退换货原因", style);
-        createCell(row1, 14, "退换货类型", style);
-
-    }
-
-    /**
-     * 初始化sheet，设置列数和每列宽度
-     * 
-     * @author Huang
-     * @param sheet
-     */
-    private void initSheet(XSSFSheet sheet){
-        sheet.setColumnWidth(0, (short) (5000));
-        sheet.setColumnWidth(1, (short) (5000));
-        sheet.setColumnWidth(2, (short) (5000));
-        sheet.setColumnWidth(3, (short) (5000));
-        sheet.setColumnWidth(4, (short) (5000));
-        sheet.setColumnWidth(5, (short) (5000));
-        sheet.setColumnWidth(6, (short) (5000));
-        sheet.setColumnWidth(7, (short) (5000));
-        sheet.setColumnWidth(8, (short) (5000));
-        sheet.setColumnWidth(9, (short) (5000));
-        sheet.setColumnWidth(10, (short) (5000));
-        sheet.setColumnWidth(11, (short) (5000));
-        sheet.setColumnWidth(12, (short) (5000));
-        sheet.setColumnWidth(13, (short) (5000));
-        sheet.setColumnWidth(14, (short) (5000));
-
-    }
-
-    /**
-     * 使用用户格式格式化日期
-     * 
-     * @param date日期
-     * @param pattern日期格式
-     * @author Huang
-     * @return
-     */
-    private String formatDate(Date date,String pattern){
-        String returnValue = "";
-        if (date != null){
-            SimpleDateFormat df = new SimpleDateFormat(pattern);
-            returnValue = df.format(date);
-        }
-        return (returnValue);
     }
 
     // 通过订单code查询订单

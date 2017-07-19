@@ -193,7 +193,7 @@
 		<constructor-arg>
 			<value><![CDATA[
 				select DISTINCT
-				application.OMSCODE as platformOMSCode,application.REFUND_ACCOUNT as refundPayee,
+				application.OMS_CODE as platformOMSCode,application.REFUND_ACCOUNT as refundPayee,
 				application.SO_ORDER_CODE as soOrderCode,iteminfo.title as productName,line.rtn_extentioncode as code,
 				line.RETURN_PRICE as returnPrice,line.qty as qty,application.status as status ,application.approver as approver,
 				application.approvetime as approveTime,application.create_time as createTime,application.TRANS_CODE as TRANSCODE,
@@ -213,7 +213,7 @@
 					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '%$loginName%' AND member.id=application.memberid)
 					#end
 			        #if($returnCode)
-						AND application.omscode LIKE '%$returnCode%'
+						AND application.oms_code LIKE '%$returnCode%'
 					#end
 					#if($oderCode)
 						AND application.so_order_code LIKE '%$oderCode%'
@@ -262,7 +262,7 @@
 			     		AND application.return_application_code = :returnOrderCode
 			     	#end
 			        #if($returnCode)
-						AND application.omscode = :returnCode
+						AND application.oms_code = :returnCode
 					#end
 					#if($oderCode)
 						AND application.so_order_code = :orderCode
@@ -335,7 +335,7 @@
 			<value><![CDATA[
 				SELECT application.*
 				FROM t_so_return_application application
-				WHERE application.omscode = :omsCode
+				WHERE application.oms_code = :omsCode
 			 ]]>
 			</value>
 		</constructor-arg>

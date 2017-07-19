@@ -53,7 +53,7 @@ public class SystemOperateLog extends BaseModel{
 	}
 	
 	@Column(name = "CONTEXT")
-	@Type(type="TEXT")
+	@Type(type="text")
 	public String getContext() {
 		return context;
 	}

@@ -1,5 +1,6 @@
 package com.baozun.nebula.sdk.manager.returnapplication;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -193,6 +194,33 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     @Override
     public List<OrderReturnCommand> findExpInfo(Sort[] sorts,Map<String, Object> paraMap){
         List<OrderReturnCommand> orderReturn = returnApplicationDao.findExpInfo(sorts, paraMap);
+        for(OrderReturnCommand returnCommand :orderReturn){
+            String status=null;
+            if("1".equals(returnCommand.getType())){
+                returnCommand.setType("退货");
+            }else{
+                returnCommand.setType("换货");
+            }
+            if (ReturnApplication.SO_RETURN_STATUS_AUDITING==(Integer.parseInt(returnCommand.getStatus()))){
+                status="待审核";
+            }
+            if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN==(Integer.parseInt(returnCommand.getStatus()))){
+                status="拒绝退货";
+            }
+            if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY==(Integer.parseInt(returnCommand.getStatus()))){
+                status="待发货";
+            }
+            if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED==(Integer.parseInt(returnCommand.getStatus()))){
+                status="已发货";
+            }
+            if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND==(Integer.parseInt(returnCommand.getStatus()))){
+                status="同意退换货";
+            }
+            if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE==(Integer.parseInt(returnCommand.getStatus()))){
+                status="已完成";
+            }
+            returnCommand.setStatus(status);
+        }
         return orderReturn;
     }
 

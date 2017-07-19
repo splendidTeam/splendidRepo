@@ -31,7 +31,7 @@ public class OrderReturnCommand {
 	 * 退换货申请状态<br>
 	 * 值域参见SoReturnApplicationConstants
 	 */
-	private int status = -1; //退货状态
+	private String status ; //退货状态
 	
 	private String approver; // 审批人
 	
@@ -60,17 +60,17 @@ public class OrderReturnCommand {
 	 */
 	private String transName;
 	
-	private Integer type;
+	private String type;
 
 
 	
-    public Integer getType(){
+    public String getType(){
         return type;
     }
 
 
     
-    public void setType(Integer type){
+    public void setType(String type){
         this.type = type;
     }
 
@@ -145,12 +145,12 @@ public class OrderReturnCommand {
 	}
 
 
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
 
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
