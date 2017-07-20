@@ -140,28 +140,28 @@ function formatDate(val){
 //退换货处理函数
 function updateRefund(val, state,arg) {
 	var info = "";
-		if(arg==2){
+		if(arg==3){
 			info = nps.i18n("RETURN_UNPOST");
 		}
-		if(arg==0){
+		if(arg==1){
 			info = nps.i18n("RETURN_UNEXAIM");
 		}
 		//退换货状态为3时允许处理退换货
-		if(arg==3||arg==2){
-			if (state ==4) {
+		if(arg==4||arg==3){
+			if (state ==5) {
 				info = nps.i18n("INFO_CONFIRM_MANAGING");
-			} if(state==1) {
+			} if(state==2) {
 				info = nps.i18n("INFO_CONFIRM_REFUSED");
 			}
 		}
-	if(arg==1){
+	if(arg==2){
 	return "<a style='cursor:pointer;' class='goto_aduit_dialog' data-returncode="+returnCode+" >"+nps.i18n("RETURN_REDUSE")+"</a>";
 		info = nps.i18n("RETURN_REDUSE");
 	}
 	
 
-	if(arg==4){
-		if(state==5){
+	if(arg==5){
+		if(state==6){
 			info = nps.i18n("INFO_CONFIRM_RDFUNDED");
 		}
 	}
@@ -175,19 +175,19 @@ function updateRefund(val, state,arg) {
 			successHandler : function(data, textStatus) {
 				var backWarnEntity = data;
 				if (backWarnEntity.isSuccess) {
-					if (state == 4) {
+					if (state == 5) {
 						// 同意退换货
 						nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("RETURN_AGREE"));
 						refreshData();
 						return;
 					} 
-					if (state == 1) {
+					if (state == 2) {
 						// 退换货拒绝
 						nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("RETURN_DISAGREE"));
 						refreshData();
 						return;
 					} 
-					if (state == 5) {
+					if (state == 6) {
 						// 退换货已完成
 						nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("RETURN_RDFUNDED"));
 						refreshData();
@@ -244,10 +244,10 @@ function fnREFUSED(data, args, caller){
 
 function returnType(data){
 	var status=loxia.getObject("type", data);
-	if(status==1){
+	if(status==2){
 		return nps.i18n("RETURN");
 	}
-	if(status==2){
+	if(status==3){
 		return nps.i18n("EXCHANGE");
 	}
 }
@@ -258,7 +258,7 @@ function refund(data){
 	var returnStatus = loxia.getObject("status", data);
 	var type= loxia.getObject("type", data);
 		//returnStatus:3  或者2 ，提供同意退换货，和拒绝退换货按钮
-		if ((returnStatus == 3||returnStatus==2)) {
+		if ((returnStatus == 4||returnStatus==3)) {
 			result = [ {
 				label : nps.i18n("OPERATOR_AGREE"),
 				type : "jsfunc",
@@ -271,14 +271,14 @@ function refund(data){
 		} 
 	
 	//returnStatus:4  同意退换货，并提供已完成按钮
-	if (returnStatus == 4) {
+	if (returnStatus == 5) {
 		result = [ {
 			label : nps.i18n("OPERATOR_FINISH"),
 			type : "jsfunc",
 			content : "fnFINISH"
 		}];
 	} 
-	if (returnStatus == 0) {
+	if (returnStatus == 1) {
 		result = [ {
 			label : nps.i18n("OPERATOR_WAIT"),
 			type : "jsfunc",
@@ -295,19 +295,19 @@ function refund(data){
 
 function status(data, args, idx){
 	var status=loxia.getObject("status", data);
-	if(status==0){
+	if(status==1){
 		return nps.i18n("OPERATE_EXAIM");
 	}
-	if(status==1){
+	if(status==2){
 		return nps.i18n("OPERATOR_UNRETURN");
 	}
-	if(status==3||status==2){
+	if(status==4||status==3){
 		return nps.i18n("OPERATOR_SENDED");
 	}
-	if(status==4){
+	if(status==5){
 		return nps.i18n("OPERATOR_AGREE");
 	}
-	if(status==5){
+	if(status==6){
 		return nps.i18n("OPERATOR_FINISH");
 	}
 	if(status==7){
@@ -433,7 +433,7 @@ $j(document).ready(function() {
 			}
 			else {
 				var json = {
-					"status" : 2,
+					"status" : 3,
 					"description" : remark,
 					"orderCode" : returnorderCode,
 					"omsCode": platformOMSCode,
@@ -467,7 +467,7 @@ $j(document).ready(function() {
 			} 
 			else {
 				var json = {
-					"status" : 1,
+					"status" : 2,
 					"description" : description,
 					"orderCode" : returnorderCode,
 					"omsCode": platformOMSCode,

@@ -31,7 +31,7 @@ public class OrderReturnCommand {
 	 * 退换货申请状态<br>
 	 * 值域参见SoReturnApplicationConstants
 	 */
-	private Integer status = -1; //退货状态
+	private Integer status ; //退货状态
 	
 	private String approver; // 审批人
 	

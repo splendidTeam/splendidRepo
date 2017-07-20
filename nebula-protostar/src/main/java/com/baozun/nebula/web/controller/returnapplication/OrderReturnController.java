@@ -273,13 +273,13 @@ public class OrderReturnController extends BaseController{
             return "order/return-errorMsg";
         }
         //未发货无法申请
-        if (saleOrder.getLogisticsStatus() != SalesOrder.SALES_ORDER_STATUS_FINISHED && saleOrder.getLogisticsStatus() != SalesOrder.SALES_ORDER_STATUS_DELIVERIED && saleOrder.getLogisticsStatus() != SalesOrder.SALES_ORDER_STATUS_CANCELED
+        if (SalesOrder.SALES_ORDER_STATUS_FINISHED!=saleOrder.getLogisticsStatus()  && SalesOrder.SALES_ORDER_STATUS_DELIVERIED!=saleOrder.getLogisticsStatus()  && SalesOrder.SALES_ORDER_STATUS_CANCELED!=saleOrder.getLogisticsStatus()
                         && saleOrder.getLogisticsStatus() != SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED){
             model.addAttribute("errorMsg", "订单尚未发货，无法申请退款！");
             return "order/return-errorMsg";
         }
         //未签收无法申请
-        if (saleOrder.getLogisticsStatus() == SalesOrder.SALES_ORDER_STATUS_CANCELED || saleOrder.getLogisticsStatus() == SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED){
+        if (SalesOrder.SALES_ORDER_STATUS_CANCELED ==saleOrder.getLogisticsStatus() || SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED==saleOrder.getLogisticsStatus()){
             model.addAttribute("errorMsg", "订单已取消，无法申请退款！");
             return "order/return-errorMsg";
         }
@@ -300,7 +300,7 @@ public class OrderReturnController extends BaseController{
 
         for (OrderLineCommand line : lineCommandList){
             ReturnApplication app = sdkReturnApplicationManager.findLastApplicationByOrderLineId(line.getId());
-            if (null != app && app.getStatus() != 5 && app.getStatus() != 1){
+            if (null != app && ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(app.getStatus()) && ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(app.getStatus())){
                 model.addAttribute("errorMsg", "当前订单尚有一笔未完成的退货单！无法再次申请！");
                 return "order/return-errorMsg";
             }
@@ -339,7 +339,7 @@ public class OrderReturnController extends BaseController{
         model.addAttribute("salesOrder", saleOrder);
         model.addAttribute("type", type);
         // 银联和cod（货到付款）
-        if (saleOrder.getPayment() == 1 || saleOrder.getPayment() == 320){
+        if (SalesOrder.SO_PAYMENT_TYPE_COD.equals(saleOrder.getPayment()) ||SalesOrder.SO_PAYMENT_TYPE_UNIONPAY .equals(saleOrder.getPayment())){
             model.addAttribute("isCod", true);
         }else{
             model.addAttribute("isCod", false);
@@ -429,7 +429,7 @@ public class OrderReturnController extends BaseController{
         soReturnApp.setRefundType(saleOrder.getPayment().toString());// 退款方式
         soReturnApp.setIsNeededReturnInvoice(ReturnApplication.SO_RETURN_NEEDED_RETURNINVOICE);
         soReturnApp.setReturnReason("");
-        soReturnApp.setStatus(0);
+        soReturnApp.setStatus(ReturnApplication.SO_RETURN_STATUS_AUDITING);
         if (saleOrder.getMemberId() != null){// 如果是会员 非游客
             soReturnApp.setMemberId(saleOrder.getMemberId());
         }else{// 游客下单把下单 邮箱 作冗余过来

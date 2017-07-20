@@ -38,9 +38,6 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     private SdkReturnApplicationDao returnApplicationDao;
 
     @Autowired
-    private SdkOrderDao sdkOrderDao;
-
-    @Autowired
     private SdkReturnApplicationLineManager soReturnLineManager;
     
     @Autowired(required=false)
@@ -248,7 +245,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         returnapp.setReturnReason("");
 
         // 同意
-        if (status == 4){
+        if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(status)){
             returnapp.setStatus(ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND);
             //同意退换货后扩展业务
             if(null != returnRefundManager){
@@ -257,12 +254,12 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
             
         }
         // 拒绝退款
-        if (status == 1){
+        if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(status)){
             // 退货状态改为已拒绝
             returnapp.setStatus(ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN);
         }
-        if (returnapp.getStatus() == 4){
-            if (status == 5){
+        if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(returnapp.getStatus())){
+            if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(status)){
                 returnapp.setStatus(ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE);
             }
         }else{

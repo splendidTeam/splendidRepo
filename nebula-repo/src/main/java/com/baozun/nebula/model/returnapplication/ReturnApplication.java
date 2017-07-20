@@ -75,19 +75,19 @@ public class ReturnApplication extends BaseModel{
      * 退换货申请状态<br>
     */
     /** 待审核  （即新建）*/
-    public static final Integer SO_RETURN_STATUS_AUDITING = 0;
+    public static final Integer SO_RETURN_STATUS_AUDITING = 1;
     /** 拒绝退货  */
-    public static final Integer SO_RETURN_STATUS_REFUS_RETURN = 1;
+    public static final Integer SO_RETURN_STATUS_REFUS_RETURN = 2;
     /** 待发货 （即客服审核通过） */
-    public static final Integer SO_RETURN_STATUS_TO_DELIVERY  = 2;
+    public static final Integer SO_RETURN_STATUS_TO_DELIVERY  = 3;
     /** 已发货 */
-    public static final Integer SO_RETURN_STATUS_DELIVERIED = 3;
+    public static final Integer SO_RETURN_STATUS_DELIVERIED = 4;
     /** 同意退款 */
-    public static final Integer SO_RETURN_STATUS_AGREE_REFUND = 4;
+    public static final Integer SO_RETURN_STATUS_AGREE_REFUND = 5;
     /** 已完成 */
-    public static final Integer SO_RETURN_STATUS_RETURN_COMPLETE = 5;
+    public static final Integer SO_RETURN_STATUS_RETURN_COMPLETE = 6;
     /** 取消退货*/
-    public static final Integer SO_RETURN_STATUS_RETURN_CANCEL = 6;
+    public static final Integer SO_RETURN_STATUS_RETURN_CANCEL = 7;
     
     /**
      * refundStatus属性值域<br>
@@ -555,7 +555,7 @@ public class ReturnApplication extends BaseModel{
      */
     @Column(name = "STATUS")
     @Index(name = "IDX_SO_RETURN_APPLICATION_STATUS")
-    public int getStatus(){
+    public Integer getStatus(){
         return status;
     }
 
@@ -563,7 +563,7 @@ public class ReturnApplication extends BaseModel{
      * @param status
      *            the status to set
      */
-    public void setStatus(int status){
+    public void setStatus(Integer status){
         this.status = status;
     }
 
