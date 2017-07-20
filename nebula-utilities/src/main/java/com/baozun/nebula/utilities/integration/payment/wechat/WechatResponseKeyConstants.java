@@ -58,6 +58,23 @@ public class WechatResponseKeyConstants{
     /** 随机字符串 **/
     public static final String NONCE_STR = "nonce_str";
 
+    /**
+     * trade_state交易状态值域
+     * 
+     * SUCCESS—支付成功
+     * REFUND—转入退款
+     * NOTPAY—未支付
+     * CLOSED—已关闭
+     * REVOKED—已撤销（刷卡支付）
+     * USERPAYING--用户支付中
+     * PAYERROR--支付失败(其他原因，如银行返回失败)
+     * @author yaohua.wang@baozun.com
+     * @since 5.3.2.20
+     */
+    enum TradeStateValue{
+        SUCCESS,REFUND,NOTPAY,CLOSED,REVOKED,USERPAYING,PAYERROR
+    }
+    
     /** 交易类型 **/
     public static final String TRADE_TYPE = "trade_type";
 
