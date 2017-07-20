@@ -23,10 +23,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import redis.clients.jedis.JedisSentinelPool;
-
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
+
+import redis.clients.jedis.JedisSentinelPool;
 
 /**
  * 
@@ -38,69 +38,68 @@ import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 @Transactional
 public class MataInfoManagerImpl implements MataInfoManager{
 
-	private Log  log = LogFactory.getLog(getClass());
-	
-	@Autowired
-	private SdkMataInfoManager sdkMataInfoManager;
-	
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	
-	@Autowired(required=false)
-	private JedisSentinelPool jedisPool;
-	
-	@Autowired
-	private ZkOperator zkOperator;
-	
-	@Autowired
-	protected SolrServer solrServer;
+    private Log log = LogFactory.getLog(getClass());
 
-	
-	@Override
-	public String findValue(String key) {
-		return sdkMataInfoManager.findValue(key);
-	}
+    @Autowired
+    private SdkMataInfoManager sdkMataInfoManager;
 
-	@Override
-	public String monitorUrl() {
-		StringBuilder info = new StringBuilder();
-		//检查数据库url
-		try {
-			jdbcTemplate.getDataSource().getConnection();
-		} catch (Exception e) {
-			info.append("FAIL-DB,");
-			log.error("FAIL-DB", e);
-			
-		}
-		//检查redis url
-		try {
-			jedisPool.getResource().getClient();
-		} catch (Exception e) {
-			info.append("FAIL-REDIS,");
-			log.error("FAIL-REDIS", e);
-			
-		}
-		//检查zk url
-		try {
-			zkOperator.checkExists(zkOperator.getLifeCycleNode());
-		} catch (Exception e) {
-			info.append("FAIL-ZK,");
-			log.error("FAIL-ZK", e);
-			
-		}
-		//检查solr url
-		try {
-			solrServer.commit();
-		} catch (Exception e) {
-			info.append("FAIL-SOLR,");
-			log.error("FAIL-SOLR", e);
-			
-		}
-		if(info.toString().equals("")){
-			info.append("SUCCESS,");
-		}
-		String msg = info.substring(0, info.length()-1);
-		return msg;
-	}
-	
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired(required = false)
+    private JedisSentinelPool jedisPool;
+
+    @Autowired
+    private ZkOperator zkOperator;
+
+    @Autowired(required = false)
+    protected SolrServer solrServer;
+
+    @Override
+    public String findValue(String key){
+        return sdkMataInfoManager.findValue(key);
+    }
+
+    @Override
+    public String monitorUrl(){
+        StringBuilder info = new StringBuilder();
+        //检查数据库url
+        try{
+            jdbcTemplate.getDataSource().getConnection();
+        }catch (Exception e){
+            info.append("FAIL-DB,");
+            log.error("FAIL-DB", e);
+
+        }
+        //检查redis url
+        try{
+            jedisPool.getResource().getClient();
+        }catch (Exception e){
+            info.append("FAIL-REDIS,");
+            log.error("FAIL-REDIS", e);
+
+        }
+        //检查zk url
+        try{
+            zkOperator.checkExists(zkOperator.getLifeCycleNode());
+        }catch (Exception e){
+            info.append("FAIL-ZK,");
+            log.error("FAIL-ZK", e);
+
+        }
+        //检查solr url
+        try{
+            solrServer.commit();
+        }catch (Exception e){
+            info.append("FAIL-SOLR,");
+            log.error("FAIL-SOLR", e);
+
+        }
+        if (info.toString().equals("")){
+            info.append("SUCCESS,");
+        }
+        String msg = info.substring(0, info.length() - 1);
+        return msg;
+    }
+
 }

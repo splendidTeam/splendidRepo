@@ -36,6 +36,8 @@ import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.PaymentUtil;
+import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants.TradeStateValue;
+import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.util.SortUtil.sortMapByKeyAsc;
@@ -223,8 +225,21 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
                 String resSign = WechatUtil.makeSign(responseMap, excludes, WechatConfig.PAY_SIGN_KEY);
 
                 if (responseMap.get(WechatResponseKeyConstants.SIGN).equals(resSign)){
-                    paymentResult.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
-                    paymentResult.setMessage(responseMap.get(WechatResponseKeyConstants.TRADE_STATE));
+                    /**
+                     * trade_state为交易状态
+                     * 追加判断trade_state为SUCCESS
+                     * 
+                     * @author yaohua.wang@baozun.com
+                     * @since 5.3.2.20
+                     */
+                    String trade_state = responseMap.get(WechatResponseKeyConstants.TRADE_STATE);
+                    if(Validator.isNullOrEmpty(trade_state) && TradeStateValue.SUCCESS.equals(trade_state)){
+                        paymentResult.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
+                        paymentResult.setMessage(responseMap.get(WechatResponseKeyConstants.TRADE_STATE));
+                    }else{
+                        paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                        paymentResult.setMessage("TRADE_STATE is not SUCCESS ; TRADE_STATE value is " + trade_state + ".");
+                    }
                 }else{
                     paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
                     paymentResult.setMessage("sign not match");
@@ -290,8 +305,21 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
                 String resSign = WechatUtil.makeSign(responseMap, excludes, WechatConfig.PAY_SIGN_KEY);
 
                 if (responseMap.get(WechatResponseKeyConstants.SIGN).equals(resSign)){
-                    paymentResult.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
-                    paymentResult.setMessage(responseMap.get(WechatResponseKeyConstants.TRADE_STATE));
+                    /**
+                     * trade_state为交易状态
+                     * 追加判断trade_state为SUCCESS
+                     * 
+                     * @author yaohua.wang@baozun.com
+                     * @since 5.3.2.20
+                     */
+                    String trade_state = responseMap.get(WechatResponseKeyConstants.TRADE_STATE);
+                    if(Validator.isNullOrEmpty(trade_state) && TradeStateValue.SUCCESS.equals(trade_state)){
+                        paymentResult.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
+                        paymentResult.setMessage(responseMap.get(WechatResponseKeyConstants.TRADE_STATE));
+                    }else{
+                        paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+                        paymentResult.setMessage("TRADE_STATE is not SUCCESS ; TRADE_STATE value is " + trade_state + ".");
+                    }
                     //封装返回参数
                     getReturnCommand(paymentResult, responseMap);
                 }else{
