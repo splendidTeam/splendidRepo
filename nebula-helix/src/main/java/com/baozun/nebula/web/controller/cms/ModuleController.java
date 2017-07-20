@@ -17,8 +17,7 @@ import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
 /**
- * @since 5.3.2.20
- * @Deprecated
+ * @Deprecated since 5.3.2.20
  */
 @Deprecated
 @Controller
