@@ -23,6 +23,8 @@ import java.io.Serializable;
  * @since 2016年4月19日 上午11:10:32
  */
 public class Token implements Serializable {
+	public Token(){}
+	
 	public Token(String code, long created, long liveTime) {
 		super();
 		this.code = code;
