@@ -1,6 +1,9 @@
 package com.baozun.nebula.manager;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -16,8 +19,6 @@ import org.springframework.util.CollectionUtils;
 import com.baozun.nebula.command.cache.CacheExpiredCommand;
 import com.baozun.nebula.exception.CacheException;
 import com.baozun.nebula.utilities.common.SerializableUtil;
-
-import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.util.Pool;
@@ -319,10 +320,14 @@ public class CacheManagerImpl extends AbstractCacheManager {
 	 * @return Multi bulk reply
 	 */
 	public List<String> mget(final String... keys) {
+	    List<String> keyList = new ArrayList<String>();
+	    for(String key : keys) {
+	        keyList.add(processKey(key));
+	    }
 		Jedis jedis = null;
 		try {
 			jedis = pool.getResource();
-			return jedis.mget(keys);
+			return jedis.mget(keyList.toArray(new String[0]));
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			LOGGER.error("", e);
