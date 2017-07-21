@@ -240,5 +240,5 @@ public interface CacheManager{
 	 * @return Multi bulk reply
 	 * @since 5.3.2.21
 	 */
-    List<String> mget(String... keys);
+    List<String> mget(String... keys); 
 }
