@@ -221,5 +221,11 @@ public interface CacheManager{
      * @since 5.3.2.18 remove RowMapper rowMapper, param
      */
     List<CacheItemCommand> findAllCacheItem(Map<String, Object> paraMap);
-
+   
+    /**
+     * 阻塞式拉取redis队列的消息
+     * 
+     * @since 5.3.2.21
+     */
+    String blockPopListHead(String key, final int waitSeconds);
 }

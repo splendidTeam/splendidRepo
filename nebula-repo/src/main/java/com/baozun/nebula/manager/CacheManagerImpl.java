@@ -1,6 +1,7 @@
 package com.baozun.nebula.manager;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.baozun.nebula.command.cache.CacheExpiredCommand;
 import com.baozun.nebula.exception.CacheException;
@@ -296,5 +298,15 @@ public class CacheManagerImpl extends AbstractCacheManager{
                 pool.returnResource(jedis);
             }
         }
+    }
+    
+    public String blockPopListHead(String key, final int waitSeconds) {
+        return (String) handler(key, new RedisHandler() {
+            @Override
+            public String handler(String finalKey, Jedis jedis) {
+                List<String> result = jedis.blpop(waitSeconds, finalKey);
+                return (CollectionUtils.isEmpty(result) ? null : result.get(1));
+            }
+        });
     }
 }
