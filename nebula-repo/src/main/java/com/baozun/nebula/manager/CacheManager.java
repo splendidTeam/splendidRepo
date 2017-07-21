@@ -228,4 +228,17 @@ public interface CacheManager{
      * @since 5.3.2.21
      */
     String blockPopListHead(String key, final int waitSeconds);
+    
+	/**
+	 * Get the values of all the specified keys. If one or more keys dont exist
+	 * or is not of type String, a 'nil' value is returned instead of the value
+	 * of the specified key, but the operation never fails.
+	 * <p>
+	 * Time complexity: O(1) for every key
+	 * 
+	 * @param keys
+	 * @return Multi bulk reply
+	 * @since 5.3.2.21
+	 */
+    List<String> mget(String... keys);
 }

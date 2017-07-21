@@ -23,290 +23,314 @@ import redis.clients.jedis.Jedis;
 import redis.clients.util.Pool;
 
 @Service("dataCacheManager")
-public class CacheManagerImpl extends AbstractCacheManager{
+public class CacheManagerImpl extends AbstractCacheManager {
 
-    /** The Constant log. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(CacheManagerImpl.class);
+	/** The Constant log. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(CacheManagerImpl.class);
 
-    /**
-     * @since 5.3.2.18 使用 Pool 属性 替代 JedisSentinelPool 属性
-     */
-    @Autowired(required = false)
-    private Pool<Jedis> pool;
+	/**
+	 * @since 5.3.2.18 使用 Pool 属性 替代 JedisSentinelPool 属性
+	 */
+	@Autowired(required = false)
+	private Pool<Jedis> pool;
 
-    /**
-     * Post construct.
-     */
-    @PostConstruct
-    protected void postConstruct(){
-        if (LOGGER.isInfoEnabled()){
-            LOGGER.info("dataCacheManager postConstruct,pool is:[{}]", pool.getClass().getName());
-        }
-    }
+	/**
+	 * Post construct.
+	 */
+	@PostConstruct
+	protected void postConstruct() {
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("dataCacheManager postConstruct,pool is:[{}]", pool.getClass().getName());
+		}
+	}
 
-    //----------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------
 
-    @Override
-    public void setValue(String key,final String value,final Integer expireSeconds){
-        handler(key, new RedisHandler(){
+	@Override
+	public void setValue(String key, final String value, final Integer expireSeconds) {
+		handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.setex(finalKey, expireSeconds, value);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.setex(finalKey, expireSeconds, value);
+			}
+		});
+	}
 
-    @Override
-    public void setValue(String key,final String value){
-        handler(key, new RedisHandler(){
+	@Override
+	public void setValue(String key, final String value) {
+		handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.set(finalKey, value);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.set(finalKey, value);
+			}
+		});
+	}
 
-    @Override
-    public Long remove(String key){
-        return (Long) handler(key, new RedisHandler(){
+	@Override
+	public Long remove(String key) {
+		return (Long) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.del(finalKey);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.del(finalKey);
+			}
+		});
+	}
 
-    @Override
-    public String getValue(String key){
-        return (String) handler(key, new RedisHandler(){
+	@Override
+	public String getValue(String key) {
+		return (String) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.get(finalKey);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.get(finalKey);
+			}
+		});
+	}
 
-    @Override
-    public void pushToListFooter(String key,final String value){
-        handler(key, new RedisHandler(){
+	@Override
+	public void pushToListFooter(String key, final String value) {
+		handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.rpush(finalKey, value);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.rpush(finalKey, value);
+			}
+		});
+	}
 
-    @Override
-    public String popListHead(String key){
-        return (String) handler(key, new RedisHandler(){
+	@Override
+	public String popListHead(String key) {
+		return (String) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.lpop(finalKey);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.lpop(finalKey);
+			}
+		});
+	}
 
-    @Override
-    public Long listLen(String key){
-        return (Long) handler(key, new RedisHandler(){
+	@Override
+	public Long listLen(String key) {
+		return (Long) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.llen(finalKey);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.llen(finalKey);
+			}
+		});
+	}
 
-    @Override
-    public void addSet(String key,final String[] values){
-        handler(key, new RedisHandler(){
+	@Override
+	public void addSet(String key, final String[] values) {
+		handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.sadd(finalKey, values);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.sadd(finalKey, values);
+			}
+		});
+	}
 
-    @Override
-    public Long removeFromSet(String key,final String[] values){
-        return (Long) handler(key, new RedisHandler(){
+	@Override
+	public Long removeFromSet(String key, final String[] values) {
+		return (Long) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.srem(finalKey, values);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.srem(finalKey, values);
+			}
+		});
+	}
 
-    @Override
-    public void removeMapValue(String key,final String field){
-        handler(key, new RedisHandler(){
+	@Override
+	public void removeMapValue(String key, final String field) {
+		handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.hdel(finalKey, field);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.hdel(finalKey, field);
+			}
+		});
+	}
 
-    @Override
-    public <T> void setMapObject(String key,final String field,final T t,final int seconds){
-        handler(key, new RedisHandler(){
+	@Override
+	public <T> void setMapObject(String key, final String field, final T t, final int seconds) {
+		handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                CacheExpiredCommand<T> cec = new CacheExpiredCommand<T>();
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				CacheExpiredCommand<T> cec = new CacheExpiredCommand<T>();
 
-                cec.setObject(t);
-                cec.setExpiredTime(System.currentTimeMillis() + seconds * 1000l);
-                String value = SerializableUtil.convert2String((Serializable) cec);
-                return jedis.hset(finalKey, field, value);
+				cec.setObject(t);
+				cec.setExpiredTime(System.currentTimeMillis() + seconds * 1000l);
+				String value = SerializableUtil.convert2String((Serializable) cec);
+				return jedis.hset(finalKey, field, value);
 
-            }
-        });
-    }
+			}
+		});
+	}
 
-    @Override
-    public <T> T getMapObject(String key,final String field){
-        return (T) handler(key, new RedisHandler(){
+	@Override
+	public <T> T getMapObject(String key, final String field) {
+		return (T) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                String value = jedis.hget(finalKey, field);
-                if (StringUtils.isBlank(value)){
-                    return null;
-                }
-                CacheExpiredCommand<T> cec = (CacheExpiredCommand<T>) SerializableUtil.convert2Object(value);
-                if (System.currentTimeMillis() < cec.getExpiredTime()){
-                    return (T) cec.getObject();
-                }else{
-                    return null;
-                }
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				String value = jedis.hget(finalKey, field);
+				if (StringUtils.isBlank(value)) {
+					return null;
+				}
+				CacheExpiredCommand<T> cec = (CacheExpiredCommand<T>) SerializableUtil.convert2Object(value);
+				if (System.currentTimeMillis() < cec.getExpiredTime()) {
+					return (T) cec.getObject();
+				} else {
+					return null;
+				}
+			}
+		});
+	}
 
-    /**
-     * 计数器减少一个数量
-     */
-    @Override
-    public Long Decr(String key,final long value){
-        return (Long) handler(key, new RedisHandler(){
+	/**
+	 * 计数器减少一个数量
+	 */
+	@Override
+	public Long Decr(String key, final long value) {
+		return (Long) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                return jedis.decrBy(finalKey, value);
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				return jedis.decrBy(finalKey, value);
+			}
+		});
+	}
 
-    @Override
-    public Long incr(String key,final int expireSeconds){
-        return (Long) handler(key, new RedisHandler(){
+	@Override
+	public Long incr(String key, final int expireSeconds) {
+		return (Long) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                // reply new value
-                Long valueCurr = jedis.incr(finalKey);
-                jedis.expire(finalKey, expireSeconds);
-                return valueCurr;
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				// reply new value
+				Long valueCurr = jedis.incr(finalKey);
+				jedis.expire(finalKey, expireSeconds);
+				return valueCurr;
+			}
+		});
+	}
 
-    @Override
-    public Boolean applyRollingTimeWindow(String key,final long limit,final long window){
-        return (Boolean) handler(key, new RedisHandler(){
+	@Override
+	public Boolean applyRollingTimeWindow(String key, final long limit, final long window) {
+		return (Boolean) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                long now = System.currentTimeMillis();
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				long now = System.currentTimeMillis();
 
-                jedis.zremrangeByScore(finalKey, 0, now - window * 1000);
-                jedis.zadd(finalKey, now, String.valueOf(now));
+				jedis.zremrangeByScore(finalKey, 0, now - window * 1000);
+				jedis.zadd(finalKey, now, String.valueOf(now));
 
-                return (jedis.zcard(finalKey) <= limit);
-            }
-        });
-    }
+				return (jedis.zcard(finalKey) <= limit);
+			}
+		});
+	}
 
-    @Override
-    public int removeByPrefix(String key){
-        final String cleanKey = buildCleanKeyPattern(key);
+	@Override
+	public int removeByPrefix(String key) {
+		final String cleanKey = buildCleanKeyPattern(key);
 
-        return (int) handler(key, new RedisHandler(){
+		return (int) handler(key, new RedisHandler() {
 
-            @Override
-            public Object handler(String finalKey,Jedis jedis){
-                int delCount = 0;
-                Set<String> delKeys = jedis.keys(cleanKey);
-                if (isNotNullOrEmpty(delKeys)){
-                    for (String delkey : delKeys){
-                        jedis.del(delkey);
-                        delCount++;
-                    }
-                }
-                return delCount;
-            }
-        });
-    }
+			@Override
+			public Object handler(String finalKey, Jedis jedis) {
+				int delCount = 0;
+				Set<String> delKeys = jedis.keys(cleanKey);
+				if (isNotNullOrEmpty(delKeys)) {
+					for (String delkey : delKeys) {
+						jedis.del(delkey);
+						delCount++;
+					}
+				}
+				return delCount;
+			}
+		});
+	}
 
-    //---------------------------------------------------------------------------------
+	// ---------------------------------------------------------------------------------
 
-    public interface RedisHandler{
+	public interface RedisHandler {
 
-        Object handler(String finalKey,Jedis jedis);
-    }
+		Object handler(String finalKey, Jedis jedis);
+	}
 
-    //---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 
-    private Object handler(String key,RedisHandler redisHandler){
-        /**
-         * 全部启用cache，added by D.C 20170621
-         */
-        /*
-         * if (!useCache()){
-         * return null;
-         * }
-         */
+	private Object handler(String key, RedisHandler redisHandler) {
+		/**
+		 * 全部启用cache，added by D.C 20170621
+		 */
+		/*
+		 * if (!useCache()){ return null; }
+		 */
 
-        String userKey = processKey(key);
-        return doHandler(userKey, redisHandler);
-    }
+		String userKey = processKey(key);
+		return doHandler(userKey, redisHandler);
+	}
 
-    private Object doHandler(String userKey,RedisHandler redisHandler){
-        Jedis jedis = null;
+	private Object doHandler(String userKey, RedisHandler redisHandler) {
+		Jedis jedis = null;
 
-        try{
-            jedis = pool.getResource();
+		try {
+			jedis = pool.getResource();
 
-            return redisHandler.handler(userKey, jedis);
+			return redisHandler.handler(userKey, jedis);
 
-        }catch (Exception e){
-            pool.returnBrokenResource(jedis);
-            LOGGER.error("", e);
-            throw new CacheException(e);
-        }finally{
-            if (jedis != null){
-                pool.returnResource(jedis);
-            }
-        }
-    }
-    
-    public String blockPopListHead(String key, final int waitSeconds) {
-        return (String) handler(key, new RedisHandler() {
-            @Override
-            public String handler(String finalKey, Jedis jedis) {
-                List<String> result = jedis.blpop(waitSeconds, finalKey);
-                return (CollectionUtils.isEmpty(result) ? null : result.get(1));
-            }
-        });
-    }
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			LOGGER.error("", e);
+			throw new CacheException(e);
+		} finally {
+			if (jedis != null) {
+				pool.returnResource(jedis);
+			}
+		}
+	}
+
+	public String blockPopListHead(String key, final int waitSeconds) {
+		return (String) handler(key, new RedisHandler() {
+			@Override
+			public String handler(String finalKey, Jedis jedis) {
+				List<String> result = jedis.blpop(waitSeconds, finalKey);
+				return (CollectionUtils.isEmpty(result) ? null : result.get(1));
+			}
+		});
+	}
+
+	/**
+	 * Get the values of all the specified keys. If one or more keys dont exist
+	 * or is not of type String, a 'nil' value is returned instead of the value
+	 * of the specified key, but the operation never fails.
+	 * <p>
+	 * Time complexity: O(1) for every key
+	 * 
+	 * @param keys
+	 * @return Multi bulk reply
+	 */
+	public List<String> mget(final String... keys) {
+		Jedis jedis = null;
+		try {
+			jedis = pool.getResource();
+			return jedis.mget(keys);
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			LOGGER.error("", e);
+			throw new CacheException(e);
+		} finally {
+			if (jedis != null) {
+				pool.returnResource(jedis);
+			}
+		}
+	}
 }
