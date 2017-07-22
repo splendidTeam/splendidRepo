@@ -13,22 +13,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.command.cms.CmsPageInstanceVersionCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.manager.CacheManager;
-import com.feilong.core.TimeInterval;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
 import com.baozun.nebula.model.cms.CmsTemplateHtml;
-import com.baozun.nebula.sdk.manager.cms.SdkCmsEditAreaManager;
-import com.baozun.nebula.sdk.manager.cms.SdkCmsEditVersionAreaManager;
-import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManager;
-import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceVersionManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManager;
-import com.baozun.nebula.sdk.manager.cms.SdkCmsPublishedManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsTemplateHtmlManager;
+import com.feilong.core.TimeInterval;
 import com.feilong.core.Validator;
 
 @Service("publishCmsPageInstanceManager")
-@Transactional
 public class PublishCmsPageInstanceManagerImpl implements PublishCmsPageInstanceManager {
 
 	
@@ -36,22 +30,7 @@ public class PublishCmsPageInstanceManagerImpl implements PublishCmsPageInstance
 	private SdkCmsPageTemplateManager	sdkCmsPageTemplateManager;
 
 	@Autowired
-	private SdkCmsPublishedManager		sdkCmsPublishedManager;
-
-	@Autowired
-	private SdkCmsPageInstanceManager	sdkCmsPageInstanceManager;
-	
-	@Autowired
-	private SdkCmsPageInstanceVersionManager sdkCmsPageInstanceVersionManager;
-
-	@Autowired
 	private CacheManager				cacheManager;
-	
-	@Autowired
-	private SdkCmsEditAreaManager sdkCmsEditAreaManager;
-
-	@Autowired
-	private SdkCmsEditVersionAreaManager sdkCmsEditVersionAreaManager;
 	
 	@Autowired
 	private SdkCmsTemplateHtmlManager sdkCmsTemplateHtmlManager;
@@ -103,6 +82,7 @@ public class PublishCmsPageInstanceManagerImpl implements PublishCmsPageInstance
 	 * @param pageInstance
 	 * @param publicVersionId
 	 */
+	@Transactional(readOnly=true)
 	private void publicPage(CmsPageInstance pageInstance, Long publicVersionId, Map<String, String> result){
 
 		CmsPageTemplate template = sdkCmsPageTemplateManager.findCmsPageTemplateById(pageInstance.getTemplateId());

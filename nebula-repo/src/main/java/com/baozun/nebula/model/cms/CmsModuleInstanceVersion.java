@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -113,6 +114,7 @@ public class CmsModuleInstanceVersion extends BaseModel {
 	}
 
 	@Column(name = "TEMPLATE_ID")
+    @Index(name = "IDX_CMS_MODULE_INSTANCE_VERSION_TEMPLATE_ID")
 	public Long getTemplateId() {
 		return templateId;
 	}
@@ -187,6 +189,7 @@ public class CmsModuleInstanceVersion extends BaseModel {
 	}
 	
 	@Column(name = "START_TIME")
+    @Index(name = "IDX_CMS_MODULE_INSTANCE_VERSION_START_TIME")
 	public Date getStartTime() {
 		return startTime;
 	}
@@ -196,6 +199,7 @@ public class CmsModuleInstanceVersion extends BaseModel {
 	}
 
 	@Column(name = "END_TIME")
+    @Index(name = "IDX_CMS_MODULE_INSTANCE_VERSION_END_TIME")
 	public Date getEndTime() {
 		return endTime;
 	}
