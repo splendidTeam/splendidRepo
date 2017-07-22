@@ -39,8 +39,6 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.feilong.core.date.DateUtil;
 
-import static com.feilong.core.Validator.isNullOrEmpty;
-
 import static com.feilong.core.DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND;
 
 /**
@@ -76,12 +74,12 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
     @Override
     public ShoppingcartResult validate(Sku sku,Integer count){
         //===============① 数量不能小于1===============
-        Validate.isTrue(count >= 1, "count:%s can not <1", count);
+        Validate.isTrue(count >= 1, "count:[%s] can not <1", count);
 
         //===============② 判断sku是否存在===============
-        if (isNullOrEmpty(sku)){
+        if (null == sku){
             //XXX feilong change to exception
-            LOGGER.error("sku not exist!!!!!!");
+            LOGGER.error("sku is null, not exist!!!");
             return SKU_NOT_EXIST;
         }
 
