@@ -55,10 +55,11 @@ import com.baozun.nebula.sdk.manager.payment.PayMoneyBuilder;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponCodeManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
-import com.feilong.core.util.CollectionsUtil;
-import com.feilong.core.util.MapUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.group;
+import static com.feilong.core.util.CollectionsUtil.groupOne;
+import static com.feilong.core.util.MapUtil.extractSubMap;
 
 /**
  * 提取出来,专注于创建订单.
@@ -294,7 +295,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      * @return the map< long, shop cart command by shop>
      */
     private Map<Long, ShopCartCommandByShop> buildShopIdAndShopCartCommandByShopMap(ShoppingCartCommand shoppingCartCommand){
-        return CollectionsUtil.groupOne(shoppingCartCommand.getSummaryShopCartList(), "shopId");
+        return groupOne(shoppingCartCommand.getSummaryShopCartList(), "shopId");
     }
 
     /**
@@ -306,8 +307,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      */
     private Map<Long, List<ShoppingCartLineCommand>> buildShopIdAndShoppingCartLineCommandListMap(ShoppingCartCommand shoppingCartCommand){
         Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
-        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = MapUtil.extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands");
-        return shopIdAndShoppingCartLineCommandListMap;
+        return extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands");
     }
 
     /**
@@ -320,7 +320,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     private Map<Long, List<PromotionSKUDiscAMTBySetting>> buildShopIdAndPromotionSKUDiscAMTBySettingMap(ShoppingCartCommand shoppingCartCommand){
         List<PromotionBrief> cartPromotionBriefList = shoppingCartCommand.getCartPromotionBriefList();
         List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager.sharePromotionDiscountToEachLine(shoppingCartCommand, cartPromotionBriefList);
-        return CollectionsUtil.group(promotionSKUDiscAMTBySettingList, "shopId");
+        return group(promotionSKUDiscAMTBySettingList, "shopId");
     }
 
     /**
