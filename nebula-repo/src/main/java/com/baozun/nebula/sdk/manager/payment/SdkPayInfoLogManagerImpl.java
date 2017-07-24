@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.impl;
+package com.baozun.nebula.sdk.manager.payment;
 
 import java.util.Date;
 
@@ -39,7 +39,7 @@ import static com.feilong.core.util.ResourceBundleUtil.getValue;
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午4:11:21
- * @see com.baozun.nebula.sdk.manager.impl.SdkPayInfoManagerImpl
+ * @see com.baozun.nebula.sdk.manager.payment.SdkPayInfoManagerImpl
  * @since 5.3.1
  */
 @Transactional

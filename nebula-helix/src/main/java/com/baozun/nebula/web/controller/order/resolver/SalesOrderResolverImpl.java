@@ -39,7 +39,7 @@ import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
-import com.baozun.nebula.sdk.manager.SdkPaymentManager;
+import com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.utilities.library.address.Address;
@@ -81,9 +81,8 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
     @Autowired
     private SalesOrderManager salesOrderManager;
 
-    /** The sdk payment manager. */
     @Autowired
-    private SdkPaymentManager sdkPaymentManager;
+    private SdkPayInfoQueryManager sdkPayInfoQueryManager;
 
     /** The order manager. */
     @Autowired
@@ -324,7 +323,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
     public SalesOrderCommand getSalesOrderCommand(String subOrdinate){
         Map<String, Object> paraMap = new HashMap<String, Object>();
         paraMap.put("subOrdinate", subOrdinate);
-        List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+        List<PayInfoLog> payInfoLogs = sdkPayInfoQueryManager.findPayInfoLogListByQueryMap(paraMap);
 
         return orderManager.findOrderById(payInfoLogs.get(0).getOrderId(), SalesOrder.SALES_ORDER_STATUS_NEW);
     }
