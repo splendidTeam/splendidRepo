@@ -46,7 +46,9 @@ public class PayInfo extends BaseModel{
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -3350505308978769968L;
 
-    /** The coupon pay. */
+    /**
+     * @deprecated 没有被调用啊 since 5.3.2.22
+     */@Deprecated
     public static Integer     COUPON_PAY       = 101;
 
     /** PK. */

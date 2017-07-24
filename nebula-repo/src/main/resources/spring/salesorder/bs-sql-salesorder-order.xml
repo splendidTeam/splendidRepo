@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<bean id="SalesOrder.findOrderByCode" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据订单号查询订单</description>
-		<constructor-arg>
-			<value>
+    <bean id="SalesOrder.findOrderByCode" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单号查询订单</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					#if($sdkQueryType == 1)
 						select 
@@ -118,15 +117,15 @@
 						where  o.CODE = :code
 					#end
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
+            </value>
+        </constructor-arg>
+    </bean>
 
 
-		<bean id="SalesOrder.findOrderById" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据订单id查询订单 第一个sql用于oms同步使用 第二个普通使用</description>
-		<constructor-arg>
-			<value>
+    <bean id="SalesOrder.findOrderById" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单id查询订单 第一个sql用于oms同步使用 第二个普通使用</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					#if($sdkQueryType == 1)
 						 select 
@@ -233,15 +232,15 @@
 						where  o.id = :id
 					#end
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
+            </value>
+        </constructor-arg>
+    </bean>
 
 
-	<bean id="SalesOrder.findOrders" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询订单列表</description>
-		<constructor-arg>
-			<value>
+    <bean id="SalesOrder.findOrders" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查询订单列表</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					#if($sdkQueryType == 1)
 				 	
@@ -418,16 +417,16 @@
 		       		#end
 		       		#end
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	
-	
-	<bean id="SalesOrder.findOrdersWithOutPage" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询订单列表</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+
+
+    <bean id="SalesOrder.findOrdersWithOutPage" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查询订单列表</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					#if($sdkQueryType == 1)
 				 	
@@ -612,42 +611,70 @@
 		       		#end
 		       		#end
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
+            </value>
+        </constructor-arg>
+    </bean>
 
-	<bean id="SalesOrder.updateOrderLogisticsStatus" class="loxia.dao.support.DynamicQueryHolder">
-		<description> 更改订单物流状态</description>
-		<constructor-arg>
-			<value>
+    <bean id="SalesOrder.updateOrderLogisticsStatus" class="loxia.dao.support.DynamicQueryHolder">
+        <description> 更改订单物流状态</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[ 
 					update t_so_salesorder
 		       		set LOGISTICS_STATUS = :state,MODIFY_TIME= :modifyTime
 		       		where
 		       		CODE = :code
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
+            </value>
+        </constructor-arg>
+    </bean>
 
-	<bean id="SalesOrder.updateOrderFinancialStatus" class="loxia.dao.support.DynamicQueryHolder">
-		<description> 更改订单财务状态</description>
-		<constructor-arg>
-			<value>
+    <!-- 根据订单号,修改订单的支付方式.  by feilong -->
+    <bean id="SalesOrder.updateOrderPaymentTypeByOrderCode" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单号,修改订单的支付方式</description>
+        <constructor-arg>
+            <value>
+				<![CDATA[ 
+					update t_shop_salesorder 
+                    set payment =:payment 
+                    where code =:code
+                 ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+    
+    <!-- 根据订单id,修改订单的支付方式.  by feilong -->
+    <bean id="SalesOrder.updateOrderPaymentTypeByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单id,修改订单的支付方式.</description>
+        <constructor-arg>
+            <value>
+				<![CDATA[ 
+					update t_shop_salesorder 
+                    set payment =:payment 
+                    where id =:id
+                 ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.updateOrderFinancialStatus" class="loxia.dao.support.DynamicQueryHolder">
+        <description> 更改订单财务状态</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[ 
 					update t_so_salesorder
 		       		set FINANCIAL_STATUS = :state,MODIFY_TIME= :modifyTime
 		       		where
 		       		CODE = :code
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.findItemSkuListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
-		<description> 查询商品及sku信息</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findItemSkuListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+        <description> 查询商品及sku信息</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[ 
 					select b.code as code,a.max as maxPrice,a.min as minPrice,a.item_id as itemId,b.title as title ,c.qty as availableQty 
 					from 
@@ -674,15 +701,15 @@
 					#end
 					
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
+            </value>
+        </constructor-arg>
+    </bean>
 
-		<bean id="SalesOrder.findNotEvaultionOrderLineQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据订单id查询未评价的订单行</description>
-		<constructor-arg>
-			<value>
+
+    <bean id="SalesOrder.findNotEvaultionOrderLineQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单id查询未评价的订单行</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 						select 
 						ss.id as orderId,sol.item_id as itemId,sol.item_name as itemName,
@@ -698,14 +725,14 @@
 						#end
 						
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
+            </value>
+        </constructor-arg>
+    </bean>
 
-	<bean id="SalesOrder.findCanceledOrderList" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据会员ID查询已申请的取消订单列表</description>
-		<constructor-arg>
-			<value>
+    <bean id="SalesOrder.findCanceledOrderList" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据会员ID查询已申请的取消订单列表</description>
+        <constructor-arg>
+            <value>
 			<![CDATA[  
 				select 
 					sc.order_code as orderCode, sc."id", sc.status, ss.total
@@ -718,14 +745,14 @@
 				sc.member_id = :memberId
 				order by sc.create_time desc
 			]]>
-			</value>
-		</constructor-arg>
-	</bean>
+            </value>
+        </constructor-arg>
+    </bean>
 
-	<bean id="SalesOrder.findReturnedOrderList" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据会员ID查询已申请的退换货列表</description>
-		<constructor-arg>
-			<value>
+    <bean id="SalesOrder.findReturnedOrderList" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据会员ID查询已申请的退换货列表</description>
+        <constructor-arg>
+            <value>
 			<![CDATA[  
 				select 
 					sr.id,
@@ -757,14 +784,14 @@
 				sr.member_id = :memberId
 				order by sr.create_time desc
 			]]>
-			</value>
-		</constructor-arg>
-	</bean>
+            </value>
+        </constructor-arg>
+    </bean>
 
-	<bean id="SalesOrder.findOrderByLineId" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据订单行ID查询订单</description>
-		<constructor-arg>
-			<value>
+    <bean id="SalesOrder.findOrderByLineId" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单行ID查询订单</description>
+        <constructor-arg>
+            <value>
 			<![CDATA[  
 				select 
 					o.ID,
@@ -834,14 +861,14 @@
 				where 
 					sop.ORDER_LINE_ID is NULL and l.id = :lineId
 			]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.updateOrderFinancialStatusById" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据订单id修改订单的财务状态</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.updateOrderFinancialStatusById" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单id修改订单的财务状态</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[ 
 					update t_so_salesorder
 		       		set FINANCIAL_STATUS = :financialStatus
@@ -852,14 +879,14 @@
 						-1
 		       		) 
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.findCountOfOrder" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查找条数</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findCountOfOrder" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查找条数</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[ 
 					select COUNT(*) AS COUNT from t_so_salesorder o
 					where 1=1
@@ -875,42 +902,42 @@
 						and o.MEMBER_ID = :memberId
 					#end
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.findCountOfOrderByShopId" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查找某个店铺的订单数量条数</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findCountOfOrderByShopId" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查找某个店铺的订单数量条数</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					select COUNT(*) AS COUNT from t_so_salesorder o where o.shop_id = :shopId and (o.logistics_status != 9 and o.logistics_status != 10)  
 					#if($memberId)
 						and o.MEMBER_ID = :memberId
 					#end
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.findItemCountOfOrderByShopId" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查找某个店铺的订单的商品数量</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findItemCountOfOrderByShopId" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查找某个店铺的订单的商品数量</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					select SUM(o.QUANTITY) AS COUNT from t_so_salesorder o where o.shop_id = :shopId and (o.logistics_status != 9 and o.logistics_status != 10)  
 					#if($memberId)
 						and o.MEMBER_ID = :memberId
 					#end
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-		<bean id="SalesOrder.findNoPayOrders" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询末付款订单列表</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findNoPayOrders" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查询末付款订单列表</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					select 
 						o.ID,
@@ -965,36 +992,36 @@
 						and o.LOGISTICS_STATUS = 1
 						and o.MEMBER_ID = :memberId
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.findCodeSeq" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询code的序列号</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findCodeSeq" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查询code的序列号</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					SELECT nextval('SEQ_T_SAL_SALESORDER_CODE') as CODESEQ
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	
-	<bean id="SalesOrder.findOrderSerialNO" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询流水的序列号</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="SalesOrder.findOrderSerialNO" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查询流水的序列号</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					SELECT nextval('SEQ_T_SAL_SALESORDER_SERIALNO') as SERIALNO
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	<bean id="SalesOrder.findToBeCancelOrders" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询符合取消条件的订单（非COD，未付款，时间大于多少）</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+    <bean id="SalesOrder.findToBeCancelOrders" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查询符合取消条件的订单（非COD，未付款，时间大于多少）</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					select 
 						o.ID,
@@ -1042,13 +1069,13 @@
 			       		)
 			       		OR o.FINANCIAL_STATUS = 4
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	<bean id="SalesOrder.findOrderByCodeList" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据订单code查询订单信息</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+    <bean id="SalesOrder.findOrderByCodeList" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单code查询订单信息</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					select 
 						o.ID,
@@ -1092,14 +1119,14 @@
 					      '-1'
 					      )
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.findOrderByExntentionListAndOrderCreateTime" class="loxia.dao.support.DynamicQueryHolder">
-	    <description>根据订单code查询订单信息</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findOrderByExntentionListAndOrderCreateTime" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单code查询订单信息</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					select 
 						o.ID,
@@ -1148,14 +1175,14 @@
 					     ) 
 					        
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.findOrderByExntentionListAndOrderStatus" class="loxia.dao.support.DynamicQueryHolder">
-	    <description>根据订单状态和extentionList查找对应的订单信息</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findOrderByExntentionListAndOrderStatus" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单状态和extentionList查找对应的订单信息</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					select 
 						o.ID,
@@ -1208,13 +1235,13 @@
 								        )
 					     ) 
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	<bean id="SalesOrder.updateLogisticsInfo" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据订单code更新物流信息</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+    <bean id="SalesOrder.updateLogisticsInfo" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单code更新物流信息</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					update t_so_salesorder
 		       		set 
@@ -1226,14 +1253,14 @@
 		       		where
 		       		CODE = :orderCode
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.findSimpleOrderByOrderQueryCommand" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询订单分页列表</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findSimpleOrderByOrderQueryCommand" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查询订单分页列表</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 				select 
 					o.ID as orderId,
@@ -1293,14 +1320,14 @@
 				     -1)
 					#end
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="SalesOrder.findSimpleOrderListByOrderQueryCommand" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询未完成的订单list列表or</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="SalesOrder.findSimpleOrderListByOrderQueryCommand" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查询未完成的订单list列表or</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					select 
 					o.ID as orderId,
@@ -1344,7 +1371,7 @@
 				     order by  o.CREATE_TIME DESC
 					
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
+            </value>
+        </constructor-arg>
+    </bean>
 </beans>

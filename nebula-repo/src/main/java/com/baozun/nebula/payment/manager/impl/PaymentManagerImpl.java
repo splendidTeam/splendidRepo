@@ -160,15 +160,15 @@ public class PaymentManagerImpl implements PaymentManager{
     }
 
     @Override
-    public PaymentResult getOrderInfo(SalesOrderCommand order){
+    public PaymentResult getOrderInfo(SalesOrderCommand salesOrderCommand){
         PaymentResult result = new PaymentResult();
         try{
             PaymentFactory paymentFactory = PaymentFactory.getInstance();
             PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
-            PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(paymentFactory.getPayType(order.getOnLinePaymentCancelCommand().getPayType()));
-            payParamCommandAdaptor.setSalesOrderCommand(order);
-            Map<String, Object> orderParams = PropertyUtil.describe(order);
-            orderParams.putAll(PropertyUtil.describe(order.getOnLinePaymentCommand()));
+            PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(paymentFactory.getPayType(salesOrderCommand.getOnLinePaymentCancelCommand().getPayType()));
+            payParamCommandAdaptor.setSalesOrderCommand(salesOrderCommand);
+            Map<String, Object> orderParams = PropertyUtil.describe(salesOrderCommand);
+            orderParams.putAll(PropertyUtil.describe(salesOrderCommand.getOnLinePaymentCommand()));
             payParamCommandAdaptor.setRequestParams(orderParams);
 
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());// 获得支付适配器

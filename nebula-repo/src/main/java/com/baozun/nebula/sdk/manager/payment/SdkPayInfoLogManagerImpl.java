@@ -29,6 +29,7 @@ import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPayInfoLogManager;
+import com.baozun.nebula.sdk.utils.ManagerValidate;
 import com.feilong.core.bean.ConvertUtil;
 
 import static com.feilong.core.util.ResourceBundleUtil.getResourceBundle;
@@ -92,7 +93,19 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
      *            the sales order command
      * @return the pay type
      */
-    private Integer getThirdPayType(String payInfoStr){
+    private static Integer getThirdPayType(String payInfoStr){
         return ConvertUtil.toInteger(getValue(getResourceBundle("config.payMentInfo"), payInfoStr + ".payType"));
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkPayInfoLogManager#updateNoPayPayInfoLogPayTypeById(java.lang.Long, java.lang.Integer, java.lang.String, java.lang.Integer)
+     */
+    @Override
+    public void updateNoPayPayInfoLogPayTypeById(Long id,Integer payType,String payInfo,Integer thirdPayType){
+        Integer result = payInfoLogDao.updateNoPayPayInfoLogPayTypeById(id, payType, payInfo, thirdPayType);
+
+        ManagerValidate.isExpectedResult(1, result, "updateNoPayPayInfoLogPayTypeById,id:[{}],payType:[{}],payInfo:[{}],thirdPayType:[{}]", id, payType, payInfo, thirdPayType);
     }
 }
