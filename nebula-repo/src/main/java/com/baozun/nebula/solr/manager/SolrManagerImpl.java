@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import loxia.dao.Pagination;
-import net.sf.json.JSON;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -29,15 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.ItemCategoryCommand;
 import com.baozun.nebula.command.ItemSolrCommand;
 import com.baozun.nebula.command.ItemTagRelationCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
-import com.baozun.nebula.dao.product.ItemCategoryDao;
-import com.baozun.nebula.dao.product.ItemTagRelationDao;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
@@ -51,20 +45,16 @@ import com.baozun.nebula.solr.utils.JsonFormatUtil;
 import com.baozun.nebula.solr.utils.Validator;
 import com.baozun.nebula.utilities.common.LangUtil;
 
+import loxia.dao.Pagination;
+import net.sf.json.JSON;
+
 @Service("SolrManager")
-@Transactional
 public class SolrManagerImpl<T, PK extends Serializable> implements SolrManager{
 
     private static final Logger  log = LoggerFactory.getLogger(SolrManagerImpl.class);
 
     @Autowired
     protected SolrGeneralDao     solrGeneralDao;
-
-    @Autowired
-    protected ItemCategoryDao    itemCategoryDao;
-
-    @Autowired
-    protected ItemTagRelationDao itemTagRelationDao;
 
     @Override
     public Pagination<ItemSolrCommand> findAllItemCommandFormSolrByField(String queryString,String sortString,Integer startNum,Integer rowsNum,Integer currentPage,Integer size){
