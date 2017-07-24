@@ -158,7 +158,7 @@
     </bean>
 
     <!-- 根据订单id,修改PayInfo的支付方式 by feilong -->
-    <bean id="PayInfoLog.updateNoPayPayTypeByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+    <bean id="PayInfo.updateNoPayPayTypeByOrderId" class="loxia.dao.support.DynamicQueryHolder">
         <description>根据订单id,修改PayInfo的支付方式 </description>
         <constructor-arg>
             <value>
