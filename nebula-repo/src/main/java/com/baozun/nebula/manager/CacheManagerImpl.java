@@ -1,6 +1,9 @@
 package com.baozun.nebula.manager;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -11,12 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.baozun.nebula.command.cache.CacheExpiredCommand;
 import com.baozun.nebula.exception.CacheException;
 import com.baozun.nebula.utilities.common.SerializableUtil;
-
-import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.util.Pool;
@@ -286,6 +288,46 @@ public class CacheManagerImpl extends AbstractCacheManager {
 
 			return redisHandler.handler(userKey, jedis);
 
+		} catch (Exception e) {
+			pool.returnBrokenResource(jedis);
+			LOGGER.error("", e);
+			throw new CacheException(e);
+		} finally {
+			if (jedis != null) {
+				pool.returnResource(jedis);
+			}
+		}
+	}
+
+	public String blockPopListHead(String key, final int waitSeconds) {
+		return (String) handler(key, new RedisHandler() {
+			@Override
+			public String handler(String finalKey, Jedis jedis) {
+				List<String> result = jedis.blpop(waitSeconds, finalKey);
+				return (CollectionUtils.isEmpty(result) ? null : result.get(1));
+			}
+		});
+	}
+
+	/**
+	 * Get the values of all the specified keys. If one or more keys dont exist or
+	 * is not of type String, a 'nil' value is returned instead of the value of the
+	 * specified key, but the operation never fails.
+	 * <p>
+	 * Time complexity: O(1) for every key
+	 * 
+	 * @param keys
+	 * @return Multi bulk reply
+	 */
+	public List<String> mget(final String... keys) {
+		List<String> keyList = new ArrayList<String>();
+		for (String key : keys) {
+			keyList.add(processKey(key));
+		}
+		Jedis jedis = null;
+		try {
+			jedis = pool.getResource();
+			return jedis.mget(keyList.toArray(new String[0]));
 		} catch (Exception e) {
 			pool.returnBrokenResource(jedis);
 			LOGGER.error("", e);

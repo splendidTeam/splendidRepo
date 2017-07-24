@@ -234,6 +234,26 @@ public interface CacheManager {
 	List<CacheItemCommand> findAllCacheItem(Map<String, Object> paraMap);
 
 	/**
+	 * 阻塞式拉取redis队列的消息
+	 * 
+	 * @since 5.3.2.21
+	 */
+	String blockPopListHead(String key, final int waitSeconds);
+
+	/**
+	 * Get the values of all the specified keys. If one or more keys dont exist or
+	 * is not of type String, a 'nil' value is returned instead of the value of the
+	 * specified key, but the operation never fails.
+	 * <p>
+	 * Time complexity: O(1) for every key
+	 * 
+	 * @param keys
+	 * @return Multi bulk reply
+	 * @since 5.3.2.21
+	 */
+	List<String> mget(String... keys);
+
+	/**
 	 * 通过加载redis脚本，并进行存储
 	 * 
 	 * @param sha1
@@ -285,19 +305,20 @@ public interface CacheManager {
 
 	/**
 	 * 不设置过期时间的hset
+	 * 
 	 * @param key
 	 * @param field
 	 * @param value
 	 * @return
 	 */
 	public Long redisHSet(String key, String field, String value);
-	
+
 	/**
 	 * 获取
+	 * 
 	 * @param key
 	 * @param field
 	 * @return
 	 */
-	public String redisHGet(String key,String field);
-
+	public String redisHGet(String key, String field);
 }
