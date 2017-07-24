@@ -635,7 +635,7 @@
         <constructor-arg>
             <value>
 				<![CDATA[ 
-					update t_shop_salesorder 
+					update T_SO_SALESORDER 
                     set payment =:payment 
                     where code =:code
                  ]]>
@@ -649,7 +649,7 @@
         <constructor-arg>
             <value>
 				<![CDATA[ 
-					update t_shop_salesorder 
+					update T_SO_SALESORDER 
                     set payment =:payment 
                     where id =:id
                  ]]>
