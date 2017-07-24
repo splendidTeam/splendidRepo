@@ -2,8 +2,11 @@ package com.baozun.nebula.payment.manager.impl;
 
 import static com.baozun.nebula.sdk.constants.Constants.PAY_LOG_NOTIFY_AFTER_MESSAGE;
 import static com.baozun.nebula.sdk.constants.Constants.PAY_LOG_RETURN_AFTER_MESSAGE;
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -62,8 +65,6 @@ import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.feilong.core.Validator;
-
-import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 @Transactional
 @Service("paymentManager")
@@ -323,6 +324,14 @@ public class PayManagerImpl implements PayManager{
         //根据订单id查询出该订单的明细
         List<OrderLineCommand> orderLines = sdkOrderService.findOrderDetailList(orderId);
         if (null != orderLines && orderLines.size() > 0){
+        	//还原库存调整为有序，一定程度上预防死锁的发生
+            //added by D.C 2017/7/24
+     	   Collections.sort(orderLines, new Comparator<OrderLineCommand>() {
+    				@Override
+	       			public int compare(OrderLineCommand o1, OrderLineCommand o2) {
+	       				return o1.getExtentionCode().compareTo(o2.getExtentionCode());
+	       			}}
+            );
             for (OrderLineCommand orderLine : orderLines){
                 //加库存
                 if (orderLine.getExtentionCode() != null && orderLine.getCount() > 0){
@@ -349,6 +358,14 @@ public class PayManagerImpl implements PayManager{
         List<OrderLineCommand> orderLines = sdkOrderService.findOrderDetailList(orderId);
         if (isOms == null || !isOms){
             if (null != orderLines && orderLines.size() > 0){
+            	//还原库存调整为有序，一定程度上预防死锁的发生
+                //added by D.C 2017/7/24
+         	   Collections.sort(orderLines, new Comparator<OrderLineCommand>() {
+        				@Override
+ 	       			public int compare(OrderLineCommand o1, OrderLineCommand o2) {
+ 	       				return o1.getExtentionCode().compareTo(o2.getExtentionCode());
+ 	       			}}
+                );
                 for (OrderLineCommand orderLine : orderLines){
                     //加库存
                     if (orderLine.getExtentionCode() != null && orderLine.getCount() > 0){
