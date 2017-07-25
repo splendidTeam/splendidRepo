@@ -121,6 +121,7 @@ public  class ReturnApplicationCreateValidator implements Validator{
         //退货数量、退货理由非空
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "sumSelected","sumSelected.required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "reasonSelected","reasonSelected.required");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "returnType","returnType.required");
         if(com.feilong.core.Validator.isNullOrEmpty(form.getOrderCode())&&com.feilong.core.Validator.isNullOrEmpty(form.getOrderId())){
             errors.rejectValue("returnorder", "returnorder.order.notexist");
             return;
