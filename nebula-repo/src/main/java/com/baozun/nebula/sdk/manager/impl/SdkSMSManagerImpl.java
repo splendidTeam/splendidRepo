@@ -53,10 +53,7 @@ import com.feilong.tools.jsonlib.JsonUtil;
 public class SdkSMSManagerImpl implements SdkSMSManager {
 	
 	private static final Logger	LOG= LoggerFactory.getLogger(SdkSMSManagerImpl.class);
-	
-	@Value("#{meta['sms.secret']}")
-	private String secret;
-	
+
 	@Autowired
 	private SmsSendLogDao smsSendLogDao;
 
@@ -67,18 +64,23 @@ public class SdkSMSManagerImpl implements SdkSMSManager {
 		//TODO mobile没有mask
 		LOG.info("[SEND_SMS_BEGIN]  param : {}" ,JsonUtil.format(sms));
 		String result = null;
-		if(Validator.isNotNullOrEmpty(secret)){
+		/*
+		 * http://jira.baozun.cn/browse/NB-814
+		 * 兼容升级对接后端HUB短信服务接口加密方式
+		 * @since Nebula 5.3.2.22
+		 */
+		if(Validator.isNotNullOrEmpty(com.baozun.hub.sdk.constants.SdkContext.getSecret())){
 		    result = SmsManager.send(sms);
 		}else{
 		    result = SmsService.send(sms);
 		}
 		LOG.info("[SEND_SMS_END]  result : {}" ,result);
-	         Map<String, Object> map = JsonUtil.toMap(result);
+	    Map<String, Object> map = JsonUtil.toMap(result);
 		Map<String, String> resultMap=new HashMap<String, String>();
 		Set<Entry<String, Object>> entrySet = map.entrySet();
 		for (Entry<String, Object> entry : entrySet) {
-		        resultMap.put(entry.getKey(),entry.getValue().toString());
-		    }
+		    resultMap.put(entry.getKey(),entry.getValue().toString());
+		}
 		//记录日志
 		saveSmsSendLog(resultMap, sms);
 		
