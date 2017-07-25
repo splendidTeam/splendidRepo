@@ -74,7 +74,6 @@ public class ModuleTag extends TagSupport {
 			if(Validator.isNotNullOrEmpty(cmsTemplateHtml)){
 				Long currentVerison = cmsTemplateHtml.getVersionId();
 				data = cmsTemplateHtml.getData();
-				logger.info("--------------------------------------> current version is " + currentVerison+", data is "+data);
 				Optional<Map<String, List<CmsModuleInstanceVersionCommand>>> hitResult = cache.getValue(CacheKeyConstant.CMS_MODULE_KEY + ":" + CacheKeyConstant.CMS_MODULE_VERSION_KEY);
 				Map<String, List<CmsModuleInstanceVersionCommand>> publishVersionsQueue = hitResult.isPresent() ? hitResult.get() : null;
 				if(Validator.isNotNullOrEmpty(publishVersionsQueue)){
