@@ -22,7 +22,9 @@ import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.cms.CmsTemplateHtml;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManagerImpl;
+import com.baozun.nebula.utils.cache.GuavaAbstractLoadingCache;
 import com.feilong.core.Validator;
+import com.google.common.base.Optional;
 
 @Component
 public class ModuleTag extends TagSupport {
@@ -43,9 +45,9 @@ public class ModuleTag extends TagSupport {
 
 		if(applicationContext == null){
 			applicationContext = WebApplicationContextUtils.getWebApplicationContext(this.pageContext.getServletContext());
+			sdkCmsModuleInstanceManager = (SdkCmsModuleInstanceManager)applicationContext.getBean("sdkCmsModuleInstanceManager");
+			cacheManager = (CacheManager)applicationContext.getBean("dataCacheManager");
 		}
-		sdkCmsModuleInstanceManager = (SdkCmsModuleInstanceManager)applicationContext.getBean("sdkCmsModuleInstanceManager");
-		cacheManager = (CacheManager)applicationContext.getBean("dataCacheManager");
 		JspWriter out = this.pageContext.getOut();
 		
 		
@@ -68,9 +70,10 @@ public class ModuleTag extends TagSupport {
 				Long currentVerison = cmsTemplateHtml.getVersionId();
 				data = cmsTemplateHtml.getData();
 				logger.info("--------------------------------------> current version is " + currentVerison+", data is "+data);
-				Map<String, List<CmsModuleInstanceVersionCommand>> publishVersionsQueue = cacheManager.getMapObject(CacheKeyConstant.CMS_MODULE_KEY, CacheKeyConstant.CMS_MODULE_VERSION_KEY);
-				if(Validator.isNotNullOrEmpty(publishVersionsQueue)){
-					List<CmsModuleInstanceVersionCommand> versions = publishVersionsQueue.get(code);
+				Optional<Map<String, List<CmsModuleInstanceVersionCommand>>> hitResult = cache.getValue(CacheKeyConstant.CMS_MODULE_KEY + ":" + CacheKeyConstant.CMS_MODULE_VERSION_KEY);
+				
+				if(hitResult.isPresent() && Validator.isNotNullOrEmpty(hitResult.get())){
+					List<CmsModuleInstanceVersionCommand> versions = hitResult.get().get(code);
 					Date now = new Date();
 					if(Validator.isNotNullOrEmpty(versions)){
 						for(CmsModuleInstanceVersionCommand version : versions){
@@ -116,7 +119,6 @@ public class ModuleTag extends TagSupport {
 			out.println(data);
 		}
 		catch(Exception e){
-			e.printStackTrace();
 		}
 		return SKIP_BODY;
 	}
@@ -134,6 +136,17 @@ public class ModuleTag extends TagSupport {
 		this.code = code;
 	}
 
+	/**
+	 * 启用0.5分钟缓存
+	 */
+	private GuavaAbstractLoadingCache<String, Optional<Map<String, List<CmsModuleInstanceVersionCommand>>>> cache = new GuavaAbstractLoadingCache<String, Optional<Map<String, List<CmsModuleInstanceVersionCommand>>>>(
+			100, 30) {
+		@Override
+		protected Optional<Map<String, List<CmsModuleInstanceVersionCommand>>> fetchData(String key) {
+			Map<String, List<CmsModuleInstanceVersionCommand>> publishVersionsQueue = cacheManager.getMapObject(CacheKeyConstant.CMS_MODULE_KEY, CacheKeyConstant.CMS_MODULE_VERSION_KEY);
+			return Optional.fromNullable(publishVersionsQueue);
+		}
+	};
 
 	
 }
