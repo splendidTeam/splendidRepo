@@ -16,7 +16,10 @@
  */
 package com.baozun.nebula.web.controller.order.validator;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
+import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 
 /**
@@ -28,27 +31,39 @@ import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 public interface SalesOrderCreateValidatorHandler{
 
     /**
-     * 执行 {@link com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand,String)}渲染之前.
-     *
+     * 执行 {@link SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand, OrderForm, HttpServletRequest)}渲染之前.
+     * 
      * <p>
      * 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
      * </p>
+     *
+     * @param checkStatusShoppingCartCommand
+     *            the check status shopping cart command
+     * @param orderForm
+     *            the order form
+     * @param request
+     *            the request
+     * @return the sales order result
      * 
-     * @param ShoppingCartCommand
-     * @param SalesOrderResult
+     * @since 5.3.2.22 change method params
      */
-    SalesOrderResult preHandle(ShoppingCartCommand shoppingCartCommand,String couponCode);
+    SalesOrderResult preHandle(ShoppingCartCommand checkStatusShoppingCartCommand,OrderForm orderForm,HttpServletRequest request);
 
     /**
-     * 
-     * 执行 {@link com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand,String)}渲染之后.
+     * 执行 {@link SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand, OrderForm, HttpServletRequest)}渲染之后.
      * 
      * <p>
      * 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
      * </p>
-     * 
-     * @param ShoppingCartCommand
-     * @param SalesOrderResult
+     *
+     * @param checkStatusShoppingCartCommand
+     *            the check status shopping cart command
+     * @param orderForm
+     *            the order form
+     * @param request
+     *            the request
+     * @return the sales order result
+     * @since 5.3.2.22 change method params
      */
-    SalesOrderResult postHandle(ShoppingCartCommand shoppingCartCommand,String couponCode);
+    SalesOrderResult postHandle(ShoppingCartCommand checkStatusShoppingCartCommand,OrderForm orderForm,HttpServletRequest request);
 }

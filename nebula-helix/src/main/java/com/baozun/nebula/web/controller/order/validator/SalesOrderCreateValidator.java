@@ -16,7 +16,10 @@
  */
 package com.baozun.nebula.web.controller.order.validator;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
+import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 
 /**
@@ -28,13 +31,27 @@ import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 public interface SalesOrderCreateValidator{
 
     /**
-     * 购物车和优惠券促销验证.
+     * Validate.
+     * 
+     * <p>
+     * 你可以使用这个接口方法, 来校验
+     * </p>
+     * 
+     * <ul>
+     * <li>购物车 VS 优惠券</li>
+     * <li>购物车 VS 物流方式</li>
+     * <li>购物车 VS 支付方式</li>
+     * <li>....</li>
+     * </ul>
      *
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @param couponCode
-     *            the coupon
+     * @param checkStatusShoppingCartCommand
+     *            the check status shopping cart command
+     * @param orderForm
+     *            the order form
+     * @param request
+     *            the request
      * @return the sales order result
+     * @since 5.3.2.22
      */
-    SalesOrderResult validate(ShoppingCartCommand shoppingCartCommand,String couponCode);
+    SalesOrderResult validate(ShoppingCartCommand checkStatusShoppingCartCommand,OrderForm orderForm,HttpServletRequest request);
 }

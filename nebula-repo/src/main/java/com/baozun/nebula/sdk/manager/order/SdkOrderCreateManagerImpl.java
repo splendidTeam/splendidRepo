@@ -137,31 +137,31 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      * com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set, com.baozun.nebula.sdk.command.SalesOrderCreateOptions)
      */
     @Override
-    public String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos,SalesOrderCreateOptions salesOrderCreateOptions){
-        Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null!");
+    public String saveOrder(ShoppingCartCommand checkStatusShoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos,SalesOrderCreateOptions salesOrderCreateOptions){
+        Validate.notNull(checkStatusShoppingCartCommand, "checkStatusShoppingCartCommand can't be null!");
         Validate.notNull(salesOrderCommand, "salesOrderCommand can't be null!");
 
-        preCreateOrder(shoppingCartCommand, salesOrderCommand, memCombos);
+        preCreateOrder(checkStatusShoppingCartCommand, salesOrderCommand, memCombos);
 
-        return saveOrderInfo(salesOrderCommand, shoppingCartCommand, defaultIfNull(salesOrderCreateOptions, new SalesOrderCreateOptions()));
+        return saveOrderInfo(salesOrderCommand, checkStatusShoppingCartCommand, defaultIfNull(salesOrderCreateOptions, new SalesOrderCreateOptions()));
     }
 
     /**
      * Pre create order.
      *
-     * @param shoppingCartCommand
+     * @param checkStatusShoppingCartCommand
      *            the shopping cart command
      * @param salesOrderCommand
      *            the sales order command
      * @param memCombos
      *            the mem combos
      */
-    private void preCreateOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
+    private void preCreateOrder(ShoppingCartCommand checkStatusShoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
         //去除抬头和未选中的商品
-        refactoringShoppingCartCommand(shoppingCartCommand);
+        refactoringShoppingCartCommand(checkStatusShoppingCartCommand);
 
         // 下单之前的引擎检查
-        sdkEngineManager.createOrderDoEngineChck(salesOrderCommand.getMemberId(), memCombos, shoppingCartCommand);
+        sdkEngineManager.createOrderDoEngineChck(salesOrderCommand.getMemberId(), memCombos, checkStatusShoppingCartCommand);
     }
 
     /*
@@ -222,24 +222,24 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      *
      * @param salesOrderCommand
      *            the sales order command
-     * @param shoppingCartCommand
+     * @param checkStatusShoppingCartCommand
      *            the shopping cart command
      * @param salesOrderCreateOptions
      *            the sales order create options
      * @return the string
      */
-    private String saveOrderInfo(SalesOrderCommand salesOrderCommand,ShoppingCartCommand shoppingCartCommand,SalesOrderCreateOptions salesOrderCreateOptions){
+    private String saveOrderInfo(SalesOrderCommand salesOrderCommand,ShoppingCartCommand checkStatusShoppingCartCommand,SalesOrderCreateOptions salesOrderCreateOptions){
         String subOrdinate = orderCodeCreator.createOrderSerialNO();
         Validate.notBlank(subOrdinate, "subOrdinate can't be blank!");
 
         //基于店铺的 订单行列表.
-        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = buildShopIdAndShoppingCartLineCommandListMap(shoppingCartCommand);
+        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = buildShopIdAndShoppingCartLineCommandListMap(checkStatusShoppingCartCommand);
 
         //基于店铺的促销.
-        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = buildShopIdAndPromotionSKUDiscAMTBySettingMap(shoppingCartCommand);
+        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = buildShopIdAndPromotionSKUDiscAMTBySettingMap(checkStatusShoppingCartCommand);
 
         //基于店铺的ShopCartCommandByShop.
-        Map<Long, ShopCartCommandByShop> shopIdAndShopCartCommandByShopMap = buildShopIdAndShopCartCommandByShopMap(shoppingCartCommand);
+        Map<Long, ShopCartCommandByShop> shopIdAndShopCartCommandByShopMap = buildShopIdAndShopCartCommandByShopMap(checkStatusShoppingCartCommand);
 
         //*****************************************************************************************
         boolean isSendEmail = isSendEmail();
@@ -267,7 +267,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
         //*************************************************************************************
         // 保存支付流水
-        BigDecimal payMoney = payMoneyBuilder.build(salesOrderCommand, shoppingCartCommand);
+        BigDecimal payMoney = payMoneyBuilder.build(salesOrderCommand, checkStatusShoppingCartCommand);
         sdkPayCodeManager.savaPayCode(subOrdinate, payMoney);
 
         //*************************************************************************************
