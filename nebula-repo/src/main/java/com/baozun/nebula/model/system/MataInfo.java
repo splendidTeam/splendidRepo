@@ -159,7 +159,7 @@ public class MataInfo  implements Serializable {
 	public void setCode(String code) {
 		this.code = code;
 	}
-	@Column(name = "VALUE")
+	@Column(name = "VALUE",length = 4000)
 	public String getValue() {
 		return value;
 	}

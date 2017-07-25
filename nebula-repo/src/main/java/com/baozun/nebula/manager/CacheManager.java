@@ -202,6 +202,17 @@ public interface CacheManager {
 	 * @since 5.0.0
 	 */
 	Long incr(String key, int expireSeconds);
+	
+	/**
+	 * 计数器加一个数量 
+	 * add by jiulin
+	 * @param key
+	 * @param value
+	 * @param expireSeconds
+	 * @return
+	 * @since 5.3.2.22
+	 */
+	Long incrBy(String key,long value,int expireSeconds);
 
 	/**
 	 * Rolling Time Window, 用于控制用户在某个时间窗口内的访问次数， 比如：发送短信业务，5分钟内可以发送2次，24小时内可以发送5次
@@ -258,6 +269,11 @@ public interface CacheManager {
 	 * 
 	 * @param sha1
 	 * @return 脚本储存的HASHKEY
+	 * 
+	 * for example:
+	 * String str = redisScriptLoad("redis.call('get',key); return ok;");
+	 * str is XXXXXXXXXXXXXXX
+	 * 
 	 */
 	public String redisScriptLoad(String script);
 
@@ -268,6 +284,12 @@ public interface CacheManager {
 	 * @param key
 	 * @param value
 	 * @return 返回结果
+	 * @since 5.3.2.22
+	 * 
+	 * for example:
+	 * String str = redisScriptLoad("redis.call('get',key); return ok;");
+	 * Object obj = redisEvalSHA(str,key,value);
+	 * 
 	 */
 	public Object redisEvalSHA(String sha1, List<String> key, List<String> value);
 
@@ -278,6 +300,10 @@ public interface CacheManager {
 	 * @param key
 	 * @param value
 	 * @return
+	 * @since 5.3.2.22
+	 * 
+	 * for example:
+	 * Object obj = redisEvalSHA("redis.call('get',key); return ok;",key,value);
 	 */
 	public Object redisEval(String script, List<String> key, List<String> value);
 
@@ -285,6 +311,8 @@ public interface CacheManager {
 	 * 清空所有缓存的脚本
 	 * 
 	 * @return 总是返回 OK
+	 * @since 5.3.2.22
+	 * 
 	 */
 	public String redisEvalFlush();
 
@@ -292,6 +320,7 @@ public interface CacheManager {
 	 * 杀掉当前正在运行的脚本
 	 * 
 	 * @return 执行成功返回 OK ，否则返回一个错误
+	 * @since 5.3.2.22
 	 */
 	public String redisEvalKill();
 
@@ -300,6 +329,7 @@ public interface CacheManager {
 	 * 
 	 * @param sha1
 	 * @return 其实是个List<Boolean>
+	 * @since 5.3.2.22
 	 */
 	public Object redisEvalExists(String... sha1);
 
@@ -310,6 +340,7 @@ public interface CacheManager {
 	 * @param field
 	 * @param value
 	 * @return
+	 * @since 5.3.2.22
 	 */
 	public Long redisHSet(String key, String field, String value);
 
@@ -319,6 +350,7 @@ public interface CacheManager {
 	 * @param key
 	 * @param field
 	 * @return
+	 * @since 5.3.2.22
 	 */
 	public String redisHGet(String key, String field);
 }
