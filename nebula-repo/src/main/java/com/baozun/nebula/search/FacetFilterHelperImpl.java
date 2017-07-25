@@ -18,6 +18,7 @@ package com.baozun.nebula.search;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,7 +51,6 @@ import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utils.cache.GuavaAbstractLoadingCache;
 import com.feilong.core.TimeInterval;
 import com.feilong.core.Validator;
-import com.feilong.core.util.comparator.PropertyComparator;
 
 /**
  * FacetFilterHelper的默认实现
@@ -364,7 +364,21 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
                         List<Facet> facets = facetGroup.getFacets();
 
                         if (facets != null){
-                            Collections.sort(facets, new PropertyComparator<Facet>("sortNo"));
+                            //Collections.sort(facets, new PropertyComparator<Facet>("sortNo"));
+                        	Collections.sort(facets, new Comparator<Facet>() {
+								@Override
+								public int compare(Facet o1, Facet o2) {
+									if (o1.getSortNo() == o2.getSortNo()) {
+							            return 0;
+							        } else if (o1.getSortNo() == null) {
+							            return -1;
+							        } else if ( o2.getSortNo() == null) {
+							            return -1;
+							        }
+									return o1.getSortNo().compareTo(o2.getSortNo());
+								}
+                        		
+                        	});
                             facetGroup.setFacets(facets);
                         }
                         break;
