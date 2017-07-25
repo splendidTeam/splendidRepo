@@ -45,7 +45,12 @@ public class ModuleTag extends TagSupport {
 
 		if(applicationContext == null){
 			applicationContext = WebApplicationContextUtils.getWebApplicationContext(this.pageContext.getServletContext());
+		}
+		
+		if(sdkCmsModuleInstanceManager == null){
 			sdkCmsModuleInstanceManager = (SdkCmsModuleInstanceManager)applicationContext.getBean("sdkCmsModuleInstanceManager");
+		}
+		if(cacheManager == null) {
 			cacheManager = (CacheManager)applicationContext.getBean("dataCacheManager");
 		}
 		JspWriter out = this.pageContext.getOut();
@@ -71,9 +76,9 @@ public class ModuleTag extends TagSupport {
 				data = cmsTemplateHtml.getData();
 				logger.info("--------------------------------------> current version is " + currentVerison+", data is "+data);
 				Optional<Map<String, List<CmsModuleInstanceVersionCommand>>> hitResult = cache.getValue(CacheKeyConstant.CMS_MODULE_KEY + ":" + CacheKeyConstant.CMS_MODULE_VERSION_KEY);
-				
-				if(hitResult.isPresent() && Validator.isNotNullOrEmpty(hitResult.get())){
-					List<CmsModuleInstanceVersionCommand> versions = hitResult.get().get(code);
+				Map<String, List<CmsModuleInstanceVersionCommand>> publishVersionsQueue = hitResult.isPresent() ? hitResult.get() : null;
+				if(Validator.isNotNullOrEmpty(publishVersionsQueue)){
+					List<CmsModuleInstanceVersionCommand> versions = publishVersionsQueue.get(code);
 					Date now = new Date();
 					if(Validator.isNotNullOrEmpty(versions)){
 						for(CmsModuleInstanceVersionCommand version : versions){
@@ -119,6 +124,7 @@ public class ModuleTag extends TagSupport {
 			out.println(data);
 		}
 		catch(Exception e){
+			logger.error("", e);
 		}
 		return SKIP_BODY;
 	}
