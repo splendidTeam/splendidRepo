@@ -87,7 +87,6 @@ public class ReturnApplicationLine extends BaseModel {
 		this.rtnExtentionCode = rtnExtentionCode;
 	}
 
-//	@Column(name = "CHG_EXTENTIONCODE", nullable = false)
 	@Column(name = "CHG_EXTENTIONCODE")
 	public String getChgExtentionCode() {
 		return chgExtentionCode;

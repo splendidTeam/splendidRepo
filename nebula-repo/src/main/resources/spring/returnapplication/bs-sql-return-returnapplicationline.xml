@@ -10,21 +10,21 @@
 			<value><![CDATA[
 				select 
 					DISTINCT
-					 soline.return_orderid as RETURNORDERID,
-					 soline.rtn_extentioncode as RTNEXTENTIONCODE,
-					 soline.chg_extentioncode as CHGEXTENTIONCODE,
-					 soline.qty as QTY,
-					 soline.so_lineid as SOLINEID,
-					 soline.package_line_id as PACKAGELINEID,
-					 soline.return_reason as RETURNREASON,
-					 soline.create_time as CREATETIME,
-					 soline.imgname as  IMGNAME,
-				     soline.memo as MEMO,
-					 soline.return_price as RETURNPRICE,
-				     soline.type as TYPE,
+					 soline.RETURN_ORDERID as RETURNORDERID,
+					 soline.RTN_EXTENTIONCODE as RTNEXTENTIONCODE,
+					 soline.CHG_EXTENTIONCODE as CHGEXTENTIONCODE,
+					 soline.QTY as QTY,
+					 soline.SO_LINEID as SOLINEID,
+					 soline.PACKAGE_LINE_ID as PACKAGELINEID,
+					 soline.RETURN_REASON as RETURNREASON,
+					 soline.CREATE_TIME as CREATETIME,
+					 soline.IMGNAME as  IMGNAME,
+				     soline.MEMO as MEMO,
+					 soline.RETURN_PRICE as RETURNPRICE,
+				     soline.TYPE as TYPE,
 				     iteminfo.title as productName,
 				     item.code as itemCode
-				  from t_so_return_line soline 
+				  from T_SO_RETURN_APPLICATION_LINE soline 
 				  left join t_pd_sku sku
 			    	on soline.rtn_extentioncode=sku.out_id
 			      left join t_pd_iteminfo iteminfo 
@@ -46,19 +46,19 @@
 		<constructor-arg>
 			<value><![CDATA[
 				select 
-					soline.return_orderid as RETURNORDERID,
-					soline.rtn_extentioncode as RTNEXTENTIONCODE,
-					soline.chg_extentioncode as CHGEXTENTIONCODE,
-					soline.qty as QTY,
-					soline.so_lineid as SOLINEID,
-					soline.package_line_id as PACKAGELINEID,
-					soline.return_reason as RETURNREASON,
-					soline.create_time as CREATETIME,
-					soline.imgname as  IMGNAME,
-					soline.memo as MEMO,
-					soline.return_price as RETURNPRICE,
-					soline.type as TYPE
-				from t_so_return_line soline 
+					soline.RETURN_ORDERID as RETURNORDERID,
+					soline.RTN_EXTENTIONCODE as RTNEXTENTIONCODE,
+					soline.CHG_EXTENTIONCODE as CHGEXTENTIONCODE,
+					soline.QTY as QTY,
+					soline.SO_LINEID as SOLINEID,
+					soline.PACKAGE_LINE_ID as PACKAGELINEID,
+					soline.RETURN_REASON as RETURNREASON,
+					soline.CREATE_TIME as CREATETIME,
+					soline.IMGNAME as  IMGNAME,
+					soline.MEMO as MEMO,
+					soline.RETURN_PRICE as RETURNPRICE,
+					soline.TYPE as TYPE
+				from T_SO_RETURN_APPLICATION_LINE soline 
 			    where soline.id in(
 					#foreach($return_line_id in $returnLinesIds)
     					$return_line_id,
