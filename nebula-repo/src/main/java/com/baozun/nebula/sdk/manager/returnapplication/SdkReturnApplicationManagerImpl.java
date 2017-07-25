@@ -50,6 +50,9 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     public Integer countCompletedAppsByPrimaryLineId(Long primaryLineId, Integer[] status){
         Integer count = 0;
         count = returnApplicationDao.countItemByOrderLineIdAndStatus(primaryLineId, status);
+        if(null==count){
+            return 0;
+        }
         return count;
     }
 
@@ -140,7 +143,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
             throw new Exception("对应的申请单不存在");
         }
         //审核通过时必须填写退货地址
-        if (status.intValue() == 2 && returnAddress == ""){
+        if (status.intValue() == ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY && returnAddress == ""){
             throw new Exception("退货地址为空");
         }else{
             returnapp.setReturnAddress(returnAddress);

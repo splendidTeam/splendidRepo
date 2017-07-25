@@ -572,7 +572,7 @@ public class ReturnApplication extends BaseModel{
      */
     @Column(name = "OMS_STATUS")
     @Index(name = "IDX_SO_RETURN_APPLICATION_OMS_STATUS")
-    public int getOmsStatus(){
+    public Integer getOmsStatus(){
         return omsStatus;
     }
 
@@ -580,7 +580,7 @@ public class ReturnApplication extends BaseModel{
      * @param omsStatus
      *            the omsStatus to set
      */
-    public void setOmsStatus(int omsStatus){
+    public void setOmsStatus(Integer omsStatus){
         this.omsStatus = omsStatus;
     }
 
@@ -589,7 +589,7 @@ public class ReturnApplication extends BaseModel{
      */
     @Column(name = "REFUND_STATUS")
     @Index(name = "IDX_SO_RETURN_APPLICATION_REFUND_STATUS")
-    public int getRefundStatus(){
+    public Integer getRefundStatus(){
         return refundStatus;
     }
 
@@ -597,7 +597,7 @@ public class ReturnApplication extends BaseModel{
      * @param refundStatus
      *            the refundStatus to set
      */
-    public void setRefundStatus(int refundStatus){
+    public void setRefundStatus(Integer refundStatus){
         this.refundStatus = refundStatus;
     }
 

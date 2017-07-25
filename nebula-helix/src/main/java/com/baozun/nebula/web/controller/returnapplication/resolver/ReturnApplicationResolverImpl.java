@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baozun.nebula.api.returnapplication.ReturnApplicationCodeCreatorManager;
-import com.baozun.nebula.api.salesorder.OrderCodeCreatorManager;
 import com.baozun.nebula.command.ReturnApplicationCommand;
-import com.baozun.nebula.dao.product.SkuDao;
-import com.baozun.nebula.dao.returnapplication.SdkReturnApplicationDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.model.returnapplication.ReturnApplication;
 import com.baozun.nebula.model.returnapplication.ReturnApplicationDeliveryInfo;
@@ -22,8 +19,6 @@ import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
-import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationLineManager;
 import com.baozun.nebula.sdk.manager.returnapplication.SdkReturnApplicationManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
@@ -37,25 +32,10 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 	private SdkOrderLineDao sdkOrderLineDao;
 	
 	@Autowired
-	private SkuDao skuDao;
-	
-	@Autowired
 	private SdkSkuManager sdkSkuManager;
 	
 	@Autowired
 	private SdkReturnApplicationManager sdkReturnApplicationManager;
-	
-	@Autowired
-	private SdkReturnApplicationLineManager soReturnLineManager;
-	
-	@Autowired
-	private OrderManager orderManager;
-	
-	@Autowired
-	private SdkReturnApplicationDao sdkReturnApplicationDao;
-	
-	@Autowired
-	private OrderManager OrderManager;
 	
     /** The ReturnApplication code creator. */
     @Autowired(required = false)
@@ -74,7 +54,7 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 		returnApplication.setVersion(date);
 		returnApplication.setRefundBankBranch(returnOrderForm.getBranch());
 		returnApplication.setRefundBank(returnOrderForm.getBank());
-		returnApplication.setType(Integer.parseInt(returnOrderForm.getReturnType()[0]));
+		returnApplication.setType(returnOrderForm.getReturnType()[0]);
 		returnApplication.setSoOrderCode(returnOrderForm.getOrderCode());
 		returnApplication.setSoOrderId(returnOrderForm.getOrderId());
 		returnApplication.setRefundType(String.valueOf(salesOrder.getPayment()));// 退款方式
@@ -97,7 +77,7 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 			returnLine.setQty(sumSelected[i]);
 			returnLine.setSoLineId(lineId);
 			returnLine.setMemo(returnOrderForm.getMemo());
-			returnLine.setType(Integer.parseInt(returnOrderForm.getReturnType()[i]));
+			returnLine.setType(returnOrderForm.getReturnType()[i]);
 			returnLine.setCreateTime(date);
 			//退货
 			if(ReturnApplication.SO_RETURN_TYPE_RETURN.equals(returnOrderForm.getReturnType())){

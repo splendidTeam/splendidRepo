@@ -140,7 +140,7 @@ public class ReturnOrderForm  extends BaseForm{
 	private String retrunReason;
 	
 	/**退换货类型1：退货 2：换货*/
-	private String[] returnType;
+	private Integer[] returnType;
 	
 	/**以下部分为returnDelivery信息*/
 	private ReturnApplicationDeliveryInfo returnDeliveryInfo;
@@ -155,7 +155,7 @@ public class ReturnOrderForm  extends BaseForm{
 	}
 
 	
-    public String[] getReturnType(){
+    public Integer[] getReturnType(){
         return returnType;
     }
     
@@ -169,7 +169,7 @@ public class ReturnOrderForm  extends BaseForm{
         this.extentionCode = extentionCode;
     }
 
-    public void setReturnType(String[] returnType){
+    public void setReturnType(Integer[] returnType){
         this.returnType = returnType;
     }
 
