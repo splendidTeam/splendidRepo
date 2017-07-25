@@ -221,8 +221,21 @@ public class CacheManagerImpl extends AbstractCacheManager {
 			}
 		});
 	}
-
+	
 	@Override
+    public Long incrBy(String key,final long value,final int expireSeconds){
+	    return (Long) handler(key, new RedisHandler() {
+
+            @Override
+            public Object handler(String finalKey, Jedis jedis) {
+                Long valueCurr = jedis.incrBy(finalKey, value);
+                jedis.expire(finalKey, expireSeconds);
+                return valueCurr;
+            }
+        });
+    }
+
+    @Override
 	public Boolean applyRollingTimeWindow(String key, final long limit, final long window) {
 		return (Boolean) handler(key, new RedisHandler() {
 

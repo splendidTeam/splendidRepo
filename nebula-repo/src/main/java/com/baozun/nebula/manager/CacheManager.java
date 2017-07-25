@@ -202,6 +202,17 @@ public interface CacheManager {
 	 * @since 5.0.0
 	 */
 	Long incr(String key, int expireSeconds);
+	
+	/**
+	 * 计数器加一个数量 
+	 * add by jiulin
+	 * @param key
+	 * @param value
+	 * @param expireSeconds
+	 * @return
+	 * @since 5.3.2.22
+	 */
+	Long incrBy(String key,long value,int expireSeconds);
 
 	/**
 	 * Rolling Time Window, 用于控制用户在某个时间窗口内的访问次数， 比如：发送短信业务，5分钟内可以发送2次，24小时内可以发送5次
