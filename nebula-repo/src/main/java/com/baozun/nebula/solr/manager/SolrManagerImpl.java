@@ -345,12 +345,54 @@ public class SolrManagerImpl<T, PK extends Serializable> implements SolrManager{
         List<ItemForSolrCommand> datas = new ArrayList<ItemForSolrCommand>();
         for (ItemForSolrI18nCommand command : beans){
             ItemForSolrCommand solrCommand = new ItemForSolrCommand();
-            try{
-                PropertyUtils.copyProperties(solrCommand, command);
-                datas.add(solrCommand);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            
+            solrCommand.setId(command.getId());
+            solrCommand.setCode(command.getCode());
+            solrCommand.setKeyword(command.getKeyword());
+            solrCommand.setTitle(command.getTitle());
+            solrCommand.setSubTitle(command.getSubTitle());
+            solrCommand.setSketch(command.getSketch());
+            solrCommand.setDescription(command.getDescription());
+            solrCommand.setShopName(command.getShopName());
+            solrCommand.setIndustryName(command.getIndustryName());
+            solrCommand.setStyle(command.getStyle());
+            solrCommand.setGroupStyle(command.getGroupStyle());
+            solrCommand.setSort_no(command.getSort_no());
+            solrCommand.setDefault_sort(command.getDefault_sort());
+            solrCommand.setList_price(command.getList_price());
+            solrCommand.setSale_price(command.getSale_price());
+            solrCommand.setModifyTime(command.getModifyTime());
+            solrCommand.setListTime(command.getListTime());
+            solrCommand.setActiveBeginTime(command.getActiveBeginTime());
+            solrCommand.setSalesCount(command.getSalesCount());
+            solrCommand.setRankavg(command.getRankavg());
+            solrCommand.setItemCount(command.getItemCount());
+            solrCommand.setViewCount(command.getViewCount());
+            solrCommand.setFavoredCount(command.getFavoredCount());
+            solrCommand.setSeoKeywords(command.getSeoKeywords());
+            solrCommand.setSeoDescription(command.getSeoDescription());
+            solrCommand.setSeoTitle(command.getSeoTitle());
+            solrCommand.setImageUrl(command.getImageUrl());
+            solrCommand.setItemIsDisplay(command.getItemIsDisplay());
+            solrCommand.setDynamicNameForSearchMap(command.getDynamicNameForSearchMap());
+            solrCommand.setDynamicForSearchMap(command.getDynamicForSearchMap());
+            solrCommand.setDynamicNameWithoutSearchMap(command.getDynamicNameWithoutSearchMap());
+            solrCommand.setDynamicWithoutSearchMap(command.getDynamicWithoutSearchMap());
+            solrCommand.setDynamicForCustomerMap(command.getDynamicForCustomerMap());
+            solrCommand.setCategoryOrder(command.getCategoryOrder());
+            solrCommand.setCategoryParent(command.getCategoryParent());
+            solrCommand.setCategoryName(command.getCategoryName());
+            solrCommand.setCategoryCode(command.getCategoryCode());
+            solrCommand.setAllCategoryCodes(command.getAllCategoryCodes());
+            solrCommand.setAllCategoryIds(command.getAllCategoryIds());
+            solrCommand.setCategoryTree(command.getCategoryTree());
+            solrCommand.setNavigationTree(command.getNavigationTree());
+            
+            solrCommand.setPinyinAllList_A(command.getPinyinAllList_A());
+            solrCommand.setPinyinAllList_B(command.getPinyinAllList_B());
+            solrCommand.setChannels(command.getChannels());
+            
+            datas.add(solrCommand);
         }
         return datas;
     }
