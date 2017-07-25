@@ -24,8 +24,9 @@ import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 
 /**
  * 购物车和优惠券促销验证的扩展器.
- * 
+ *
  * @author daibowen
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.18
  */
 public interface SalesOrderCreateValidatorHandler{
@@ -33,18 +34,13 @@ public interface SalesOrderCreateValidatorHandler{
     /**
      * 执行 {@link SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand, OrderForm, HttpServletRequest)}渲染之前.
      * 
-     * <p>
-     * 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
-     * </p>
-     *
      * @param checkStatusShoppingCartCommand
-     *            the check status shopping cart command
+     *            选中行的购物车
      * @param orderForm
-     *            the order form
+     *            提交的订单表单信息
      * @param request
      *            the request
-     * @return the sales order result
-     * 
+     * @return 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
      * @since 5.3.2.22 change method params
      */
     SalesOrderResult preHandle(ShoppingCartCommand checkStatusShoppingCartCommand,OrderForm orderForm,HttpServletRequest request);
@@ -52,17 +48,13 @@ public interface SalesOrderCreateValidatorHandler{
     /**
      * 执行 {@link SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand, OrderForm, HttpServletRequest)}渲染之后.
      * 
-     * <p>
-     * 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
-     * </p>
-     *
      * @param checkStatusShoppingCartCommand
-     *            the check status shopping cart command
+     *            选中行的购物车
      * @param orderForm
-     *            the order form
+     *            提交的订单表单信息
      * @param request
      *            the request
-     * @return the sales order result
+     * @return 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
      * @since 5.3.2.22 change method params
      */
     SalesOrderResult postHandle(ShoppingCartCommand checkStatusShoppingCartCommand,OrderForm orderForm,HttpServletRequest request);
