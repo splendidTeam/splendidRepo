@@ -38,6 +38,9 @@ public class ReturnLineCommand implements Command {
     private String itemCode;
     
     private String productName;
+    
+    //关联订单行商品的upc
+    private String extentionCode;
 
 	public Long getReturnOrderId() {
 		return returnOrderId;
@@ -150,5 +153,16 @@ public class ReturnLineCommand implements Command {
 	public void setItemCode(String itemCode) {
 		this.itemCode = itemCode;
 	}
+
+    
+    public String getExtentionCode(){
+        return extentionCode;
+    }
+
+    
+    public void setExtentionCode(String extentionCode){
+        this.extentionCode = extentionCode;
+    }
+	
 
 }

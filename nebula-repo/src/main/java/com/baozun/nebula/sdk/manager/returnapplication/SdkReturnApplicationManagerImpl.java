@@ -1,6 +1,5 @@
 package com.baozun.nebula.sdk.manager.returnapplication;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -16,12 +15,10 @@ import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.dao.returnapplication.SdkReturnApplicationDao;
 import com.baozun.nebula.dao.returnapplication.SdkSoReturnApplicationDeliveryInfoDao;
-import com.baozun.nebula.dao.salesorder.SdkOrderDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.returnapplication.ReturnApplication;
 import com.baozun.nebula.model.returnapplication.ReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.returnapplication.ReturnApplicationLine;
-import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.feilong.core.Validator;
 
@@ -195,7 +192,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     public List<OrderReturnCommand> findExpInfo(Sort[] sorts,Map<String, Object> paraMap){
         List<OrderReturnCommand> orderReturn = returnApplicationDao.findExpInfo(sorts, paraMap);
         for(OrderReturnCommand returnCommand :orderReturn){
-            if("1".equals(returnCommand.getType())){
+            if(ReturnApplication.SO_RETURN_TYPE_RETURN.equals(returnCommand.getType())){
                 returnCommand.setBusinessType("退货");
             }else{
                 returnCommand.setBusinessType("换货");

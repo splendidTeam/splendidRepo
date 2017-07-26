@@ -22,8 +22,9 @@
 				     soline.MEMO as MEMO,
 					 soline.RETURN_PRICE as RETURNPRICE,
 				     soline.TYPE as TYPE,
-				     iteminfo.title as productName,
-				     item.code as itemCode
+				     line.item_name as productName,
+				     item.code as itemCode,
+				     line.extention_code as extentionCode
 				  from T_SO_RETURN_APPLICATION_LINE soline 
 				  left join t_pd_sku sku
 			    	on soline.rtn_extentioncode=sku.out_id
@@ -31,6 +32,8 @@
 			     	on sku.item_id=iteminfo.item_id 
 			     left join t_pd_item item
 			     on sku.item_id=item.id
+			     left join t_so_orderline line
+			     on soline.so_lineid=line.id
 			     	where  soline.return_orderid in(
 					#foreach($return_orderid in $returnOrderIds)
     					$return_orderid,

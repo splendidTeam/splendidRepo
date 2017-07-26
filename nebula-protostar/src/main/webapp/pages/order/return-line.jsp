@@ -56,7 +56,7 @@
 		<div class="ui-tag-change">
 			<div class="tag-change-content" style="width: 100%;">
 				<div style="float: left; margin-left: 10px;">
-					<input type="hidden" value="${SoReturnApplication.id}"
+					<input type="hidden" value="${SoReturnApplication.returnApplicationCode}"
 						id="returnCode">
 					<div class="ui-block-line ui-block-line-37">
 						<label> <spring:message code="return.list.code" /></label> <label>${SoReturnApplication.omsCode }</label>
@@ -121,9 +121,6 @@
 							 			 已完成
 							 		 </c:if> <c:if test="${SoReturnApplication.status == 7}">
 							 			 取消
-							 		 </c:if>
-							 		  <c:if test="${SoReturnApplication.status == 8}">
-							 			 OMS退换货入库
 							 		 </c:if>
 						</label>
 					</div>
@@ -265,42 +262,28 @@
 							<th><spring:message code="order.return.reason" /></th>
 							<th><spring:message code="user.list.filter.createtime" /></th>
 							<th><spring:message code="order.returnExtentionCode" /></th>
+							<th><spring:message code="order.return.type" /></th>
 							<th><spring:message code="order.return.memo" /></th>
 						</tr>
 						<c:if test="${!empty SoReturnLine }">
 							<c:forEach items="${SoReturnLine}" var="SoReturnLine"
 								varStatus="index">
 								<tr class="${index.count%2==0?'even':'odd' }">
-									<td>${SoReturnLine.rtnExtentionCode}</td>
+									<td>${SoReturnLine.extentionCode}</td>
 									<td><a
-										href="${frontendBaseUrl}/${SoReturnLine.itemCode}/item"
+										href="${frontendBaseUrl}/${SoReturnLine.itemCode}/item.htm"
 										target="_blank">${SoReturnLine.productName}</td>
 									<td>${SoReturnLine.qty}</td>
 									<td>${SoReturnLine.soLineId}</td>
-									<td><c:if test="${SoReturnLine.returnReason =='R001A'}">
-									 			我改变主意了
-									 		 </c:if> <c:if test="${SoReturnLine.returnReason =='R002A'}">
-									 			商品质量有问题
-									 		 </c:if> <c:if test="${SoReturnLine.returnReason == 'R003A'}">
-									 			商品包装破损
-									 		 </c:if> <c:if test="${SoReturnLine.returnReason == 'R004A'}">
-									 			尺码不合适
-									 		 </c:if> <c:if test="${SoReturnLine.returnReason == 'R005A'}">
-									 			颜色/款式与商品描述不符
-									 		 </c:if>
-									 		 <c:if test="${SoReturnLine.returnReason == 'R006A'}">
-									 			其它原因
-									 		 </c:if></td>
-
+									<!-- 各商城的退货理由可能不同，因此这里只显示编码，不做转换了 -->
+									<td>${SoReturnLine.returnReason}</td>
 									<td><fmt:formatDate value="${SoReturnLine.createTime }"
 											type="both" /></td>
 									<td>
-										<c:if test="${SoReturnApplication.type==1 }">
-											${SoReturnLine.rtnExtentionCode}
-										</c:if>
-										<c:if test="${SoReturnApplication.type==2 }">
-											${SoReturnLine.chgExtentionCode}
-										</c:if>
+										${empty SoReturnLine.rtnExtentionCode?SoReturnLine.chgExtentionCode:SoReturnLine.rtnExtentionCode}
+									</td>
+									<td>
+										${empty SoReturnLine.rtnExtentionCode?'换货':'退货'}
 									</td>
 									<td>${SoReturnLine.memo }</td>
 								</tr>

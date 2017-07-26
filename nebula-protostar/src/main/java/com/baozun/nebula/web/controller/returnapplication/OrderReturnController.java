@@ -92,9 +92,6 @@ public class OrderReturnController extends BaseController{
     private ReturnOrderAppManager returnOrderAppManager;
     
     @Autowired
-    private ExcelManipulatorFactory excelFactory;
-    
-    @Autowired
     @Qualifier("returnOrderWriter")
     private ExcelWriter returnOrderWriter;
 
@@ -244,7 +241,6 @@ public class OrderReturnController extends BaseController{
             sorts[0] = sort;
         }
         List<OrderReturnCommand> returnCommandList = sdkReturnApplicationManager.findExpInfo(sorts, queryBean.getParaMap());
-        ExcelWriter writer = excelFactory.createExcelWriter("exportReturn");
         Map<String, Object> beans = new HashMap<String, Object>();
         beans.put("expReturnList", returnCommandList);
         try {
@@ -253,7 +249,7 @@ public class OrderReturnController extends BaseController{
             response.setHeader("Content-Type", "application/octet-stream");
             response.setHeader("Content-Disposition", "attachment; filename=\""
                     + FILE_NAME+"\"");
-            writer.write(path, response.getOutputStream(), beans);
+            returnOrderWriter.write(path, response.getOutputStream(), beans);
         } catch (Exception e) {
             e.printStackTrace();
             throw  new BusinessException(ErrorCodes.SYSTEM_ERROR);
@@ -463,6 +459,7 @@ public class OrderReturnController extends BaseController{
         soReturnApp.setReturnPrice(returnTotalMoney);
         ReturnApplicationCommand command = new ReturnApplicationCommand();
         command.setReturnApplication(soReturnApp);
+        command.setReturnLineList(returnLineList);
         try{
             sdkReturnApplicationManager.createReturnApplication(command, saleOrder);
             return SUCCESS;

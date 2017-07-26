@@ -211,12 +211,12 @@ function updateRefund(val, state,arg) {
 
 //同意退换货
 function fnAGREE(data, args, caller) {
-	updateRefund(data.returnApplicationCode, 4,data.status);
+	updateRefund(data.returnApplicationCode, 5,data.status);
 }
 
 //已完成
 function fnFINISH(data, args, caller) {
-	updateRefund(data.returnApplicationCode, 5,data.status);
+	updateRefund(data.returnApplicationCode, 6,data.status);
 }
 
 //同意退换货
@@ -244,10 +244,10 @@ function fnREFUSED(data, args, caller){
 
 function returnType(data){
 	var status=loxia.getObject("type", data);
-	if(status==2){
+	if(status==1){
 		return nps.i18n("RETURN");
 	}
-	if(status==3){
+	if(status==2){
 		return nps.i18n("EXCHANGE");
 	}
 }
