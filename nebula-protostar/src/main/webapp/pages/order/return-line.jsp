@@ -107,22 +107,22 @@
 
 					<div class="ui-block-line ui-block-line-37">
 						<label> <spring:message code="return.status" /></label> <label>
-							<c:if test="${SoReturnApplication.status == 0}">
+							<c:if test="${SoReturnApplication.status == 1}">
 							 			待审核
-							 		 </c:if> <c:if test="${SoReturnApplication.status == 1}">
-							 			 拒绝退换货
 							 		 </c:if> <c:if test="${SoReturnApplication.status == 2}">
-							 			 待发货
+							 			 拒绝退换货
 							 		 </c:if> <c:if test="${SoReturnApplication.status == 3}">
-							 			 已发货
+							 			 待发货
 							 		 </c:if> <c:if test="${SoReturnApplication.status == 4}">
-							 			 同意退款
+							 			 已发货
 							 		 </c:if> <c:if test="${SoReturnApplication.status == 5}">
-							 			 已完成
+							 			 同意退款
 							 		 </c:if> <c:if test="${SoReturnApplication.status == 6}">
+							 			 已完成
+							 		 </c:if> <c:if test="${SoReturnApplication.status == 7}">
 							 			 取消
 							 		 </c:if>
-							 		  <c:if test="${SoReturnApplication.status == 7}">
+							 		  <c:if test="${SoReturnApplication.status == 8}">
 							 			 OMS退换货入库
 							 		 </c:if>
 						</label>

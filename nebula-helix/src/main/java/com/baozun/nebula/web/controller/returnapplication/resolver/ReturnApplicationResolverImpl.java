@@ -80,7 +80,7 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 			returnLine.setType(returnOrderForm.getReturnType()[i]);
 			returnLine.setCreateTime(date);
 			//退货
-			if(ReturnApplication.SO_RETURN_TYPE_RETURN.equals(returnOrderForm.getReturnType())){
+			if(ReturnApplication.SO_RETURN_TYPE_RETURN.equals(returnOrderForm.getReturnType()[i])){
 				returnLine.setRtnExtentionCode(line.getExtentionCode());
 				returnLine.setChgExtentionCode(null);
 				returnTotalMoney = returnTotalMoney.add(line.getSubtotal().divide(new BigDecimal(line.getCount()))
