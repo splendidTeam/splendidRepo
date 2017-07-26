@@ -33,7 +33,6 @@ import com.unionpay.acp.sdk.SDKConstants;
 import com.unionpay.acp.sdk.UnionPayBase;
 
 import static com.feilong.core.util.SortUtil.sortMapByKeyAsc;
-import static com.feilong.core.util.SortUtil.sortMapByKeyDesc;
 
 public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
 
@@ -94,7 +93,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         Map<String, String> submitFromData = AcpService.sign(map, SDKConstants.UTF_8_ENCODING);
         // 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("submitFromData：{}", JsonUtil.format(sortMapByKeyDesc(submitFromData)));
+            LOGGER.debug("submitFromData：{}", JsonUtil.format(sortMapByKeyAsc(submitFromData)));
         }
 
         String requestFrontUrl = SDKConfig.getConfig().getFrontRequestUrl(); // 获取请求银联的前台地址：对应属性文件acp_sdk.properties文件中的acpsdk.frontTransUrl
