@@ -262,7 +262,7 @@
 			        #if($returnCode)
 						AND application.oms_code = :returnCode
 					#end
-					#if($oderCode)
+					#if($orderCode)
 						AND application.so_order_code = :orderCode
 					#end
 					#if($Logname)
