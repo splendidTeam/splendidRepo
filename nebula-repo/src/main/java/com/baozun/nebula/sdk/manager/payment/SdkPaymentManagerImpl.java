@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager.impl;
+package com.baozun.nebula.sdk.manager.payment;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -29,6 +29,7 @@ import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.sdk.command.PayInfoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
+import com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.feilong.core.Validator;
@@ -63,6 +64,9 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
     @Autowired
     private SdkPayCodeManager sdkPayCodeManager;
 
+    @Autowired
+    private SdkPayInfoQueryManager sdkPayInfoQueryManager;
+
     @Value("#{meta['orderCodeCreator']}")
     private String orderCodeCreatorPath = "com.baozun.nebula.api.salesorder.DefaultOrderCodeCreatorManager";
 
@@ -77,10 +81,7 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
 
     @Override
     public void upPayInfoCallCloseStaBySubOrdinate(Long orderId,Boolean callCloseStatus,Date modifyTime){
-        Map<String, Object> paraMap = new HashMap<String, Object>();
-        paraMap.put("orderId", orderId);
-        paraMap.put("paySuccessStatusStr", 2);
-        List<PayInfoLog> payInfoList = findPayInfoLogListByQueryMap(paraMap);
+        List<PayInfoLog> payInfoList = sdkPayInfoQueryManager.findPayInfoLogListByOrderId(orderId, false);
         if (payInfoList != null && payInfoList.size() != 0){
             //根据createTime 降序排列 取第一个
             PayInfoLog payInfoLog = payInfoList.get(0);
@@ -199,15 +200,23 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
         return payCodeDao.findPayCodeByCodeAndPayType(code, payType);
     }
 
+    //---------------------------------------------------------------------
+
     @Override
     @Transactional(readOnly = true)
     public List<PayInfoCommand> findPayInfoCommandByOrderId(Long orderId){
         return payInfoDao.findPayInfoCommandByOrderId(orderId);
     }
 
+    /**
+     * @deprecated pls use {@link com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager#findPayInfoLogListByQueryMap(Map)} ,实现和原来完全一样
+     *             <br>
+     *             since 5.3.2.22
+     */
     @Override
     @Transactional(readOnly = false)
+    @Deprecated
     public List<PayInfoLog> findPayInfoLogListByQueryMap(Map<String, Object> paraMap){
-        return payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
+        return sdkPayInfoQueryManager.findPayInfoLogListByQueryMap(paraMap);
     }
 }

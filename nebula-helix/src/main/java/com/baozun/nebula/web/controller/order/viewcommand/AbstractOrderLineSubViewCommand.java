@@ -142,6 +142,13 @@ public abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
     
     
   //**********************************************************************************************
+    
+  //**********************************************************************************************
+    /** 折扣 
+     * @since 5.3.2.22
+     * */
+    private BigDecimal discount;
+  //**********************************************************************************************
     /**
      * 获得 orderline行的唯一标识,那么此处的id={@link OrderLine#id}.
      *
@@ -505,6 +512,26 @@ public abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
     public void setEvaluationStatus(Integer evaluationStatus){
         this.evaluationStatus = evaluationStatus;
     }
+
+    /**
+     * 获取 折扣
+     * @return BigDecimal
+     * @since 5.3.2.22
+     */
+    public BigDecimal getDiscount(){
+        return discount;
+    }
+
+    /**
+     * 设置 折扣
+     * @param BigDecimal
+     *          the discount to set
+     * @since 5.3.2.22
+     */
+    public void setDiscount(BigDecimal discount){
+        this.discount = discount;
+    }
+    
     
     
 }

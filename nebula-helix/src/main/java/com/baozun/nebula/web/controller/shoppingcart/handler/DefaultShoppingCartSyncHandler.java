@@ -14,7 +14,9 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.shoppingcart;
+package com.baozun.nebula.web.controller.shoppingcart.handler;
+
+import static com.feilong.core.util.CollectionsUtil.collect;
 
 import java.util.List;
 
@@ -24,14 +26,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartAddManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartQueryManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.PackageInfoElement;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameLineExtractor;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartAddDetermineSameLineElements;
-
-import static com.feilong.core.util.CollectionsUtil.collect;
+import com.baozun.nebula.web.controller.shoppingcart.builder.DefaultShoppingcartOneLineMaxQuantityBuilder;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartOneLineMaxQuantityBuilder;
 
 /**
- * The Class SdkShoppingCartSyncManagerImpl.
+ * The Class DefaultShoppingCartSyncHandler.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月23日 下午6:24:22
@@ -39,7 +44,7 @@ import static com.feilong.core.util.CollectionsUtil.collect;
  */
 @Transactional
 @Service("sdkShoppingCartSyncManager")
-public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManager{
+public class DefaultShoppingCartSyncHandler implements ShoppingCartSyncHandler{
 
     /**  */
     @Autowired
@@ -55,6 +60,9 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
 
     @Autowired
     private ShoppingCartAddSameLineExtractor shoppingCartAddSameLineExtractor;
+
+    @Autowired(required = false)
+    private ShoppingcartOneLineMaxQuantityBuilder shoppingcartOneLineMaxQuantityBuilder = new DefaultShoppingcartOneLineMaxQuantityBuilder();
 
     /*
      * (non-Javadoc)
@@ -97,7 +105,9 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
         boolean isInDB = null != cartLineInDb;
 
         if (isInDB){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
-            sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
+            //返回合并后单行商品数量
+            int totalQuantity = bulidTotalQuantity(memberId, quantity, cartLineInDb);
+            sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), totalQuantity);
         }else{
             sdkShoppingCartAddManager.addCartLine(memberId, shoppingCartLineCommand);
         }
@@ -120,6 +130,24 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
                         collect(shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList(), PackageInfoElement.class, "type", "featureInfo"));
 
         return shoppingCartAddSameLineExtractor.extractor(shoppingCartLineCommandListInDB, shoppingcartAddDetermineSameLineElements);
+    }
+
+    /**
+     * 校验合并后商品数量，如果超过设置的单行购买最大值则将商品数量修改为最大值
+     * 
+     * @param memberId
+     * @param quantity
+     * @param cartLineInDb
+     * @return
+     * @since 5.3.2.22
+     */
+    private int bulidTotalQuantity(Long memberId,Integer quantity,ShoppingCartLineCommand cartLineInDb){
+        //合并后单行总数量
+        int totalQuantity = cartLineInDb.getQuantity() + quantity;
+        //获取单行可购买的最大值
+        int maxQuantity = shoppingcartOneLineMaxQuantityBuilder.build(memberId, cartLineInDb.getSkuId());
+        //如果合并后数量大于设置的单行可购买的最大值则取单行可购买的最大值
+        return totalQuantity > maxQuantity ? maxQuantity : totalQuantity;
     }
 
 }

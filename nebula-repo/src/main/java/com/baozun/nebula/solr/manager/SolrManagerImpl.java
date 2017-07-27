@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import loxia.dao.Pagination;
-import net.sf.json.JSON;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -29,15 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.ItemCategoryCommand;
 import com.baozun.nebula.command.ItemSolrCommand;
 import com.baozun.nebula.command.ItemTagRelationCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
-import com.baozun.nebula.dao.product.ItemCategoryDao;
-import com.baozun.nebula.dao.product.ItemTagRelationDao;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
@@ -51,20 +45,16 @@ import com.baozun.nebula.solr.utils.JsonFormatUtil;
 import com.baozun.nebula.solr.utils.Validator;
 import com.baozun.nebula.utilities.common.LangUtil;
 
+import loxia.dao.Pagination;
+import net.sf.json.JSON;
+
 @Service("SolrManager")
-@Transactional
 public class SolrManagerImpl<T, PK extends Serializable> implements SolrManager{
 
     private static final Logger  log = LoggerFactory.getLogger(SolrManagerImpl.class);
 
     @Autowired
     protected SolrGeneralDao     solrGeneralDao;
-
-    @Autowired
-    protected ItemCategoryDao    itemCategoryDao;
-
-    @Autowired
-    protected ItemTagRelationDao itemTagRelationDao;
 
     @Override
     public Pagination<ItemSolrCommand> findAllItemCommandFormSolrByField(String queryString,String sortString,Integer startNum,Integer rowsNum,Integer currentPage,Integer size){
@@ -355,12 +345,54 @@ public class SolrManagerImpl<T, PK extends Serializable> implements SolrManager{
         List<ItemForSolrCommand> datas = new ArrayList<ItemForSolrCommand>();
         for (ItemForSolrI18nCommand command : beans){
             ItemForSolrCommand solrCommand = new ItemForSolrCommand();
-            try{
-                PropertyUtils.copyProperties(solrCommand, command);
-                datas.add(solrCommand);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            
+            solrCommand.setId(command.getId());
+            solrCommand.setCode(command.getCode());
+            solrCommand.setKeyword(command.getKeyword());
+            solrCommand.setTitle(command.getTitle());
+            solrCommand.setSubTitle(command.getSubTitle());
+            solrCommand.setSketch(command.getSketch());
+            solrCommand.setDescription(command.getDescription());
+            solrCommand.setShopName(command.getShopName());
+            solrCommand.setIndustryName(command.getIndustryName());
+            solrCommand.setStyle(command.getStyle());
+            solrCommand.setGroupStyle(command.getGroupStyle());
+            solrCommand.setSort_no(command.getSort_no());
+            solrCommand.setDefault_sort(command.getDefault_sort());
+            solrCommand.setList_price(command.getList_price());
+            solrCommand.setSale_price(command.getSale_price());
+            solrCommand.setModifyTime(command.getModifyTime());
+            solrCommand.setListTime(command.getListTime());
+            solrCommand.setActiveBeginTime(command.getActiveBeginTime());
+            solrCommand.setSalesCount(command.getSalesCount());
+            solrCommand.setRankavg(command.getRankavg());
+            solrCommand.setItemCount(command.getItemCount());
+            solrCommand.setViewCount(command.getViewCount());
+            solrCommand.setFavoredCount(command.getFavoredCount());
+            solrCommand.setSeoKeywords(command.getSeoKeywords());
+            solrCommand.setSeoDescription(command.getSeoDescription());
+            solrCommand.setSeoTitle(command.getSeoTitle());
+            solrCommand.setImageUrl(command.getImageUrl());
+            solrCommand.setItemIsDisplay(command.getItemIsDisplay());
+            solrCommand.setDynamicNameForSearchMap(command.getDynamicNameForSearchMap());
+            solrCommand.setDynamicForSearchMap(command.getDynamicForSearchMap());
+            solrCommand.setDynamicNameWithoutSearchMap(command.getDynamicNameWithoutSearchMap());
+            solrCommand.setDynamicWithoutSearchMap(command.getDynamicWithoutSearchMap());
+            solrCommand.setDynamicForCustomerMap(command.getDynamicForCustomerMap());
+            solrCommand.setCategoryOrder(command.getCategoryOrder());
+            solrCommand.setCategoryParent(command.getCategoryParent());
+            solrCommand.setCategoryName(command.getCategoryName());
+            solrCommand.setCategoryCode(command.getCategoryCode());
+            solrCommand.setAllCategoryCodes(command.getAllCategoryCodes());
+            solrCommand.setAllCategoryIds(command.getAllCategoryIds());
+            solrCommand.setCategoryTree(command.getCategoryTree());
+            solrCommand.setNavigationTree(command.getNavigationTree());
+            
+            solrCommand.setPinyinAllList_A(command.getPinyinAllList_A());
+            solrCommand.setPinyinAllList_B(command.getPinyinAllList_B());
+            solrCommand.setChannels(command.getChannels());
+            
+            datas.add(solrCommand);
         }
         return datas;
     }

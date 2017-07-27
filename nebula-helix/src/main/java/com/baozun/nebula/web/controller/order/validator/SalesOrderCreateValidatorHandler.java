@@ -16,39 +16,46 @@
  */
 package com.baozun.nebula.web.controller.order.validator;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
+import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 
 /**
  * 购物车和优惠券促销验证的扩展器.
- * 
+ *
  * @author daibowen
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.18
  */
 public interface SalesOrderCreateValidatorHandler{
 
     /**
-     * 执行 {@link com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand,String)}渲染之前.
-     *
-     * <p>
-     * 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
-     * </p>
+     * 执行 {@link SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand, OrderForm, HttpServletRequest)}渲染之前.
      * 
-     * @param ShoppingCartCommand
-     * @param SalesOrderResult
+     * @param checkStatusShoppingCartCommand
+     *            选中行的购物车
+     * @param orderForm
+     *            提交的订单表单信息
+     * @param request
+     *            the request
+     * @return 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
+     * @since 5.3.2.22 change method params
      */
-    SalesOrderResult preHandle(ShoppingCartCommand shoppingCartCommand,String couponCode);
+    SalesOrderResult preHandle(ShoppingCartCommand checkStatusShoppingCartCommand,OrderForm orderForm,HttpServletRequest request);
 
     /**
+     * 执行 {@link SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand, OrderForm, HttpServletRequest)}渲染之后.
      * 
-     * 执行 {@link com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidatorImpl#validate(ShoppingCartCommand,String)}渲染之后.
-     * 
-     * <p>
-     * 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
-     * </p>
-     * 
-     * @param ShoppingCartCommand
-     * @param SalesOrderResult
+     * @param checkStatusShoppingCartCommand
+     *            选中行的购物车
+     * @param orderForm
+     *            提交的订单表单信息
+     * @param request
+     *            the request
+     * @return 如果没有什么需要特殊处理的,实现需要返回SalesOrderResult.SUCCESS
+     * @since 5.3.2.22 change method params
      */
-    SalesOrderResult postHandle(ShoppingCartCommand shoppingCartCommand,String couponCode);
+    SalesOrderResult postHandle(ShoppingCartCommand checkStatusShoppingCartCommand,OrderForm orderForm,HttpServletRequest request);
 }

@@ -21,7 +21,7 @@ import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
 /**
- * 
+ * PayInfoLog 的业务.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午4:07:32
@@ -30,5 +30,25 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 public interface SdkPayInfoLogManager extends BaseManager{
 
     void savePayInfoLogOfPayMain(String subOrdinate,SalesOrderCommand salesOrderCommand,PayInfo payInfo);
+
+    /**
+     * 更新未支付的payInfoLog信息支付方式.
+     * 
+     * @param id
+     *            the order id
+     * @param payType
+     *            the pay type
+     * @param payInfo
+     *            the pay info
+     * @param thirdPayType
+     *            the third pay type
+     * @return the integer
+     * @since 5.3.2.22
+     */
+    void updateNoPayPayInfoLogPayTypeById(//
+                    Long id,
+                    Integer payType,
+                    String payInfo,
+                    Integer thirdPayType);
 
 }

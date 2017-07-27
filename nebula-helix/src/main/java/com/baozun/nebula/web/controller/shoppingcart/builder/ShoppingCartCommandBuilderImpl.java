@@ -103,11 +103,12 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, key, request);
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
-        //---------------------------------------------------------------
+        //-----取选中状态的购物车行-------------------------------------------------------
         List<ShoppingCartLineCommand> shoppingCartLineCommandListWithCheckStatus = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
         Validate.notEmpty(shoppingCartLineCommandListWithCheckStatus, "shoppingCartLineCommandList [is not] null/empty,but checkStatus shoppingCartLineCommandList is null/empty");
 
         //--------------------------------since 5.3.2.20-------------------------------------
+        //校验被选中状态的购物车行.
         ShoppingcartBatchResult shoppingcartBatchResult = checkStatusShoppingCartLineListValidator.validate(memberDetails, shoppingCartLineCommandListWithCheckStatus, ShoppingcartBatchOptions.DEFAULT);
         Validate.notNull(shoppingcartBatchResult, "shoppingcartBatchResult can't be null!");
 

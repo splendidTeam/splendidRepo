@@ -19,6 +19,7 @@ package com.baozun.nebula.web.controller.shoppingcart.validator;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAIN_LINE_MAX_THAN_COUNT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
+import static com.feilong.core.Validator.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.LinkedHashMap;
@@ -39,8 +40,6 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartBatchO
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartBatchResult;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
-
-import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
  * 
@@ -121,8 +120,7 @@ public class DefaultCheckStatusShoppingCartLineListValidator extends AbstractSho
         //如果有,那么这一行累计数量进行校验; 如果没有那么仅仅校验传入的数量
         Integer oneLineTotalCount = shoppingCartLineCommand.getQuantity();
 
-        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
-        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, skuId, oneLineTotalCount)){
+        if (shoppingcartOneLineMaxQuantityValidator.isGreaterThanMaxQuantity(memberDetails, skuId, oneLineTotalCount)){
             return ONE_LINE_MAX_THAN_COUNT;
         }
 

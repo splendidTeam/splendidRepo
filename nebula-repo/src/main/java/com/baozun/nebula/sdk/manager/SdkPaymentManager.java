@@ -102,6 +102,10 @@ public interface SdkPaymentManager extends BaseManager{
      * 
      * @param paraMap
      * @return
+     * @deprecated pls use {@link com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager#findPayInfoLogListByQueryMap(Map)} ,实现和原来完全一样
+     *             <br>
+     *             since 5.3.2.22
      */
+    @Deprecated
     List<PayInfoLog> findPayInfoLogListByQueryMap(Map<String, Object> paraMap);
 }

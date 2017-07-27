@@ -19,6 +19,7 @@ package com.baozun.nebula.web.controller.shoppingcart.validator.add;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAIN_LINE_MAX_THAN_COUNT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
+import static com.feilong.core.util.CollectionsUtil.select;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.List;
@@ -42,10 +43,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.AbstractShoppingc
 import com.baozun.nebula.web.controller.shoppingcart.validator.DefaultShoppingcartTotalLineMaxSizeValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLinePackageInfoFormListValidator;
-import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartOneLineMaxQuantityValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartTotalLineMaxSizeValidator;
-
-import static com.feilong.core.util.CollectionsUtil.select;
 
 /**
  * The Class DefaultShoppingcartLineAddValidator.
@@ -84,6 +82,7 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     /**  */
     @Autowired
     private ShoppingcartAddDetermineSameLineElementsBuilder shoppingcartAddDetermineSameLineElementsBuilder;
+    
 
     //---------------------------------------------------------------------
 
@@ -145,8 +144,7 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
         //如果有,那么这一行累计数量进行校验; 如果没有那么仅仅校验传入的数量
         Integer oneLineTotalCount = null != toBeOperatedShoppingCartLineCommand ? toBeOperatedShoppingCartLineCommand.getQuantity() + count : count;
 
-        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
-        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, skuId, oneLineTotalCount)){
+        if (shoppingcartOneLineMaxQuantityValidator.isGreaterThanMaxQuantity(memberDetails, skuId, oneLineTotalCount)){
             return ONE_LINE_MAX_THAN_COUNT;
         }
 

@@ -20,6 +20,8 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+import static com.feilong.core.util.CollectionsUtil.collect;
+import static com.feilong.core.util.CollectionsUtil.find;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.List;
@@ -44,11 +46,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
 import com.baozun.nebula.web.controller.shoppingcart.validator.AbstractShoppingcartLineOperateValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLinePackageInfoFormListValidator;
-import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartOneLineMaxQuantityValidator;
 import com.feilong.tools.jsonlib.JsonUtil;
-
-import static com.feilong.core.util.CollectionsUtil.collect;
-import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
  * 默认实现.
@@ -131,8 +129,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
         //---------------------------------------------------------------------------------------
 
         //2.3 单行最大数量 校验
-        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
-        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, count)){
+        if (shoppingcartOneLineMaxQuantityValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, count)){
             return ONE_LINE_MAX_THAN_COUNT;
         }
 
@@ -155,7 +152,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
             //---------------------------------------------------------------
             int totalQuantity = needCombinedShoppingCartLineCommand.getQuantity() + count;
             //校验单行库存
-            if (shoppingcartLineUpdateValidatorConfig.getIsCheckSingleLineSkuInventory() && useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, totalQuantity)){
+            if (shoppingcartLineUpdateValidatorConfig.getIsCheckSingleLineSkuInventory() && shoppingcartOneLineMaxQuantityValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, totalQuantity)){
                 return ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
             }
 

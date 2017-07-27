@@ -19,6 +19,7 @@ package com.baozun.nebula.sdk.manager.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,8 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
         Map<String, Integer> extentionCodeAndCountMap = buildExtentionCodeAndCountMap(shoppingCartLineCommandList);
-        deductSkuInventory(extentionCodeAndCountMap);
+        //扣减库存调整为有序扣减，避免死锁  added by D.C 2017/7/24
+        deductSkuInventory(new TreeMap<String, Integer>(extentionCodeAndCountMap));
     }
 
     /*

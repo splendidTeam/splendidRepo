@@ -16,15 +16,11 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
-import java.util.Set;
-
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
-import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 
 /**
- * 提取出来,专注于创建订单.
+ * 提取出来,专注于查询订单.
  * 
  * <h3>说点题外话:</h3>
  * 
@@ -47,51 +43,26 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
  * </blockquote>
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @version 5.3.1 2016年5月14日 下午7:01:38
- * @since 5.3.1
+ * @since 5.3.2.22
  */
-public interface SdkOrderCreateManager extends BaseManager{
+public interface SdkOrderQueryManager extends BaseManager{
 
     /**
-     * 通过商品清单下订单.
+     * 根据交易流水号查询订单信息.
      * 
      * <p>
-     * 创建订单的核心思想是 ,某某人 要买什么什么东西, 收货地址 支付方式 等等是什么
+     * 敏感信息解密处理
      * </p>
      *
-     * @param checkStatusShoppingCartCommand
-     *            选中的购物车行信息
-     * @param salesOrderCommand
-     *            the sales order command
-     * @param memCombos
-     *            the mem combos
-     * @return the string
-     */
-    //TODO 参数支持memberId 不支持memCombos
-    String saveOrder(ShoppingCartCommand checkStatusShoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos,SalesOrderCreateOptions salesOrderCreateOptions);
-
-    //-------------------------------------------------------------------------------------------------------------------------
-    /**
+     * @param subOrdinate
+     *            the sub ordinate
+     * @param paySuccessStatus
+     *            true表示支付成功
+     * @return 如果 <code>subOrdinate</code> 是null,抛出 {@link NullPointerException}<br>
+     *         如果 <code>subOrdinate</code> 是blank,抛出 {@link IllegalArgumentException}<br>
+     *         如果 <code>subOrdinate 和 paySuccessStatus</code> 是查询不到PayInfoLog list,抛出异常<br>
      * 
-     * @param shoppingCartCommand
-     * @param salesOrderCommand
-     * @param memCombos
-     * @return
-     * @deprecated 没有被调用
      */
-    @Deprecated
-    String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos);
+    SalesOrderCommand findSalesOrderCommandBySubOrdinate(String subOrdinate,boolean paySuccessStatus);
 
-    /**
-     * 手工下订单.
-     *
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @param salesOrderCommand
-     *            the sales order command
-     * @return the string
-     * @deprecated 感觉应该可以和 {@link #saveOrder(ShoppingCartCommand, SalesOrderCommand, Set)}进行某种合并,暂时时间关系不动
-     */
-    @Deprecated
-    String saveManualOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,SalesOrderCreateOptions salesOrderCreateOptions);
 }

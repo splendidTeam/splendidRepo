@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.GuestShoppingcartResolver;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.MemberShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 
 /**
@@ -29,6 +31,8 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolv
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月22日 下午2:51:08
+ * @see GuestShoppingcartResolver
+ * @see MemberShoppingcartResolver
  * @since 5.3.1
  */
 public interface ShoppingcartFactory{
@@ -38,18 +42,19 @@ public interface ShoppingcartFactory{
      *
      * @param memberDetails
      *            the member details
-     * @return the shoppingcart resolver
+     * @return 如果 null== memberDetails,返回 {@link GuestShoppingcartResolver}; 否则返回 {@link MemberShoppingcartResolver}
      */
     ShoppingcartResolver getShoppingcartResolver(MemberDetails memberDetails);
 
     /**
-     * 获得 shopping cart line command list.
+     * 获得购物车行list.
      *
      * @param memberDetails
      *            the member details
      * @param request
      *            the request
-     * @return the shopping cart line command list
+     * @return 如果 null== memberDetails,将从 {@link GuestShoppingcartResolver}中取; 否则从 {@link MemberShoppingcartResolver}取
+     * @see #getShoppingcartResolver(MemberDetails)
      */
     List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request);
 
@@ -63,7 +68,10 @@ public interface ShoppingcartFactory{
      *            如果key不是null或者empty,那么表示是立即购买途径
      * @param request
      *            the request
-     * @return the shopping cart line command list
+     * @return 如果key是null 或者 empty,那么就直接调用 {@link #getShoppingCartLineCommandList(MemberDetails, HttpServletRequest)}<br>
+     *         如果key不是null或者empty,那么表示是立即购买途径,从寄存器中获取
+     * @see #getShoppingCartLineCommandList(MemberDetails, HttpServletRequest)
+     * @see #getShoppingcartResolver(MemberDetails)
      */
     List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,String key,HttpServletRequest request);
 }

@@ -14,11 +14,12 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.impl;
+package com.baozun.nebula.sdk.manager.payment;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPayInfoManager;
+import com.baozun.nebula.sdk.utils.ManagerValidate;
 
 /**
  * The Class SdkPayInfoManagerImpl.
@@ -47,7 +49,7 @@ public class SdkPayInfoManagerImpl implements SdkPayInfoManager{
 
     /** The pay info dao. */
     @Autowired
-    private PayInfoDao          payInfoDao;
+    private PayInfoDao payInfoDao;
 
     /*
      * (non-Javadoc)
@@ -94,5 +96,21 @@ public class SdkPayInfoManagerImpl implements SdkPayInfoManager{
         // 付款时间
         payInfo.setModifyTime(new Date());
         return payInfoDao.save(payInfo);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkPayInfoManager#updateNoPayPayTypeByOrderId(java.lang.Long, java.lang.Integer, java.lang.String)
+     */
+    @Override
+    public void updateNoPayPayTypeByOrderId(Long id,Integer payType,String payInfo){
+        Validate.notNull(id, "id can't be null!");
+        Validate.notNull(payType, "payType can't be null!");
+        Validate.notBlank(payInfo, "payInfo can't be blank!");
+
+        Integer result = payInfoDao.updateNoPayPayTypeByOrderId(id, payType, payInfo);
+
+        ManagerValidate.isExpectedResult(1, result, "updateNoPayPayTypeByOrderId,id:[{}],payType:[{}],payInfo:[{}]", id, payType, payInfo);
     }
 }

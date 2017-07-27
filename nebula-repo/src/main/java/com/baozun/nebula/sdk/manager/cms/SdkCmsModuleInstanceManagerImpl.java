@@ -431,18 +431,21 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 	}
 	
 	@Override
+	@Transactional(readOnly=true)
 	public void loadModuleMap() {
+		
+		Map<String,CmsTemplateHtml> swapModuleMap = new HashMap<String,CmsTemplateHtml>(moduleMap.size());
 		/**
 		 * 1、获取所有的发布的模块
 		 * 2、将发布模块的版本放入到缓存中
-		 * 3、清空发布模块的缓存
+		 * 3、清空发布模块的缓存  !!!!!不能清空!!!!  added by D.C 2017/7/22
 		 * 4、将当前发布模块的内容放入到缓存中
 		 */
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("isPublished", true);
 		List<CmsModuleInstance> moduleList= cmsModuleInstanceDao.findEffectCmsModuleInstanceListByQueryMap(param);
 		Map<String, Object> moduleparam = new HashMap<String, Object>();
-		moduleMap.clear();
+		//moduleMap.clear(); 老的数据不能清空，清空后会造成短时的访问空白
 		sdkCmsModuleInstanceVersionManager.setPublicModuleVersionCacheInfo();
 		for(CmsModuleInstance module:moduleList){
 			String moduleCode = module.getCode();
@@ -451,17 +454,18 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 			moduleparam.put("moduleCode", moduleCode);
 			List<CmsTemplateHtml> publisingTemplate = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlListByQueryMap(moduleparam);
 			if(Validator.isNotNullOrEmpty(publisingTemplate) && publisingTemplate.size() == 1){
-				moduleMap.put(moduleCode,publisingTemplate.get(0)); 
+				swapModuleMap.put(moduleCode,publisingTemplate.get(0)); 
 			}else{
 				HashMap<String, Object> baseParam = new HashMap<String, Object>();
 				baseParam.put("moduleCode", moduleCode);
 				baseParam.put("versionId", -1);
 				publisingTemplate = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlListByQueryMap(baseParam);
 				if(Validator.isNotNullOrEmpty(publisingTemplate) && publisingTemplate.size() == 1){
-					moduleMap.put(moduleCode,publisingTemplate.get(0)); 
+					swapModuleMap.put(moduleCode,publisingTemplate.get(0)); 
 				}
 			}
 		}
+		moduleMap = swapModuleMap;
 	}
 	
 	@Override

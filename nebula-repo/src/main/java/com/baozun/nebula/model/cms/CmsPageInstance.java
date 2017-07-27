@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -127,6 +128,7 @@ public class CmsPageInstance extends BaseModel {
 	}
 
 	@Column(name = "CODE")
+    @Index(name = "IDX_CMS_PAGE_INSTANCE_CODE")
 	public String getCode() {
 		return code;
 	}

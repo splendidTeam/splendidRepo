@@ -14,26 +14,24 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.validator;
+package com.baozun.nebula.payment.manager;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
 
 /**
- * 所有购物车操作的base 校验.
+ * 支付成功的业务.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
+ * @since 5.3.2.22
  */
-public abstract class AbstractShoppingcartLineOperateValidator{
+public interface PaymentResultSuccessUpdateManager{
 
-    /** The shoppingcart one line max quantity validator. */
-    @Autowired
-    protected ShoppingcartOneLineMaxQuantityValidator shoppingcartOneLineMaxQuantityValidator;
-
-    /** 购物车 sku 库存校验. */
-    @Autowired
-    protected ShoppingCartInventoryValidator shoppingCartInventoryValidator;
-
-    //---------------------------------------------------------------------
-
+    /**
+     * 更改订单和支付详细信息
+     * 
+     * @param paymentStatusInformation
+     * @param payType
+     */
+    void updateSuccess(PaymentServiceReturnCommand paymentStatusInformation,Integer payType);
 
 }

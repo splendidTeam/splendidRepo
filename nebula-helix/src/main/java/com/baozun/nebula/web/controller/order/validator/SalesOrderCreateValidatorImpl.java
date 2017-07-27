@@ -23,6 +23,8 @@ import static com.baozun.nebula.web.controller.order.resolver.SalesOrderResult.S
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,9 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
+import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
+import com.baozun.nebula.web.controller.order.resolver.SalesOrderResultUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.Validator.isNullOrEmpty;
@@ -56,12 +60,11 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidator#validate(com.baozun.nebula.sdk.command.shoppingcart.
-     * ShoppingCartCommand, java.lang.String)
+     * @see com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidator#validate(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand, com.baozun.nebula.web.controller.order.form.OrderForm, javax.servlet.http.HttpServletRequest)
      */
     @Override
-    public SalesOrderResult validate(ShoppingCartCommand shoppingCartCommand,String couponCode){
-        if (isNullOrEmpty(shoppingCartCommand) || isNullOrEmpty(shoppingCartCommand.getShoppingCartLineCommands())){// 購物車不能為空
+    public SalesOrderResult validate(ShoppingCartCommand checkStatusShoppingCartCommand,OrderForm orderForm,HttpServletRequest request){
+        if (isNullOrEmpty(checkStatusShoppingCartCommand) || isNullOrEmpty(checkStatusShoppingCartCommand.getShoppingCartLineCommands())){// 購物車不能為空
             return ORDER_SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
@@ -70,7 +73,7 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
         if (null != salesOrderCreateValidatorHandler){
             LOGGER.debug("salesOrderCreateValidatorHandler:[{}] is not null,will call [preHandle] method.", salesOrderCreateValidatorHandler.getClass().getName());
 
-            SalesOrderResult salesOrderResult = salesOrderCreateValidatorHandler.preHandle(shoppingCartCommand, couponCode);
+            SalesOrderResult salesOrderResult = salesOrderCreateValidatorHandler.preHandle(checkStatusShoppingCartCommand, orderForm, request);
 
             if (SUCCESS != salesOrderResult){ //如果preHandle()方法返回值不是SalesOrderResult.SUCCESS则直接返回
                 LOGGER.debug("[{}] call [preHandle] method,not SUCCESS,return :[{}].", salesOrderCreateValidatorHandler.getClass().getName(), salesOrderResult);
@@ -79,25 +82,16 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
         }
 
         //-------------------------------------------------------------------------
-
-        //** 如果输入了优惠券则要进行优惠券验证
-        if (isNotNullOrEmpty(couponCode)){
-            LOGGER.debug("will check couponCode:[{}]", couponCode);
-
-            //** 校驗优惠券促销 
-            SalesOrderResult salesOrderResult = checkCoupon(shoppingCartCommand, couponCode);
-            if (SUCCESS != salesOrderResult){
-                LOGGER.debug("check couponCode:[{}] result is :[{}],return this result", couponCode, salesOrderResult);
-                return salesOrderResult;
-            }
+        SalesOrderResult salesOrderResult = validateCouponInfo(checkStatusShoppingCartCommand, orderForm);
+        if (SalesOrderResultUtil.isNotSuccess(salesOrderResult)){
+            return salesOrderResult;
         }
-
         //-------------------------------------------------------------------------
 
         if (null != salesOrderCreateValidatorHandler){
             LOGGER.debug("salesOrderCreateValidatorHandler:[{}] is not null,will call [postHandle] method.", salesOrderCreateValidatorHandler.getClass().getName());
 
-            SalesOrderResult salesOrderResult = salesOrderCreateValidatorHandler.postHandle(shoppingCartCommand, couponCode);
+            salesOrderResult = salesOrderCreateValidatorHandler.postHandle(checkStatusShoppingCartCommand, orderForm, request);
 
             if (SUCCESS != salesOrderResult){//如果postHandle()方法返回值不是SalesOrderResult.SUCCESS则直接返回
                 LOGGER.debug("[{}] call [postHandle] method,not SUCCESS,return :[{}].", salesOrderCreateValidatorHandler.getClass().getName(), salesOrderResult);
@@ -107,6 +101,27 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
 
         //---------------------------------------------------------------
         return SUCCESS;
+    }
+
+    /**
+     * @param checkStatusShoppingCartCommand
+     * @param orderForm
+     * @since 5.3.2.22
+     */
+    private SalesOrderResult validateCouponInfo(ShoppingCartCommand checkStatusShoppingCartCommand,OrderForm orderForm){
+        String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
+        //** 如果输入了优惠券则要进行优惠券验证
+        if (isNotNullOrEmpty(couponCode)){
+            LOGGER.debug("will check couponCode:[{}]", couponCode);
+
+            //** 校驗优惠券促销 
+            SalesOrderResult salesOrderResult = checkCoupon(checkStatusShoppingCartCommand, couponCode);
+            if (SUCCESS != salesOrderResult){
+                LOGGER.debug("check couponCode:[{}] result is :[{}],return this result", couponCode, salesOrderResult);
+                return salesOrderResult;
+            }
+        }
+        return SalesOrderResult.SUCCESS;
     }
 
     /**
@@ -185,4 +200,5 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
         }
         return null;
     }
+
 }

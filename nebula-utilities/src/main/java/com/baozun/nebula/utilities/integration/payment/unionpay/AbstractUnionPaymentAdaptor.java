@@ -27,13 +27,12 @@ import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.PaymentUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
+import com.feilong.tools.slf4j.Slf4jUtil;
 import com.unionpay.acp.sdk.AcpService;
 import com.unionpay.acp.sdk.SDKConfig;
 import com.unionpay.acp.sdk.SDKConstants;
-import com.unionpay.acp.sdk.UnionPayBase;
 
 import static com.feilong.core.util.SortUtil.sortMapByKeyAsc;
-import static com.feilong.core.util.SortUtil.sortMapByKeyDesc;
 
 public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
 
@@ -86,7 +85,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
         Map<String, String> submitFromData = AcpService.sign(map, SDKConstants.UTF_8_ENCODING);
         // 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("submitFromData：{}", JsonUtil.format(sortMapByKeyDesc(submitFromData)));
+            LOGGER.debug("submitFromData：{}", JsonUtil.format(sortMapByKeyAsc(submitFromData)));
         }
 
         String requestFrontUrl = SDKConfig.getConfig().getFrontRequestUrl(); // 获取请求银联的前台地址：对应属性文件acp_sdk.properties文件中的acpsdk.frontTransUrl
@@ -521,7 +520,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
 
     @Override
     public boolean isSupportClosePaymentRequest(){
-        return true;
+        return false;
     }
 
     /**
@@ -541,58 +540,11 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
      */
     @Override
     public PaymentResult closePaymentRequest(Map<String, String> addition){
-        PaymentResult result = new PaymentResult();
 
-        /** 请求参数设置完毕，以下对请求参数进行签名并发送http post请求，接收同步应答报文 **/
-        Map<String, String> reqData = AcpService.sign(addition, SDKConstants.UTF_8_ENCODING);
-        // 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
-        String reqUrl = SDKConfig.getConfig().getBackRequestUrl();
-        // 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的acpsdk.backTransUrl
-
-        Map<String, String> rspData = AcpService.post(reqData, reqUrl, SDKConstants.UTF_8_ENCODING);
-        // 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
-
-        /** 对应答码的处理，请根据您的业务逻辑来编写程序,以下应答码处理逻辑仅供参考-------------> **/
-
-        // 应答码规范参考open.unionpay.com帮助中心 下载 产品接口规范 《平台接入接口规范-第5部分-附录》
-        if (!rspData.isEmpty()){
-            if (AcpService.validate(rspData, SDKConstants.UTF_8_ENCODING)){
-                LOGGER.info("验证签名成功");
-                String respCode = rspData.get("respCode");
-                if ("00".equals(respCode)){
-                    // 交易已受理(不代表交易已成功），等待接收后台通知确定交易成功，也可以主动发起 查询交易确定交易状态。
-                    System.out.println("respCode = 00");
-                    result.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
-                    result.setMessage(SUCCESS);
-                }else if ("03".equals(respCode) || "04".equals(respCode) || "05".equals(respCode)){
-                    // 后续需发起交易状态查询交易确定交易状态。
-                    result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-                    result.setMessage(OTHERSTATUS);
-                }else{
-                    // 其他应答码为失败请排查原因
-                    result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-                    result.setMessage(OTHERSTATUS);
-                }
-            }else{
-                LOGGER.error("验证签名失败");
-                // TODO 检查验证签名失败的原因
-                result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-                result.setMessage(OTHERSTATUS);
-            }
-        }else{
-            // 未返回正确的http状态
-            LOGGER.error("未获取到返回报文或返回http状态码非200");
-            result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-            result.setMessage("HTTP Status Code is not 200 !");
-        }
-        String reqMessage = UnionPayBase.genHtmlResult(reqData);
-        String rspMessage = UnionPayBase.genHtmlResult(rspData);
-        LOGGER.warn("</br>请求报文:<br/>" + reqMessage + "<br/>" + "应答报文:</br>" + rspMessage + "");
-
-        PaymentServiceReturnCommand paymentServiceReturnCommand = new PaymentServiceReturnCommand();
-        paymentServiceReturnCommand.setOrderNo(rspData.get("orderId"));
-        result.setPaymentStatusInformation(paymentServiceReturnCommand);
-        return result;
+        //银联支付 关闭交易需要传递银联的交易流水号, 但是我们未支付的交易可能没有
+        // 所以暂时定义为不支持
+        String messagePattern = "{} not support!";
+        throw new UnsupportedOperationException(Slf4jUtil.format(messagePattern, addition));
     }
 
 }

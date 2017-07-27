@@ -16,15 +16,10 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
-import java.util.Set;
-
 import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.sdk.command.SalesOrderCommand;
-import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 
 /**
- * 提取出来,专注于创建订单.
+ * 提取出来,专注于修改订单.
  * 
  * <h3>说点题外话:</h3>
  * 
@@ -47,51 +42,30 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
  * </blockquote>
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @version 5.3.1 2016年5月14日 下午7:01:38
- * @since 5.3.1
+ * @since 5.3.2.22
  */
-public interface SdkOrderCreateManager extends BaseManager{
+public interface SdkOrderUpdateManager extends BaseManager{
 
     /**
-     * 通过商品清单下订单.
+     * 根据订单号,修改订单的支付方式.
      * 
-     * <p>
-     * 创建订单的核心思想是 ,某某人 要买什么什么东西, 收货地址 支付方式 等等是什么
-     * </p>
-     *
-     * @param checkStatusShoppingCartCommand
-     *            选中的购物车行信息
-     * @param salesOrderCommand
-     *            the sales order command
-     * @param memCombos
-     *            the mem combos
-     * @return the string
-     */
-    //TODO 参数支持memberId 不支持memCombos
-    String saveOrder(ShoppingCartCommand checkStatusShoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos,SalesOrderCreateOptions salesOrderCreateOptions);
-
-    //-------------------------------------------------------------------------------------------------------------------------
-    /**
-     * 
-     * @param shoppingCartCommand
-     * @param salesOrderCommand
-     * @param memCombos
+     * @param code
+     *            订单号
+     * @param payment
+     *            支付类型
      * @return
-     * @deprecated 没有被调用
      */
-    @Deprecated
-    String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos);
+    void updatePaymentTypeByOrderCode(String code,Integer payment);
 
     /**
-     * 手工下订单.
-     *
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @param salesOrderCommand
-     *            the sales order command
-     * @return the string
-     * @deprecated 感觉应该可以和 {@link #saveOrder(ShoppingCartCommand, SalesOrderCommand, Set)}进行某种合并,暂时时间关系不动
+     * 根据订单id,修改订单的支付方式.
+     * 
+     * @param id
+     *            订单id
+     * @param payment
+     *            支付方式
+     * @return
      */
-    @Deprecated
-    String saveManualOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,SalesOrderCreateOptions salesOrderCreateOptions);
+    void updatePaymentTypeByOrderId(Long id,Integer payment);
+
 }

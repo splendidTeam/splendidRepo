@@ -16,8 +16,12 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.constants.Constants;
+import com.baozun.nebula.web.controller.shoppingcart.builder.DefaultShoppingcartOneLineMaxQuantityBuilder;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartOneLineMaxQuantityBuilder;
 
 /**
  * 默认实现.
@@ -25,7 +29,11 @@ import com.baozun.nebula.web.constants.Constants;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1.9
  */
+@Component("shoppingcartOneLineMaxQuantityValidator")
 public class DefaultShoppingcartOneLineMaxQuantityValidator implements ShoppingcartOneLineMaxQuantityValidator{
+
+    @Autowired(required = false)
+    private ShoppingcartOneLineMaxQuantityBuilder shoppingcartOneLineMaxQuantityBuilder = new DefaultShoppingcartOneLineMaxQuantityBuilder();
 
     /*
      * (non-Javadoc)
@@ -34,6 +42,9 @@ public class DefaultShoppingcartOneLineMaxQuantityValidator implements Shoppingc
      */
     @Override
     public boolean isGreaterThanMaxQuantity(MemberDetails memberDetails,Long skuId,Integer totalCount){
-        return totalCount > Constants.SHOPPING_CART_SKU_ONE_LINE_COUNT;
+        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+
+        return totalCount > shoppingcartOneLineMaxQuantityBuilder.build(memberId, skuId);
     }
+
 }

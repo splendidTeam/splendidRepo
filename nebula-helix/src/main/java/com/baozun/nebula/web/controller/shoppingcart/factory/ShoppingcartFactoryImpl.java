@@ -29,11 +29,12 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.feilong.accessor.AutoKeyAccessor;
-import com.feilong.core.Validator;
 import com.feilong.core.bean.BeanUtil;
 
+import static com.feilong.core.Validator.isNullOrEmpty;
+
 /**
- * The Class ShoppingcartFactoryImpl.
+ * 购物车工厂的实现.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月22日 下午2:52:34
@@ -55,7 +56,9 @@ public class ShoppingcartFactoryImpl implements ShoppingcartFactory{
     /** The auto key accessor. */
     @Autowired
     @Qualifier("immediatelyBuyAutoKeyAccessor")
-    protected AutoKeyAccessor    autoKeyAccessor;
+    protected AutoKeyAccessor autoKeyAccessor;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -76,7 +79,8 @@ public class ShoppingcartFactoryImpl implements ShoppingcartFactory{
      */
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request){
-        return getShoppingcartResolver(memberDetails).getShoppingCartLineCommandList(memberDetails, request);
+        ShoppingcartResolver shoppingcartResolver = getShoppingcartResolver(memberDetails);
+        return shoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
     }
 
     /*
@@ -89,7 +93,7 @@ public class ShoppingcartFactoryImpl implements ShoppingcartFactory{
 
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,String key,HttpServletRequest request){
-        return Validator.isNullOrEmpty(key) ? getShoppingCartLineCommandList(memberDetails, request) : getFromAccessor(key, request);
+        return isNullOrEmpty(key) ? getShoppingCartLineCommandList(memberDetails, request) : getFromAccessor(key, request);
     }
 
     /**

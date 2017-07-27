@@ -15,19 +15,20 @@
  */
 package com.baozun.nebula.dao.salesorder;
 
+import com.baozun.nebula.model.salesorder.SalesOrderExt;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
-
-import com.baozun.nebula.model.salesorder.SalesOrderExt;
 
 /**
  * SdkOrderExtDao 订单拓展Dao
  * 
  * @author: pengfei.fang
  * @date: 2016年02月02日
+ * @deprecated 没有使用 since 5.3.2.22
  **/
-
+@Deprecated
 public interface SdkOrderExtDao extends GenericEntityDao<SalesOrderExt, Long>{
 
 	/**
