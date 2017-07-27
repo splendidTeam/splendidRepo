@@ -24,7 +24,9 @@ package com.baozun.nebula.web.controller.shoppingcart.builder;
 public interface ShoppingcartOneLineMaxQuantityBuilder{
     /**
      * 构建单行可购买最大值
-     * @param Long memberId,Long skuId
+     * 
+     * @param memberId 此处参数不使用MemberDetails的原因是因为在同步游客和会员购物车进行合并时传入参数限制，故此处参数使用memberID
+     * @param skuId
      * @return
      */
     int build(Long memberId,Long skuId);

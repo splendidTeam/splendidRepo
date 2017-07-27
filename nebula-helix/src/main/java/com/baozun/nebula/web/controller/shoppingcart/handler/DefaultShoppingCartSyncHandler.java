@@ -146,8 +146,11 @@ public class DefaultShoppingCartSyncHandler implements ShoppingCartSyncHandler{
         int totalQuantity = cartLineInDb.getQuantity() + quantity;
         //获取单行可购买的最大值
         int maxQuantity = shoppingcartOneLineMaxQuantityBuilder.build(memberId, cartLineInDb.getSkuId());
-        //如果合并后数量大于设置的单行可购买的最大值则取单行可购买的最大值
-        return totalQuantity > maxQuantity ? maxQuantity : totalQuantity;
+        //如果合并后数量大于设置的单行可购买的最大值则取单行可购买的最大值 
+        //此处使用了Math.min()函数 取两者间最小值  假如购买量为5 默认量为8 取最小 则取5 满足要求
+        //购买量为10 默认量为8 取最小 则取8 满足要求
+        //购买量为8 默认量为8 取最小 则取8 满足要求
+        return Math.min(totalQuantity, maxQuantity);
     }
 
 }
