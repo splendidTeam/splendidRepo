@@ -25,7 +25,7 @@ import com.baozun.nebula.web.constants.Constants;
 public class DefaultShoppingcartOneLineMaxQuantityBuilder implements ShoppingcartOneLineMaxQuantityBuilder{
     
     @Override
-    public Integer build(Long memberId,Long skuId){
+    public int build(Long memberId,Long skuId){
         return Constants.SHOPPING_CART_SKU_ONE_LINE_COUNT;
     }
     

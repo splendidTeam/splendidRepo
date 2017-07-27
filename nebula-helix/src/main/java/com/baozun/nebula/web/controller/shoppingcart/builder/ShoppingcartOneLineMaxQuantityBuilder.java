@@ -27,6 +27,6 @@ public interface ShoppingcartOneLineMaxQuantityBuilder{
      * @param Long memberId,Long skuId
      * @return
      */
-    Integer build(Long memberId,Long skuId);
+    int build(Long memberId,Long skuId);
 
 }

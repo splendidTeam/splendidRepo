@@ -103,12 +103,8 @@ public class DefaultShoppingCartSyncHandler implements ShoppingCartSyncHandler{
 
         ShoppingCartLineCommand cartLineInDb = findInDb(shoppingCartLineCommand, shoppingCartLineCommandListInDB);
         boolean isInDB = null != cartLineInDb;
-        //合并后单行总数量
-        Integer totalQuantity = cartLineInDb.getQuantity() + quantity;
-        //获取单行可购买的最大值
-        Integer maxQuantity = shoppingcartOneLineMaxQuantityBuilder.build(memberId, cartLineInDb.getSkuId());
-        //如果合并后数量大于设置的单行可购买的最大值则取单行可购买的最大值
-        totalQuantity = totalQuantity>maxQuantity?maxQuantity:totalQuantity;
+        //返回合并后单行商品数量
+        Integer totalQuantity = bulidTotalQuantity(memberId, quantity, cartLineInDb);
         if (isInDB){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
             sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(),totalQuantity );
         }else{
@@ -133,6 +129,24 @@ public class DefaultShoppingCartSyncHandler implements ShoppingCartSyncHandler{
                         collect(shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList(), PackageInfoElement.class, "type", "featureInfo"));
 
         return shoppingCartAddSameLineExtractor.extractor(shoppingCartLineCommandListInDB, shoppingcartAddDetermineSameLineElements);
+    }
+    
+    /**
+     * 校验合并后商品数量，如果超过设置的单行购买最大值则将商品数量修改为最大值
+     * @param memberId
+     * @param quantity
+     * @param cartLineInDb
+     * @return
+     * @since 5.3.2.22
+     */
+    private Integer bulidTotalQuantity(Long memberId,Integer quantity,ShoppingCartLineCommand cartLineInDb){
+        //合并后单行总数量
+        Integer totalQuantity = cartLineInDb.getQuantity() + quantity;
+        //获取单行可购买的最大值
+        Integer maxQuantity = shoppingcartOneLineMaxQuantityBuilder.build(memberId, cartLineInDb.getSkuId());
+        //如果合并后数量大于设置的单行可购买的最大值则取单行可购买的最大值
+        totalQuantity = totalQuantity>maxQuantity?maxQuantity:totalQuantity;
+        return totalQuantity;
     }
 
 }
