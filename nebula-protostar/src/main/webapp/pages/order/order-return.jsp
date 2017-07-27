@@ -71,12 +71,12 @@
 							<span>
 							   <select loxiatype="select" name="q_long_status" id="status" >
 							           <option value="">不限</option>
-						               <option value=0>待审核</option>
-						               <option value=1>拒绝</option>
-						               <option value=2>退回中</option>
-						               <option value=3>退回中</option>
-						               <option value=4>同意退款</option>
-						                <option value=5>已完成</option>						               
+						               <option value=1>待审核</option>
+						               <option value=2>拒绝</option>
+						               <option value=3>待退回</option>
+						               <option value=4>已退回</option>
+						               <option value=5>同意退换货</option>
+						                <option value=6>已完成</option>						               
 						               
 						        </select>
 							</span>

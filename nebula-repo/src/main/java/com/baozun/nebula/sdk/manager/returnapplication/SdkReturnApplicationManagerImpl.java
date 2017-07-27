@@ -201,14 +201,14 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
                 returnCommand.setBusinessStatus("待审核");
             }
             if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(returnCommand.getStatus())){
-                returnCommand.setBusinessStatus("拒绝退货");
+                returnCommand.setBusinessStatus("拒绝退换货");
             }
             if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(returnCommand.getStatus())){
-                returnCommand.setBusinessStatus("待发货");
+                returnCommand.setBusinessStatus("退回中");
             }
-            if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED.equals(returnCommand.getStatus())){
+            /*if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED.equals(returnCommand.getStatus())){
                 returnCommand.setBusinessStatus("已发货");
-            }
+            }*/
             if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(returnCommand.getStatus())){
                 returnCommand.setBusinessStatus("同意退换货");
             }

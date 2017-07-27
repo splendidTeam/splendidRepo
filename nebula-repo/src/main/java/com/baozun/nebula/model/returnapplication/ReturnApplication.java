@@ -78,11 +78,11 @@ public class ReturnApplication extends BaseModel{
     public static final Integer SO_RETURN_STATUS_AUDITING = 1;
     /** 拒绝退货  */
     public static final Integer SO_RETURN_STATUS_REFUS_RETURN = 2;
-    /** 待发货 （即客服审核通过） */
+    /** 退货中（即客服审核通过） */
     public static final Integer SO_RETURN_STATUS_TO_DELIVERY  = 3;
-    /** 已发货 */
+    /** 已发货 （目前该状态没用上，审核通过后的状态都为退货中，知道同意退换货）*/
     public static final Integer SO_RETURN_STATUS_DELIVERIED = 4;
-    /** 同意退款 */
+    /** 同意退换货 */
     public static final Integer SO_RETURN_STATUS_AGREE_REFUND = 5;
     /** 已完成 */
     public static final Integer SO_RETURN_STATUS_RETURN_COMPLETE = 6;
@@ -341,7 +341,7 @@ public class ReturnApplication extends BaseModel{
      */
     @Column(name = "TYPE")
     @Index(name = "IDX_SO_RETURN_APPLICATION_TYPE")
-    public int getType(){
+    public Integer getType(){
         return type;
     }
 
@@ -349,7 +349,7 @@ public class ReturnApplication extends BaseModel{
      * @param type
      *            the type to set
      */
-    public void setType(int type){
+    public void setType(Integer type){
         this.type = type;
     }
 

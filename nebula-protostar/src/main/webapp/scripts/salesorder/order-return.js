@@ -301,7 +301,7 @@ function status(data, args, idx){
 	if(status==2){
 		return nps.i18n("OPERATOR_UNRETURN");
 	}
-	if(status==4||status==3){
+	if(status==3){
 		return nps.i18n("OPERATOR_SENDED");
 	}
 	if(status==5){

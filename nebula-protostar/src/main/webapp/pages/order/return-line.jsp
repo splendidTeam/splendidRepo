@@ -59,7 +59,7 @@
 					<input type="hidden" value="${SoReturnApplication.returnApplicationCode}"
 						id="returnCode">
 					<div class="ui-block-line ui-block-line-37">
-						<label> <spring:message code="return.list.code" /></label> <label>${SoReturnApplication.omsCode }</label>
+						<label> <spring:message code="return.list.code" /></label> <label>${SoReturnApplication.returnApplicationCode}</label>
 					</div>
 					<div class="ui-block-line ui-block-line-37">
 						<label><spring:message code="return.type" /></label>
@@ -107,19 +107,22 @@
 
 					<div class="ui-block-line ui-block-line-37">
 						<label> <spring:message code="return.status" /></label> <label>
-							<c:if test="${SoReturnApplication.status == 1}">
+									<c:if test="${SoReturnApplication.status == 1}">
 							 			待审核
-							 		 </c:if> <c:if test="${SoReturnApplication.status == 2}">
+							 		 </c:if>
+							 		  <c:if test="${SoReturnApplication.status == 2}">
 							 			 拒绝退换货
-							 		 </c:if> <c:if test="${SoReturnApplication.status == 3}">
-							 			 待发货
-							 		 </c:if> <c:if test="${SoReturnApplication.status == 4}">
-							 			 已发货
-							 		 </c:if> <c:if test="${SoReturnApplication.status == 5}">
-							 			 同意退款
-							 		 </c:if> <c:if test="${SoReturnApplication.status == 6}">
+							 		 </c:if>
+							 		  <c:if test="${SoReturnApplication.status == 3}">
+							 			 退回中
+							 		 </c:if> 
+							 		 <c:if test="${SoReturnApplication.status == 5}">
+							 			 同意退换货
+							 		 </c:if> 
+							 		 <c:if test="${SoReturnApplication.status == 6}">
 							 			 已完成
-							 		 </c:if> <c:if test="${SoReturnApplication.status == 7}">
+							 		 </c:if>
+							 		  <c:if test="${SoReturnApplication.status == 7}">
 							 			 取消
 							 		 </c:if>
 						</label>
