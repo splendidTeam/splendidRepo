@@ -33,7 +33,7 @@ import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartOneLine
 public class DefaultShoppingcartOneLineMaxQuantityValidator implements ShoppingcartOneLineMaxQuantityValidator{
 
     @Autowired(required = false)
-    private ShoppingcartOneLineMaxQuantityBuilder shoppingcartOneLineMaxQuantityBuild = new DefaultShoppingcartOneLineMaxQuantityBuilder();
+    private ShoppingcartOneLineMaxQuantityBuilder shoppingcartOneLineMaxQuantityBuilder = new DefaultShoppingcartOneLineMaxQuantityBuilder();
 
     /*
      * (non-Javadoc)
@@ -42,7 +42,9 @@ public class DefaultShoppingcartOneLineMaxQuantityValidator implements Shoppingc
      */
     @Override
     public boolean isGreaterThanMaxQuantity(MemberDetails memberDetails,Long skuId,Integer totalCount){
-        return totalCount > shoppingcartOneLineMaxQuantityBuild.build(memberDetails.getMemberId(), skuId);
+        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+
+        return totalCount > shoppingcartOneLineMaxQuantityBuilder.build(memberId, skuId);
     }
 
 }
