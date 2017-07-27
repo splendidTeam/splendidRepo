@@ -14,26 +14,19 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.validator;
-
-import org.springframework.beans.factory.annotation.Autowired;
+package com.baozun.nebula.web.controller.shoppingcart.builder;
 
 /**
- * 所有购物车操作的base 校验.
- * 
- * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
+ * 单行可购买最大值构造器
+ * @author bowen.dai
+ * @since 5.3.2.22
  */
-public abstract class AbstractShoppingcartLineOperateValidator{
-
-    /** The shoppingcart one line max quantity validator. */
-    @Autowired
-    protected ShoppingcartOneLineMaxQuantityValidator shoppingcartOneLineMaxQuantityValidator;
-
-    /** 购物车 sku 库存校验. */
-    @Autowired
-    protected ShoppingCartInventoryValidator shoppingCartInventoryValidator;
-
-    //---------------------------------------------------------------------
-
+public interface ShoppingcartOneLineMaxQuantityBuilder{
+    /**
+     * 构建单行可购买最大值
+     * @param Long memberId,Long skuId
+     * @return
+     */
+    Integer build(Long memberId,Long skuId);
 
 }

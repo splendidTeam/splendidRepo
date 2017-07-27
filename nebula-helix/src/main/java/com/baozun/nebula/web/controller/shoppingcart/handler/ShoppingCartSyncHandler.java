@@ -14,11 +14,10 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.shoppingcart;
+package com.baozun.nebula.web.controller.shoppingcart.handler;
 
 import java.util.List;
 
-import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
@@ -28,7 +27,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
  * @version 5.3.1 2016年5月23日 下午6:24:48
  * @since 5.3.1
  */
-public interface SdkShoppingCartSyncManager extends BaseManager{
+public interface ShoppingCartSyncHandler{
 
     /**
      * 将指定的 购物车行 list 同步到指定的用户.
