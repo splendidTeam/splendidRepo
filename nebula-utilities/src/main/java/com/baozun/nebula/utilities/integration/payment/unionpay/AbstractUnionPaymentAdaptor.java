@@ -52,14 +52,6 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor{
 
     private static final String OTHERSTATUS = "OTHERSTATUS";
 
-    public AbstractUnionPaymentAdaptor(){
-        SDKConfig.getConfig().loadProperties(ProfileConfigUtil.findCommonPro("config/unionpay.properties"));
-    }
-
-    static{
-        SDKConfig.getConfig().loadProperties(ProfileConfigUtil.findCommonPro("config/unionpay.properties"));
-    }
-
     /**
      * 重要：联调测试时请仔细阅读注释！
      * 

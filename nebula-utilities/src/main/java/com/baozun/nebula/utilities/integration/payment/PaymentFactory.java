@@ -65,17 +65,14 @@ public class PaymentFactory{
 
     //--------------------------------------------------------------------------------------------------------------
 
+    
     public static final String ALIPAYDEFAULTALIPAYCONFIG = "config/alipay.properties";
 
     public static final String ALIPAYINTERNATIONALCREDITCARDCONFIG = "config/payment/alipay/alipay_InternationalCreditCard.properties";
 
     public static final String ALIPAYADDRESS = "config/payment/alipay/alipayAddress.properties";
 
-    /**
-     * @deprecated 目前银联配置文件格式参见 com.baozun.nebula.utilities.integration.payment.unionpay.AbstractUnionPaymentAdaptor.AbstractUnionPaymentAdaptor()
-     */
-    @Deprecated
-    public static final String UNIONPAYDEFAULTALIPAYCONFIG = "config/payment/unionpay/unionpay.properties";
+    public static final String UNIONPAYDEFAULTALIPAYCONFIG = "config/unionpay.properties";
 
     //--------------------------------------------------------------------------------------------------------------
 
@@ -271,8 +268,9 @@ public class PaymentFactory{
      * 初始化银联适配器
      */
     private PaymentAdaptor initUnionPaymentAdaptor(){
-        //不需要传配置参数, 内部已经实现了
-        return new UnionPaymentAdaptor();
+        String type = PAY_TYPE_UNIONPAY;
+        Properties properties = loadProperties(type);
+        return null == properties ? null : new UnionPaymentAdaptor(properties);
     }
 
     /*
