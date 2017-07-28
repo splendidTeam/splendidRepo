@@ -19,9 +19,7 @@ package com.baozun.nebula.web.controller.order.resolver;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,13 +32,9 @@ import com.baozun.nebula.constants.MetaInfoConstants;
 import com.baozun.nebula.manager.salesorder.SalesOrderManager;
 import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
-import com.baozun.nebula.model.salesorder.PayInfoLog;
-import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
-import com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager;
-import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
@@ -80,13 +74,6 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
     /** The sales order manager. */
     @Autowired
     private SalesOrderManager salesOrderManager;
-
-    @Autowired
-    private SdkPayInfoQueryManager sdkPayInfoQueryManager;
-
-    /** The order manager. */
-    @Autowired
-    private OrderManager orderManager;
 
     /** The sales order source resolver. */
     @Autowired(required = false)
@@ -312,19 +299,4 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         return null;
     }
 
-    /**
-     * 通過支付流水號查詢訂單.
-     *
-     * @param subOrdinate
-     *            the sub ordinate
-     * @return the sales order command
-     */
-    @Override
-    public SalesOrderCommand getSalesOrderCommand(String subOrdinate){
-        Map<String, Object> paraMap = new HashMap<String, Object>();
-        paraMap.put("subOrdinate", subOrdinate);
-        List<PayInfoLog> payInfoLogs = sdkPayInfoQueryManager.findPayInfoLogListByQueryMap(paraMap);
-
-        return orderManager.findOrderById(payInfoLogs.get(0).getOrderId(), SalesOrder.SALES_ORDER_STATUS_NEW);
-    }
 }

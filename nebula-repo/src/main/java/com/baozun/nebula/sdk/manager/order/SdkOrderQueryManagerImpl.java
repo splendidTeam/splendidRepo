@@ -17,6 +17,7 @@
 package com.baozun.nebula.sdk.manager.order;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -32,15 +33,18 @@ import com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toMap;
 
 /**
- * 
+ * The Class SdkOrderQueryManagerImpl.
+ *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.22
  */
 @Service("sdkOrderQueryManager")
 public class SdkOrderQueryManagerImpl implements SdkOrderQueryManager{
 
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SdkOrderQueryManagerImpl.class);
 
     /** The order manager. */
@@ -51,6 +55,7 @@ public class SdkOrderQueryManagerImpl implements SdkOrderQueryManager{
     @Autowired
     protected SdkPaymentManager sdkPaymentManager;
 
+    /** The sdk pay info query manager. */
     @Autowired
     private SdkPayInfoQueryManager sdkPayInfoQueryManager;
 
@@ -69,6 +74,40 @@ public class SdkOrderQueryManagerImpl implements SdkOrderQueryManager{
         // 获取支付详细Log
         // 1为支付成功的订单
         List<PayInfoLog> payInfoLogList = sdkPayInfoQueryManager.findPayInfoLogListBySubOrdinate(subOrdinate, paySuccessStatus);
+        return build(subOrdinate, payInfoLogList, paySuccessStatus);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.order.SdkOrderQueryManager#findSalesOrderCommandBySubOrdinate(java.lang.String)
+     */
+    @Override
+    //TODO 暂时不加 readonly 读库和master 有延迟
+    @Transactional
+    public SalesOrderCommand findSalesOrderCommandBySubOrdinate(String subOrdinate){
+        Validate.notEmpty(subOrdinate, "subOrdinate can't be null/empty!");
+
+        Map<String, Object> paraMap = toMap("subOrdinate", (Object) subOrdinate);
+
+        List<PayInfoLog> payInfoLogList = sdkPayInfoQueryManager.findPayInfoLogListByQueryMap(paraMap);
+        return build(subOrdinate, payInfoLogList, null);
+    }
+
+    //---------------------------------------------------------------------
+
+    /**
+     * Builds the.
+     *
+     * @param subOrdinate
+     *            the sub ordinate
+     * @param payInfoLogList
+     *            the pay info log list
+     * @param paySuccessStatus
+     *            the pay success status
+     * @return the sales order command
+     */
+    private SalesOrderCommand build(String subOrdinate,List<PayInfoLog> payInfoLogList,Boolean paySuccessStatus){
         if (isNullOrEmpty(payInfoLogList)){
             LOGGER.error("can't get payInfo_log by subOrdinate:[{}] and paySuccessStatus:[{}]", subOrdinate, paySuccessStatus);
             throw new BusinessException(60004);//TODO TRANSACTION_SO_NOT_EXIST = 60004;
@@ -81,4 +120,5 @@ public class SdkOrderQueryManagerImpl implements SdkOrderQueryManager{
         }
         throw new BusinessException("");
     }
+
 }

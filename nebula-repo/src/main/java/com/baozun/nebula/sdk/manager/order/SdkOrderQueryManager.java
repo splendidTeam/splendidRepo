@@ -65,4 +65,22 @@ public interface SdkOrderQueryManager extends BaseManager{
      */
     SalesOrderCommand findSalesOrderCommandBySubOrdinate(String subOrdinate,boolean paySuccessStatus);
 
+    /**
+     * 根据交易流水号查询订单信息.
+     * 
+     * <p>
+     * 敏感信息解密处理
+     * </p>
+     *
+     * @param subOrdinate
+     *            the sub ordinate
+     * @param paySuccessStatus
+     *            true表示支付成功
+     * @return 如果 <code>subOrdinate</code> 是null,抛出 {@link NullPointerException}<br>
+     *         如果 <code>subOrdinate</code> 是blank,抛出 {@link IllegalArgumentException}<br>
+     *         如果 <code>subOrdinate</code> 是查询不到PayInfoLog list,抛出异常<br>
+     * 
+     */
+    SalesOrderCommand findSalesOrderCommandBySubOrdinate(String subOrdinate);
+
 }

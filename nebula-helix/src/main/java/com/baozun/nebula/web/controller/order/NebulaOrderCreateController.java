@@ -35,6 +35,7 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager;
+import com.baozun.nebula.sdk.manager.order.SdkOrderQueryManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
@@ -158,6 +159,9 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
 
     @Autowired
     private SalesOrderCreateValidator salesOrderCreateValidator;
+
+    @Autowired
+    private SdkOrderQueryManager sdkOrderQueryManager;
 
     /**
      * 订单类型处理器
@@ -320,7 +324,7 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
 
     protected SalesOrderReturnObject createReturnObject(String subOrdinate){
         // 通過支付流水號查詢訂單
-        SalesOrderCommand salesOrderCommand = salesOrderResolver.getSalesOrderCommand(subOrdinate);
+        SalesOrderCommand salesOrderCommand = sdkOrderQueryManager.findSalesOrderCommandBySubOrdinate(subOrdinate);
         SalesOrderReturnObject salesOrderReturnObject = new SalesOrderReturnObject();
         salesOrderReturnObject.setCode(salesOrderCommand.getCode());
         salesOrderReturnObject.setId(salesOrderCommand.getId());
