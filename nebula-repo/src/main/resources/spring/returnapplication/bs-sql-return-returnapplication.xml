@@ -142,7 +142,7 @@
 			    from t_so_return_application application
 			     where 1=1 
 			     	#if($loginName)
-					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_email LIKE '$loginName' AND member.id=application.member_id)
+					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '$loginName' AND member.id=application.member_id)
 					#end
 			        #if($returnCode)
 						AND application.return_application_code LIKE '$returnCode'

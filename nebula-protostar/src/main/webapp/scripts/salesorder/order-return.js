@@ -315,6 +315,20 @@ function status(data, args, idx){
 	}
 }
 
+function logName(data){
+	var memberId=loxia.getObject("memberId", data);
+	var memberUrl= base+'/member/findMemberById.json';
+	var json = {
+			"memberId" : memberId
+		};
+		var _d = loxia.syncXhr(memberUrl, json, {
+			type : "POST"
+		});
+		if (_d!=null) {
+			return _d.loginName;
+		}
+}
+
 var exportUrl =base+"/salesorder/return/exportReturn.htm";
 $j(document).ready(function() {
 	var errorMsg = $j("#errorMsg").val();
@@ -354,6 +368,7 @@ $j(document).ready(function() {
 			name:"accountName",
 			label:nps.i18n("LABEL_LOGIN_CODE"),
 			width:"10%",
+			template : "logName"
 		},{
 			name:"transName",
 			label:nps.i18n("LABEL_LOGISTICS_NAME"),

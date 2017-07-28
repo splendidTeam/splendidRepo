@@ -53,7 +53,7 @@
 		                 <td><label><spring:message code="order.return.logisticsName"/></label></td>
 		                <td>
 		                    <span id="searchkeytext">
-		                    	<input type="text" name="q_sl_Logname" loxiaType="input" mandatory="false" placeholder="<spring:message code="order.return.logisticsName"/>"></input>
+		                    	<input type="text" name="q_sl_logisticsName" loxiaType="input" mandatory="false" placeholder="<spring:message code="order.return.logisticsName"/>"></input>
 		                    </span>
 		                </td>
 		                  <td><label><spring:message code="user.list.filter.createtime"/></label></td>
@@ -73,8 +73,8 @@
 							           <option value="">不限</option>
 						               <option value=1>待审核</option>
 						               <option value=2>拒绝</option>
-						               <option value=3>待退回</option>
-						               <option value=4>已退回</option>
+						               <option value=3>退回中</option>
+						              <!--  <option value=4>已退回</option> -->
 						               <option value=5>同意退换货</option>
 						                <option value=6>已完成</option>						               
 						               

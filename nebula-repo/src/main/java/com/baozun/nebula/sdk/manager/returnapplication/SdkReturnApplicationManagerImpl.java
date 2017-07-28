@@ -183,7 +183,6 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         returnapp.setApprover(lastModifier);
         returnapp.setApproveTime(now);
         returnapp.setVersion(now);
-        returnapp.setReturnReason("");
         returnapp = returnApplicationDao.save(returnapp);
         return returnapp;
     }
@@ -242,7 +241,6 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         returnapp.setApprover(lastModifier);
         returnapp.setApproveTime(now);
         returnapp.setVersion(now);
-        returnapp.setReturnReason("");
 
         // 同意
         if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(status)){

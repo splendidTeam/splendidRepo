@@ -166,8 +166,8 @@ public class OrderReturnController extends BaseController{
     }
 
     /**
-     * 退款状态审核
-     * 退货状态为 同意退款、拒绝退款、已完成
+     * 退换货确认（仓库收到退回商品后）
+     * 退货状态为 同意退换货、拒绝退换货、已完成
      * 
      * @param returnOrderCode
      * @param refundStatus
