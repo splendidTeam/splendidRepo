@@ -19,6 +19,7 @@ package com.baozun.nebula.web.controller.shoppingcart.validator.add;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAIN_LINE_MAX_THAN_COUNT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.TOTAL_MAX_THAN_QUANTITY;
 import static com.feilong.core.util.CollectionsUtil.select;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
@@ -34,8 +35,10 @@ import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameLineExtractor;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.shoppingcart.builder.DefaultShoppingcartLineAddSameLineSettlementStateBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartLineCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartAddDetermineSameLineElementsBuilder;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartLineAddSameLineSettlementStateBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
@@ -43,6 +46,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.AbstractShoppingc
 import com.baozun.nebula.web.controller.shoppingcart.validator.DefaultShoppingcartTotalLineMaxSizeValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLinePackageInfoFormListValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartMaxTotalQuantityValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartTotalLineMaxSizeValidator;
 
 /**
@@ -71,6 +75,22 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     @Autowired(required = false)
     private ShoppingcartTotalLineMaxSizeValidator shoppingcartTotalLineMaxSizeValidator;
 
+    /**
+     * 需要操作购物车行的选中状态构造器
+     * 
+     * @since 5.3.2.22
+     */
+    @Autowired(required = false)
+    private ShoppingcartLineAddSameLineSettlementStateBuilder shoppingcartLineAddSameLineSettlementStateBuilder = new DefaultShoppingcartLineAddSameLineSettlementStateBuilder();
+
+    /**
+     * 购物车购买最大数量校验
+     * 
+     * @since 5.3.2.22
+     */
+    @Autowired
+    private ShoppingcartMaxTotalQuantityValidator shoppingcartMaxTotalQuantityValidator;
+
     /** The shoppingcart line operate common validator. */
     @Autowired
     private ShoppingcartLineOperateCommonValidator shoppingcartLineOperateCommonValidator;
@@ -82,7 +102,6 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     /**  */
     @Autowired
     private ShoppingcartAddDetermineSameLineElementsBuilder shoppingcartAddDetermineSameLineElementsBuilder;
-    
 
     //---------------------------------------------------------------------
 
@@ -160,6 +179,13 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
             }
         }
 
+        // -----------4.商品总数量验证-----------------------------------------------------------------------------
+        //计算当前购物车商品总数量
+        Integer currentTotalCount = ShoppingCartUtil.getSumQuantity(mainLines);
+        //校验添加后购物车商品总数是否超过规定最大数量
+        if (shoppingcartMaxTotalQuantityValidator.isGreaterThanMaxQuantity(memberDetails, currentTotalCount + count)){
+            return TOTAL_MAX_THAN_QUANTITY;
+        }
         //---------------------------------------------------------------------
         return validateInventory(shoppingCartLineCommandList, shoppingCartLineAddForm, sku, toBeOperatedShoppingCartLineCommand, oneLineTotalCount);
     }
@@ -216,6 +242,9 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
 
             //引用对象 重新赋予新值
             toBeOperatedShoppingCartLineCommand.setQuantity(oneLineTotalCount);
+            //配置待操作行选中状态
+            toBeOperatedShoppingCartLineCommand.setSettlementState(shoppingcartLineAddSameLineSettlementStateBuilder.build(toBeOperatedShoppingCartLineCommand) == true ? 1 : 0);
+
         }else{
             // 构造一条 塞进去
             ShoppingCartLineCommand shoppingCartLineCommand = shoppingCartLineCommandBuilder.build(shoppingCartLineAddForm, sku.getOutid());

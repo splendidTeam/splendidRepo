@@ -20,6 +20,7 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.TOTAL_MAX_THAN_QUANTITY;
 import static com.feilong.core.util.CollectionsUtil.collect;
 import static com.feilong.core.util.CollectionsUtil.find;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
@@ -37,6 +38,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartUpdateNeedCombinedLineExtractor;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartUpdateDetermineSameLineElementsBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
@@ -46,6 +48,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
 import com.baozun.nebula.web.controller.shoppingcart.validator.AbstractShoppingcartLineOperateValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLinePackageInfoFormListValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartMaxTotalQuantityValidator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
@@ -84,6 +87,14 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
     /** 购物车修改的时候相同行提取器. */
     @Autowired
     private ShoppingCartUpdateNeedCombinedLineExtractor shoppingCartUpdateNeedCombinedLineExtractor;
+    
+    /**
+     * 购物车购买最大数量校验
+     * 
+     * @since 5.3.2.22
+     */
+    @Autowired
+    private ShoppingcartMaxTotalQuantityValidator shoppingcartMaxTotalQuantityValidator ;
 
     /*
      * (non-Javadoc)
@@ -131,6 +142,14 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
         //2.3 单行最大数量 校验
         if (shoppingcartOneLineMaxQuantityValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, count)){
             return ONE_LINE_MAX_THAN_COUNT;
+        }
+        
+     // -----------4.商品总数量验证-----------------------------------------------------------------------------
+        //计算当前购物车商品总数量
+        Integer currentTotalCount = ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
+        //校验添加后购物车商品总数是否超过规定最大数量
+        if (shoppingcartMaxTotalQuantityValidator.isGreaterThanMaxQuantity(memberDetails, currentTotalCount + count)){
+            return TOTAL_MAX_THAN_QUANTITY;
         }
 
         //-----------------------------------------------------------------------------------------

@@ -58,6 +58,12 @@ public enum ShoppingcartResult{
 
     /** 超过库存数. */
     MAX_THAN_INVENTORY,
+    
+    /** 购买总商品数量超过最大限制.
+     * 
+     * @since 5.3.2.22
+     *  */
+    TOTAL_MAX_THAN_QUANTITY,
 
     // ******************删除*************************************************
 

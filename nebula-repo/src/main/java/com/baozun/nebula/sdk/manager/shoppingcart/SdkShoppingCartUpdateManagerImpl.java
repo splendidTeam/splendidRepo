@@ -72,6 +72,19 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
         int result = sdkShoppingCartLineDao.updateCartLineQuantityByLineId(memberId, lineId, quantity);
         ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],update line:[{}] count:[{}]", memberId, lineId, quantity);
     }
+    
+
+
+    @Override
+    public void updateCartLineQuantityAndSettlementByLineId(Long memberId,Long lineId,Integer quantity,Integer settlementState){
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notNull(lineId, "lineId can't be null!");
+        Validate.notNull(quantity, "quantity can't be null!");
+        Validate.notNull(settlementState, "settlementState can't be null!");
+        int result = sdkShoppingCartLineDao.updateCartLineQuantityAndSettlementStateByLineId(memberId, lineId, quantity,settlementState);
+        ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],update line:[{}] count:[{}] settlementState:[{}]", memberId, lineId, quantity,settlementState);
+        
+    }
 
     /*
      * (non-Javadoc)
@@ -221,4 +234,6 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
         int result = sdkShoppingCartLineDao.updateCartLineSkuInfo(memberId, cartLineId, newSkuId, quantity);
         ManagerValidate.isExpectedResult(1, result, "memberId:[{}],update lineId:[{}],change to newSkuId:[{}],quantity:[{}]", memberId, cartLineId, newSkuId, quantity);
     }
+
+
 }
