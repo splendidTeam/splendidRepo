@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd	
 		">
 
-     <bean id="redisconfig" class="redis.clients.jedis.JedisPoolConfig">
+         <bean id="redisconfig" class="redis.clients.jedis.JedisPoolConfig">
         <property name="maxTotal">
             <value type="long">#{redis['redis.MaxTotal']}</value>
         </property>
