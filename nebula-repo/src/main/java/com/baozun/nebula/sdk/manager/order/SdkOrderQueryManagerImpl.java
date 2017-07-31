@@ -65,14 +65,13 @@ public class SdkOrderQueryManagerImpl implements SdkOrderQueryManager{
      * @see com.baozun.store.web.controller.payment.builder.PaymentBuilder#getOrderCodeBySubOrdinate(java.lang.String, boolean)
      */
     @Override
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
+    //TODO 暂时不加 readonly 读库和master 有延迟
     public SalesOrderCommand findSalesOrderCommandBySubOrdinate(String subOrdinate,boolean paySuccessStatus){
         Validate.notEmpty(subOrdinate, "subOrdinate can't be null/empty!");
 
         //---------------------------------------------------------------------
-
         // 获取支付详细Log
-        // 1为支付成功的订单
         List<PayInfoLog> payInfoLogList = sdkPayInfoQueryManager.findPayInfoLogListBySubOrdinate(subOrdinate, paySuccessStatus);
         return build(subOrdinate, payInfoLogList, paySuccessStatus);
     }
