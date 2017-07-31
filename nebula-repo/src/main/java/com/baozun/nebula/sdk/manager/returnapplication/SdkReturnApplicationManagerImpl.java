@@ -39,6 +39,10 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     
     @Autowired(required=false)
     private ReturnRefundManager  returnRefundManager;
+    
+    @Autowired(required=false)
+    private ReturnReasonResolver    returnReasonResolver;
+    
 
     @Autowired
     private SdkSoReturnApplicationDeliveryInfoDao sdkReturnApplicationDeliveryInfoDao;
@@ -214,6 +218,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
             if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(returnCommand.getStatus())){
                 returnCommand.setBusinessStatus("已完成");
             }
+            returnReasonResolver.getReasonResolver(returnCommand);
         }
         return orderReturn;
     }

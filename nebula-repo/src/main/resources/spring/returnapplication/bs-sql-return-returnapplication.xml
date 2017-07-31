@@ -192,7 +192,8 @@
 				application.SO_ORDER_CODE as soOrderCode,iteminfo.title as productName,line.rtn_extentioncode as code,
 				line.RETURN_PRICE as returnPrice,line.qty as qty,application.status as status ,application.approver as approver,
 				application.approvetime as approveTime,application.create_time as createTime,application.TRANS_CODE as TRANSCODE,
-				application.trans_Name as transName,application.RETURN_REASON  as returnReason,application.type as type
+				application.trans_Name as transName,application.RETURN_REASON  as returnReason,application.type as type,
+				member.login_name as refundPayee
 			    from t_so_return_application_line line 
 			    left join  t_so_return_application application
 			   	 on line.return_orderid=application.id
@@ -200,6 +201,8 @@
 			    	on line.rtn_extentioncode=sku.out_id
 			    left join t_pd_iteminfo iteminfo 
 			     	on sku.item_id=iteminfo.item_id
+			    left join t_mem_member member
+			    	on application.memberid=member.id
 			     where 1=1 
 			     	#if($returnOrderCode)
 			     		AND application.return_application_code  like '$returnOrderCode'

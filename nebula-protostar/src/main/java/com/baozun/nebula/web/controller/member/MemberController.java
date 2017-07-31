@@ -202,7 +202,10 @@ public class MemberController extends BaseController {
 	
 	@RequestMapping("/member/findMemberById.json")
     @ResponseBody
-    public Object  findMemberById(@RequestParam("memberId") Long memberId) {
+    public MemberPersonalDataCommand  findMemberById(@RequestParam("memberId") Long memberId) {
+	    if(memberId==-1){
+            return null;
+        }
 	    MemberPersonalDataCommand memberPersonalDataCommand = memberManager.findMemberById(memberId);
 	    if(Validator.isNotNullOrEmpty(memberPersonalDataCommand)){
 	        return memberPersonalDataCommand;

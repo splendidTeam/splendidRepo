@@ -6,12 +6,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.ReturnLineCommand;
 import com.baozun.nebula.dao.returnapplication.SdkReturnApplicationLineDao;
 import com.baozun.nebula.model.returnapplication.ReturnApplicationLine;
+import com.feilong.core.Validator;
 
 
 
@@ -26,6 +28,9 @@ public class SdkReturnApplicationLineManagerImpl implements SdkReturnApplication
 	private static final Logger	log	= LoggerFactory.getLogger(SdkReturnApplicationLineManagerImpl.class);
 	@Autowired
 	private SdkReturnApplicationLineDao soReturnLineDao;
+	
+    @Autowired(required=false)
+    private ReturnLineReasonResolver returnLineReasonResolver;
 	@Override
 	public List<ReturnApplicationLine> saveReturnLine(List<ReturnApplicationLine> soReturnLine) {
 		List<ReturnApplicationLine> returnLines=new ArrayList<ReturnApplicationLine>();
@@ -40,6 +45,11 @@ public class SdkReturnApplicationLineManagerImpl implements SdkReturnApplication
 	@Override
 	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderIds(List<Long> returnOrderIds) {
 		List<ReturnLineCommand> soReturnLines = soReturnLineDao.findSoReturnLinesByReturnOrderIds(returnOrderIds);
+		if(Validator.isNotNullOrEmpty(soReturnLines)){
+		    for(ReturnLineCommand returnLineCommand:soReturnLines){
+		        returnLineReasonResolver.getReturnLineReason(returnLineCommand);
+	        }
+		}
 		return soReturnLines;
 	}
 	

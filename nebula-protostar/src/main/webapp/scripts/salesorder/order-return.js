@@ -324,8 +324,10 @@ function logName(data){
 		var _d = loxia.syncXhr(memberUrl, json, {
 			type : "POST"
 		});
-		if (_d!=null) {
+		if (_d!=null && _d!="" && _d!=undefined) {
 			return _d.loginName;
+		}else{
+			return "";
 		}
 }
 
