@@ -289,6 +289,7 @@ public interface CacheManager {
 	 * for example:
 	 * String str = redisScriptLoad("redis.call('get',key); return ok;");
 	 * Object obj = redisEvalSHA(str,key,value);
+	 * notice:由于字段结构问题，sha1这个参数会被加上前辍,在此使用时请注意
 	 * 
 	 */
 	public Object redisEvalSHA(String sha1, List<String> key, List<String> value);
@@ -304,6 +305,7 @@ public interface CacheManager {
 	 * 
 	 * for example:
 	 * Object obj = redisEvalSHA("redis.call('get',key); return ok;",key,value);
+	 * notice:由于字段结构问题，script这个参数会被加上前辍,在此使用时请注意
 	 */
 	public Object redisEval(String script, List<String> key, List<String> value);
 
