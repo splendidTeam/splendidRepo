@@ -146,7 +146,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
 
         // -----------商品总数量验证-----------------------------------------------------------------------------
         //since 5.3.2.22
-        //计算当前购物车商品总数量
+        //计算修改后购物车商品总数量
         Integer sumTotalQuantity = sumTotalQuantity(shoppingCartLineCommandList, currentShoppingCartLineCommand, count);
         //校验添加后购物车商品总数是否超过规定最大数量
         if (shoppingcartMaxTotalQuantityValidator.isGreaterThanMaxQuantity(memberDetails, sumTotalQuantity)){
@@ -213,7 +213,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
     private Integer sumTotalQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentShoppingCartLineCommand,Integer count){
         //计算修改前购物车商品总数量
         Integer currentTotalCount = ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
-        //当前购物车总数量-修改的购物车行原来购买数量+修改后的数量
+        //修改后购物车商品总数量=当前购物车总数量-修改的购物车行原来购买数量+修改后的数量
         return currentTotalCount - currentShoppingCartLineCommand.getQuantity() + count;
     }
 
