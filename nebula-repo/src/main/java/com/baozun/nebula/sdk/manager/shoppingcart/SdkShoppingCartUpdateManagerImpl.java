@@ -76,12 +76,12 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
 
 
     @Override
-    public void updateCartLineQuantityAndSettlementByLineId(Long memberId,Long lineId,Integer quantity,Integer settlementState){
+    public void updateCartLineQuantityAndSettlementByLineId(Long memberId,Long lineId,Integer quantity,boolean settlementState){
         Validate.notNull(memberId, "memberId can't be null!");
         Validate.notNull(lineId, "lineId can't be null!");
         Validate.notNull(quantity, "quantity can't be null!");
         Validate.notNull(settlementState, "settlementState can't be null!");
-        int result = sdkShoppingCartLineDao.updateCartLineQuantityAndSettlementStateByLineId(memberId, lineId, quantity,settlementState);
+        int result = sdkShoppingCartLineDao.updateCartLineQuantityAndSettlementStateByLineId(memberId, lineId, quantity,settlementState==true?1:0);
         ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],update line:[{}] count:[{}] settlementState:[{}]", memberId, lineId, quantity,settlementState);
         
     }

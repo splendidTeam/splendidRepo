@@ -39,7 +39,7 @@ public class DefaultShoppingcartMaxTotalQuantityValidator implements Shoppingcar
      * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartMaxTotalCountValidator#isGreaterThanMaxCount(com.baozun.nebula.web.MemberDetails, java.lang.Integer)
      */
     @Override
-    public boolean isGreaterThanMaxQuantity(MemberDetails memberDetails,Integer totalCount){
-        return totalCount > shoppingcartMaxTotalQuantityBuilder.build(memberDetails);
+    public boolean isGreaterThanMaxQuantity(MemberDetails memberDetails,Integer totalQuantity){
+        return totalQuantity > shoppingcartMaxTotalQuantityBuilder.build(memberDetails);
     }
 }

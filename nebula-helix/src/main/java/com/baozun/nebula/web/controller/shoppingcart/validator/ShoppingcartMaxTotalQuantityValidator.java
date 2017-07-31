@@ -28,7 +28,7 @@ import com.baozun.nebula.web.MemberDetails;
 public interface ShoppingcartMaxTotalQuantityValidator{
 
     /**
-     * 校验指定用户购物车中商品总数量是否超过总行最大数量 MaxCount(购买商品最大总数量MaxCount自己实现).
+     * 校验指定用户购物车中商品总数量是否超过总行最大数量 MaxTotalQuantity(购买商品最大总数量MaxTotalQuantity自己实现).
      * 
      * <h3>注意:</h3>
      * <blockquote>
@@ -37,10 +37,10 @@ public interface ShoppingcartMaxTotalQuantityValidator{
      * </p>
      * </blockquote>
      * 
-     * <h3>关于购物车中商品最大数量 MaxCount:</h3>
+     * <h3>关于购物车中商品最大数量 MaxTotalQuantity:</h3>
      * <blockquote>
      * <p>
-     * 具体实现上,你可以将这个最大数量 MaxCount配置在数据库,配置在 properties文件,配置上你实际项目方便的地方
+     * 具体实现上,你可以将这个最大数量 MaxTotalQuantity配置在数据库,配置在 properties文件,配置上你实际项目方便的地方
      * </p>
      * </blockquote>
      * 
@@ -53,11 +53,11 @@ public interface ShoppingcartMaxTotalQuantityValidator{
      *
      * @param memberDetails
      *            the member details
-     * @param totalCount
+     * @param totalQuantity
      *            购物车中商品总数量(add操作后)
-     * @return 如果大于商品最大数量 MaxCount,那么返回true,否则返回false
+     * @return 如果大于商品最大数量MaxTotalQuantity,那么返回true,否则返回false
      * @since 5.3.2.22
      */
-    boolean isGreaterThanMaxQuantity(MemberDetails memberDetails,Integer totalCount);
+    boolean isGreaterThanMaxQuantity(MemberDetails memberDetails,Integer totalQuantity);
 
 }

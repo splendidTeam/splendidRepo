@@ -166,10 +166,14 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
     /**
      * 根据购物车行修改购物车中物品的数量和选中状态
      * 
-     * @param shoppingCartId
-     * @param itemId
+     * @param memberId
+     *              哪个会员
+     * @param cartLineId
+     *              哪个订单行
      * @param quantity
+     *              修改后的数量
      * @param settlementState
+     *              选中不选中状态, 1 是选中,0是不选中
      * @return
      * 
      * @since 5.3.2.22

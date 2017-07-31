@@ -28,7 +28,7 @@ public interface ShoppingcartMaxTotalQuantityBuilder{
      * 构建可购买商品最大值
      * 
      * @param memberDetails
-     * @return
+     * @return  可购买商品最大值
      */
     int build(MemberDetails memberDetails);
 

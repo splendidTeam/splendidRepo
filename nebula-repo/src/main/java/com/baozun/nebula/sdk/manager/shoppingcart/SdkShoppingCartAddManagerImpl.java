@@ -101,7 +101,7 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         Validate.notNull(shoppingCartLineCommand, "shoppingCartLineCommand can't be null!");
 
         if (isUpdate(shoppingCartLineCommand)){ // 更新
-            sdkShoppingCartUpdateManager.updateCartLineQuantityAndSettlementByLineId(memberId, shoppingCartLineCommand.getId(), shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSettlementState());
+            sdkShoppingCartUpdateManager.updateCartLineQuantityAndSettlementByLineId(memberId, shoppingCartLineCommand.getId(), shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSettlementState().equals(1));
         }else{
             addCartLine(memberId, shoppingCartLineCommand);
         }

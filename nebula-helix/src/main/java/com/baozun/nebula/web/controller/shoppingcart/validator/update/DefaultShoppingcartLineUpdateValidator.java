@@ -87,14 +87,14 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
     /** 购物车修改的时候相同行提取器. */
     @Autowired
     private ShoppingCartUpdateNeedCombinedLineExtractor shoppingCartUpdateNeedCombinedLineExtractor;
-    
+
     /**
      * 购物车购买最大数量校验
      * 
      * @since 5.3.2.22
      */
     @Autowired
-    private ShoppingcartMaxTotalQuantityValidator shoppingcartMaxTotalQuantityValidator ;
+    private ShoppingcartMaxTotalQuantityValidator shoppingcartMaxTotalQuantityValidator;
 
     /*
      * (non-Javadoc)
@@ -143,13 +143,15 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
         if (shoppingcartOneLineMaxQuantityValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, count)){
             return ONE_LINE_MAX_THAN_COUNT;
         }
-        
-     // -----------4.商品总数量验证-----------------------------------------------------------------------------
+
+        // -----------商品总数量验证-----------------------------------------------------------------------------
+        //since 5.3.2.22
         //计算当前购物车商品总数量
-        Integer currentTotalCount = ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
+        Integer sumTotalQuantity = sumTotalQuantity(shoppingCartLineCommandList, currentShoppingCartLineCommand, count);
         //校验添加后购物车商品总数是否超过规定最大数量
-        if (shoppingcartMaxTotalQuantityValidator.isGreaterThanMaxQuantity(memberDetails, currentTotalCount + count)){
+        if (shoppingcartMaxTotalQuantityValidator.isGreaterThanMaxQuantity(memberDetails, sumTotalQuantity)){
             return TOTAL_MAX_THAN_QUANTITY;
+
         }
 
         //-----------------------------------------------------------------------------------------
@@ -198,6 +200,21 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
         }
 
         return null;
+    }
+
+    /**
+     * 计算当前购物车商品总数量(修改后)
+     * 
+     * @return
+     *         商品总数量
+     * 
+     * @since 5.3.2.22
+     */
+    private Integer sumTotalQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentShoppingCartLineCommand,Integer count){
+        //计算修改前购物车商品总数量
+        Integer currentTotalCount = ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
+        //当前购物车总数量-修改的购物车行原来购买数量+修改后的数量
+        return currentTotalCount - currentShoppingCartLineCommand.getQuantity() + count;
     }
 
     /**
