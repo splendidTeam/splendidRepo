@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.baozun.nebula</groupId>
     <artifactId>nebula</artifactId>
-    <version>5.3.2.22-SNAPSHOT</version>
+    <version>5.3.2.22-redis-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <modules>
@@ -15,7 +15,7 @@
     </modules>
 
     <properties>
-        <version.nebula>5.3.2.22-SNAPSHOT</version.nebula>
+        <version.nebula>5.3.2.22-redis-SNAPSHOT</version.nebula>
         <!-- 让整个项目统一字符集编码 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -65,7 +65,7 @@
 
         <version.velocity>1.7</version.velocity>
         <version.loxia>2.5.2</version.loxia>
-        <version.jedis>2.2.1</version.jedis>
+        <version.jedis>2.9.0</version.jedis>
         <version.commons-pool>1.6</version.commons-pool>
         <version.commons-lang>2.6</version.commons-lang>
         <version.commons-lang3>3.4</version.commons-lang3>
