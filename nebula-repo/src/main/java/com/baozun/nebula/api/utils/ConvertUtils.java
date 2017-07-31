@@ -23,8 +23,7 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.beanutils.BeanUtils;
 
-import com.baozun.nebula.sdk.command.ConsigneeCommand;
-import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.feilong.core.bean.PropertyUtil;
 
 /**
  * 转换工具类 复制源对象的属性到目标对象 (如果源对象与目标对象的属性类型不同,则可能会抛出异常,返回空对象)
@@ -34,6 +33,12 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
  */
 public class ConvertUtils{
 
+    /**
+     * 
+     * 
+     * @deprecated since 5.3.2.22 直接使用 PropertyDescriptor 没有缓存,性能不高, 该方法 可以使用 {@link PropertyUtil#copyProperties(Object, Object, String...)}
+     */
+    @Deprecated
     public static Object convertTwoObject(Object target,Object sourse){
         if (sourse == null){
             return null;
@@ -67,6 +72,12 @@ public class ConvertUtils{
         return target;
     }
 
+    /**
+     * 
+     * 
+     * @deprecated since 5.3.2.22 直接使用 PropertyDescriptor 没有缓存, 性能不高, 该方法 可以使用 {@link PropertyUtil#copyProperties(Object, Object, String...)}
+     */
+    @Deprecated
     public static Object convertFromTarget(Object target,Object sourse){
         if (target == null){
             return null;
@@ -93,13 +104,4 @@ public class ConvertUtils{
         return target;
     }
 
-    public static void main(String[] args){
-        SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
-        salesOrderCommand.setAddress("测试地址");
-        salesOrderCommand.setEmail("test");
-        ConsigneeCommand consigneeCommand = new ConsigneeCommand();
-        consigneeCommand = (ConsigneeCommand) convertFromTarget(consigneeCommand, salesOrderCommand);
-        System.out.println("===" + consigneeCommand.getAddress());
-        System.out.println("===" + consigneeCommand.getArea());
-    }
 }

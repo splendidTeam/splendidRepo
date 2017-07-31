@@ -49,6 +49,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.web.command.OrderQueryCommand;
+import com.feilong.core.bean.PropertyUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -61,31 +62,31 @@ import loxia.dao.Sort;
 public class SalesOrderManagerImpl implements SalesOrderManager{
 
     /** The Constant log. */
-    private static final Logger    LOGGER = LoggerFactory.getLogger(SalesOrderManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SalesOrderManagerImpl.class);
 
     @Autowired
-    private OrderManager           sdkOrderService;
+    private OrderManager sdkOrderService;
 
     @Autowired
-    private ItemDao                itemDao;
+    private ItemDao itemDao;
 
     @Autowired
-    private ItemInfoDao            itemInfoDao;
+    private ItemInfoDao itemInfoDao;
 
     @Autowired
-    private ItemCategoryDao        itemCategoryDao;
+    private ItemCategoryDao itemCategoryDao;
 
     @Autowired
-    private ItemTagRelationDao     itemTagRelationDao;
+    private ItemTagRelationDao itemTagRelationDao;
 
     @Autowired
-    private SkuDao                 skuDao;
+    private SkuDao skuDao;
 
     @Autowired
-    private CouponDao              couponDao;
+    private CouponDao couponDao;
 
     @Autowired
-    private CouponTypeDao          couponTypeDao;
+    private CouponTypeDao couponTypeDao;
 
     @Autowired
     private PromotionCouponCodeDao promotionCouponCodeDao;
@@ -97,7 +98,7 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
     private SdkShoppingCartManager sdkShoppingCartManager;
 
     @Autowired
-    private SdkOrderDao            sdkOrderDao;
+    private SdkOrderDao sdkOrderDao;
 
     @Override
     public List<OrderPromotionCommand> findOrderPormots(String orderCode){
@@ -250,11 +251,7 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
     }
 
     @Override
-    public Integer immediatelyBuy(
-                    Long userId,
-                    Set<String> membComboIds,
-                    ShoppingCartLineCommand shoppingCartLineCommand,
-                    List<ShoppingCartLineCommand> lines){
+    public Integer immediatelyBuy(Long userId,Set<String> membComboIds,ShoppingCartLineCommand shoppingCartLineCommand,List<ShoppingCartLineCommand> lines){
         return sdkShoppingCartManager.immediatelyBuy(userId, membComboIds, shoppingCartLineCommand, lines);
     }
 
@@ -345,7 +342,9 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
      *             如果实例化 JavaBean 失败
      * @throws InvocationTargetException
      *             如果调用属性的 setter 方法失败
+     * @deprecated 直接使用 PropertyDescriptor 没有缓存, 会影响性能, 该方法 可以使用 {@link PropertyUtil#describe(Object, String...)}
      */
+    @Deprecated
     private Map convertBean(Object bean) throws IntrospectionException,IllegalAccessException,InvocationTargetException{
         Class type = bean.getClass();
         Map returnMap = new HashMap();
