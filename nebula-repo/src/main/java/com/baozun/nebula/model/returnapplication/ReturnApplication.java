@@ -2,6 +2,8 @@ package com.baozun.nebula.model.returnapplication;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -127,6 +129,23 @@ public class ReturnApplication extends BaseModel{
      * 发送异常:SEND_MQ_ERROR
      */
     public static final Integer SO_RETURN_SYNTYPE_SEND_MQ_ERROR = 2;
+    
+    
+    /**
+     * key : 退换货数字状态 
+     * value ： 退换货状态中文描述 
+     * */
+    public static Map<Integer,String> getStatusDescMap(){
+        Map<Integer,String>  map =  new HashMap<Integer,String>();
+            map.put(new Integer(SO_RETURN_STATUS_AUDITING), "待审核");
+            map.put(new Integer(SO_RETURN_STATUS_REFUS_RETURN), "拒绝退换货");
+        map.put(new Integer(SO_RETURN_STATUS_TO_DELIVERY), "退回中");
+        map.put(new Integer(SO_RETURN_STATUS_DELIVERIED), "已发货");
+        map.put(new Integer(SO_RETURN_STATUS_AGREE_REFUND), "同意退换货");
+            map.put(new Integer(SO_RETURN_STATUS_RETURN_COMPLETE), "已完成");
+            map.put(new Integer(SO_RETURN_STATUS_RETURN_CANCEL), "取消退货");
+        return map ;
+    }
     
     /**
      * PK
