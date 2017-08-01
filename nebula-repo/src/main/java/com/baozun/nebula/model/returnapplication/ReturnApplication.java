@@ -31,14 +31,19 @@ public class ReturnApplication extends BaseModel{
     /**
      * returnReason属性值域: 退换货申请原因<br>
      */
-    public static final String SO_RETURN_REASON_FIRST="R001A";
-    public static final String SO_RETURN_REASON_SECOND = "R002A";
-    public static final String SO_RETURN_REASON_THIRD = "R003A";
-    public static final String SO_RETURN_REASON_FOURTH = "R004A";
-    public static final String SO_RETURN_REASON_FIFTH = "R005A";
-    public static final String SO_RETURN_REASON_SIXTH = "R006A";
-    public static final String SO_RETURN_REASON_SEVENTH = "R007A";
-    public static final String SO_RETURN_REASON_EIGHTH = "R007A";
+    /**不想买了*/
+    public static final String SO_RETURN_REASON_CHEANGE_MIND="R001A";
+    /** 商品质量问题 */
+    public static final String SO_RETURN_REASON_DAMAGED_GOOD = "R002A";
+    /** 包装破损 */
+    public static final String SO_RETURN_REASON_DAMAGED_PACKAGE = "R003A";
+    /** 尺码与商品描述不符*/
+    public static final String SO_RETURN_REASON_SIZE_UNMATCH = "R004A";
+    /** 颜色、图案、款式与商品描述不符*/
+    public static final String SO_RETURN_REASON_PRODUCT_UNMATCH = "R005A";
+    /** 其他原因*/
+    public static final String SO_RETURN_REASON_OTHER_REASON = "R006A";
+    
 
     /**
      * isNeededReturnInvoice属性值域<br>
