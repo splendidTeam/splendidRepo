@@ -137,13 +137,13 @@ public class ReturnApplication extends BaseModel{
      * */
     public static Map<Integer,String> getStatusDescMap(){
         Map<Integer,String>  map =  new HashMap<Integer,String>();
-            map.put(new Integer(SO_RETURN_STATUS_AUDITING), "待审核");
-            map.put(new Integer(SO_RETURN_STATUS_REFUS_RETURN), "拒绝退换货");
-        map.put(new Integer(SO_RETURN_STATUS_TO_DELIVERY), "退回中");
-        map.put(new Integer(SO_RETURN_STATUS_DELIVERIED), "已发货");
-        map.put(new Integer(SO_RETURN_STATUS_AGREE_REFUND), "同意退换货");
-            map.put(new Integer(SO_RETURN_STATUS_RETURN_COMPLETE), "已完成");
-            map.put(new Integer(SO_RETURN_STATUS_RETURN_CANCEL), "取消退货");
+            map.put(SO_RETURN_STATUS_AUDITING, "待审核");
+            map.put(SO_RETURN_STATUS_REFUS_RETURN, "拒绝退换货");
+            map.put(SO_RETURN_STATUS_TO_DELIVERY, "退回中");
+            map.put(SO_RETURN_STATUS_DELIVERIED, "已发货");
+            map.put(SO_RETURN_STATUS_AGREE_REFUND, "同意退换货");
+            map.put(SO_RETURN_STATUS_RETURN_COMPLETE, "已完成");
+            map.put(SO_RETURN_STATUS_RETURN_CANCEL, "取消退货");
         return map ;
     }
     
