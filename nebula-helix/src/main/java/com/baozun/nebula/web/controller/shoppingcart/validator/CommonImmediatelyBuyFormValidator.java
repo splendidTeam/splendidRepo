@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -29,6 +31,7 @@ import com.baozun.nebula.web.controller.shoppingcart.form.CommonImmediatelyBuyFo
  * @version 5.3.1 2016年5月28日 下午4:48:53
  * @since 5.3.1
  */
+@Component("commonImmediatelyBuyFormValidator")
 public class CommonImmediatelyBuyFormValidator implements Validator{
 
     /*
