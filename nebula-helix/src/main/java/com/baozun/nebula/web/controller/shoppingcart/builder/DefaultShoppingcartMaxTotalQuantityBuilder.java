@@ -17,22 +17,24 @@
 package com.baozun.nebula.web.controller.shoppingcart.builder;
 
 import com.baozun.nebula.web.MemberDetails;
+
 /**
  * 默认的可购买商品最大值构造器
+ * 
  * @author bowen.dai
  * @since 5.3.2.22
  */
 public class DefaultShoppingcartMaxTotalQuantityBuilder implements ShoppingcartMaxTotalQuantityBuilder{
+
     /**
-     * 购物车中商品最大数量
+     * 默认的购物车中商品最大数量
      * 
      */
-    public static final int SHOPPING_CART_SKU_MAX_TOTAL_COUNT = 99;
+    private static final int SHOPPING_CART_SKU_MAX_TOTAL_QUANTITY = 99;
+
     @Override
     public int build(MemberDetails memberDetails){
-        return SHOPPING_CART_SKU_MAX_TOTAL_COUNT;
+        return SHOPPING_CART_SKU_MAX_TOTAL_QUANTITY;
     }
-    
+
 }
-
-

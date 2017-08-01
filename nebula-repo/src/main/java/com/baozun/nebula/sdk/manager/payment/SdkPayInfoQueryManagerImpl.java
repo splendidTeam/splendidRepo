@@ -55,7 +55,8 @@ public class SdkPayInfoQueryManagerImpl implements SdkPayInfoQueryManager{
      * @see com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager#findPayInfoLogListByQueryMap(java.util.Map)
      */
     @Override
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
+    //TODO 暂时不加 readonly 读库和master 有延迟
     public List<PayInfoLog> findPayInfoLogListByQueryMap(Map<String, Object> paraMap){
         return payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
     }
@@ -66,7 +67,7 @@ public class SdkPayInfoQueryManagerImpl implements SdkPayInfoQueryManager{
      * @see com.baozun.store.web.manager.payment.StorePaymentManager#getPayInfoLogListBySubOrdinate(java.lang.String, boolean)
      */
     @Override
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true) //TODO 暂时不加 readonly 读库和master 有延迟
     public List<PayInfoLog> findPayInfoLogListBySubOrdinate(String subOrdinate,boolean paySuccessStatus){
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("subOrdinate", subOrdinate);
@@ -84,7 +85,7 @@ public class SdkPayInfoQueryManagerImpl implements SdkPayInfoQueryManager{
      * @see com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager#isPaySuccess(java.lang.String)
      */
     @Override
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true) //TODO 暂时不加 readonly 读库和master 有延迟
     public boolean isPaySuccess(String subOrdinate){
         List<PayInfoLog> payInfoLogList = findPayInfoLogListBySubOrdinate(subOrdinate, true);
         return isNotNullOrEmpty(payInfoLogList);

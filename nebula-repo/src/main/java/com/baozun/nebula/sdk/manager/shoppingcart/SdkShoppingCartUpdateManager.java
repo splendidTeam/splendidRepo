@@ -70,13 +70,13 @@ public interface SdkShoppingCartUpdateManager extends BaseManager{
      * @param quantity
      *            数量
      * @param settlementState
-     *            选中状态                  
+     *            选中状态     true为选中 ,false为不选中             
      * @throws NativeUpdateRowCountNotEqualException
      *             如果修改的结果,即影响的行数不等于1,那么将抛出该异常
      * @throws NullPointerException
      *             如果 <code>memberId</code> 是null,或者<code>lineId</code> 是null,或者<code>quantity</code> 是null
      */
-    void updateCartLineQuantityAndSettlementByLineId(Long memberId,Long lineId,Integer quantity,Integer settlementState);
+    void updateCartLineQuantityAndSettlementByLineId(Long memberId,Long lineId,Integer quantity,boolean settlementState);
 
     /**
      * 批量更新指定会员 指定购物车行的数量.
