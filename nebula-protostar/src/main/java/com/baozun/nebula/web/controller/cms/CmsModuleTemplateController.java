@@ -25,7 +25,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,11 +147,8 @@ public class CmsModuleTemplateController extends BaseController{
 
         CmsModuleTemplate saveCmsModuleTemplate = cmsModuleTemplateManager.saveCmsModuleTemplate(cmsModuleTemplate);
 
-        //---------------------------------------------------------------------
-        Validate.notNull(saveCmsModuleTemplate, "saveCmsModuleTemplate can't be null!");
-
         if (LOGGER.isInfoEnabled()){
-            LOGGER.info("saveCmsModuleTemplate over,{}", JsonUtil.format(cmsModuleTemplate));
+            LOGGER.info("saveCmsModuleTemplate over,{}", JsonUtil.format(saveCmsModuleTemplate));
         }
         return "redirect:/newcms/moduleTemplateList.htm";
     }
