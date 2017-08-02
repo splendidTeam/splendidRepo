@@ -123,6 +123,12 @@ public class CmsModuleTemplateController extends BaseController{
      */
     @RequestMapping("/cmsModuleTemplate/save.json")
     public String saveCmsModuleTemplate(CmsModuleTemplate cmsModuleTemplate,@RequestParam("templateFile") CommonsMultipartFile templateFile,Model model){
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("in put cmsModuleTemplate:[{}]", JsonUtil.format(cmsModuleTemplate));
+        }
+
+        //---------------------------------------------------------------------
+
         if (templateFile.getSize() > 0){
             String data = uploadManager.uploadFileToString(templateFile);
             cmsModuleTemplate.setData(data);
@@ -132,6 +138,8 @@ public class CmsModuleTemplateController extends BaseController{
             }
 
         }
+
+        //---------------------------------------------------------------------
         cmsModuleTemplate.setImg(ImageOpeartion.imageUrlConvert(cmsModuleTemplate.getImg(), UPLOAD_IMG_DOMAIN, true));
 
         if (LOGGER.isDebugEnabled()){
@@ -139,6 +147,8 @@ public class CmsModuleTemplateController extends BaseController{
         }
 
         CmsModuleTemplate saveCmsModuleTemplate = cmsModuleTemplateManager.saveCmsModuleTemplate(cmsModuleTemplate);
+
+        //---------------------------------------------------------------------
         Validate.notNull(saveCmsModuleTemplate, "saveCmsModuleTemplate can't be null!");
 
         if (LOGGER.isInfoEnabled()){
