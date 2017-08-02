@@ -60,6 +60,7 @@ import com.baozun.nebula.sdk.manager.SdkColumnManager;
 import com.baozun.nebula.task.DynamicTask;
 import com.baozun.nebula.task.PublishModuleTask;
 import com.baozun.nebula.utilities.common.Validator;
+import com.baozun.nebula.utils.image.ImageOpeartion;
 
 /**
  * 模块管理Manager实现
@@ -69,667 +70,657 @@ import com.baozun.nebula.utilities.common.Validator;
  */
 @Service
 @Transactional
-public class ColumnManagerImpl implements ColumnManager {
-	
-	private static final Logger			log	= LoggerFactory.getLogger(ColumnManagerImpl.class);
+public class ColumnManagerImpl implements ColumnManager{
 
-	@Autowired
-	private ColumnComponentDao			columnComponentDao;
+    private static final Logger log = LoggerFactory.getLogger(ColumnManagerImpl.class);
 
-	@Autowired
-	private ColumnModuleDao				columnModuleDao;
+    @Autowired
+    private ColumnComponentDao columnComponentDao;
 
-	@Autowired
-	private ItemDao						itemDao;
+    @Autowired
+    private ColumnModuleDao columnModuleDao;
 
-	@Autowired
-	private ItemImageDao				itemImageDao;
+    @Autowired
+    private ItemDao itemDao;
 
-	@Autowired
-	private CategoryDao					categoryDao;
+    @Autowired
+    private ItemImageDao itemImageDao;
 
-	@Autowired
-	private SdkColumnManager			sdkColumnManager;
+    @Autowired
+    private CategoryDao categoryDao;
 
-	@Autowired
-	private ColumnPublishedDao			columnPublishedDao;
+    @Autowired
+    private SdkColumnManager sdkColumnManager;
 
-	@Autowired
-	private ColumnPublishedHistoryDao	columnPublishedHistoryDao;
+    @Autowired
+    private ColumnPublishedDao columnPublishedDao;
 
-	@Autowired
-	private ColumnPageDao				columnPageDao;
+    @Autowired
+    private ColumnPublishedHistoryDao columnPublishedHistoryDao;
 
-	@Autowired
-	private SchedulerManager			schedulerManager;
-	
-	@Autowired
-	private CacheManager				cacheManager;
+    @Autowired
+    private ColumnPageDao columnPageDao;
 
-	@Override
-	public void saveColumnComponent(ColumnComponent[] columnComponents, String customBaseUrl, String moduleCode,
-			String pageCode, String publishTime, Long targetId) throws Exception {
-		ColumnModule columnModule = columnModuleDao.findColumnModuleByCode(moduleCode, pageCode);
-		if (columnModule == null) {
-			throw new BusinessException(ErrorCodes.MODULE_NOT_EXIST);
-		}
-		Long moduleId = columnModule.getId();
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		Date publishTimeDate = null;
-		if (StringUtils.isNotBlank(publishTime)) {
-			try {
-				publishTimeDate = format.parse(publishTime);
-				columnModule.setPublishTime(publishTimeDate);
-				columnModuleDao.updateColModPubTimById(columnModule.getPublishTime(), moduleId);
-			} catch (ParseException e1) {
-				e1.printStackTrace();
-			}
-		}
-		Map<String, Object> paraMap = new HashMap<String, Object>();
-		paraMap.put("moduleId", moduleId);
-		if(null != targetId){
-			paraMap.put("targetId", targetId);
-		}
-		List<ColumnComponent> columnCompList = columnComponentDao.findEffectColumnComponentListByQueryMap(paraMap);
-		/** 模块的组件集合 */
-		Map<Long, ColumnComponent> dbColumnCompMap = new HashMap<Long, ColumnComponent>();
-		for (ColumnComponent columnComponent : columnCompList) {
-			dbColumnCompMap.put(columnComponent.getId(), columnComponent);
-		}
-		Integer sortNo = 0;
-		for (ColumnComponent columnComponent : columnComponents) {
-			
-			Integer sortNoForPage = columnComponent.getSortNo();
-			if(sortNoForPage != null){
-				sortNo = sortNoForPage;
-			}
-			
-			Long id = columnComponent.getId();
-			columnComponent.setImg(getImgUrl(columnComponent.getImg(), customBaseUrl, true));
-			columnComponent.setSortNo(sortNo);
-			columnComponent.setModuleId(moduleId);
-			if (id == null) {
-				columnComponentDao.save(columnComponent);
-			} else {
-				ColumnComponent dbColumnComp = dbColumnCompMap.get(id);
-				/** 比对数据是不一致, 一致就不修改, 不一致就修改 */
-				if (!isColumnComponentUpdate(dbColumnComp, columnComponent)) {
-					columnComponentDao.updateComlumCompById(columnComponent.getId(), columnComponent.getDescription(),
-							columnComponent.getExt(), columnComponent.getImg(), columnComponent.getSortNo(),
-							columnComponent.getTargetId(), columnComponent.getTitle(), columnComponent.getUrl(),
-							columnComponent.getImgHeight(), columnComponent.getImgWidth());
-				}
-				dbColumnCompMap.remove(id);
-			}
-			sortNo++;
-		}
-		/** 要删除的组件id */
-		List<Long> removeList = new ArrayList<Long>();
+    @Autowired
+    private SchedulerManager schedulerManager;
 
-		for (Map.Entry<Long, ColumnComponent> entry : dbColumnCompMap.entrySet()) {
-			removeList.add(entry.getKey());
-		}
-		/** 通过ids删除组件 */
-		if (removeList.size() > 0) {
-			columnComponentDao.removeColumnComponentByIds(removeList);
-		}
+    @Autowired
+    private CacheManager cacheManager;
 
-		Date now = new Date();
-		if (null != publishTimeDate && publishTimeDate.compareTo(now) > 0) {
-			addTask(pageCode, moduleCode, publishTimeDate);
-		}
-	}
-	
-	
-	@Override
-	public void saveColumnComponent(ColumnComponent[] columnComponents, String customBaseUrl, String moduleCode,
-			String pageCode, String publishTime) throws Exception {
-		ColumnModule columnModule = columnModuleDao.findColumnModuleByCode(moduleCode, pageCode);
-		if (columnModule == null) {
-			throw new BusinessException(ErrorCodes.MODULE_NOT_EXIST);
-		}
-		Long moduleId = columnModule.getId();
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		Date publishTimeDate = null;
-		if (StringUtils.isNotBlank(publishTime)) {
-			try {
-				publishTimeDate = format.parse(publishTime);
-				columnModule.setPublishTime(publishTimeDate);
-				columnModuleDao.updateColModPubTimById(columnModule.getPublishTime(), moduleId);
-			} catch (ParseException e1) {
-				e1.printStackTrace();
-			}
-		}
-		List<ColumnComponent> columnCompList = columnComponentDao.findColumnCompListByModuleId(moduleId);
-		/** 模块的组件集合 */
-		Map<Long, ColumnComponent> dbColumnCompMap = new HashMap<Long, ColumnComponent>();
-		for (ColumnComponent columnComponent : columnCompList) {
-			dbColumnCompMap.put(columnComponent.getId(), columnComponent);
-		}
-		Integer sortNo = 0;
-		for (ColumnComponent columnComponent : columnComponents) {
-			Long id = columnComponent.getId();
-			columnComponent.setImg(getImgUrl(columnComponent.getImg(), customBaseUrl, true));
-			
-			Integer sortNoForPage = columnComponent.getSortNo();
-			if(sortNoForPage != null){
-				sortNo = sortNoForPage;
-			}
-			
-			columnComponent.setSortNo(sortNo);
-			columnComponent.setModuleId(moduleId);
-			if (id == null) {
-				columnComponentDao.save(columnComponent);
-			} else {
-				ColumnComponent dbColumnComp = dbColumnCompMap.get(id);
-				/** 比对数据是不一致, 一致就不修改, 不一致就修改 */
-				if (!isColumnComponentUpdate(dbColumnComp, columnComponent)) {
-					columnComponentDao.updateComlumCompById(columnComponent.getId(), columnComponent.getDescription(),
-							columnComponent.getExt(), columnComponent.getImg(), columnComponent.getSortNo(),
-							columnComponent.getTargetId(), columnComponent.getTitle(), columnComponent.getUrl(),
-							columnComponent.getImgHeight(), columnComponent.getImgWidth());
-				}
-				dbColumnCompMap.remove(id);
-			}
-			sortNo++;
-		}
-		/** 要删除的组件id */
-		List<Long> removeList = new ArrayList<Long>();
-		
-		for (Map.Entry<Long, ColumnComponent> entry : dbColumnCompMap.entrySet()) {
-			removeList.add(entry.getKey());
-		}
-		/** 通过ids删除组件 */
-		if (removeList.size() > 0) {
-			columnComponentDao.removeColumnComponentByIds(removeList);
-		}
-		
-		Date now = new Date();
-		if (null != publishTimeDate && publishTimeDate.compareTo(now) > 0) {
-			addTask(pageCode, moduleCode, publishTimeDate);
-		}
-		
-	}
+    @Override
+    public void saveColumnComponent(ColumnComponent[] columnComponents,String customBaseUrl,String moduleCode,String pageCode,String publishTime,Long targetId) throws Exception{
+        ColumnModule columnModule = columnModuleDao.findColumnModuleByCode(moduleCode, pageCode);
+        if (columnModule == null){
+            throw new BusinessException(ErrorCodes.MODULE_NOT_EXIST);
+        }
+        Long moduleId = columnModule.getId();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date publishTimeDate = null;
+        if (StringUtils.isNotBlank(publishTime)){
+            try{
+                publishTimeDate = format.parse(publishTime);
+                columnModule.setPublishTime(publishTimeDate);
+                columnModuleDao.updateColModPubTimById(columnModule.getPublishTime(), moduleId);
+            }catch (ParseException e1){
+                e1.printStackTrace();
+            }
+        }
+        Map<String, Object> paraMap = new HashMap<String, Object>();
+        paraMap.put("moduleId", moduleId);
+        if (null != targetId){
+            paraMap.put("targetId", targetId);
+        }
+        List<ColumnComponent> columnCompList = columnComponentDao.findEffectColumnComponentListByQueryMap(paraMap);
+        /** 模块的组件集合 */
+        Map<Long, ColumnComponent> dbColumnCompMap = new HashMap<Long, ColumnComponent>();
+        for (ColumnComponent columnComponent : columnCompList){
+            dbColumnCompMap.put(columnComponent.getId(), columnComponent);
+        }
+        Integer sortNo = 0;
+        for (ColumnComponent columnComponent : columnComponents){
 
-	/**
-	 * 判断版块组件中的数据是否有修改过
-	 * 
-	 * @param dbColumnComp
-	 * @param columnComp
-	 * @return
-	 */
-	private Boolean isColumnComponentUpdate(ColumnComponent dbColumnComp, ColumnComponent columnComp) {
-		if (dbColumnComp == null) {
-			return false;
-		}
-		/** description */
-		String dbDesc = dbColumnComp.getDescription();
-		String desc = columnComp.getDescription();
-		if (StringUtils.isNotBlank(dbDesc) || StringUtils.isNotBlank(desc)) {
-			if (StringUtils.isNotBlank(dbDesc)) {
-				if (!dbDesc.equals(desc)) {
-					return false;
-				}
-			} else {
-				if (!desc.equals(dbDesc)) {
-					return false;
-				}
-			}
-		}
-		/** ext */
-		String dbExt = dbColumnComp.getExt();
-		String ext = columnComp.getExt();
-		if (StringUtils.isNotBlank(dbExt) || StringUtils.isNotBlank(ext)) {
-			if (StringUtils.isNotBlank(dbExt)) {
-				if (!dbExt.equals(ext)) {
-					return false;
-				}
-			} else {
-				if (!ext.equals(dbExt)) {
-					return false;
-				}
-			}
-		}
-		/** img */
-		String dbImg = dbColumnComp.getImg();
-		String img = columnComp.getImg();
-		if (StringUtils.isNotBlank(dbImg) || StringUtils.isNotBlank(img)) {
-			if (StringUtils.isNotBlank(dbImg)) {
-				if (!dbImg.equals(img)) {
-					return false;
-				}
-			} else {
-				if (!img.equals(dbImg)) {
-					return false;
-				}
-			}
-		}
+            Integer sortNoForPage = columnComponent.getSortNo();
+            if (sortNoForPage != null){
+                sortNo = sortNoForPage;
+            }
 
-		/** url */
-		String dbUrl = dbColumnComp.getUrl();
-		String url = columnComp.getUrl();
-		if (StringUtils.isNotBlank(dbUrl) || StringUtils.isNotBlank(url)) {
-			if (StringUtils.isNotBlank(dbUrl)) {
-				if (!dbUrl.equals(url)) {
-					return false;
-				}
-			} else {
-				if (!url.equals(dbUrl)) {
-					return false;
-				}
-			}
-		}
-		/** targetId */
-		Long dbTargetId = dbColumnComp.getTargetId();
-		Long targetId = columnComp.getTargetId();
-		if (dbTargetId != null || targetId != null) {
-			if (dbTargetId != null) {
-				if (!dbTargetId.equals(targetId)) {
-					return false;
-				}
-			} else {
-				if (!targetId.equals(dbTargetId)) {
-					return false;
-				}
-			}
-		}
-		/** title */
-		String dbTitle = dbColumnComp.getTitle();
-		String title = columnComp.getTitle();
-		if (StringUtils.isNotBlank(dbTitle) || StringUtils.isNotBlank(title)) {
-			if (StringUtils.isNotBlank(dbTitle)) {
-				if (!dbTitle.equals(title)) {
-					return false;
-				}
-			} else {
-				if (!title.equals(dbTitle)) {
-					return false;
-				}
-			}
-		}
-		/** sort_NO */
-		Integer dbSortNo = dbColumnComp.getSortNo();
-		Integer sortNo = columnComp.getSortNo();
-		if (dbSortNo != null || sortNo != null) {
-			if (dbSortNo != null) {
-				if (!dbSortNo.equals(sortNo)) {
-					return false;
-				}
-			} else {
-				if (!sortNo.equals(dbSortNo)) {
-					return false;
-				}
-			}
-		}
+            Long id = columnComponent.getId();
+            columnComponent.setImg(ImageOpeartion.imageUrlConvert(columnComponent.getImg(), customBaseUrl, true));
+            columnComponent.setSortNo(sortNo);
+            columnComponent.setModuleId(moduleId);
+            if (id == null){
+                columnComponentDao.save(columnComponent);
+            }else{
+                ColumnComponent dbColumnComp = dbColumnCompMap.get(id);
+                /** 比对数据是不一致, 一致就不修改, 不一致就修改 */
+                if (!isColumnComponentUpdate(dbColumnComp, columnComponent)){
+                    columnComponentDao.updateComlumCompById(
+                                    columnComponent.getId(),
+                                    columnComponent.getDescription(),
+                                    columnComponent.getExt(),
+                                    columnComponent.getImg(),
+                                    columnComponent.getSortNo(),
+                                    columnComponent.getTargetId(),
+                                    columnComponent.getTitle(),
+                                    columnComponent.getUrl(),
+                                    columnComponent.getImgHeight(),
+                                    columnComponent.getImgWidth());
+                }
+                dbColumnCompMap.remove(id);
+            }
+            sortNo++;
+        }
+        /** 要删除的组件id */
+        List<Long> removeList = new ArrayList<Long>();
 
-		Integer dbWidth = dbColumnComp.getImgWidth();
-		Integer width = columnComp.getImgWidth();
-		if (dbWidth != null || width != null) {
-			if (dbWidth != null) {
-				if (!dbWidth.equals(width)) {
-					return false;
-				}
-			} else {
-				if (!width.equals(dbWidth)) {
-					return false;
-				}
-			}
-		}
+        for (Map.Entry<Long, ColumnComponent> entry : dbColumnCompMap.entrySet()){
+            removeList.add(entry.getKey());
+        }
+        /** 通过ids删除组件 */
+        if (removeList.size() > 0){
+            columnComponentDao.removeColumnComponentByIds(removeList);
+        }
 
-		Integer dbHeight = dbColumnComp.getImgHeight();
-		Integer height = columnComp.getImgHeight();
-		if (dbHeight != null || height != null) {
-			if (dbHeight != null) {
-				if (!dbHeight.equals(height)) {
-					return false;
-				}
-			} else {
-				if (!height.equals(dbHeight)) {
-					return false;
-				}
-			}
-		}
+        Date now = new Date();
+        if (null != publishTimeDate && publishTimeDate.compareTo(now) > 0){
+            addTask(pageCode, moduleCode, publishTimeDate);
+        }
+    }
 
-		return true;
-	}
+    @Override
+    public void saveColumnComponent(ColumnComponent[] columnComponents,String customBaseUrl,String moduleCode,String pageCode,String publishTime) throws Exception{
+        ColumnModule columnModule = columnModuleDao.findColumnModuleByCode(moduleCode, pageCode);
+        if (columnModule == null){
+            throw new BusinessException(ErrorCodes.MODULE_NOT_EXIST);
+        }
+        Long moduleId = columnModule.getId();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date publishTimeDate = null;
+        if (StringUtils.isNotBlank(publishTime)){
+            try{
+                publishTimeDate = format.parse(publishTime);
+                columnModule.setPublishTime(publishTimeDate);
+                columnModuleDao.updateColModPubTimById(columnModule.getPublishTime(), moduleId);
+            }catch (ParseException e1){
+                e1.printStackTrace();
+            }
+        }
+        List<ColumnComponent> columnCompList = columnComponentDao.findColumnCompListByModuleId(moduleId);
+        /** 模块的组件集合 */
+        Map<Long, ColumnComponent> dbColumnCompMap = new HashMap<Long, ColumnComponent>();
+        for (ColumnComponent columnComponent : columnCompList){
+            dbColumnCompMap.put(columnComponent.getId(), columnComponent);
+        }
+        Integer sortNo = 0;
+        for (ColumnComponent columnComponent : columnComponents){
+            Long id = columnComponent.getId();
+            columnComponent.setImg(com.baozun.nebula.utils.image.ImageOpeartion.imageUrlConvert(columnComponent.getImg(), customBaseUrl, true));
 
-	/**
-	 * 图片地址的绝对路径, 相对路径 之间的转化
-	 * 
-	 * @param imgUrl
-	 * @param customBaseUrl
-	 * @param flag
-	 *            : true 绝对路径 --> 相对路径 :false 相对路径 --> 绝对路径
-	 * @return
-	 */
-	private String getImgUrl(String imgUrl, String customBaseUrl, Boolean flag) {
-		if (flag) {
-			if (StringUtils.isNotBlank(imgUrl) && imgUrl.toLowerCase().startsWith("http://")) {
-				return imgUrl.replace(customBaseUrl, "");
-			}
-		} else {
-			if (StringUtils.isNotBlank(imgUrl)) {
-				return customBaseUrl + imgUrl;
-			}
-		}
-		return "";
-	}
+            Integer sortNoForPage = columnComponent.getSortNo();
+            if (sortNoForPage != null){
+                sortNo = sortNoForPage;
+            }
 
-	@Override
-	public List<ColumnComponentCommand> findColumnComponentByPageCode(String pageCode) {
-		ColumnPage columnPage = columnPageDao.findColumnPageByPageCode(pageCode);
-		if(null == columnPage){
-			throw new BusinessException(ErrorCodes.COLUMN_PAGE_NOT_EXIST);
-		}
-		Map<String, Object> paramMap = new HashMap<String, Object>();
-		paramMap.put("pageId", columnPage.getId());
-		List<ColumnModuleCommand> columnModuleCommandList = columnModuleDao.findColumnModuleCommandListByQueryMap(paramMap);
-		/** key: module id ; value: ColumnModuleCommand */
-		Map<Long, ColumnModuleCommand> columnModuleMap = new HashMap<Long, ColumnModuleCommand>();
-		for(ColumnModuleCommand columnModuleCommand : columnModuleCommandList){
-			columnModuleMap.put(columnModuleCommand.getId(), columnModuleCommand);
-		}
-		
-		List<ColumnComponentCommand> columnCompCommandList = columnComponentDao.findColumnComponentByPageCode(pageCode);
-		
-		return processColumnComponentData(columnCompCommandList, columnModuleMap);
-	}
-	
-	/**
-	 * 处理columnComponentCommand中的数据
-	 * @param ColumnComponentCommandList
-	 * @return
-	 */
-	private List<ColumnComponentCommand> processColumnComponentData(List<ColumnComponentCommand> columnCompCommandList, Map<Long, ColumnModuleCommand> columnModuleMap){
-		List<Long> itemIds = new ArrayList<Long>();
-		List<Long> categoryIds = new ArrayList<Long>();
-		for (ColumnComponentCommand columnComponentCommand : columnCompCommandList) {
-			ColumnModuleCommand columnModuleCommand = columnModuleMap.get(columnComponentCommand.getModule_id());
-			Long targetId = columnComponentCommand.getTargetId();
-			Integer type = columnModuleCommand.getType();
-			/**
-			 * 新品热推管理, 精品推荐默认商品管理, 最热排行管理都是商品 精品推荐默认分类管理 是商品分类
-			 */
-			if (null == targetId || null == type) {
-				continue;
-			}
-			if (type.equals(ColumnModule.TYPE_ITEM)) {
-				itemIds.add(targetId);
-			} else if (type.equals(ColumnModule.TYPE_CATEGORY)) {
-				categoryIds.add(targetId);
-			}
-		}
-		/** item image */
-		List<ItemImage> itemImageList = itemImageDao.findItemImageByItemIds(itemIds, ItemImage.IMG_TYPE_LIST);
-		Map<Long, List<ItemImage>> itemImageListMap = new HashMap<Long, List<ItemImage>>();
-		List<ItemImage> itemImages = null;
-		for (Long itemId : itemIds) {
-			itemImages = new ArrayList<ItemImage>();
-			for (ItemImage itemIamge : itemImageList) {
-				if (itemId.equals(itemIamge.getItemId())) {
-					itemImages.add(0, itemIamge);
-				}
-			}
-			itemImageListMap.put(itemId, itemImages);
-		}
-		/** item */
-		List<ItemCommand> itemCommandList = itemDao.findItemCommandListByIds(itemIds);
-		Map<Long, ItemCommand> itemCommandMap = new HashMap<Long, ItemCommand>();
-		for (ItemCommand itemCommand : itemCommandList) {
-			Long itemId = itemCommand.getId();
-			itemCommand.setItemImageList(itemImageListMap.get(itemId));
-			itemCommandMap.put(itemId, itemCommand);
-		}
+            columnComponent.setSortNo(sortNo);
+            columnComponent.setModuleId(moduleId);
+            if (id == null){
+                columnComponentDao.save(columnComponent);
+            }else{
+                ColumnComponent dbColumnComp = dbColumnCompMap.get(id);
+                /** 比对数据是不一致, 一致就不修改, 不一致就修改 */
+                if (!isColumnComponentUpdate(dbColumnComp, columnComponent)){
+                    columnComponentDao.updateComlumCompById(
+                                    columnComponent.getId(),
+                                    columnComponent.getDescription(),
+                                    columnComponent.getExt(),
+                                    columnComponent.getImg(),
+                                    columnComponent.getSortNo(),
+                                    columnComponent.getTargetId(),
+                                    columnComponent.getTitle(),
+                                    columnComponent.getUrl(),
+                                    columnComponent.getImgHeight(),
+                                    columnComponent.getImgWidth());
+                }
+                dbColumnCompMap.remove(id);
+            }
+            sortNo++;
+        }
+        /** 要删除的组件id */
+        List<Long> removeList = new ArrayList<Long>();
 
-		/** category */
-		List<Category> categoryList = categoryDao.findCategoryListByIds(categoryIds);
-		Map<Long, Category> categoryMap = new HashMap<Long, Category>();
-		for (Category category : categoryList) {
-			categoryMap.put(category.getId(), category);
-		}
+        for (Map.Entry<Long, ColumnComponent> entry : dbColumnCompMap.entrySet()){
+            removeList.add(entry.getKey());
+        }
+        /** 通过ids删除组件 */
+        if (removeList.size() > 0){
+            columnComponentDao.removeColumnComponentByIds(removeList);
+        }
 
-		for (ColumnComponentCommand columnComponentCommand : columnCompCommandList) {
-			ColumnModuleCommand columnModuleCommand = columnModuleMap.get(columnComponentCommand.getModule_id());
-			Long targetId = columnComponentCommand.getTargetId();
-			Integer type = columnModuleCommand.getType();
-			if (null == targetId || null == type) {
-				continue;
-			}
-			
-			if (ColumnModule.TYPE_ITEM.equals(type)) {
-				columnComponentCommand.setItemCommand(itemCommandMap.get(targetId));
-			} else if (ColumnModule.TYPE_CATEGORY.equals(type)) {
-				columnComponentCommand.setCategory(categoryMap.get(targetId));
-			}
+        Date now = new Date();
+        if (null != publishTimeDate && publishTimeDate.compareTo(now) > 0){
+            addTask(pageCode, moduleCode, publishTimeDate);
+        }
 
-		}
-		
-		return columnCompCommandList;
-	}
+    }
 
-	/**
-	 * 添加定时任务(定时发布)
-	 * 
-	 * @param pageCode
-	 * @param moduleCode
-	 * @param publishTime
-	 * @throws Exception
-	 */
-	private void addTask(String pageCode, String moduleCode, Date publishTime) throws Exception {
-		// 先删除已经有的
-		DynamicTask task = new PublishModuleTask(this, pageCode, moduleCode);
+    /**
+     * 判断版块组件中的数据是否有修改过
+     * 
+     * @param dbColumnComp
+     * @param columnComp
+     * @return
+     */
+    private Boolean isColumnComponentUpdate(ColumnComponent dbColumnComp,ColumnComponent columnComp){
+        if (dbColumnComp == null){
+            return false;
+        }
+        /** description */
+        String dbDesc = dbColumnComp.getDescription();
+        String desc = columnComp.getDescription();
+        if (StringUtils.isNotBlank(dbDesc) || StringUtils.isNotBlank(desc)){
+            if (StringUtils.isNotBlank(dbDesc)){
+                if (!dbDesc.equals(desc)){
+                    return false;
+                }
+            }else{
+                if (!desc.equals(dbDesc)){
+                    return false;
+                }
+            }
+        }
+        /** ext */
+        String dbExt = dbColumnComp.getExt();
+        String ext = columnComp.getExt();
+        if (StringUtils.isNotBlank(dbExt) || StringUtils.isNotBlank(ext)){
+            if (StringUtils.isNotBlank(dbExt)){
+                if (!dbExt.equals(ext)){
+                    return false;
+                }
+            }else{
+                if (!ext.equals(dbExt)){
+                    return false;
+                }
+            }
+        }
+        /** img */
+        String dbImg = dbColumnComp.getImg();
+        String img = columnComp.getImg();
+        if (StringUtils.isNotBlank(dbImg) || StringUtils.isNotBlank(img)){
+            if (StringUtils.isNotBlank(dbImg)){
+                if (!dbImg.equals(img)){
+                    return false;
+                }
+            }else{
+                if (!img.equals(dbImg)){
+                    return false;
+                }
+            }
+        }
 
-		String taskName = task.getTaskName();
+        /** url */
+        String dbUrl = dbColumnComp.getUrl();
+        String url = columnComp.getUrl();
+        if (StringUtils.isNotBlank(dbUrl) || StringUtils.isNotBlank(url)){
+            if (StringUtils.isNotBlank(dbUrl)){
+                if (!dbUrl.equals(url)){
+                    return false;
+                }
+            }else{
+                if (!url.equals(dbUrl)){
+                    return false;
+                }
+            }
+        }
+        /** targetId */
+        Long dbTargetId = dbColumnComp.getTargetId();
+        Long targetId = columnComp.getTargetId();
+        if (dbTargetId != null || targetId != null){
+            if (dbTargetId != null){
+                if (!dbTargetId.equals(targetId)){
+                    return false;
+                }
+            }else{
+                if (!targetId.equals(dbTargetId)){
+                    return false;
+                }
+            }
+        }
+        /** title */
+        String dbTitle = dbColumnComp.getTitle();
+        String title = columnComp.getTitle();
+        if (StringUtils.isNotBlank(dbTitle) || StringUtils.isNotBlank(title)){
+            if (StringUtils.isNotBlank(dbTitle)){
+                if (!dbTitle.equals(title)){
+                    return false;
+                }
+            }else{
+                if (!title.equals(dbTitle)){
+                    return false;
+                }
+            }
+        }
+        /** sort_NO */
+        Integer dbSortNo = dbColumnComp.getSortNo();
+        Integer sortNo = columnComp.getSortNo();
+        if (dbSortNo != null || sortNo != null){
+            if (dbSortNo != null){
+                if (!dbSortNo.equals(sortNo)){
+                    return false;
+                }
+            }else{
+                if (!sortNo.equals(dbSortNo)){
+                    return false;
+                }
+            }
+        }
 
-		schedulerManager.removeTask(task.getTaskName());
+        Integer dbWidth = dbColumnComp.getImgWidth();
+        Integer width = columnComp.getImgWidth();
+        if (dbWidth != null || width != null){
+            if (dbWidth != null){
+                if (!dbWidth.equals(width)){
+                    return false;
+                }
+            }else{
+                if (!width.equals(dbWidth)){
+                    return false;
+                }
+            }
+        }
 
-		// 添加新的
-		schedulerManager.addTask(task, "invoke", publishTime, taskName);
-	}
+        Integer dbHeight = dbColumnComp.getImgHeight();
+        Integer height = columnComp.getImgHeight();
+        if (dbHeight != null || height != null){
+            if (dbHeight != null){
+                if (!dbHeight.equals(height)){
+                    return false;
+                }
+            }else{
+                if (!height.equals(dbHeight)){
+                    return false;
+                }
+            }
+        }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.manager.column.ColumnManager#publishColumnPage(java.lang.String)
-	 */
-	@Override
-	public boolean publishColumnPage(String pageCode) {
-		ColumnPageCommand pageCmd = sdkColumnManager.findColumnModuleMapByPageCode(pageCode);
+        return true;
+    }
 
-		Map<String, ColumnModuleCommand> moduleMap = pageCmd.getColumnModuleMap();
-		if (Validator.isNotNullOrEmpty(moduleMap)) {
-			Date publishedDate = new Date();
-			ObjectMapper mapper = new ObjectMapper();
+    @Override
+    public List<ColumnComponentCommand> findColumnComponentByPageCode(String pageCode){
+        ColumnPage columnPage = columnPageDao.findColumnPageByPageCode(pageCode);
+        if (null == columnPage){
+            throw new BusinessException(ErrorCodes.COLUMN_PAGE_NOT_EXIST);
+        }
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("pageId", columnPage.getId());
+        List<ColumnModuleCommand> columnModuleCommandList = columnModuleDao.findColumnModuleCommandListByQueryMap(paramMap);
+        /** key: module id ; value: ColumnModuleCommand */
+        Map<Long, ColumnModuleCommand> columnModuleMap = new HashMap<Long, ColumnModuleCommand>();
+        for (ColumnModuleCommand columnModuleCommand : columnModuleCommandList){
+            columnModuleMap.put(columnModuleCommand.getId(), columnModuleCommand);
+        }
 
-			List<Long> idsToBedel = new ArrayList<Long>();
+        List<ColumnComponentCommand> columnCompCommandList = columnComponentDao.findColumnComponentByPageCode(pageCode);
 
-			for (String key : moduleMap.keySet()) {
-				Map<String, Object> paramMap = new HashMap<String, Object>();
-				paramMap.put("pageCode", pageCode);
-				paramMap.put("moduleCode", key);
-				List<ColumnPublished> list = columnPublishedDao.findColumnPublishedListByQueryMap(paramMap);
+        return processColumnComponentData(columnCompCommandList, columnModuleMap);
+    }
 
-				if (Validator.isNotNullOrEmpty(list)) {
-					for (ColumnPublished p : list) {
-						idsToBedel.add(p.getId());
-					}
-				}
-			}
-			// 删除t_col_column_published表中的对应的数据
-			columnPublishedDao.deleteAllByPrimaryKey(idsToBedel);
-			// columnPublishedDao.removeColumnPublishedByIds(idsToBedel);
+    /**
+     * 处理columnComponentCommand中的数据
+     * 
+     * @param ColumnComponentCommandList
+     * @return
+     */
+    private List<ColumnComponentCommand> processColumnComponentData(List<ColumnComponentCommand> columnCompCommandList,Map<Long, ColumnModuleCommand> columnModuleMap){
+        List<Long> itemIds = new ArrayList<Long>();
+        List<Long> categoryIds = new ArrayList<Long>();
+        for (ColumnComponentCommand columnComponentCommand : columnCompCommandList){
+            ColumnModuleCommand columnModuleCommand = columnModuleMap.get(columnComponentCommand.getModule_id());
+            Long targetId = columnComponentCommand.getTargetId();
+            Integer type = columnModuleCommand.getType();
+            /**
+             * 新品热推管理, 精品推荐默认商品管理, 最热排行管理都是商品 精品推荐默认分类管理 是商品分类
+             */
+            if (null == targetId || null == type){
+                continue;
+            }
+            if (type.equals(ColumnModule.TYPE_ITEM)){
+                itemIds.add(targetId);
+            }else if (type.equals(ColumnModule.TYPE_CATEGORY)){
+                categoryIds.add(targetId);
+            }
+        }
+        /** item image */
+        List<ItemImage> itemImageList = itemImageDao.findItemImageByItemIds(itemIds, ItemImage.IMG_TYPE_LIST);
+        Map<Long, List<ItemImage>> itemImageListMap = new HashMap<Long, List<ItemImage>>();
+        List<ItemImage> itemImages = null;
+        for (Long itemId : itemIds){
+            itemImages = new ArrayList<ItemImage>();
+            for (ItemImage itemIamge : itemImageList){
+                if (itemId.equals(itemIamge.getItemId())){
+                    itemImages.add(0, itemIamge);
+                }
+            }
+            itemImageListMap.put(itemId, itemImages);
+        }
+        /** item */
+        List<ItemCommand> itemCommandList = itemDao.findItemCommandListByIds(itemIds);
+        Map<Long, ItemCommand> itemCommandMap = new HashMap<Long, ItemCommand>();
+        for (ItemCommand itemCommand : itemCommandList){
+            Long itemId = itemCommand.getId();
+            itemCommand.setItemImageList(itemImageListMap.get(itemId));
+            itemCommandMap.put(itemId, itemCommand);
+        }
 
-			for (String key : moduleMap.keySet()) {
-				ColumnModuleCommand module = moduleMap.get(key);
-				List<ColumnComponentCommand> cptCmdList = module.getComponentList();
+        /** category */
+        List<Category> categoryList = categoryDao.findCategoryListByIds(categoryIds);
+        Map<Long, Category> categoryMap = new HashMap<Long, Category>();
+        for (Category category : categoryList){
+            categoryMap.put(category.getId(), category);
+        }
 
-				List<ColumnComponent> columnComponentList = new ArrayList<ColumnComponent>(cptCmdList.size());
+        for (ColumnComponentCommand columnComponentCommand : columnCompCommandList){
+            ColumnModuleCommand columnModuleCommand = columnModuleMap.get(columnComponentCommand.getModule_id());
+            Long targetId = columnComponentCommand.getTargetId();
+            Integer type = columnModuleCommand.getType();
+            if (null == targetId || null == type){
+                continue;
+            }
 
-				if (Validator.isNotNullOrEmpty(cptCmdList)) {
-					for (ColumnComponentCommand ccCmd : cptCmdList) {
-						ColumnComponent cc = new ColumnComponent();
-						cc = (ColumnComponent) ConvertUtils.convertFromTarget(cc, ccCmd);
-						columnComponentList.add(cc);
-					}
-				}
+            if (ColumnModule.TYPE_ITEM.equals(type)){
+                columnComponentCommand.setItemCommand(itemCommandMap.get(targetId));
+            }else if (ColumnModule.TYPE_CATEGORY.equals(type)){
+                columnComponentCommand.setCategory(categoryMap.get(targetId));
+            }
 
-				String value = null;
+        }
 
-				// 转换成json格式的数据
-				if (Validator.isNotNullOrEmpty(columnComponentList)) {
-					try {
-						value = mapper.writeValueAsString(columnComponentList);
-					} catch (Exception e) {
-						log.error(e.getMessage());
+        return columnCompCommandList;
+    }
 
-						// 转json失败 ， 回滚事务
-						throw new RuntimeException();
-					}
-				}
+    /**
+     * 添加定时任务(定时发布)
+     * 
+     * @param pageCode
+     * @param moduleCode
+     * @param publishTime
+     * @throws Exception
+     */
+    private void addTask(String pageCode,String moduleCode,Date publishTime) throws Exception{
+        // 先删除已经有的
+        DynamicTask task = new PublishModuleTask(this, pageCode, moduleCode);
 
-				// 在t_col_column_published和t_col_column_published_history表中添加数据
-				ColumnPublished published = new ColumnPublished();
-				ColumnPublishedHistory history = new ColumnPublishedHistory();
+        String taskName = task.getTaskName();
 
-				published.setModuleCode(key);
-				published.setPageCode(pageCode);
-				published.setPublishedTime(publishedDate);
-				published.setValue(value);
+        schedulerManager.removeTask(task.getTaskName());
 
-				history.setModuleCode(key);
-				history.setPageCode(pageCode);
-				history.setPublishedTime(publishedDate);
-				history.setValue(value);
+        // 添加新的
+        schedulerManager.addTask(task, "invoke", publishTime, taskName);
+    }
 
-				columnPublishedDao.save(published);
-				columnPublishedHistoryDao.save(history);
-			}
-			// 删除缓存中的数据
-			cacheManager.removeMapValue(CacheKeyConstant.COLUMN_KEY, pageCode);
-			return true;
-		}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.manager.column.ColumnManager#publishColumnPage(java.lang.String)
+     */
+    @Override
+    public boolean publishColumnPage(String pageCode){
+        ColumnPageCommand pageCmd = sdkColumnManager.findColumnModuleMapByPageCode(pageCode);
 
-		return false;
-	}
+        Map<String, ColumnModuleCommand> moduleMap = pageCmd.getColumnModuleMap();
+        if (Validator.isNotNullOrEmpty(moduleMap)){
+            Date publishedDate = new Date();
+            ObjectMapper mapper = new ObjectMapper();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.manager.column.ColumnManager#publishColumnModule(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public boolean publishColumnModule(String pageCode, String moduleCode) {
+            List<Long> idsToBedel = new ArrayList<Long>();
 
-		// 根据 pageCode 和 moduleCode 查出对应模块
-		ColumnModule module = columnModuleDao.findColumnModuleByPageCodeAndModuleCode(pageCode, moduleCode);
+            for (String key : moduleMap.keySet()){
+                Map<String, Object> paramMap = new HashMap<String, Object>();
+                paramMap.put("pageCode", pageCode);
+                paramMap.put("moduleCode", key);
+                List<ColumnPublished> list = columnPublishedDao.findColumnPublishedListByQueryMap(paramMap);
 
-		if (Validator.isNotNullOrEmpty(module)) {
+                if (Validator.isNotNullOrEmpty(list)){
+                    for (ColumnPublished p : list){
+                        idsToBedel.add(p.getId());
+                    }
+                }
+            }
+            // 删除t_col_column_published表中的对应的数据
+            columnPublishedDao.deleteAllByPrimaryKey(idsToBedel);
+            // columnPublishedDao.removeColumnPublishedByIds(idsToBedel);
 
-			// 查出已经发布过的东西，并且删除
-			Map<String, Object> paramMap = new HashMap<String, Object>();
-			paramMap.put("pageCode", pageCode);
-			paramMap.put("moduleCode", moduleCode);
-			List<ColumnPublished> list = columnPublishedDao.findColumnPublishedListByQueryMap(paramMap);
+            for (String key : moduleMap.keySet()){
+                ColumnModuleCommand module = moduleMap.get(key);
+                List<ColumnComponentCommand> cptCmdList = module.getComponentList();
 
-			List<Long> idsToBedel = new ArrayList<Long>();
+                List<ColumnComponent> columnComponentList = new ArrayList<ColumnComponent>(cptCmdList.size());
 
-			if (Validator.isNotNullOrEmpty(list)) {
-				for (ColumnPublished p : list) {
-					idsToBedel.add(p.getId());
-				}
-			}
+                if (Validator.isNotNullOrEmpty(cptCmdList)){
+                    for (ColumnComponentCommand ccCmd : cptCmdList){
+                        ColumnComponent cc = new ColumnComponent();
+                        cc = (ColumnComponent) ConvertUtils.convertFromTarget(cc, ccCmd);
+                        columnComponentList.add(cc);
+                    }
+                }
 
-			columnPublishedDao.deleteAllByPrimaryKey(idsToBedel);
+                String value = null;
 
-			Long moduleId = module.getId();
-			List<ColumnComponent> componentList = columnComponentDao.findColumnCompListByModuleId(moduleId);
-			if (Validator.isNotNullOrEmpty(componentList)) {
-				String value = null;
+                // 转换成json格式的数据
+                if (Validator.isNotNullOrEmpty(columnComponentList)){
+                    try{
+                        value = mapper.writeValueAsString(columnComponentList);
+                    }catch (Exception e){
+                        log.error(e.getMessage());
 
-				Date publishedDate = new Date();
-				ObjectMapper mapper = new ObjectMapper();
+                        // 转json失败 ， 回滚事务
+                        throw new RuntimeException();
+                    }
+                }
 
-				if (Validator.isNotNullOrEmpty(componentList)) {
+                // 在t_col_column_published和t_col_column_published_history表中添加数据
+                ColumnPublished published = new ColumnPublished();
+                ColumnPublishedHistory history = new ColumnPublishedHistory();
 
-					try {
-						value = mapper.writeValueAsString(componentList);
-					} catch (Exception e) {
-						log.error(e.getMessage());
+                published.setModuleCode(key);
+                published.setPageCode(pageCode);
+                published.setPublishedTime(publishedDate);
+                published.setValue(value);
 
-						// 转json失败 ， 回滚事务
-						throw new RuntimeException();
-					}
-				}
+                history.setModuleCode(key);
+                history.setPageCode(pageCode);
+                history.setPublishedTime(publishedDate);
+                history.setValue(value);
 
-				ColumnPublished published = new ColumnPublished();
-				ColumnPublishedHistory history = new ColumnPublishedHistory();
+                columnPublishedDao.save(published);
+                columnPublishedHistoryDao.save(history);
+            }
+            // 删除缓存中的数据
+            cacheManager.removeMapValue(CacheKeyConstant.COLUMN_KEY, pageCode);
+            return true;
+        }
 
-				published.setModuleCode(moduleCode);
-				published.setPageCode(pageCode);
-				published.setPublishedTime(publishedDate);
-				published.setValue(value);
+        return false;
+    }
 
-				history.setModuleCode(moduleCode);
-				history.setPageCode(pageCode);
-				history.setPublishedTime(publishedDate);
-				history.setValue(value);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.manager.column.ColumnManager#publishColumnModule(java.lang.String, java.lang.String)
+     */
+    @Override
+    public boolean publishColumnModule(String pageCode,String moduleCode){
 
-				columnPublishedDao.save(published);
-				columnPublishedHistoryDao.save(history);
+        // 根据 pageCode 和 moduleCode 查出对应模块
+        ColumnModule module = columnModuleDao.findColumnModuleByPageCodeAndModuleCode(pageCode, moduleCode);
 
-				return true;
-			}
-		}
-		return false;
-	}
+        if (Validator.isNotNullOrEmpty(module)){
 
-	@Override
-	public List<ColumnModuleCommand> findColumnModuleByPageCode(String pageCode) {
-		ColumnPage columnPage = columnPageDao.findColumnPageByPageCode(pageCode);
-		if(null == columnPage){
-			throw new BusinessException(ErrorCodes.COLUMN_PAGE_NOT_EXIST);
-		}
-		List<ColumnModuleCommand> columnModuleCommandList = columnModuleDao.findColumnModuleCommandByPageCode(pageCode);
-		List<Long> moduleIdList = new ArrayList<Long>();
-		/** key: module id ; value: ColumnModuleCommand */
-		Map<Long, ColumnModuleCommand> columnModuleMap = new HashMap<Long, ColumnModuleCommand>();
-		for(ColumnModuleCommand columnModuleCommand : columnModuleCommandList){
-			moduleIdList.add(columnModuleCommand.getId());
-			columnModuleMap.put(columnModuleCommand.getId(), columnModuleCommand);
-		}
-		// columnComponent
-		List<ColumnComponentCommand> columnComponentList = columnComponentDao.findColumnComponentCommandListByModuleIds(moduleIdList);
-		List<ColumnComponentCommand> columnCompCommandList = processColumnComponentData(columnComponentList, columnModuleMap);
-		
-		/****** key: module_id, value: ColumnComponentCommand集合******/
-		Map<Long, List<ColumnComponentCommand>> columnComponentMap = new HashMap<Long, List<ColumnComponentCommand>>();
-		for(ColumnModuleCommand columnModuleCommand : columnModuleCommandList){
-			List<ColumnComponentCommand> componentList = new ArrayList<ColumnComponentCommand>();
-			Long moduleId = columnModuleCommand.getId();
-			for(ColumnComponentCommand columnComponentCommand : columnCompCommandList){
-				if(moduleId.equals(columnComponentCommand.getModule_id())){
-					componentList.add(columnComponentCommand);
-				}
-			}
-			columnComponentMap.put(moduleId, componentList);
-		}
-		
-		for(ColumnModuleCommand columnModuleCommand : columnModuleCommandList){
-			columnModuleCommand.setComponentList(columnComponentMap.get(columnModuleCommand.getId()));
-			columnModuleCommand.setPageId(columnPage.getId());
-			columnModuleCommand.setPageCode(columnPage.getCode());
-		}
-		return columnModuleCommandList;
-	}
+            // 查出已经发布过的东西，并且删除
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("pageCode", pageCode);
+            paramMap.put("moduleCode", moduleCode);
+            List<ColumnPublished> list = columnPublishedDao.findColumnPublishedListByQueryMap(paramMap);
 
-	@Override
-	public List<ColumnComponent> findColumnCompByTargetId(Long targetId, String moduleCode, String pageCode) {
-		
-		ColumnModule columnModule = columnModuleDao.findColumnModuleByCode(moduleCode, pageCode);
-		Map<String, Object> paraMap = new HashMap<String, Object>();
-		paraMap.put("targetId", targetId);
-		paraMap.put("moduleId", columnModule.getId());
-		List<ColumnComponent> columnComponentList = columnComponentDao.findEffectColumnComponentListByQueryMap(paraMap);
-		return columnComponentList;
-	}
+            List<Long> idsToBedel = new ArrayList<Long>();
+
+            if (Validator.isNotNullOrEmpty(list)){
+                for (ColumnPublished p : list){
+                    idsToBedel.add(p.getId());
+                }
+            }
+
+            columnPublishedDao.deleteAllByPrimaryKey(idsToBedel);
+
+            Long moduleId = module.getId();
+            List<ColumnComponent> componentList = columnComponentDao.findColumnCompListByModuleId(moduleId);
+            if (Validator.isNotNullOrEmpty(componentList)){
+                String value = null;
+
+                Date publishedDate = new Date();
+                ObjectMapper mapper = new ObjectMapper();
+
+                if (Validator.isNotNullOrEmpty(componentList)){
+
+                    try{
+                        value = mapper.writeValueAsString(componentList);
+                    }catch (Exception e){
+                        log.error(e.getMessage());
+
+                        // 转json失败 ， 回滚事务
+                        throw new RuntimeException();
+                    }
+                }
+
+                ColumnPublished published = new ColumnPublished();
+                ColumnPublishedHistory history = new ColumnPublishedHistory();
+
+                published.setModuleCode(moduleCode);
+                published.setPageCode(pageCode);
+                published.setPublishedTime(publishedDate);
+                published.setValue(value);
+
+                history.setModuleCode(moduleCode);
+                history.setPageCode(pageCode);
+                history.setPublishedTime(publishedDate);
+                history.setValue(value);
+
+                columnPublishedDao.save(published);
+                columnPublishedHistoryDao.save(history);
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public List<ColumnModuleCommand> findColumnModuleByPageCode(String pageCode){
+        ColumnPage columnPage = columnPageDao.findColumnPageByPageCode(pageCode);
+        if (null == columnPage){
+            throw new BusinessException(ErrorCodes.COLUMN_PAGE_NOT_EXIST);
+        }
+        List<ColumnModuleCommand> columnModuleCommandList = columnModuleDao.findColumnModuleCommandByPageCode(pageCode);
+        List<Long> moduleIdList = new ArrayList<Long>();
+        /** key: module id ; value: ColumnModuleCommand */
+        Map<Long, ColumnModuleCommand> columnModuleMap = new HashMap<Long, ColumnModuleCommand>();
+        for (ColumnModuleCommand columnModuleCommand : columnModuleCommandList){
+            moduleIdList.add(columnModuleCommand.getId());
+            columnModuleMap.put(columnModuleCommand.getId(), columnModuleCommand);
+        }
+        // columnComponent
+        List<ColumnComponentCommand> columnComponentList = columnComponentDao.findColumnComponentCommandListByModuleIds(moduleIdList);
+        List<ColumnComponentCommand> columnCompCommandList = processColumnComponentData(columnComponentList, columnModuleMap);
+
+        /****** key: module_id, value: ColumnComponentCommand集合 ******/
+        Map<Long, List<ColumnComponentCommand>> columnComponentMap = new HashMap<Long, List<ColumnComponentCommand>>();
+        for (ColumnModuleCommand columnModuleCommand : columnModuleCommandList){
+            List<ColumnComponentCommand> componentList = new ArrayList<ColumnComponentCommand>();
+            Long moduleId = columnModuleCommand.getId();
+            for (ColumnComponentCommand columnComponentCommand : columnCompCommandList){
+                if (moduleId.equals(columnComponentCommand.getModule_id())){
+                    componentList.add(columnComponentCommand);
+                }
+            }
+            columnComponentMap.put(moduleId, componentList);
+        }
+
+        for (ColumnModuleCommand columnModuleCommand : columnModuleCommandList){
+            columnModuleCommand.setComponentList(columnComponentMap.get(columnModuleCommand.getId()));
+            columnModuleCommand.setPageId(columnPage.getId());
+            columnModuleCommand.setPageCode(columnPage.getCode());
+        }
+        return columnModuleCommandList;
+    }
+
+    @Override
+    public List<ColumnComponent> findColumnCompByTargetId(Long targetId,String moduleCode,String pageCode){
+
+        ColumnModule columnModule = columnModuleDao.findColumnModuleByCode(moduleCode, pageCode);
+        Map<String, Object> paraMap = new HashMap<String, Object>();
+        paraMap.put("targetId", targetId);
+        paraMap.put("moduleId", columnModule.getId());
+        List<ColumnComponent> columnComponentList = columnComponentDao.findEffectColumnComponentListByQueryMap(paraMap);
+        return columnComponentList;
+    }
 }
