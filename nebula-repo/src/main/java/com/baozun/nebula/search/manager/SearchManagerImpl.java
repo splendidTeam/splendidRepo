@@ -112,6 +112,11 @@ public class SearchManagerImpl implements SearchManager{
 
     @Override
     public void setSolrBoost(SolrQuery solrQuery,Boost boost){
+        
+        if (Validator.isNotNullOrEmpty(boost.getBq()) && Validator.isNotNullOrEmpty(boost.getQf()) && Validator.isNotNullOrEmpty(boost.getPf()) && Validator.isNotNullOrEmpty(boost.getBf())){
+            boost.setDeftype(null);
+        }
+
         if (Validator.isNotNullOrEmpty(boost.getDeftype())){
             solrQuery.set("defType", boost.getDeftype());
         }
