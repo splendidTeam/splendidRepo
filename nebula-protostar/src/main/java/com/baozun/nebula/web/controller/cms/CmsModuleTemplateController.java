@@ -135,7 +135,7 @@ public class CmsModuleTemplateController extends BaseController{
         cmsModuleTemplate.setImg(ImageOpeartion.imageUrlConvert(cmsModuleTemplate.getImg(), UPLOAD_IMG_DOMAIN, true));
 
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("imageUrlConvert over");
+            LOGGER.debug("imageUrlConvert over,will save cmsModuleTemplate:[{}]", JsonUtil.format(cmsModuleTemplate));
         }
 
         CmsModuleTemplate saveCmsModuleTemplate = cmsModuleTemplateManager.saveCmsModuleTemplate(cmsModuleTemplate);
