@@ -1,5 +1,7 @@
 package com.baozun.nebula.utils.image;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -14,7 +16,7 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
 import org.slf4j.Logger;
@@ -22,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+
+import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
  * 图像操作
@@ -542,17 +546,14 @@ public class ImageOpeartion{
             LOGGER.debug("input imgUrl:[{}],customBaseUrl:[{}],flag:[{}]", imgUrl, customBaseUrl, flag);
         }
 
-        //---------------------------------------------------------------------
-
-        if (flag){
-            if (StringUtils.isNotBlank(imgUrl) && imgUrl.toLowerCase().startsWith("http://")){
-                return imgUrl.replace(customBaseUrl, "");
-            }
-        }else{
-            if (StringUtils.isNotBlank(imgUrl)){
-                return customBaseUrl + imgUrl;
-            }
+        if (isNullOrEmpty(imgUrl)){
+            return EMPTY;
         }
-        return "";
+
+        //---------------------------------------------------------------------
+        if (flag){
+            return StringUtils.removeStart(imgUrl, customBaseUrl);
+        }
+        return customBaseUrl + imgUrl;
     }
 }
