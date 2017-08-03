@@ -20,9 +20,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,6 +39,9 @@ import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
+
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * CmsModuleInstanceController
@@ -258,7 +258,7 @@ public class CmsModuleInstanceController extends BaseController {
 	public BackWarnEntity recoverTemplateCodeArea(Long templateId, Long versionId, String code) throws UnsupportedEncodingException {
 		BackWarnEntity back = new BackWarnEntity();
 		try {
-			String data = cmsModuleInstanceManager.recoverTemplateCodeArea(templateId, versionId, code);
+            String data = cmsModuleInstanceManager.recoverTemplateCodeArea(templateId, versionId, code);
 			back.setIsSuccess(true);
 			back.setDescription(data);
 			return back;
