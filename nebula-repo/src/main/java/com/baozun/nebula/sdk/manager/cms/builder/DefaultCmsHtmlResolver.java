@@ -24,7 +24,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,27 +35,19 @@ import org.springframework.stereotype.Component;
 @Component("cmsHtmlResolver")
 public class DefaultCmsHtmlResolver implements CmsHtmlResolver{
 
+    /** The cms image src resolver. */
     @Autowired
     private CmsImageSrcResolver cmsImageSrcResolver;
 
+    /** The cms anchor href resolver. */
     @Autowired
     private CmsAnchorHrefResolver cmsAnchorHrefResolver;
 
-    /**
-     * 静态base标识
-     */
+    /** 静态base标识. */
     private final static String STATIC_BASE_CHAR = "#{staticbase}";
 
-    /**
-     * version
-     */
+    /** version. */
     private final static String VERSION = "version=000000";
-
-    /**
-     * 上传图片的域名
-     */
-    @Value("#{meta['upload.img.domain.base']}")
-    private String UPLOAD_IMG_DOMAIN = "";
 
     /*
      * (non-Javadoc)
@@ -69,14 +60,21 @@ public class DefaultCmsHtmlResolver implements CmsHtmlResolver{
             return EMPTY;
         }
 
-        //---------------------------------------------------------------------
         Document document = Jsoup.parse(html);
+
+        //---------------------------------------------------------------------
         //process img
         Elements imgs = document.select("img");
         for (Element element : imgs){
-            String src = element.attr("src");
-            element.attr("src", cmsImageSrcResolver.resolver(src));
+            element.attr("src", cmsImageSrcResolver.resolver(element.attr("src")));
         }
+
+        //PROCESS a
+        Elements as = document.select("a");
+        for (Element element : as){
+            element.attr("href", cmsAnchorHrefResolver.resolver(element.attr("href")));
+        }
+        //---------------------------------------------------------------------
 
         //process script
         Elements scripts = document.select("script");
@@ -93,7 +91,6 @@ public class DefaultCmsHtmlResolver implements CmsHtmlResolver{
         }
 
         //process css
-
         Elements links = document.select("link");
         for (Element element : links){
             String href = element.attr("href");
@@ -105,13 +102,6 @@ public class DefaultCmsHtmlResolver implements CmsHtmlResolver{
                 href = STATIC_BASE_CHAR + "/" + href + "?" + VERSION;
             }
             element.attr("href", href);
-        }
-
-        //PROCESS a
-        Elements as = document.select("a");
-        for (Element element : as){
-            String href = element.attr("href");
-            element.attr("href", cmsAnchorHrefResolver.resolver(href));
         }
 
         return document.toString();

@@ -20,6 +20,8 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import org.springframework.stereotype.Component;
 
+import com.feilong.core.net.URIUtil;
+
 import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
@@ -56,7 +58,7 @@ public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
         }
 
         //不是以 http 开头
-        if (!href.startsWith("http")){
+        if (!URIUtil.create(href).isAbsolute()){
             return PAGE_BASE_CHAR + "/" + href;
         }
 

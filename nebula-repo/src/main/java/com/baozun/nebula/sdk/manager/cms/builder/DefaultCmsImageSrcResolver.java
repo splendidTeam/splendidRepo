@@ -21,6 +21,8 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.feilong.core.net.URIUtil;
+
 import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
@@ -67,8 +69,8 @@ public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
             return STATIC_BASE_CHAR + imageSrc + "?" + VERSION;
         }
 
-        //不是以 http 开头
-        if (!imageSrc.startsWith("http")){
+        //不是绝对地址
+        if (!URIUtil.create(imageSrc).isAbsolute()){
             return STATIC_BASE_CHAR + "/" + imageSrc + "?" + VERSION;
         }
 
