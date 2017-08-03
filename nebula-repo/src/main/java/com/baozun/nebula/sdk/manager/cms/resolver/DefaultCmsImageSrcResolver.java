@@ -58,6 +58,14 @@ public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
 
         //---------------------------------------------------------------------
 
+        //以 #{imgbase}开头,那么不动, 后面有替换
+        //since 5.3.2.22
+        if (imageSrc.startsWith(DefaultCmsHtmlReplaceResolver.IMG_BASE_CHAR)){
+            return imageSrc + "?" + VERSION;
+        }
+
+        //---------------------------------------------------------------------
+
         //以 / 开头
         if (imageSrc.startsWith("/")){
             return DefaultCmsHtmlReplaceResolver.STATIC_BASE_CHAR + imageSrc + "?" + VERSION;

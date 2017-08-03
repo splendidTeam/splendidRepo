@@ -49,6 +49,13 @@ public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
 
         //---------------------------------------------------------------------
 
+        //以 #{pagebase} 开头,那么不动, 后面有替换
+        //since 5.3.2.22
+        if (href.startsWith(DefaultCmsHtmlReplaceResolver.PAGE_BASE_CHAR)){
+            return href;
+        }
+        //---------------------------------------------------------------------
+
         //以 / 开头
         if (href.startsWith("/")){
             return DefaultCmsHtmlReplaceResolver.PAGE_BASE_CHAR + href;
