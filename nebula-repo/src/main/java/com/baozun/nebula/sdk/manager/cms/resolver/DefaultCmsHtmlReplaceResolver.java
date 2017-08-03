@@ -122,7 +122,13 @@ public class DefaultCmsHtmlReplaceResolver implements CmsHtmlReplaceResolver{
 
         String result = html;
         for (Map.Entry<String, String> entry : formatUrlMap.entrySet()){
-            result = result.replace(entry.getKey(), entry.getValue());
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("will replace html ,use :[{}] ,replace :[{}]", value, key);
+            }
+            result = result.replace(key, value);
         }
 
         //---------------------------------------------------------------------
