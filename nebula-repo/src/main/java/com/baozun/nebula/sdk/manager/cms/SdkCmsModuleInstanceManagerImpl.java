@@ -290,12 +290,58 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 
     @Override
     public CmsModuleInstance createOrUpdateModuleInstance(CmsModuleInstance cmsModuleInstance,String html){
-        /** 保存页面实例 */
-        CmsModuleInstance instance = null;
         Long id = cmsModuleInstance.getId();
 
         checkPageInstanceCode(cmsModuleInstance, id);
 
+        CmsModuleInstance instance = saveCmsModuleInstance(cmsModuleInstance, id);
+        
+
+        //---------------------------------------------------------------------
+
+        Map<String, String> editAreaMap = sdkCmsParseHtmlContentManager.processPageHtml(html, Constants.CMS_MODULE);
+        Long moduleId = instance.getId();
+        // 保存页面编辑区域
+        for (Map.Entry<String, String> entry : editAreaMap.entrySet()){
+            //根据moduleCode查询
+            Map<String, Object> paraMap = new HashMap<>();
+            paraMap.put("moduleCode", entry.getKey());
+            paraMap.put("moduleTemplateId", instance.getTemplateId());
+            paraMap.put("moduleId", moduleId);
+            List<CmsEditArea> cmsEditAreas = sdkCmsEditAreaManager.findCmsEditAreaListByQueryMap(paraMap);
+            //修改
+            if (isNotNullOrEmpty(cmsEditAreas)){
+                CmsEditArea cmsEditArea = sdkCmsEditAreaManager.findCmsEditAreaById(cmsEditAreas.get(0).getId());
+                cmsEditArea.setData(entry.getValue());
+                cmsEditArea.setModifyTime(new Date());
+                sdkCmsEditAreaManager.saveCmsEditArea(cmsEditArea);
+            }else{
+                //新增
+                CmsEditArea cmsEditArea = new CmsEditArea();
+                cmsEditArea.setModuleCode(entry.getKey());
+                cmsEditArea.setData(entry.getValue());
+                cmsEditArea.setLifecycle(CmsEditArea.LIFECYCLE_ENABLE);
+                cmsEditArea.setModuleId(moduleId);
+                cmsEditArea.setModuleTemplateId(instance.getTemplateId());
+                cmsEditArea.setCreateTime(new Date());
+
+                sdkCmsEditAreaManager.saveCmsEditArea(cmsEditArea);
+            }
+        }
+        LOGGER.info("save Success, module's id is [{}], code is [{}]", instance.getId(), instance.getCode());
+        return instance;
+    }
+
+    /**
+     * @param cmsModuleInstance
+     * @param id
+     * @return
+     * @since 5.3.2.22
+     */
+    private CmsModuleInstance saveCmsModuleInstance(CmsModuleInstance cmsModuleInstance,Long id){
+        //---------------------------------------------------------------------
+        /** 保存页面实例 */
+        CmsModuleInstance instance = null;
         if (null != id){
             // 修改
             CmsModuleInstance dbModule = cmsModuleInstanceDao.getByPrimaryKey(id);
@@ -311,38 +357,6 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
             cmsModuleInstance.setIsPublished(false);
             instance = cmsModuleInstanceDao.save(cmsModuleInstance);
         }
-
-        Map<String, String> editAreaMap = sdkCmsParseHtmlContentManager.processPageHtml(html, Constants.CMS_MODULE);
-        Long moduleId = instance.getId();
-        // 保存页面编辑区域
-        CmsEditArea cmsEditArea = null;
-        for (Map.Entry<String, String> entry : editAreaMap.entrySet()){
-            //根据moduleCode查询
-            Map<String, Object> paraMap = new HashMap<String, Object>();
-            paraMap.put("moduleCode", entry.getKey());
-            paraMap.put("moduleTemplateId", instance.getTemplateId());
-            paraMap.put("moduleId", moduleId);
-            List<CmsEditArea> cmsEditAreas = sdkCmsEditAreaManager.findCmsEditAreaListByQueryMap(paraMap);
-            //修改
-            if (cmsEditAreas != null && cmsEditAreas.size() > 0){
-                cmsEditArea = sdkCmsEditAreaManager.findCmsEditAreaById(cmsEditAreas.get(0).getId());
-                cmsEditArea.setData(entry.getValue());
-                cmsEditArea.setModifyTime(new Date());
-                sdkCmsEditAreaManager.saveCmsEditArea(cmsEditArea);
-            }else{
-                //新增
-                cmsEditArea = new CmsEditArea();
-                cmsEditArea.setModuleCode(entry.getKey());
-                cmsEditArea.setData(entry.getValue());
-                cmsEditArea.setLifecycle(CmsEditArea.LIFECYCLE_ENABLE);
-                cmsEditArea.setModuleId(moduleId);
-                cmsEditArea.setModuleTemplateId(instance.getTemplateId());
-                cmsEditArea.setCreateTime(new Date());
-
-                sdkCmsEditAreaManager.saveCmsEditArea(cmsEditArea);
-            }
-        }
-        LOGGER.info("save Success, module's id is " + instance.getId() + ", code is " + instance.getCode());
         return instance;
     }
 

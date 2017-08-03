@@ -51,28 +51,25 @@ import loxia.dao.Sort;
 @Service("sdkCmsPageTemplateManager")
 public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
 
-    private final static Logger log = LoggerFactory.getLogger(SdkCmsPageTemplateManagerImpl.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(SdkCmsPageTemplateManagerImpl.class);
 
     @Autowired
     private CmsPageTemplateDao cmsPageTemplateDao;
 
-    @Autowired
-    private SdkCmsPageInstanceManager sdkCmsPageInstanceManager;
-
     /**
      * 静态base标识
      */
-    public final static String STATIC_BASE_CHAR = "#{staticbase}";
+    private final static String STATIC_BASE_CHAR = "#{staticbase}";
 
     /**
      * 页面base标识
      */
-    public final static String PAGE_BASE_CHAR = "#{pagebase}";
+    private final static String PAGE_BASE_CHAR = "#{pagebase}";
 
     /**
      * 图片base标识
      */
-    public final static String IMG_BASE_CHAR = "#{imgbase}";
+    private final static String IMG_BASE_CHAR = "#{imgbase}";
 
     /**
      * version
@@ -83,6 +80,7 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * 保存CmsPageTemplate
      * 
      */
+    @Override
     public CmsPageTemplate saveCmsPageTemplate(CmsPageTemplate model){
         model.setCreateTime(new Date());
         model.setLifecycle(BaseModel.LIFECYCLE_ENABLE);
@@ -93,9 +91,9 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * 通过id获取CmsPageTemplate
      * 
      */
+    @Override
     @Transactional(readOnly = true)
     public CmsPageTemplate findCmsPageTemplateById(Long id){
-
         return cmsPageTemplateDao.getByPrimaryKey(id);
     }
 
@@ -104,9 +102,9 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * 
      * @return
      */
+    @Override
     @Transactional(readOnly = true)
     public List<CmsPageTemplate> findAllCmsPageTemplateList(){
-
         return cmsPageTemplateDao.findAllCmsPageTemplateList();
     };
 
@@ -116,9 +114,9 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * @param ids
      * @return
      */
+    @Override
     @Transactional(readOnly = true)
     public List<CmsPageTemplate> findCmsPageTemplateListByIds(List<Long> ids){
-
         return cmsPageTemplateDao.findCmsPageTemplateListByIds(ids);
     };
 
@@ -128,9 +126,9 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * @param paraMap
      * @return
      */
+    @Override
     @Transactional(readOnly = true)
     public List<CmsPageTemplate> findCmsPageTemplateListByQueryMap(Map<String, Object> paraMap){
-
         return cmsPageTemplateDao.findCmsPageTemplateListByQueryMap(paraMap);
     };
 
@@ -143,9 +141,9 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * @param sorts
      * @return
      */
+    @Override
     @Transactional(readOnly = true)
     public Pagination<CmsPageTemplate> findCmsPageTemplateListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
-
         return cmsPageTemplateDao.findCmsPageTemplateListByQueryMapWithPage(page, sorts, paraMap);
     };
 
@@ -156,6 +154,7 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * @param ids
      * @return
      */
+    @Override
     public void enableOrDisableCmsPageTemplateByIds(List<Long> ids,Integer state){
         cmsPageTemplateDao.enableOrDisableCmsPageTemplateByIds(ids, state);
     }
@@ -167,41 +166,10 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * @param ids
      * @return
      */
+    @Override
     public void removeCmsPageTemplateByIds(List<Long> ids){
-        //		for(Long tempid : ids){
-        //			if(!CheckPublishedInstanceInTemplate(tempid)){
-        //				HashMap<String, Object> param = new HashMap<String, Object>();
-        //				param.put("templateId", tempid);
-        //				param.put("isPublished", false);
-        //				List<CmsPageInstance> cancelInstances = sdkCmsPageInstanceManager.findEffectCmsPageInstanceListByQueryMap(param);
-        //				List<Long> instanceIds = new ArrayList<Long>();
-        //				for(CmsPageInstance cancelInstance : cancelInstances){
-        //					instanceIds.add(cancelInstance.getId());
-        //				}
-        //				sdkCmsPageInstanceManager.removeCmsPageInstanceByIds(instanceIds);
-        //			}else{
-        //				return PublishResult.REMOVETEMPLATEEXISTPUBLISHEDINSTANCE;				
-        //			}
-        //		}
-
         cmsPageTemplateDao.removeCmsPageTemplateByIds(ids);
-        //return PublishResult.SUCCESS;
     }
-
-    //	/**
-    //	 * 检测模板是否包含已发布的实例
-    //	 * @param tempid 模板id
-    //	 */
-    //	private boolean CheckPublishedInstanceInTemplate(Long tempid){
-    //		Map<String, Object> param = new HashMap<String, Object>();
-    //		param.put("templateId", tempid);
-    //		param.put("isPublished", true);
-    //		List<CmsPageInstance> cmsPageInstances = sdkCmsPageInstanceManager.findEffectCmsPageInstanceListByQueryMap(param);
-    //		if(Validator.isNotNullOrEmpty(cmsPageInstances) && cmsPageInstances.size()>0){
-    //			return true;
-    //		}
-    //		return false;
-    //	}
 
     /**
      * 获取有效的CmsPageTemplate列表
@@ -210,9 +178,9 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * @param ids
      * @return
      */
+    @Override
     @Transactional(readOnly = true)
     public List<CmsPageTemplate> findAllEffectCmsPageTemplateList(){
-
         return cmsPageTemplateDao.findAllEffectCmsPageTemplateList();
     };
 
@@ -223,9 +191,9 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * @param paraMap
      * @return
      */
+    @Override
     @Transactional(readOnly = true)
     public List<CmsPageTemplate> findEffectCmsPageTemplateListByQueryMap(Map<String, Object> paraMap){
-
         return cmsPageTemplateDao.findEffectCmsPageTemplateListByQueryMap(paraMap);
     };
 
@@ -239,9 +207,9 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
      * @param sorts
      * @return
      */
+    @Override
     @Transactional(readOnly = true)
     public Pagination<CmsPageTemplate> findEffectCmsPageTemplateListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
-
         return cmsPageTemplateDao.findEffectCmsPageTemplateListByQueryMapWithPage(page, sorts, paraMap);
     }
 
@@ -324,11 +292,9 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
     @Override
     public String processTemplateBase(String html){
         Properties metainfoProperties = ProfileConfigUtil.findPro("config/metainfo.properties");
-
         if (StringUtils.isBlank(html)){
             return "";
         }
-
         Properties properties = ProfileConfigUtil.findPro("config/metainfo.properties");
 
         String pagebase = StringUtils.trim(properties.getProperty("page.base"));
@@ -336,7 +302,7 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
         String staticbase = StringUtils.trim(properties.getProperty("static.domain.base"));
 
         String imgbase = StringUtils.trim(properties.getProperty("upload.img.domain.base"));
-        log.info("pagebase:[{}], staticbase:[{}],imgbase:[{}]", pagebase, staticbase, imgbase);
+        LOGGER.info("pagebase:[{}], staticbase:[{}],imgbase:[{}]", pagebase, staticbase, imgbase);
 
         if (StringUtils.isBlank(pagebase)){
             pagebase = "";
@@ -361,7 +327,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
         }else if (imgbase.endsWith("/")){
             imgbase = imgbase.substring(0, imgbase.length() - 1);
         }
-
         html = html.replace(PAGE_BASE_CHAR, pagebase);
         html = html.replace(STATIC_BASE_CHAR, staticbase);
         html = html.replace(IMG_BASE_CHAR, imgbase);
