@@ -26,6 +26,7 @@ import com.baozun.nebula.model.cms.CmsPublished;
 import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
 import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlResolver;
 import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
  * SdkCmsParseHtmlContentManagerImpl
@@ -539,6 +540,10 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
         dealHtml(pageAreaMap, document, CMS_PRODUCT_EDIT_CLASS, pageType);
 
         //---------------------------------------------------------------------
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("pageAreaMap:[{}]", JsonUtil.format(pageAreaMap));
+        }
 
         return pageAreaMap;
     }

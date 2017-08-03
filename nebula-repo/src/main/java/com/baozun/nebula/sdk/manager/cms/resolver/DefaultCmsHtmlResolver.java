@@ -23,6 +23,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +36,9 @@ import org.springframework.stereotype.Component;
  */
 @Component("cmsHtmlResolver")
 public class DefaultCmsHtmlResolver implements CmsHtmlResolver{
+
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCmsHtmlResolver.class);
 
     /** The cms image src resolver. */
     @Autowired
@@ -66,13 +71,26 @@ public class DefaultCmsHtmlResolver implements CmsHtmlResolver{
         //process img
         Elements imgs = document.select("img");
         for (Element element : imgs){
-            element.attr("src", cmsImageSrcResolver.resolver(element.attr("src")));
+            String src = element.attr("src");
+            String result = cmsImageSrcResolver.resolver(src);
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("element:[{}], attr:[{}], result:{}", element.toString(), src, result);
+            }
+            element.attr("src", result);
         }
 
         //PROCESS a
         Elements as = document.select("a");
         for (Element element : as){
-            element.attr("href", cmsAnchorHrefResolver.resolver(element.attr("href")));
+            String attr = element.attr("href");
+            String result = cmsAnchorHrefResolver.resolver(attr);
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("element:[{}], attr:[{}], result:{}", element.toString(), attr, result);
+            }
+
+            element.attr("href", result);
         }
         //---------------------------------------------------------------------
 
@@ -104,6 +122,11 @@ public class DefaultCmsHtmlResolver implements CmsHtmlResolver{
             element.attr("href", href);
         }
 
-        return document.toString();
+        String string = document.toString();
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("final result:{}", string);
+        }
+
+        return string;
     }
 }
