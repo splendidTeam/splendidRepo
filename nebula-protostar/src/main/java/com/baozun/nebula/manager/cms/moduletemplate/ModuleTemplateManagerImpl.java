@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.cms.CmsModuleTemplateDao;
 import com.baozun.nebula.model.cms.CmsModuleTemplate;
-import com.baozun.nebula.sdk.manager.cms.SdkCmsCommonManager;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
 
 @Service("moduleTemplateManager")
 @Transactional
@@ -16,16 +16,14 @@ public class ModuleTemplateManagerImpl implements ModuleTemplateManager{
     private CmsModuleTemplateDao cmsModuleTemplateDao;
 
     @Autowired
-    private SdkCmsCommonManager sdkCmsCommonManager;
+    private CmsHtmlReplaceResolver cmsHtmlReplaceResolver;
 
     @Override
     public String packModuleTemplateById(Long id){
         CmsModuleTemplate template = cmsModuleTemplateDao.getByPrimaryKey(id);
-
         if (template != null){
-            return sdkCmsCommonManager.processTemplateBase(template.getData());
+            return cmsHtmlReplaceResolver.processTemplateBase(template.getData());
         }
-
         return "";
     }
 

@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.cms.builder;
+package com.baozun.nebula.sdk.manager.cms.resolver;
 
 /**
  * 

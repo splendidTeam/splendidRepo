@@ -44,6 +44,7 @@ import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPublished;
 import com.baozun.nebula.model.cms.CmsTemplateHtml;
 import com.baozun.nebula.sdk.constants.Constants;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
 import com.feilong.core.Validator;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
@@ -99,6 +100,9 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 
     @Autowired
     private SdkCmsTemplateHtmlManager sdkCmsTemplateHtmlManager;
+
+    @Autowired
+    private CmsHtmlReplaceResolver cmsHtmlReplaceResolver;
 
     public static Map<String, CmsTemplateHtml> moduleMap = new HashMap<>();
 
@@ -295,7 +299,6 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
         checkPageInstanceCode(cmsModuleInstance, id);
 
         CmsModuleInstance instance = saveCmsModuleInstance(cmsModuleInstance, id);
-        
 
         //---------------------------------------------------------------------
 
@@ -479,7 +482,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
         }else{
             sdkCmsEditAreaManager.removeCmsModuleEditAreaByTemplateId(templateId, code);
         }
-        data = sdkCmsPageTemplateManager.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.processTemplateBase(data);
         return data;
     }
 

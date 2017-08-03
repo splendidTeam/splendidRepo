@@ -23,7 +23,8 @@ import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPageInstanceVersion;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
 import com.baozun.nebula.model.cms.CmsPublished;
-import com.baozun.nebula.sdk.manager.cms.builder.CmsHtmlResolver;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlResolver;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
 import com.feilong.core.Validator;
 
 /**
@@ -84,6 +85,9 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
     @Autowired
     private SdkCmsPageInstanceVersionManager sdkCmsPageInstanceVersionManager;
 
+    @Autowired
+    private CmsHtmlReplaceResolver cmsHtmlReplaceResolver;
+
     @Override
     public <T> String getParseModuleData(List<T> editAreaList,Long templateId){
         CmsModuleTemplate template = sdkCmsModuleTemplateManager.findCmsModuleTemplateById(templateId);
@@ -140,7 +144,7 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
             }
         }
         data = document.toString();
-        data = sdkCmsPageTemplateManager.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.processTemplateBase(data);
         data = processOnlyEditData(data);
         data = processExtraHtmlTag(data);
         return data;
@@ -261,7 +265,7 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
             data = document.toString();
 
         }
-        data = sdkCmsPageTemplateManager.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.processTemplateBase(data);
         if (isEdit){
             data = processNoEditData(data);
         }else{
@@ -395,7 +399,7 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
             }
             data = document.toString();
         }
-        data = sdkCmsPageTemplateManager.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.processTemplateBase(data);
         if (isEdit){
             data = processNoEditData(data);
         }

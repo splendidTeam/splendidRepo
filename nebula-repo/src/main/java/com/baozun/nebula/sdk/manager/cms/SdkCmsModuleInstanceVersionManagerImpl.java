@@ -71,12 +71,6 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
     private CmsModuleInstanceVersionDao cmsModuleInstanceVersionDao;
 
     @Autowired
-    private SdkCmsPageTemplateManager sdkCmsPageTemplateManager;
-
-    @Autowired
-    private SdkCmsModuleTemplateManager sdkCmsModuleTemplateManager;
-
-    @Autowired
     private SdkCmsEditVersionAreaManager sdkCmsEditVersionAreaManager;
 
     @Autowired

@@ -128,13 +128,4 @@ public interface SdkCmsPageTemplateManager extends BaseManager{
      */
     Pagination<CmsPageTemplate> findEffectCmsPageTemplateListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap);
 
-    /**
-     * 根据配置文件将#{staticbase},#{pagebase}转换成真实的路径
-     * (方法移至SdkCmsCommonManager)
-     * 
-     * @param html
-     * @return
-     */
-    @Deprecated
-    String processTemplateBase(String html);
 }

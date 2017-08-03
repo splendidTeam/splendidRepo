@@ -14,10 +14,11 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.cms.builder;
+package com.baozun.nebula.sdk.manager.cms.resolver;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.feilong.core.net.URIUtil;
@@ -30,11 +31,21 @@ import static com.feilong.core.Validator.isNullOrEmpty;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.22
  */
-@Component("cmsAnchorHrefResolver")
-public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
+@Component("cmsImageSrcResolver")
+public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
 
-    /** 页面base标识. */
-    private final static String PAGE_BASE_CHAR = "#{pagebase}";
+    /** 上传图片的域名. */
+    @Value("#{meta['upload.img.domain.base']}")
+    private String UPLOAD_IMG_DOMAIN = "";
+
+    /** 静态base标识. */
+    private final static String STATIC_BASE_CHAR = "#{staticbase}";
+
+    /** 图片base标识. */
+    private final static String IMG_BASE_CHAR = "#{imgbase}";
+
+    /** version. */
+    private final static String VERSION = "version=000000";
 
     /*
      * (non-Javadoc)
@@ -42,26 +53,31 @@ public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
      * @see com.baozun.nebula.sdk.manager.cms.builder.CmsSrcResolver#resolver(java.lang.String)
      */
     @Override
-    public String resolver(String href){
-        if (isNullOrEmpty(href)){
+    public String resolver(String imageSrc){
+        if (isNullOrEmpty(imageSrc)){
             return EMPTY;
         }
-        if (href.startsWith("javascript:void(0)") || href.startsWith("JAVASCRIPT:VOID(0)") || href.startsWith("#")){
-            return EMPTY;
+
+        if (imageSrc.indexOf("version=") != -1){
+            return imageSrc;
         }
 
         //---------------------------------------------------------------------
 
         //以 / 开头
-        if (href.startsWith("/")){
-            return PAGE_BASE_CHAR + href;
+        if (imageSrc.startsWith("/")){
+            return STATIC_BASE_CHAR + imageSrc + "?" + VERSION;
         }
 
-        //不是以 http 开头
-        if (!URIUtil.create(href).isAbsolute()){
-            return PAGE_BASE_CHAR + "/" + href;
+        //不是绝对地址
+        if (!URIUtil.create(imageSrc).isAbsolute()){
+            return STATIC_BASE_CHAR + "/" + imageSrc + "?" + VERSION;
         }
 
-        return href;
+        // 以 imgbase 开头
+        if (imageSrc.startsWith(UPLOAD_IMG_DOMAIN)){
+            return IMG_BASE_CHAR + "/" + imageSrc.replace(UPLOAD_IMG_DOMAIN, "") + "?" + VERSION;
+        }
+        return imageSrc;
     }
 }

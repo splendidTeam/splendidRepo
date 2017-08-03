@@ -39,7 +39,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
-import com.baozun.nebula.sdk.manager.cms.builder.CmsHtmlResolver;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlResolver;
 import com.baozun.nebula.utils.image.ImageOpeartion;
 import com.feilong.core.Validator;
 

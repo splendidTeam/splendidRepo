@@ -19,20 +19,16 @@ package com.baozun.nebula.sdk.manager.cms;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.cms.CmsPageTemplateDao;
 import com.baozun.nebula.model.BaseModel;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -49,66 +45,8 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SdkCmsPageTemplateManagerImpl.class);
 
-    /**
-     * 上传图片的域名
-     */
-    @Value("#{meta['upload.img.domain.base']}")
-    private String UPLOAD_IMG_DOMAIN = "";
-
-    /** 静态base标识. */
-    private final static String STATIC_BASE_CHAR = "#{staticbase}";
-
-    /** 图片base标识. */
-    private final static String IMG_BASE_CHAR = "#{imgbase}";
-
-    /** 页面base标识. */
-    private final static String PAGE_BASE_CHAR = "#{pagebase}";
-
     @Autowired
     private CmsPageTemplateDao cmsPageTemplateDao;
-
-    @Override
-    public String processTemplateBase(String html){
-        if (StringUtils.isBlank(html)){
-            return "";
-        }
-        Properties properties = ProfileConfigUtil.findPro("config/metainfo.properties");
-
-        String pagebase = StringUtils.trim(properties.getProperty("page.base"));
-
-        String staticbase = StringUtils.trim(properties.getProperty("static.domain.base"));
-
-        String imgbase = UPLOAD_IMG_DOMAIN;
-        LOGGER.info("pagebase:[{}], staticbase:[{}],imgbase:[{}]", pagebase, staticbase, imgbase);
-
-        if (StringUtils.isBlank(pagebase)){
-            pagebase = "";
-        }else if ("/".equals(pagebase)){
-            pagebase = "";
-        }else if (pagebase.endsWith("/")){
-            pagebase = pagebase.substring(0, pagebase.length() - 1);
-        }
-
-        if (StringUtils.isBlank(staticbase)){
-            staticbase = "";
-        }else if ("/".equals(staticbase)){
-            staticbase = "";
-        }else if (staticbase.endsWith("/")){
-            staticbase = staticbase.substring(0, staticbase.length() - 1);
-        }
-
-        if (StringUtils.isBlank(imgbase)){
-            imgbase = "";
-        }else if ("/".equals(imgbase)){
-            imgbase = "";
-        }else if (imgbase.endsWith("/")){
-            imgbase = imgbase.substring(0, imgbase.length() - 1);
-        }
-        html = html.replace(PAGE_BASE_CHAR, pagebase);
-        html = html.replace(STATIC_BASE_CHAR, staticbase);
-        html = html.replace(IMG_BASE_CHAR, imgbase);
-        return html;
-    }
 
     //---------------------------------------------------------------------
 

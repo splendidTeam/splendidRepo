@@ -10,7 +10,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
-import com.baozun.nebula.sdk.manager.cms.builder.CmsHtmlResolver;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlResolver;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
 import com.baozun.nebula.utils.FileUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -26,6 +27,9 @@ public class PageInstanceManagerTest{
     @Autowired
     private CmsHtmlResolver cmsHtmlResolver;
 
+    @Autowired
+    private CmsHtmlReplaceResolver cmsHtmlReplaceResolver;
+
     @Test
     public void export() throws Exception{
         String html = "";
@@ -34,7 +38,7 @@ public class PageInstanceManagerTest{
         html = cmsHtmlResolver.resolver(html);
         System.out.println(html);
 
-        html = sdkCmsPageTemplateManager.processTemplateBase(html);
+        html = cmsHtmlReplaceResolver.processTemplateBase(html);
         System.out.println(html);
     }
 }
