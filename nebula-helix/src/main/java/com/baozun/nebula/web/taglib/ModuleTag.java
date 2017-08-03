@@ -23,7 +23,6 @@ import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManagerImpl;
 import com.baozun.nebula.utils.cache.GuavaAbstractLoadingCache;
 import com.feilong.core.Validator;
-import com.feilong.tools.jsonlib.JsonUtil;
 import com.google.common.base.Optional;
 
 @Component
@@ -71,7 +70,11 @@ public class ModuleTag extends TagSupport{
             CmsTemplateHtml cmsTemplateHtml = SdkCmsModuleInstanceManagerImpl.moduleMap.get(code);
 
             if (LOGGER.isDebugEnabled()){
-                LOGGER.debug("when code:[{}] load cmsTemplateHtml:{}", code, JsonUtil.format(cmsTemplateHtml));
+                if (null != cmsTemplateHtml){
+                    LOGGER.debug("when code:[{}] load cmsTemplate,versionId:[{}],lifecycle:[{}],Html:[{}]", code, cmsTemplateHtml.getVersionId(), cmsTemplateHtml.getLifecycle(), cmsTemplateHtml.getData());
+                }else{
+                    LOGGER.warn("when code:[{}] cmsTemplateHtml is null", code);
+                }
             }
 
             //---------------------------------------------------------------------

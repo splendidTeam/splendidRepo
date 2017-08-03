@@ -46,6 +46,7 @@ import com.baozun.nebula.model.cms.CmsTemplateHtml;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
 import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toMap;
@@ -103,6 +104,8 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 
     public static Map<String, CmsTemplateHtml> moduleMap = new HashMap<>();
 
+    //---------------------------------------------------------------------
+
     @Override
     @Transactional(readOnly = true)
     public void loadModuleMap(){
@@ -119,6 +122,8 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
         Map<String, Object> moduleparam = new HashMap<>();
         //moduleMap.clear(); 老的数据不能清空，清空后会造成短时的访问空白
         sdkCmsModuleInstanceVersionManager.setPublicModuleVersionCacheInfo();
+
+        //---------------------------------------------------------------------
 
         for (CmsModuleInstance cmsModuleInstance : moduleList){
             String moduleCode = cmsModuleInstance.getCode();
@@ -141,6 +146,13 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
                 }
             }
         }
+
+        //---------------------------------------------------------------------
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("swapModuleMap:[{}]", JsonUtil.format(swapModuleMap));
+        }
+
         moduleMap = swapModuleMap;
     }
 
