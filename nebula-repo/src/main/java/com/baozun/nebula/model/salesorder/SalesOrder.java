@@ -563,7 +563,6 @@ public class SalesOrder extends BaseModel{
      * @return the 财务状态
      */
     @Column(name = "FINANCIAL_STATUS")
-    @Index(name = "IDX_SALESORDER_FINANCIAL_STATUS")
     public Integer getFinancialStatus(){
         return financialStatus;
     }
@@ -885,6 +884,7 @@ public class SalesOrder extends BaseModel{
      * @return the 创建时间
      */
     @Column(name = "CREATE_TIME")
+    @Index(name = "IDX_SALESORDER_CREATETIME")
     public Date getCreateTime(){
         return createTime;
     }

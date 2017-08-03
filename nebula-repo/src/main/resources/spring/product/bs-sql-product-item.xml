@@ -182,6 +182,7 @@
 						tpi.isaddcategory as isaddcategory,
 						tpi.isaddtag as isaddtag,
 						tpi.lifecycle as lifecycle,
+						tpi.create_time as createTime,
 						tpii.item_id as id, 
 						tpii.item_id as itemId, 
 						tpii.language as language,

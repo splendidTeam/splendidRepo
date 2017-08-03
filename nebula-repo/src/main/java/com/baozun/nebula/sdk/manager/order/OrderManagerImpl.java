@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -33,6 +34,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
+import com.baozun.nebula.command.cms.CmsModuleInstanceVersionCommand;
+import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.dao.freight.DistributionModeDao;
 import com.baozun.nebula.dao.payment.PayInfoDao;
@@ -73,7 +76,9 @@ import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
 import com.baozun.nebula.sdk.manager.SdkSecretManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.utils.cache.GuavaAbstractLoadingCache;
 import com.feilong.core.Validator;
+import com.google.common.base.Optional;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.Validator.isNullOrEmpty;
@@ -286,8 +291,13 @@ public class OrderManagerImpl implements OrderManager{
                     orderLineList.add(line);
                     // 属性list
                     String properties = line.getSaleProperty();
-                    List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-                    line.setSkuPropertys(propList);
+                    try {
+						List<SkuProperty>  propList = cache.getValue(properties).get();
+						line.setSkuPropertys(propList);
+					} catch (ExecutionException e) {
+					}
+                  /*  List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
+                    line.setSkuPropertys(propList);*/
                 }
             }
             order.setOrderLines(orderLineList);
@@ -325,8 +335,12 @@ public class OrderManagerImpl implements OrderManager{
                         orderLineList.add(line);
                         // 属性list
                         String properties = line.getSaleProperty();
-                        List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-                        line.setSkuPropertys(propList);
+						try {
+							List<SkuProperty>  propList = cache.getValue(properties).get();
+							line.setSkuPropertys(propList);
+						} catch (ExecutionException e) {
+						}
+						//sdkSkuManager.getSkuPros(properties);
                     }
                 }
                 order.setOrderLines(orderLineList);
@@ -334,6 +348,17 @@ public class OrderManagerImpl implements OrderManager{
         }
         return salesOrderPage;
     }
+    
+    /**
+	 * 启用10分钟缓存
+	 */
+	private GuavaAbstractLoadingCache<String, Optional<List<SkuProperty>>> cache = new GuavaAbstractLoadingCache<String, Optional<List<SkuProperty>>>(
+			100, 600) {
+		@Override
+		protected Optional<List<SkuProperty>> fetchData(String key) {
+			return Optional.fromNullable(sdkSkuManager.getSkuPros(key));
+		}
+	};
 
     /*
      * (non-Javadoc)

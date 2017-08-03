@@ -25,7 +25,7 @@
         <maven-compiler-plugin.encoding>${project.build.sourceEncoding}</maven-compiler-plugin.encoding>
         <!-- **********************end maven-compiler-plugin config******************************************* -->
 
-        <version.feilong-platform>1.10.4</version.feilong-platform>
+        <version.feilong-platform>1.10.5</version.feilong-platform>
 
         <!--*********************begin plugins version************************************ -->
         <v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
@@ -65,7 +65,7 @@
 
         <version.velocity>1.7</version.velocity>
         <version.loxia>2.5.2</version.loxia>
-        <version.jedis>2.2.1</version.jedis>
+        <version.jedis>2.9.0</version.jedis>
         <version.commons-pool>1.6</version.commons-pool>
         <version.commons-lang>2.6</version.commons-lang>
         <version.commons-lang3>3.4</version.commons-lang3>
