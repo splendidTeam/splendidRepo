@@ -18,6 +18,8 @@ package com.baozun.nebula.sdk.manager.cms.resolver;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.feilong.core.net.URIUtil;
@@ -33,6 +35,9 @@ import static com.feilong.core.Validator.isNullOrEmpty;
 @Component("cmsAnchorHrefResolver")
 public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
 
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCmsAnchorHrefResolver.class);
+
     /*
      * (non-Javadoc)
      * 
@@ -40,10 +45,18 @@ public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
      */
     @Override
     public String resolver(String href){
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("will do with href:[{}]", href);
+        }
+
         if (isNullOrEmpty(href)){
             return EMPTY;
         }
+
+        href = href.trim();
+        //---------------------------------------------------------------------
         if (href.startsWith("javascript:void(0)") || href.startsWith("JAVASCRIPT:VOID(0)") || href.startsWith("#")){
+            LOGGER.debug("href:[{}],do nothing,return it", href);
             return EMPTY;
         }
 
@@ -52,18 +65,23 @@ public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
         //以 #{pagebase} 开头,那么不动, 后面有替换
         //since 5.3.2.22
         if (href.startsWith(DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER)){
+            LOGGER.debug("href:[{}],startsWith :[{}] ,do nothing,return it", href, DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER);
             return href;
         }
         //---------------------------------------------------------------------
 
         //以 / 开头
         if (href.startsWith("/")){
-            return DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER + href;
+            String result = DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER + href;
+            LOGGER.debug("href:[{}],startsWith :[/] ,return :[{}]", href, result);
+            return result;
         }
 
         //不是以 http 开头
         if (!URIUtil.create(href).isAbsolute()){
-            return DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER + "/" + href;
+            String result = DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER + "/" + href;
+            LOGGER.debug("href:[{}],is not isAbsolute ,return :[{}]", href, result);
+            return result;
         }
 
         return href;

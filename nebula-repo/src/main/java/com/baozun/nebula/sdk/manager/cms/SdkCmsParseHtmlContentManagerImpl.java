@@ -23,8 +23,8 @@ import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPageInstanceVersion;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
 import com.baozun.nebula.model.cms.CmsPublished;
-import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlResolver;
 import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlResolver;
 import com.feilong.core.Validator;
 
 /**
@@ -518,7 +518,7 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
     @Override
     public Map<String, String> processPageHtml(String html,int pageType){
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("the param html:{}", html);
+            LOGGER.debug("input param html:[{}],pageType:[{}]", html, pageType);
         }
 
         /** key:areaCode, value:html */

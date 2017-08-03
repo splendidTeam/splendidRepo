@@ -18,6 +18,8 @@ package com.baozun.nebula.sdk.manager.cms.resolver;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +36,9 @@ import static com.feilong.core.Validator.isNullOrEmpty;
 @Component("cmsImageSrcResolver")
 public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
 
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCmsImageSrcResolver.class);
+
     /** 上传图片的域名. */
     @Value("#{meta['upload.img.domain.base']}")
     private String UPLOAD_IMG_DOMAIN = "";
@@ -48,11 +53,20 @@ public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
      */
     @Override
     public String resolver(String imageSrc){
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("will do with imageSrc:[{}]", imageSrc);
+        }
+
         if (isNullOrEmpty(imageSrc)){
             return EMPTY;
         }
 
+        //---------------------------------------------------------------------
+
+        imageSrc = imageSrc.trim();
+
         if (imageSrc.indexOf("version=") != -1){
+            LOGGER.debug("imageSrc:[{}] contains version param,do nothing,return it", imageSrc);
             return imageSrc;
         }
 
@@ -60,25 +74,33 @@ public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
 
         //以 #{imgbase}开头,那么不动, 后面有替换
         //since 5.3.2.22
+        String imageSrcAndVersion = imageSrc + "?" + VERSION;
         if (imageSrc.startsWith(DefaultCmsHtmlReplaceResolver.IMG_BASE_PLACE_HOLDER)){
-            return imageSrc + "?" + VERSION;
+            LOGGER.debug("imageSrc:[{}] starts with [{}],append version and return:[{}]", imageSrc, DefaultCmsHtmlReplaceResolver.IMG_BASE_PLACE_HOLDER, imageSrcAndVersion);
+            return imageSrcAndVersion;
         }
 
         //---------------------------------------------------------------------
 
         //以 / 开头
         if (imageSrc.startsWith("/")){
-            return DefaultCmsHtmlReplaceResolver.STATIC_BASE_PLACE_HOLDER + imageSrc + "?" + VERSION;
+            String result = DefaultCmsHtmlReplaceResolver.STATIC_BASE_PLACE_HOLDER + imageSrcAndVersion;
+            LOGGER.debug("imageSrc:[{}] starts with [/],append before with:[{}],return [{}]", imageSrc, DefaultCmsHtmlReplaceResolver.STATIC_BASE_PLACE_HOLDER, result);
+            return result;
         }
 
         //不是绝对地址
         if (!URIUtil.create(imageSrc).isAbsolute()){
-            return DefaultCmsHtmlReplaceResolver.STATIC_BASE_PLACE_HOLDER + "/" + imageSrc + "?" + VERSION;
+            String result = DefaultCmsHtmlReplaceResolver.STATIC_BASE_PLACE_HOLDER + "/" + imageSrcAndVersion;
+            LOGGER.debug("imageSrc:[{}] is not isAbsolute,append before with:[{}],return [{}]", imageSrc, DefaultCmsHtmlReplaceResolver.STATIC_BASE_PLACE_HOLDER, result);
+            return result;
         }
 
         // 以 imgbase 开头
         if (imageSrc.startsWith(UPLOAD_IMG_DOMAIN)){
-            return DefaultCmsHtmlReplaceResolver.IMG_BASE_PLACE_HOLDER + "/" + imageSrc.replace(UPLOAD_IMG_DOMAIN, "") + "?" + VERSION;
+            String result = DefaultCmsHtmlReplaceResolver.IMG_BASE_PLACE_HOLDER + "/" + imageSrc.replace(UPLOAD_IMG_DOMAIN, "") + "?" + VERSION;
+            LOGGER.debug("imageSrc:[{}] start with [{}],append before with:[{}],return [{}]", imageSrc, UPLOAD_IMG_DOMAIN, DefaultCmsHtmlReplaceResolver.IMG_BASE_PLACE_HOLDER, result);
+            return result;
         }
         return imageSrc;
     }
