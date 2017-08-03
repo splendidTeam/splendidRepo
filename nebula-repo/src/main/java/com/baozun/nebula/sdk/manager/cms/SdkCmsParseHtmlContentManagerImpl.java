@@ -23,6 +23,7 @@ import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPageInstanceVersion;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
 import com.baozun.nebula.model.cms.CmsPublished;
+import com.baozun.nebula.sdk.manager.cms.builder.CmsHtmlResolver;
 import com.feilong.core.Validator;
 
 /**
@@ -61,6 +62,9 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
     public final static String CMS_DIV_EDIT_BUTTON_CLASS = ".wui-tips";
 
     public final static String CMS_PRODUCT_EDIT_CLASS = ".cms-product-edit";
+
+    @Autowired
+    private CmsHtmlResolver cmsHtmlResolver;
 
     @Autowired
     private SdkCmsModuleTemplateManager sdkCmsModuleTemplateManager;
@@ -561,7 +565,7 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
                 }
             }
             String areaHtml = element.html();
-            pageAreaMap.put(areaCode, sdkCmsPageTemplateManager.addTemplateBase(areaHtml));
+            pageAreaMap.put(areaCode, cmsHtmlResolver.resolver(areaHtml));
             i++;
         }
     }
@@ -605,7 +609,7 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
                 throw new BusinessException("模块编辑区域的code不存在");
             }
             String areaHtml = element.html();
-            pageAreaMap.put(areaCode, cls + "EDIT_CLASS_SEP" + sdkCmsPageTemplateManager.addTemplateBase(areaHtml));
+            pageAreaMap.put(areaCode, cls + "EDIT_CLASS_SEP" + cmsHtmlResolver.resolver(areaHtml));
             i++;
         }
     }

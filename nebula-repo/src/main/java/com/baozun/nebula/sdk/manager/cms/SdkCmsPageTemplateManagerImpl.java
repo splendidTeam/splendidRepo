@@ -22,13 +22,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +42,6 @@ import loxia.dao.Sort;
  * CmsPageTemplateManager
  * 
  * @author Justin
- *
  */
 @Transactional
 @Service("sdkCmsPageTemplateManager")
@@ -53,28 +49,68 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SdkCmsPageTemplateManagerImpl.class);
 
+    /**
+     * 上传图片的域名
+     */
+    @Value("#{meta['upload.img.domain.base']}")
+    private String UPLOAD_IMG_DOMAIN = "";
+
+    /** 静态base标识. */
+    private final static String STATIC_BASE_CHAR = "#{staticbase}";
+
+    /** 图片base标识. */
+    private final static String IMG_BASE_CHAR = "#{imgbase}";
+
+    /** 页面base标识. */
+    private final static String PAGE_BASE_CHAR = "#{pagebase}";
+
     @Autowired
     private CmsPageTemplateDao cmsPageTemplateDao;
 
-    /**
-     * 静态base标识
-     */
-    private final static String STATIC_BASE_CHAR = "#{staticbase}";
+    @Override
+    public String processTemplateBase(String html){
+        if (StringUtils.isBlank(html)){
+            return "";
+        }
+        Properties properties = ProfileConfigUtil.findPro("config/metainfo.properties");
 
-    /**
-     * 页面base标识
-     */
-    private final static String PAGE_BASE_CHAR = "#{pagebase}";
+        String pagebase = StringUtils.trim(properties.getProperty("page.base"));
 
-    /**
-     * 图片base标识
-     */
-    private final static String IMG_BASE_CHAR = "#{imgbase}";
+        String staticbase = StringUtils.trim(properties.getProperty("static.domain.base"));
 
-    /**
-     * version
-     */
-    private final static String VERSION = "version=000000";
+        String imgbase = UPLOAD_IMG_DOMAIN;
+        LOGGER.info("pagebase:[{}], staticbase:[{}],imgbase:[{}]", pagebase, staticbase, imgbase);
+
+        if (StringUtils.isBlank(pagebase)){
+            pagebase = "";
+        }else if ("/".equals(pagebase)){
+            pagebase = "";
+        }else if (pagebase.endsWith("/")){
+            pagebase = pagebase.substring(0, pagebase.length() - 1);
+        }
+
+        if (StringUtils.isBlank(staticbase)){
+            staticbase = "";
+        }else if ("/".equals(staticbase)){
+            staticbase = "";
+        }else if (staticbase.endsWith("/")){
+            staticbase = staticbase.substring(0, staticbase.length() - 1);
+        }
+
+        if (StringUtils.isBlank(imgbase)){
+            imgbase = "";
+        }else if ("/".equals(imgbase)){
+            imgbase = "";
+        }else if (imgbase.endsWith("/")){
+            imgbase = imgbase.substring(0, imgbase.length() - 1);
+        }
+        html = html.replace(PAGE_BASE_CHAR, pagebase);
+        html = html.replace(STATIC_BASE_CHAR, staticbase);
+        html = html.replace(IMG_BASE_CHAR, imgbase);
+        return html;
+    }
+
+    //---------------------------------------------------------------------
 
     /**
      * 保存CmsPageTemplate
@@ -211,125 +247,5 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager{
     @Transactional(readOnly = true)
     public Pagination<CmsPageTemplate> findEffectCmsPageTemplateListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
         return cmsPageTemplateDao.findEffectCmsPageTemplateListByQueryMapWithPage(page, sorts, paraMap);
-    }
-
-    @Override
-    public String addTemplateBase(String html){
-        Properties metainfoProperties = ProfileConfigUtil.findPro("config/metainfo.properties");
-        if (StringUtils.isBlank(html)){
-            return "";
-        }
-        Properties properties = ProfileConfigUtil.findPro("config/metainfo.properties");
-        String imgbase = StringUtils.trim(properties.getProperty("upload.img.domain.base"));
-
-        Document doc = Jsoup.parse(html);
-        //process img
-        Elements imgs = doc.select("img");
-        for (Element ele : imgs){
-            String src = ele.attr("src");
-            if (StringUtils.isBlank(src) || src.indexOf("version=") != -1){
-                continue;
-            }else if (src.startsWith("/")){
-                src = STATIC_BASE_CHAR + src + "?" + VERSION;
-            }else if (!src.startsWith("http")){
-                src = STATIC_BASE_CHAR + "/" + src + "?" + VERSION;
-            }else if (src.startsWith(imgbase)){
-                src = IMG_BASE_CHAR + "/" + src.replace(imgbase, "") + "?" + VERSION;
-            }
-
-            ele.attr("src", src);
-        }
-
-        //process script
-        Elements scripts = doc.select("script");
-        for (Element ele : scripts){
-            String src = ele.attr("src");
-            if (StringUtils.isBlank(src)){
-                continue;
-            }else if (src.startsWith("/")){
-                src = STATIC_BASE_CHAR + src + "?" + VERSION;
-            }else if (!src.startsWith("http")){
-                src = STATIC_BASE_CHAR + "/" + src + "?" + VERSION;
-            }
-            ele.attr("src", src);
-        }
-
-        //process css
-
-        Elements links = doc.select("link");
-        for (Element ele : links){
-            String href = ele.attr("href");
-            if (StringUtils.isBlank(href)){
-                continue;
-            }else if (href.startsWith("/")){
-                href = STATIC_BASE_CHAR + href + "?" + VERSION;
-            }else if (!href.startsWith("http")){
-                href = STATIC_BASE_CHAR + "/" + href + "?" + VERSION;
-            }
-            ele.attr("href", href);
-        }
-
-        //PROCESS a
-        Elements as = doc.select("a");
-        for (Element ele : as){
-            String href = ele.attr("href");
-            if (StringUtils.isBlank(href)){
-                continue;
-            }else if (href.startsWith("javascript:void(0)") || href.startsWith("JAVASCRIPT:VOID(0)") || href.startsWith("#")){
-                continue;
-            }
-            if (href.startsWith("/")){
-                href = PAGE_BASE_CHAR + href;
-            }else if (!href.startsWith("http")){
-                href = PAGE_BASE_CHAR + "/" + href;
-            }
-            ele.attr("href", href);
-        }
-
-        return doc.toString();
-    }
-
-    @Override
-    public String processTemplateBase(String html){
-        Properties metainfoProperties = ProfileConfigUtil.findPro("config/metainfo.properties");
-        if (StringUtils.isBlank(html)){
-            return "";
-        }
-        Properties properties = ProfileConfigUtil.findPro("config/metainfo.properties");
-
-        String pagebase = StringUtils.trim(properties.getProperty("page.base"));
-
-        String staticbase = StringUtils.trim(properties.getProperty("static.domain.base"));
-
-        String imgbase = StringUtils.trim(properties.getProperty("upload.img.domain.base"));
-        LOGGER.info("pagebase:[{}], staticbase:[{}],imgbase:[{}]", pagebase, staticbase, imgbase);
-
-        if (StringUtils.isBlank(pagebase)){
-            pagebase = "";
-        }else if ("/".equals(pagebase)){
-            pagebase = "";
-        }else if (pagebase.endsWith("/")){
-            pagebase = pagebase.substring(0, pagebase.length() - 1);
-        }
-
-        if (StringUtils.isBlank(staticbase)){
-            staticbase = "";
-        }else if ("/".equals(staticbase)){
-            staticbase = "";
-        }else if (staticbase.endsWith("/")){
-            staticbase = staticbase.substring(0, staticbase.length() - 1);
-        }
-
-        if (StringUtils.isBlank(imgbase)){
-            imgbase = "";
-        }else if ("/".equals(imgbase)){
-            imgbase = "";
-        }else if (imgbase.endsWith("/")){
-            imgbase = imgbase.substring(0, imgbase.length() - 1);
-        }
-        html = html.replace(PAGE_BASE_CHAR, pagebase);
-        html = html.replace(STATIC_BASE_CHAR, staticbase);
-        html = html.replace(IMG_BASE_CHAR, imgbase);
-        return html;
     }
 }
