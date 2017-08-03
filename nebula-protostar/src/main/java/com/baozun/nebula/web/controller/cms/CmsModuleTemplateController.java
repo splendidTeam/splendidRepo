@@ -111,7 +111,7 @@ public class CmsModuleTemplateController extends BaseController{
     public String view(Model model,Long id){
         CmsModuleTemplate cmt = cmsModuleTemplateManager.findCmsModuleTemplateById(id);
         String data = cmt.getData();
-        data = cmsHtmlReplaceResolver.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.resolver(data);
         model.addAttribute("data", data);
         return "/cms/module/cms-module-view";
     }

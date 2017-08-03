@@ -10,6 +10,6 @@ public interface CmsHtmlReplaceResolver extends BaseManager{
      * @param html
      * @return
      */
-    String processTemplateBase(String html);
+    String resolver(String html);
 
 }

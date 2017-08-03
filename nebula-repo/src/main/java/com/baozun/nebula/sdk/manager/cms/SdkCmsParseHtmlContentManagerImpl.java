@@ -144,7 +144,7 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
             }
         }
         data = document.toString();
-        data = cmsHtmlReplaceResolver.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.resolver(data);
         data = processOnlyEditData(data);
         data = processExtraHtmlTag(data);
         return data;
@@ -265,7 +265,7 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
             data = document.toString();
 
         }
-        data = cmsHtmlReplaceResolver.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.resolver(data);
         if (isEdit){
             data = processNoEditData(data);
         }else{
@@ -399,7 +399,7 @@ public class SdkCmsParseHtmlContentManagerImpl implements SdkCmsParseHtmlContent
             }
             data = document.toString();
         }
-        data = cmsHtmlReplaceResolver.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.resolver(data);
         if (isEdit){
             data = processNoEditData(data);
         }

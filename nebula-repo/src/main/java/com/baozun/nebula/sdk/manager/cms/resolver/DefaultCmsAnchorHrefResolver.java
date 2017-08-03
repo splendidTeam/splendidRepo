@@ -33,9 +33,6 @@ import static com.feilong.core.Validator.isNullOrEmpty;
 @Component("cmsAnchorHrefResolver")
 public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
 
-    /** 页面base标识. */
-    private final static String PAGE_BASE_CHAR = "#{pagebase}";
-
     /*
      * (non-Javadoc)
      * 
@@ -54,12 +51,12 @@ public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
 
         //以 / 开头
         if (href.startsWith("/")){
-            return PAGE_BASE_CHAR + href;
+            return DefaultCmsHtmlReplaceResolver.PAGE_BASE_CHAR + href;
         }
 
         //不是以 http 开头
         if (!URIUtil.create(href).isAbsolute()){
-            return PAGE_BASE_CHAR + "/" + href;
+            return DefaultCmsHtmlReplaceResolver.PAGE_BASE_CHAR + "/" + href;
         }
 
         return href;

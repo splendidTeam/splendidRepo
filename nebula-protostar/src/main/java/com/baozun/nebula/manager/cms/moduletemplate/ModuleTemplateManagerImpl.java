@@ -22,7 +22,7 @@ public class ModuleTemplateManagerImpl implements ModuleTemplateManager{
     public String packModuleTemplateById(Long id){
         CmsModuleTemplate template = cmsModuleTemplateDao.getByPrimaryKey(id);
         if (template != null){
-            return cmsHtmlReplaceResolver.processTemplateBase(template.getData());
+            return cmsHtmlReplaceResolver.resolver(template.getData());
         }
         return "";
     }

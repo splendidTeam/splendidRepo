@@ -38,12 +38,6 @@ public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
     @Value("#{meta['upload.img.domain.base']}")
     private String UPLOAD_IMG_DOMAIN = "";
 
-    /** 静态base标识. */
-    private final static String STATIC_BASE_CHAR = "#{staticbase}";
-
-    /** 图片base标识. */
-    private final static String IMG_BASE_CHAR = "#{imgbase}";
-
     /** version. */
     private final static String VERSION = "version=000000";
 
@@ -66,17 +60,17 @@ public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
 
         //以 / 开头
         if (imageSrc.startsWith("/")){
-            return STATIC_BASE_CHAR + imageSrc + "?" + VERSION;
+            return DefaultCmsHtmlReplaceResolver.STATIC_BASE_CHAR + imageSrc + "?" + VERSION;
         }
 
         //不是绝对地址
         if (!URIUtil.create(imageSrc).isAbsolute()){
-            return STATIC_BASE_CHAR + "/" + imageSrc + "?" + VERSION;
+            return DefaultCmsHtmlReplaceResolver.STATIC_BASE_CHAR + "/" + imageSrc + "?" + VERSION;
         }
 
         // 以 imgbase 开头
         if (imageSrc.startsWith(UPLOAD_IMG_DOMAIN)){
-            return IMG_BASE_CHAR + "/" + imageSrc.replace(UPLOAD_IMG_DOMAIN, "") + "?" + VERSION;
+            return DefaultCmsHtmlReplaceResolver.IMG_BASE_CHAR + "/" + imageSrc.replace(UPLOAD_IMG_DOMAIN, "") + "?" + VERSION;
         }
         return imageSrc;
     }

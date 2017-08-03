@@ -135,7 +135,7 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
     public String findUpdatedCmsPageInstance(Long templateId){
         CmsPageTemplate template = sdkCmsPageTemplateManager.findCmsPageTemplateById(templateId);
         String data = template.getData();
-        return cmsHtmlReplaceResolver.processTemplateBase(data);
+        return cmsHtmlReplaceResolver.resolver(data);
     }
 
     @SuppressWarnings("deprecation")
@@ -178,7 +178,7 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
         }else{
             sdkCmsEditAreaManager.removeCmsEditAreaByTemplateId(templateId, code);
         }
-        data = cmsHtmlReplaceResolver.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.resolver(data);
         return data;
     }
 

@@ -38,7 +38,7 @@ public class PageInstanceManagerTest{
         html = cmsHtmlResolver.resolver(html);
         System.out.println(html);
 
-        html = cmsHtmlReplaceResolver.processTemplateBase(html);
+        html = cmsHtmlReplaceResolver.resolver(html);
         System.out.println(html);
     }
 }

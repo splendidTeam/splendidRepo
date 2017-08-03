@@ -479,7 +479,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
         }else{
             sdkCmsEditAreaManager.removeCmsModuleEditAreaByTemplateId(templateId, code);
         }
-        data = cmsHtmlReplaceResolver.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.resolver(data);
         return data;
     }
 
