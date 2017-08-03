@@ -42,7 +42,6 @@ import com.baozun.nebula.model.cms.CmsModuleInstance;
 import com.baozun.nebula.model.cms.CmsModuleTemplate;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleTemplateManager;
-import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
 import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
 import com.baozun.nebula.utils.image.ImageOpeartion;
 import com.baozun.nebula.utils.query.bean.QueryBean;
@@ -76,9 +75,6 @@ public class CmsModuleTemplateController extends BaseController{
 
     @Autowired
     private UploadManager uploadManager;
-
-    @Autowired
-    private SdkCmsPageTemplateManager sdkCmsPageTemplateManager;
 
     @Autowired
     private SdkCmsModuleInstanceManager sdkCmsModuleInstanceManager;

@@ -40,8 +40,8 @@ import com.baozun.nebula.sdk.manager.cms.SdkCmsEditAreaManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsEditVersionAreaManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManagerImpl;
-import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlResolver;
 import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlResolver;
 import com.baozun.nebula.utils.image.ImageOpeartion;
 import com.feilong.core.Validator;
 
@@ -135,8 +135,7 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
     public String findUpdatedCmsPageInstance(Long templateId){
         CmsPageTemplate template = sdkCmsPageTemplateManager.findCmsPageTemplateById(templateId);
         String data = template.getData();
-        data = cmsHtmlReplaceResolver.processTemplateBase(data);
-        return data;
+        return cmsHtmlReplaceResolver.processTemplateBase(data);
     }
 
     @SuppressWarnings("deprecation")

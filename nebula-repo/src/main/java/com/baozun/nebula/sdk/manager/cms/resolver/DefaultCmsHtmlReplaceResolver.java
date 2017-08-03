@@ -33,7 +33,7 @@ import com.baozun.nebula.utilities.common.ProfileConfigUtil;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
 @Transactional
-@Service("sdkCmsCommonManager")
+@Service("cmsHtmlReplaceResolver")
 public class DefaultCmsHtmlReplaceResolver implements CmsHtmlReplaceResolver{
 
     /** The Constant log. */

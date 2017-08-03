@@ -78,9 +78,6 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
     private SdkCmsEditAreaManager sdkCmsEditAreaManager;
 
     @Autowired
-    private SdkCmsPageTemplateManager sdkCmsPageTemplateManager;
-
-    @Autowired
     private SdkCmsEditVersionAreaManager sdkCmsEditVersionAreaManager;
 
     @Autowired
