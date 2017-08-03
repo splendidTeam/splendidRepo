@@ -60,7 +60,7 @@ public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
 
         //以 #{imgbase}开头,那么不动, 后面有替换
         //since 5.3.2.22
-        if (imageSrc.startsWith(DefaultCmsHtmlReplaceResolver.IMG_BASE_CHAR)){
+        if (imageSrc.startsWith(DefaultCmsHtmlReplaceResolver.IMG_BASE_PLACE_HOLDER)){
             return imageSrc + "?" + VERSION;
         }
 
@@ -68,17 +68,17 @@ public class DefaultCmsImageSrcResolver implements CmsImageSrcResolver{
 
         //以 / 开头
         if (imageSrc.startsWith("/")){
-            return DefaultCmsHtmlReplaceResolver.STATIC_BASE_CHAR + imageSrc + "?" + VERSION;
+            return DefaultCmsHtmlReplaceResolver.STATIC_BASE_PLACE_HOLDER + imageSrc + "?" + VERSION;
         }
 
         //不是绝对地址
         if (!URIUtil.create(imageSrc).isAbsolute()){
-            return DefaultCmsHtmlReplaceResolver.STATIC_BASE_CHAR + "/" + imageSrc + "?" + VERSION;
+            return DefaultCmsHtmlReplaceResolver.STATIC_BASE_PLACE_HOLDER + "/" + imageSrc + "?" + VERSION;
         }
 
         // 以 imgbase 开头
         if (imageSrc.startsWith(UPLOAD_IMG_DOMAIN)){
-            return DefaultCmsHtmlReplaceResolver.IMG_BASE_CHAR + "/" + imageSrc.replace(UPLOAD_IMG_DOMAIN, "") + "?" + VERSION;
+            return DefaultCmsHtmlReplaceResolver.IMG_BASE_PLACE_HOLDER + "/" + imageSrc.replace(UPLOAD_IMG_DOMAIN, "") + "?" + VERSION;
         }
         return imageSrc;
     }

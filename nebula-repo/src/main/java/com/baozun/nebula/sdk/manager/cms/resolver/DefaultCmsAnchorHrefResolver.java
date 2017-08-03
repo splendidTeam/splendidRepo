@@ -51,19 +51,19 @@ public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
 
         //以 #{pagebase} 开头,那么不动, 后面有替换
         //since 5.3.2.22
-        if (href.startsWith(DefaultCmsHtmlReplaceResolver.PAGE_BASE_CHAR)){
+        if (href.startsWith(DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER)){
             return href;
         }
         //---------------------------------------------------------------------
 
         //以 / 开头
         if (href.startsWith("/")){
-            return DefaultCmsHtmlReplaceResolver.PAGE_BASE_CHAR + href;
+            return DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER + href;
         }
 
         //不是以 http 开头
         if (!URIUtil.create(href).isAbsolute()){
-            return DefaultCmsHtmlReplaceResolver.PAGE_BASE_CHAR + "/" + href;
+            return DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER + "/" + href;
         }
 
         return href;

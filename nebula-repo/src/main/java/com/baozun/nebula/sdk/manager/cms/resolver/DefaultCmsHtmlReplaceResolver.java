@@ -52,13 +52,13 @@ public class DefaultCmsHtmlReplaceResolver implements CmsHtmlReplaceResolver{
     //---------------------------------------------------------------------
 
     /** 静态base标识. */
-    public final static String STATIC_BASE_CHAR = "#{staticbase}";
+    public final static String STATIC_BASE_PLACE_HOLDER = "#{staticbase}";
 
     /** 页面base标识. */
-    public final static String PAGE_BASE_CHAR = "#{pagebase}";
+    public final static String PAGE_BASE_PLACE_HOLDER = "#{pagebase}";
 
     /** 图片base标识. */
-    public final static String IMG_BASE_CHAR = "#{imgbase}";
+    public final static String IMG_BASE_PLACE_HOLDER = "#{imgbase}";
 
     //---------------------------------------------------------------------
 
@@ -87,9 +87,9 @@ public class DefaultCmsHtmlReplaceResolver implements CmsHtmlReplaceResolver{
     @PostConstruct
     protected void postConstruct(){
         Map<String, String> map = new HashMap<>();
-        map.put(STATIC_BASE_CHAR, format(staticBase));
-        map.put(IMG_BASE_CHAR, format(UPLOAD_IMG_DOMAIN));
-        map.put(PAGE_BASE_CHAR, format(pageUrlBase));
+        map.put(STATIC_BASE_PLACE_HOLDER, format(staticBase));
+        map.put(IMG_BASE_PLACE_HOLDER, format(UPLOAD_IMG_DOMAIN));
+        map.put(PAGE_BASE_PLACE_HOLDER, format(pageUrlBase));
 
         formatUrlMap = Collections.unmodifiableMap(map);
         if (LOGGER.isInfoEnabled()){
