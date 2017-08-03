@@ -417,7 +417,12 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
             cmsPublished.setHide(cmsEditArea.getHide());
             cmsPublished.setData(cmsEditArea.getData());
             cmsPublished.setPublishTime(new Date());
+
             CmsPublished newCmsPublished = sdkCmsPublishedManager.saveCmsPublished(cmsPublished);
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("save CmsPublished:[{}]", JsonUtil.format(newCmsPublished));
+            }
             CmsPublishedList.add(newCmsPublished);
         }
         // 修改成已发布状态
