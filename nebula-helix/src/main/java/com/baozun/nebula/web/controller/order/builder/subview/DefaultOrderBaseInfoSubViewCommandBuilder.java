@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.order.builder.subview;
 
+import static com.feilong.core.util.CollectionsUtil.find;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.List;
@@ -32,8 +33,6 @@ import com.baozun.nebula.web.controller.order.builder.OrderViewStatusParam;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderBaseInfoSubViewCommand;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderViewStatus;
 import com.feilong.core.bean.PropertyUtil;
-
-import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
  * 专门用来构造 {@link OrderBaseInfoSubViewCommand}.
@@ -64,7 +63,8 @@ public class DefaultOrderBaseInfoSubViewCommandBuilder implements OrderBaseInfoS
         OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
         //5.3.2.18增加了对"orderType"字段的转换
         //5.3.2.20增加了对"modifyTime"字段的转换
-        PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime", "logisticsStatus", "financialStatus", "total", "discount", "actualFreight", "orderType","modifyTime");
+        //5.3.2.22增加对商品总数量字段的转换
+        PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime", "logisticsStatus", "financialStatus", "total", "discount", "actualFreight", "orderType", "modifyTime", "quantity");
 
         orderBaseInfoSubViewCommand.setOrderId(salesOrderCommand.getId());
         orderBaseInfoSubViewCommand.setOrderCode(salesOrderCommand.getCode());

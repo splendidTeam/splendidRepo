@@ -53,9 +53,10 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
 
     /** 创建时间. */
     private Date createTime;
-    
+
     /**
      * 修改时间
+     * 
      * @since 5.3.2.20
      */
     private Date modifyTime;
@@ -76,18 +77,27 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
 
     /** 实付运费. */
     private BigDecimal actualFreight;
-    
-    /** 
+
+    /**
      * 订单类型 (对应salesOrder表中orderType)
+     * 
      * @since 5.3.2.18
-     * */
+     */
     private Integer orderType;
-    
-    /** 
+
+    /**
      * 显示时候用的订单总价(包括total加上运费和包装信息相关金额的总和)
+     * 
      * @since 5.3.2.18
-     * */
+     */
     private BigDecimal displayTotal;
+
+    /**
+     * 商品总数量
+     * 
+     * @since 5.3.2.22
+     */
+    private Integer quantity;
 
     /**
      * 获得 订单id.
@@ -145,7 +155,7 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
     public void setCreateTime(Date createTime){
         this.createTime = createTime;
     }
-    
+
     /**
      * 获得 修改时间.
      *
@@ -265,30 +275,30 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
     /**
      * 获得 订单类型(对应salesOrder表中orderType).
      * 
-     * @return the 订单类型 
+     * @return the 订单类型
      * @since 5.3.2.18
      */
     public Integer getOrderType(){
         return orderType;
     }
-    
+
     /**
      * 设置 订单类型 (对应salesOrder表中orderType).
      * 
      * @param orderType
-     *          the new 订单类型 
+     *            the new 订单类型
      * @since 5.3.2.18
      */
     public void setOrderType(Integer orderType){
         this.orderType = orderType;
     }
 
-    /** 
+    /**
      * 获得 显示时候用的订单总价(包括total加上运费和包装信息相关金额的总和).
      * 
      * @return the 显示时候用的订单总价(包括total加上运费和包装信息相关金额的总和)
      * @since 5.3.2.18
-     * */
+     */
     public BigDecimal getDisplayTotal(){
         return displayTotal;
     }
@@ -297,13 +307,32 @@ abstract class AbstractOrderViewCommand extends BaseViewCommand{
      * 设置 显示时候用的订单总价(包括total加上运费和包装信息相关金额的总和).
      * 
      * @param displayTotal
-     *          the new 显示时候用的订单总价(包括total加上运费和包装信息相关金额的总和).
+     *            the new 显示时候用的订单总价(包括total加上运费和包装信息相关金额的总和).
      * @since 5.3.2.18
      */
     public void setDisplayTotal(BigDecimal displayTotal){
         this.displayTotal = displayTotal;
     }
-    
-    
+
+    /**
+     * 获得 商品总数量.
+     * 
+     * @return the 商品总数量
+     * @since 5.3.2.22
+     */
+    public Integer getQuantity(){
+        return quantity;
+    }
+
+    /**
+     * 设置 商品总数量.
+     * 
+     * @param quantity
+     *            the new 商品总数量.
+     * @since 5.3.2.22
+     */
+    public void setQuantity(Integer quantity){
+        this.quantity = quantity;
+    }
 
 }
