@@ -53,14 +53,9 @@ public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
             return EMPTY;
         }
 
-        href = href.trim();
         //---------------------------------------------------------------------
-        if (href.startsWith("javascript:void(0)") || href.startsWith("JAVASCRIPT:VOID(0)") || href.startsWith("#")){
-            LOGGER.debug("href:[{}],do nothing,return it", href);
-            return EMPTY;
-        }
 
-        //---------------------------------------------------------------------
+        href = href.trim();
 
         //以 #{pagebase} 开头,那么不动, 后面有替换
         //since 5.3.2.22
@@ -68,6 +63,13 @@ public class DefaultCmsAnchorHrefResolver implements CmsAnchorHrefResolver{
             LOGGER.debug("href:[{}],startsWith :[{}] ,do nothing,return it", href, DefaultCmsHtmlReplaceResolver.PAGE_BASE_PLACE_HOLDER);
             return href;
         }
+
+        //---------------------------------------------------------------------
+        if (href.startsWith("javascript:void(0)") || href.startsWith("JAVASCRIPT:VOID(0)") || href.startsWith("#")){
+            LOGGER.debug("href:[{}],do nothing,return it", href);
+            return href;
+        }
+
         //---------------------------------------------------------------------
 
         //以 / 开头
