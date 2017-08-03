@@ -50,6 +50,7 @@ import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toMap;
+import static com.feilong.core.util.SortUtil.sortMapByKeyAsc;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -150,7 +151,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
         //---------------------------------------------------------------------
 
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("swapModuleMap:[{}]", JsonUtil.format(swapModuleMap));
+            LOGGER.debug("swapModuleMap size:[{}],swapModuleMap:[{}]", swapModuleMap.size(), JsonUtil.format(sortMapByKeyAsc(swapModuleMap)));
         }
 
         moduleMap = swapModuleMap;
