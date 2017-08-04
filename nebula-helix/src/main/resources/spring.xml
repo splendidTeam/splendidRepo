@@ -36,10 +36,6 @@
     <encryption:encryptable-properties id="meta" encryptor="configurationEncryptor" location="classpath:config/metainfo.properties" />
     <encryption:encryptable-properties id="solr" encryptor="configurationEncryptor" location="classpath:config/solr.properties" />
     <encryption:encryptable-properties id="redis" encryptor="configurationEncryptor" location="classpath:config/redis.properties" />
-    <encryption:encryptable-properties id="wechat" encryptor="configurationEncryptor" location="classpath:config/wechat.properties" />
-    <encryption:encryptable-properties id="alipay" encryptor="configurationEncryptor" location="classpath:config/alipay.properties" />
-    <encryption:encryptable-properties id="unionpay" encryptor="configurationEncryptor" location="classpath:config/unionpay.properties" /> 
-    
  
 	<aop:aspectj-autoproxy />
     <context:annotation-config />
