@@ -20,13 +20,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.cms.CmsModuleInstanceVersion;
 import com.baozun.nebula.model.cms.CmsPublished;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * SdkCmsModuleInstanceVersionManager
@@ -80,7 +80,7 @@ public interface SdkCmsModuleInstanceVersionManager extends BaseManager{
 	/**
 	 * 重新设置发布模块版本队列的缓存信息
 	 */
-	public void setPublicModuleVersionCacheInfo();
+    public void setPublicModuleVersionCacheInfo();
 
 	/**
 	 * 删除模块版本，并重新发布基础模块版本

@@ -42,7 +42,7 @@ import com.baozun.nebula.model.cms.CmsModuleInstance;
 import com.baozun.nebula.model.cms.CmsModuleTemplate;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleTemplateManager;
-import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
+import com.baozun.nebula.sdk.manager.cms.resolver.CmsHtmlReplaceResolver;
 import com.baozun.nebula.utils.image.ImageOpeartion;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
@@ -77,10 +77,10 @@ public class CmsModuleTemplateController extends BaseController{
     private UploadManager uploadManager;
 
     @Autowired
-    private SdkCmsPageTemplateManager sdkCmsPageTemplateManager;
+    private SdkCmsModuleInstanceManager sdkCmsModuleInstanceManager;
 
     @Autowired
-    private SdkCmsModuleInstanceManager sdkCmsModuleInstanceManager;
+    private CmsHtmlReplaceResolver cmsHtmlReplaceResolver;
 
     /** 上传图片的域名 */
     @Value("#{meta['upload.img.domain.base']}")
@@ -111,7 +111,7 @@ public class CmsModuleTemplateController extends BaseController{
     public String view(Model model,Long id){
         CmsModuleTemplate cmt = cmsModuleTemplateManager.findCmsModuleTemplateById(id);
         String data = cmt.getData();
-        data = sdkCmsPageTemplateManager.processTemplateBase(data);
+        data = cmsHtmlReplaceResolver.resolver(data);
         model.addAttribute("data", data);
         return "/cms/module/cms-module-view";
     }
