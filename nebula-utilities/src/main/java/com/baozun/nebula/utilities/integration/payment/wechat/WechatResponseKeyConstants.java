@@ -68,21 +68,24 @@ public class WechatResponseKeyConstants{
      * REVOKED—已撤销（刷卡支付）
      * USERPAYING--用户支付中
      * PAYERROR--支付失败(其他原因，如银行返回失败)
+     * 
      * @author yaohua.wang@baozun.com
      * @since 5.3.2.20
      */
     enum TradeStateValue{
-        SUCCESS,REFUND,NOTPAY,CLOSED,REVOKED,USERPAYING,PAYERROR
+        SUCCESS, REFUND, NOTPAY, CLOSED, REVOKED, USERPAYING, PAYERROR
     }
-    
+
     /** 交易类型 **/
     public static final String TRADE_TYPE = "trade_type";
 
     /** 二维码链接 **/
     public static final String CODE_URL = "code_url";
-    
+
     /** H5支付链接 **/
     public static final String MWEB_URL = "mweb_url";
+
+    //---------------------------------------------------------------------
 
     /** 交易类型JSAPI **/
     public static final String TRADE_TYPE_JSAPI = "JSAPI";
@@ -95,7 +98,7 @@ public class WechatResponseKeyConstants{
 
     /** 交易类型WAP **/
     public static final String TRADE_TYPE_WAP = "WAP";
-    
+
     /** 交易类型H5 **/
     public static final String TRADE_TYPE_MWEB = "MWEB";
 
