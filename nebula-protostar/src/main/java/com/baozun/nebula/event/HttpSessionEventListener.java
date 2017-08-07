@@ -16,8 +16,6 @@
  */
 package com.baozun.nebula.event;
 
-import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +52,7 @@ public class HttpSessionEventListener implements ApplicationListener<HttpSession
 				log.debug(user.getRealName() + " logout");
 			}
 		}catch (IllegalStateException e){
-			log.error("logout SimpleAsyncTaskExecutor-1 error");
+			log.warn("HttpSessionEventListener error", e);
 		}
 	}
 
