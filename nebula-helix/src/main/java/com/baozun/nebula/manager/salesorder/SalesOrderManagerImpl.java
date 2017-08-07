@@ -280,6 +280,12 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
         return sdkOrderService.saveReturnedOrder(returnOrderCommand);
     }
 
+    /**
+     * 如果该订单行所在订单参与了整单促销则查询出该订单的具体信息
+     * 
+     * @param orderLineId
+     * @return
+     */
     @Override
     public SalesOrderCommand findOrderByLineId(Long orderLineId){
         return sdkOrderService.findOrderByLineId(orderLineId);
