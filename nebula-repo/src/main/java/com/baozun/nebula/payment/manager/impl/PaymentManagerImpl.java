@@ -15,7 +15,6 @@ import com.baozun.nebula.payment.convert.PayParamCommandAdaptor;
 import com.baozun.nebula.payment.convert.PaymentConvertFactory;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
-import com.baozun.nebula.utilities.common.WechatUtil;
 import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
@@ -27,6 +26,7 @@ import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvert
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
+import com.baozun.nebula.utilities.integration.payment.wechat.WechatUtil;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 

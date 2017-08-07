@@ -28,7 +28,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.baozun.nebula.utilities.common.WechatUtil;
 import com.baozun.nebula.utilities.common.XMLUtils;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;

@@ -3,10 +3,10 @@ package com.baozun.nebula.utilities.integration.payment.convertor;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.baozun.nebula.utilities.common.WechatUtil;
 import com.baozun.nebula.utilities.integration.payment.adaptor.BasePayParamCommandAdaptor;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
+import com.baozun.nebula.utilities.integration.payment.wechat.WechatUtil;
 import com.feilong.core.Validator;
 
 public class PayParamConvertorForWechatAdaptor implements

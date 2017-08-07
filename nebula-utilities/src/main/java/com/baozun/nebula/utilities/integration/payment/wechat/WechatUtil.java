@@ -1,4 +1,4 @@
-package com.baozun.nebula.utilities.common;
+package com.baozun.nebula.utilities.integration.payment.wechat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.baozun.nebula.utilities.common.Md5Encrypt;
 
 public class WechatUtil{
 
