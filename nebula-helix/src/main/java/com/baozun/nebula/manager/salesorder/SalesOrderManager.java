@@ -44,7 +44,12 @@ public interface SalesOrderManager extends BaseManager{
     public Pagination<ReturnOrderCommand> findReturnedOrderList(Page page,Long memberId);
 
     public Integer saveReturnedOrder(ReturnOrderCommand returnOrderCommand);
-
+    
+    /**
+     * 如果该订单行所在订单参与了整单促销则查询出该订单的具体信息
+     * @param orderLineId
+     * @return
+     */
     public SalesOrderCommand findOrderByLineId(Long orderLineId);
 
     /**
