@@ -233,7 +233,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
                      * @since 5.3.2.20
                      */
                     String trade_state = responseMap.get(WechatResponseKeyConstants.TRADE_STATE);
-                    if(Validator.isNullOrEmpty(trade_state) && TradeStateValue.SUCCESS.equals(trade_state)){
+                    if (Validator.isNullOrEmpty(trade_state) && TradeStateValue.SUCCESS.equals(trade_state)){
                         paymentResult.setPaymentServiceSatus(PaymentServiceStatus.SUCCESS);
                         paymentResult.setMessage(responseMap.get(WechatResponseKeyConstants.TRADE_STATE));
                     }else{
@@ -333,6 +333,10 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
             LOGGER.error("unifiedOrder failure , return_code : {}, return_msg : {}", responseMap.get(WechatResponseKeyConstants.RETURN_CODE), responseMap.get(WechatResponseKeyConstants.RETURN_MSG));
         }
 
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug(JsonUtil.format(paymentResult));
+        }
+
         return paymentResult;
     }
 
@@ -372,7 +376,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         if (StringUtils.isNotBlank(resMap.get(WechatResponseKeyConstants.CODE_URL))){
             paymentServiceReturnCommand.setCodeUrl(resMap.get(WechatResponseKeyConstants.CODE_URL));
         }
-        if(StringUtils.isNotBlank(resMap.get(WechatResponseKeyConstants.MWEB_URL))){
+        if (StringUtils.isNotBlank(resMap.get(WechatResponseKeyConstants.MWEB_URL))){
             paymentServiceReturnCommand.setMwebUrl(resMap.get(WechatResponseKeyConstants.MWEB_URL));
         }
         paymentResult.setPaymentStatusInformation(paymentServiceReturnCommand);

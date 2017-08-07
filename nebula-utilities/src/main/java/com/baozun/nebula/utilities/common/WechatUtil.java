@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public class WechatUtil{
 
-    private final static Logger logger = LoggerFactory.getLogger(WechatUtil.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(WechatUtil.class);
 
     /**
      * 获取request body中的内容
@@ -75,6 +75,11 @@ public class WechatUtil{
             con.setRequestProperty("Pragma", "no-cache");
             con.setRequestProperty("Cache-Control", "no-cache");
             con.setRequestProperty("Content-Type", "text/xml");
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("urlStr:[{}],xmlInfo:[{}]", urlStr, xmlInfo);
+            }
+
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
             out.write(new String(xmlInfo.getBytes("UTF-8")));
             out.flush();
@@ -85,9 +90,9 @@ public class WechatUtil{
                 sb.append(line);
             }
         }catch (MalformedURLException e){
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }catch (IOException e){
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         return sb.toString();
     }
@@ -105,8 +110,8 @@ public class WechatUtil{
             sb.append("<").append(entry.getKey()).append("><![CDATA[").append(entry.getValue()).append("]]></").append(entry.getKey()).append(">");
         }
         sb.append("</xml>");
-        if (logger.isDebugEnabled()){
-            logger.debug("xml is [{}]", sb.toString());
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("xml is [{}]", sb.toString());
         }
         return sb.toString();
     }
@@ -137,7 +142,7 @@ public class WechatUtil{
         }
         String stringSignTemp = sb.append("key=").append(partnerKey).toString();
 
-        logger.debug("## stringSignTemp:[{}]", stringSignTemp);
+        LOGGER.debug("## stringSignTemp:[{}]", stringSignTemp);
         String sign = Md5Encrypt.md5(stringSignTemp).toUpperCase();
 
         return sign;
@@ -161,13 +166,13 @@ public class WechatUtil{
             if (signatureBuffer.length() > 0){
                 MessageDigest crypt = MessageDigest.getInstance(signType);
                 crypt.reset();
-                logger.debug("signatureBuffer is {}", signatureBuffer.toString());
+                LOGGER.debug("signatureBuffer is {}", signatureBuffer.toString());
                 crypt.update(signatureBuffer.toString().getBytes("UTF-8"));
                 signature = byteToHex(crypt.digest());
             }
         }catch (NoSuchAlgorithmException e){}catch (UnsupportedEncodingException e){}
 
-        logger.debug("signature is {}", signature);
+        LOGGER.debug("signature is {}", signature);
         return signature;
     }
 
