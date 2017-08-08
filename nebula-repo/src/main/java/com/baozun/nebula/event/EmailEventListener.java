@@ -19,7 +19,6 @@ package com.baozun.nebula.event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,7 @@ import com.baozun.nebula.sdk.manager.EmailTemplateManager;
  */
 @Service
 @Scope("singleton")
-public class EmailEventListener implements ApplicationListener<EmailEvent>{
+public class EmailEventListener extends AbstractNebulaEventListener<EmailEvent>{
 
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
@@ -49,7 +48,7 @@ public class EmailEventListener implements ApplicationListener<EmailEvent>{
         //logger.debug("to [{}], subject [{}], content [{}].", event.getEmail().getAddress(), event.getEmail().getSubject(), event.getEmail().getContent());
         try{
             emailTemplateManager.sendEmail(receiverEmail, code, event.getDataMap(), event.getAttachmentList());
-            
+
         }catch (Exception e){
             LOGGER.error("email send error:" + receiverEmail);
         }

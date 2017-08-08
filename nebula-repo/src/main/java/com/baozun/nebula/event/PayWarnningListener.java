@@ -19,7 +19,6 @@ package com.baozun.nebula.event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ import com.baozun.nebula.sdk.manager.SdkPayWarnningLogManager;
  */
 @Service
 @Scope("singleton")
-public class PayWarnningListener implements ApplicationListener<PayWarnningEvent>{
+public class PayWarnningListener extends AbstractNebulaEventListener<PayWarnningEvent>{
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
