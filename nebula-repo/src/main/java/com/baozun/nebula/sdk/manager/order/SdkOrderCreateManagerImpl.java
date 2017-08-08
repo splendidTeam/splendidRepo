@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.salesorder.OrderCodeCreatorManager;
+import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
@@ -50,6 +51,7 @@ import com.baozun.nebula.sdk.manager.SdkEffectiveManager;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
+import com.baozun.nebula.sdk.manager.order.event.OrderCreateSuccessEvent;
 import com.baozun.nebula.sdk.manager.order.handler.OrderCreateByShopManager;
 import com.baozun.nebula.sdk.manager.payment.PayMoneyBuilder;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
@@ -117,6 +119,10 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     @Autowired
     private PayMoneyBuilder payMoneyBuilder;
 
+    @Autowired
+    private EventPublisher eventPublisher;
+    //---------------------------------------------------------------------
+
     /*
      * (non-Javadoc)
      * 
@@ -164,28 +170,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         sdkEngineManager.createOrderDoEngineChck(salesOrderCommand.getMemberId(), memCombos, checkStatusShoppingCartCommand);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.sdk.manager.OrderManager#saveManualOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
-     * com.baozun.nebula.sdk.command.SalesOrderCommand)
-     */
-    @Override
-    public String saveManualOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,SalesOrderCreateOptions salesOrderCreateOptions){
-        if (salesOrderCommand == null || shoppingCartCommand == null){
-            throw new BusinessException(Constants.SHOPCART_IS_NULL);
-        }
-        // 下单之前的库存检查
-        for (ShoppingCartLineCommand shoppingCartLine : shoppingCartCommand.getShoppingCartLineCommands()){
-            Boolean retflag = sdkEffectiveManager.chckInventory(shoppingCartLine.getExtentionCode(), shoppingCartLine.getQuantity());
-            if (!retflag){
-                // 库存不足
-                throw new BusinessException(Constants.THE_ORDER_CONTAINS_INVENTORY_SHORTAGE_ITEM, new Object[] { shoppingCartLine.getItemName() });
-            }
-        }
-        return saveOrderInfo(salesOrderCommand, shoppingCartCommand, salesOrderCreateOptions);
-    }
-
     /**
      * Refactoring shopping cart command.
      *
@@ -217,16 +201,18 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         shoppingCartCommand.setShoppingCartLineCommands(newAllShoppingCartLineCommandList);
     }
 
+    //---------------------------------------------------------------------
+
     /**
      * 保存订单信息.
      *
      * @param salesOrderCommand
-     *            the sales order command
+     *            订单相关信息,包含收货地址,支付方式等等
      * @param checkStatusShoppingCartCommand
-     *            the shopping cart command
+     *            选中的要买的购物车行信息
      * @param salesOrderCreateOptions
-     *            the sales order create options
-     * @return the string
+     *            订单创建的选项参数
+     * @return 支付流水号
      */
     private String saveOrderInfo(SalesOrderCommand salesOrderCommand,ShoppingCartCommand checkStatusShoppingCartCommand,SalesOrderCreateOptions salesOrderCreateOptions){
         String subOrdinate = orderCodeCreator.createOrderSerialNO();
@@ -244,6 +230,11 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         //*****************************************************************************************
         boolean isSendEmail = isSendEmail();
         List<Map<String, Object>> emailDataMapList = new ArrayList<>();
+
+        //since 5.3.2.22
+        //成功创建的订单列表
+        List<SalesOrder> successSalesOrderList = new ArrayList<>();
+
         for (Map.Entry<Long, List<ShoppingCartLineCommand>> entry : shopIdAndShoppingCartLineCommandListMap.entrySet()){
             Long shopId = entry.getKey();
             List<ShoppingCartLineCommand> shoppingCartLineCommandList = entry.getValue();
@@ -252,9 +243,9 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
             List<PromotionSKUDiscAMTBySetting> shopPromotionSKUDiscAMTBySettingList = shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId);
 
             //------------------------------------------------------------------------------------------------
-
             SalesOrder salesOrder = orderCreateByShopManager.doWithPerShopCreateOrder(shopId, subOrdinate, shoppingCartLineCommandList, salesOrderCommand, shopCartCommandByShop, shopPromotionSKUDiscAMTBySettingList);
 
+            successSalesOrderList.add(salesOrder);
             //------------------------------------------------------------------------------------------------
 
             // 封装发送邮件数据
@@ -284,8 +275,17 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
         // 发邮件
         sdkOrderEmailManager.sendEmailOfCreateOrder(emailDataMapList);
+
+        //---------------------------------------------------------------------
+
+        for (SalesOrder salesOrder : successSalesOrderList){
+            // 触发登录成功事件，用于异步处理其他的业务
+            eventPublisher.publish(new OrderCreateSuccessEvent(this, salesOrder));
+        }
         return subOrdinate;
     }
+
+    //---------------------------------------------------------------------
 
     /**
      * 基于店铺的ShopCartCommandByShop.
@@ -331,6 +331,28 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     private boolean isSendEmail(){
         String isSendEmailConfig = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
         return isSendEmailConfig != null && isSendEmailConfig.equals("true");
+    }
+
+    //---------------------------------------------------------------------
+
+    /**
+     * @deprecated 感觉应该可以和 {@link #saveOrder(ShoppingCartCommand, SalesOrderCommand, Set)}进行某种合并,暂时时间关系不动
+     */
+    @Deprecated
+    @Override
+    public String saveManualOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,SalesOrderCreateOptions salesOrderCreateOptions){
+        if (salesOrderCommand == null || shoppingCartCommand == null){
+            throw new BusinessException(Constants.SHOPCART_IS_NULL);
+        }
+        // 下单之前的库存检查
+        for (ShoppingCartLineCommand shoppingCartLine : shoppingCartCommand.getShoppingCartLineCommands()){
+            Boolean retflag = sdkEffectiveManager.chckInventory(shoppingCartLine.getExtentionCode(), shoppingCartLine.getQuantity());
+            if (!retflag){
+                // 库存不足
+                throw new BusinessException(Constants.THE_ORDER_CONTAINS_INVENTORY_SHORTAGE_ITEM, new Object[] { shoppingCartLine.getItemName() });
+            }
+        }
+        return saveOrderInfo(salesOrderCommand, shoppingCartCommand, salesOrderCreateOptions);
     }
 
 }
