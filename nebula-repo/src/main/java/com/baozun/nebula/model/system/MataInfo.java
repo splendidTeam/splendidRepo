@@ -121,6 +121,10 @@ public class MataInfo  implements Serializable {
 	public static final String 	SALES_OF_PROPERTY_IS_NOT_REQUIRED = "salesOfPropertyIsNotRequired";
 	
 	/**
+	 * 批量修改商品的时候，如果修改了价格是否同步到sku上面去
+	 */
+	public static final String BATCH_UPDATE_ITEM_PRICE_TO_SKU = "BATCH_UPDATE_ITEM_PRICE_TO_SKU";
+	/**
 	 * PK
 	 */
 	private Long				id;

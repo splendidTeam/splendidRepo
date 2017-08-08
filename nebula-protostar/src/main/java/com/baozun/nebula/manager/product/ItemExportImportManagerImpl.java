@@ -44,6 +44,7 @@ import com.baozun.nebula.dao.product.ItemInfoLangDao;
 import com.baozun.nebula.dao.product.ItemPropertiesDao;
 import com.baozun.nebula.dao.product.ItemPropertiesLangDao;
 import com.baozun.nebula.dao.product.PropertyValueDao;
+import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.baseinfo.ShopManager;
@@ -107,6 +108,9 @@ public class ItemExportImportManagerImpl implements ItemExportImportManager{
 
     @Autowired
     private ItemDao                 itemDao;
+
+    @Autowired
+    private SkuDao                  skuDao;
 
     @Autowired
     private ItemInfoDao             itemInfoDao;
@@ -209,7 +213,7 @@ public class ItemExportImportManagerImpl implements ItemExportImportManager{
             if (Validator.isNullOrEmpty(batchThreshold)){
                 batchThreshold = "100";
             }
-            
+
             Integer threshold = Integer.valueOf(batchThreshold);
             if (itemCodeList != null && !itemCodeList.isEmpty() && itemCodeList.size() > threshold){
                 throw new BusinessException(ErrorCodes.ITEM_EXPORT_ITEM_CODE_OUT_SIZE, new Object[] { threshold });
@@ -1679,6 +1683,7 @@ public class ItemExportImportManagerImpl implements ItemExportImportManager{
             // 保存商品相关的数据
             Item item = null;
             List<Long> updatedItemPropertiesIdList = new ArrayList<Long>();
+            String findValue = sdkMataInfoManager.findValue(MataInfo.BATCH_UPDATE_ITEM_PRICE_TO_SKU);
             for (ImpItemCommand impItemCommand : impItemCommandList){
                 item = itemCommandMap.get(impItemCommand.getCode());
 
@@ -1687,6 +1692,12 @@ public class ItemExportImportManagerImpl implements ItemExportImportManager{
                 /*************************** 修改商品信息 ***************************/
                 // 保存商品信息数据
                 ItemInfo itemInfo = saveItemInfo(selectedColumnList, impItemCommand, itemId);
+
+                if (Boolean.parseBoolean(findValue)){
+                    //价格同步到sku
+                    saveSkuPrice(selectedColumnList, impItemCommand, itemId);
+                }
+
                 // 保存商品信息国际化数据
                 saveItemInfoLang(impItemCommand, selectedColumnList, itemInfo, itemInfoMap);
 
@@ -1850,6 +1861,13 @@ public class ItemExportImportManagerImpl implements ItemExportImportManager{
         }
         // 保存商品信息
         return itemInfoDao.save(itemInfo);
+    }
+
+    private void saveSkuPrice(List<String> selectedColumnList,ImpItemCommand impItemCommand,Long itemId){
+        if (isSelectedColumn("salePrice", selectedColumnList) || isSelectedColumn("listPrice", selectedColumnList)){
+            String code = impItemCommand.getCode();
+            skuDao.updateSkuPriceByItemCode(impItemCommand.getSalePrice(), impItemCommand.getListPrice(), code);
+        }
     }
 
     /**
