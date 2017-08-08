@@ -279,7 +279,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         //---------------------------------------------------------------------
 
         for (SalesOrder salesOrder : successSalesOrderList){
-            // 触发登录成功事件，用于异步处理其他的业务
+            // 触发事件，用于异步处理其他的业务
             eventPublisher.publish(new OrderCreateSuccessEvent(this, salesOrder));
         }
         return subOrdinate;
