@@ -18,8 +18,7 @@ package com.baozun.nebula.web.controller.member.event;
 
 import java.util.Map;
 
-import org.springframework.context.ApplicationEvent;
-
+import com.baozun.nebula.event.AbstractMemberEvent;
 import com.baozun.nebula.web.MemberDetails;
 
 /**
@@ -27,24 +26,24 @@ import com.baozun.nebula.web.MemberDetails;
  * 
  * @author D.C
  */
-public class RegisterSuccessEvent extends ApplicationEvent{
+public class RegisterSuccessEvent extends AbstractMemberEvent{
 
-	private static final long	serialVersionUID	= -3227325006512626684L;
+    private static final long serialVersionUID = -3227325006512626684L;
 
-	/* 上下文，ip agent等信息 */
-	private Map<String, String>	clientContext;
+    /* 上下文，ip agent等信息 */
+    private Map<String, String> clientContext;
 
-	public RegisterSuccessEvent(MemberDetails source, Map<String, String> clientContext){
-		super(source);
-		this.setClientContext(clientContext);
-	}
+    public RegisterSuccessEvent(MemberDetails source, Map<String, String> clientContext){
+        super(source);
+        this.setClientContext(clientContext);
+    }
 
-	public Map<String, String> getClientContext(){
-		return clientContext;
-	}
+    public Map<String, String> getClientContext(){
+        return clientContext;
+    }
 
-	public void setClientContext(Map<String, String> clientContext){
-		this.clientContext = clientContext;
-	}
+    public void setClientContext(Map<String, String> clientContext){
+        this.clientContext = clientContext;
+    }
 
 }

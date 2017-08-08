@@ -31,25 +31,21 @@ import com.baozun.nebula.sdk.manager.SdkPayWarnningLogManager;
  */
 @Service
 @Scope("singleton")
-public class PayWarnningListener implements ApplicationListener<PayWarnningEvent> {
-	private final Logger logger = LoggerFactory.getLogger(getClass());
-	@Autowired
-	private SdkPayWarnningLogManager sdkPayWarnningLogManager;
-	@Override
-	public void onApplicationEvent(PayWarnningEvent event) {
-		//mailService.sendMail(event.getEmail());
-		//logger.debug("to [{}], subject [{}], content [{}].", event.getEmail().getAddress(), event.getEmail().getSubject(), event.getEmail().getContent());
-		try{
-			//PaymentResult paymentResult,String operator,Integer type
-	
-			 PayWarnningLog payWarnningLog = new PayWarnningLog(event.getOrderCode(),
-					 event.getThirPayNo(), event.getCreateTime(),
-					 event.getPaystate_shop(), event.getPaystate_payment(), event.getIsSupportQuery(), event.getResult());
-             sdkPayWarnningLogManager.savePayWarnningLog(payWarnningLog);
-		} 
-		catch(Exception e){
-			logger.error("error:"+event.getOrderCode()+event.getResult());
-		}
-	}
+public class PayWarnningListener implements ApplicationListener<PayWarnningEvent>{
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private SdkPayWarnningLogManager sdkPayWarnningLogManager;
+
+    @Override
+    public void onApplicationEvent(PayWarnningEvent event){
+        try{
+            PayWarnningLog payWarnningLog = new PayWarnningLog(event.getOrderCode(), event.getThirPayNo(), event.getCreateTime(), event.getPaystate_shop(), event.getPaystate_payment(), event.getIsSupportQuery(), event.getResult());
+            sdkPayWarnningLogManager.savePayWarnningLog(payWarnningLog);
+        }catch (Exception e){
+            logger.error("error:" + event.getOrderCode() + event.getResult());
+        }
+    }
 
 }
