@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.constant.SchedulerConstants;
 import com.baozun.nebula.curator.ZkOperator;
-import com.baozun.nebula.curator.watcher.IWatcherInvoke;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.SchedulerManager;
 import com.baozun.nebula.model.BaseModel;
@@ -36,83 +35,85 @@ import com.feilong.core.Validator;
 
 /**
  * 定时任务 执行者
+ * 
  * @see com.baozun.nebula.zk.ScheduleTaskWatchInvoker
  * @author chengchao
- *
+ * @author D.C 2017/8/10 凌晨 初始化取消睡眠
  */
-public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
-	private Logger LOG = LoggerFactory.getLogger(ScheduleTaskWatchInvoker.class);
-	
-	@Autowired
-	private SchedulerManager schedulerManager;
-	
-	@Autowired
-	private SdkSchedulerTaskManager sdkSchedulerTaskManager;
-	
-	@Autowired
-	private ZkOperator zkOperator;
+public class ScheduleTaskWatchInvoker extends AbstractWatchInvoke{
 
-	@Autowired
-	private CacheManager cacheManager;
-	
-	private void handleTask(SchedulerTask schedulerTask) throws Exception{
-		Integer lifeCycle = schedulerTask.getLifecycle();
-		String taskBeanName = schedulerTask.getBeanName();
-		String methodName = schedulerTask.getMethodName();
-		String jobName = schedulerTask.getCode();
-		String timeExp = schedulerTask.getTimeExp();
-		
-		if(BaseModel.LIFECYCLE_ENABLE.equals(lifeCycle)){//如果是启用状态 1
-			
-			schedulerManager.removeTask(jobName);
-			
-			Object taskInstance = SpringUtil.getBean(taskBeanName);
-			schedulerManager.addTask(taskInstance, methodName, timeExp, jobName);
-			
-		}else if(BaseModel.LIFECYCLE_DELETED.equals(lifeCycle)||BaseModel.LIFECYCLE_DISABLE.equals(lifeCycle)){//如果是禁用0或者逻辑删除2
-			schedulerManager.removeTask(jobName);
-		}
-	}
+    private Logger LOG = LoggerFactory.getLogger(ScheduleTaskWatchInvoker.class);
 
-	@Override
-	public void invoke(String path, byte[] data) {
-		try {
-			TimeUnit.SECONDS.sleep(3);
-		} catch (InterruptedException e) {
-			LOG.error(e.getMessage());
-		}
-		try {
-			byte[] datas = zkOperator.getData(path);
-			Long id = Long.parseLong(new String(datas));
-			
-			// 根据Id 来做不同的事情
-			if(id!=0){
-				SchedulerTask schedulerTask = sdkSchedulerTaskManager.findSchedulerTaskById(id);
-				if(null!=schedulerTask){
-					LOG.info("handling task " + schedulerTask.getCode()+" begin");
-					handleTask(schedulerTask);
-					LOG.info("handling task " + schedulerTask.getCode()+" end");
-				}else{
-					LOG.warn("can't find taskinfo ,task id is "+id);
-				}
-			}else{//id=0 全部刷新
-				List<SchedulerTask> taskList = sdkSchedulerTaskManager.findAllEffectSchedulerTaskList();
-				
-				//先清理掉所有的定时任务
-				schedulerManager.timerClean();
-				
-				//遍历所有启用的任务，加载到定时计划中
-				if(Validator.isNotNullOrEmpty(taskList)){
-					for(SchedulerTask task:taskList){
-						handleTask(task);
-					}
-				}
-			}
-			//删除缓存
-			cacheManager.remove(SchedulerConstants.SCHEDULERTASKS);
-		} catch (Exception e) {
-			LOG.error(e.getMessage());
-		}
-	}
+    @Autowired
+    private SchedulerManager schedulerManager;
+
+    @Autowired
+    private SdkSchedulerTaskManager sdkSchedulerTaskManager;
+
+    @Autowired
+    private ZkOperator zkOperator;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    private void handleTask(SchedulerTask schedulerTask) throws Exception{
+        Integer lifeCycle = schedulerTask.getLifecycle();
+        String taskBeanName = schedulerTask.getBeanName();
+        String methodName = schedulerTask.getMethodName();
+        String jobName = schedulerTask.getCode();
+        String timeExp = schedulerTask.getTimeExp();
+
+        if (BaseModel.LIFECYCLE_ENABLE.equals(lifeCycle)){//如果是启用状态 1
+
+            schedulerManager.removeTask(jobName);
+
+            Object taskInstance = SpringUtil.getBean(taskBeanName);
+            schedulerManager.addTask(taskInstance, methodName, timeExp, jobName);
+
+        }else if (BaseModel.LIFECYCLE_DELETED.equals(lifeCycle) || BaseModel.LIFECYCLE_DISABLE.equals(lifeCycle)){//如果是禁用0或者逻辑删除2
+            schedulerManager.removeTask(jobName);
+        }
+    }
+
+    @Override
+    public void invoke(String path,byte[] data){
+        if (!this.initialized.compareAndSet(false, true)){
+            try{
+                TimeUnit.SECONDS.sleep(3);
+            }catch (InterruptedException e){}
+        }
+        try{
+            byte[] datas = zkOperator.getData(path);
+            Long id = Long.parseLong(new String(datas));
+
+            // 根据Id 来做不同的事情
+            if (id != 0){
+                SchedulerTask schedulerTask = sdkSchedulerTaskManager.findSchedulerTaskById(id);
+                if (null != schedulerTask){
+                    LOG.info("handling task " + schedulerTask.getCode() + " begin");
+                    handleTask(schedulerTask);
+                    LOG.info("handling task " + schedulerTask.getCode() + " end");
+                }else{
+                    LOG.warn("can't find taskinfo ,task id is " + id);
+                }
+            }else{//id=0 全部刷新
+                List<SchedulerTask> taskList = sdkSchedulerTaskManager.findAllEffectSchedulerTaskList();
+
+                //先清理掉所有的定时任务
+                schedulerManager.timerClean();
+
+                //遍历所有启用的任务，加载到定时计划中
+                if (Validator.isNotNullOrEmpty(taskList)){
+                    for (SchedulerTask task : taskList){
+                        handleTask(task);
+                    }
+                }
+            }
+            //删除缓存
+            cacheManager.remove(SchedulerConstants.SCHEDULERTASKS);
+        }catch (Exception e){
+            LOG.error(e.getMessage());
+        }
+    }
 
 }
