@@ -159,6 +159,18 @@ public class PaymentManagerImpl implements PaymentManager{
         return result;
     }
 
+    /**
+     * <h2>订单状态查询</h2>
+     * 
+     * <p>注：wechatpay调用该方法查询微信支付状态时，可以按API中transaction_id或者out_trade_no维度查询订单状态。（当两个值都赋值transaction_id优先于out_trade_no）<br>
+     * 但该方法实现调用中，payParamConvertorAdaptor.commandConvertorToMapForOrderInfo(payParamCommandAdaptor)的实现类PayParamConvertorForWechatAdaptor
+     * 将payParamCommand.getOrderNo()(即同payParamCommand.getRequestParams().get("code")，其实二者为一个值)，同时赋值给了transaction_id和out_trade_no的value。<br>
+     * 导致该方法实现查询wechatpay支付状态只能如上所述优先按transaction_id，查询微信支付状态。不能用于按out_trade_no查询微信支付状态。
+     * 因无法兼容升级，故在此JavaDoc说明。</p>
+     * 
+     * @param order
+     * @return
+     */
     @Override
     public PaymentResult getOrderInfo(SalesOrderCommand salesOrderCommand){
         PaymentResult result = new PaymentResult();
