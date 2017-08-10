@@ -44,6 +44,7 @@
 						o.MODIFY_TIME as modifyTime,
 						o.TRANS_CODE as transCode,
 					    o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
+					    o.lang as lang,
 						sc.NAME,
 						sc.buyer_name as buyerName,
 						sc.buyer_tel as buyerTel,
