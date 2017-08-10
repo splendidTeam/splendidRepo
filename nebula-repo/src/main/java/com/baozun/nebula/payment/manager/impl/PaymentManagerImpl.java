@@ -122,7 +122,7 @@ public class PaymentManagerImpl implements PaymentManager{
 
     @Override
     public PaymentResult cancelPayment(SalesOrderCommand order){
-        PaymentResult result = new PaymentResult();
+        PaymentResult paymentResult = new PaymentResult();
         try{
             PaymentFactory paymentFactory = PaymentFactory.getInstance();
             PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
@@ -141,22 +141,22 @@ public class PaymentManagerImpl implements PaymentManager{
                 Map<String, String> params = payParamConvertorAdaptor.commandConvertorToMapForCaneclOrder(payParamCommandAdaptor);
                 // 將支付所需的定制参数赋值给addition
                 payParamConvertorAdaptor.extendCommandConvertorMap(params, orderParams);
-                result = paymentAdaptor.closePaymentRequest(params);
+                paymentResult = paymentAdaptor.closePaymentRequest(params);
             }else{
-                result.setMessage("not support");
-                result.setPaymentServiceSatus(PaymentServiceStatus.NOT_SUPPORT);
+                paymentResult.setMessage("not support");
+                paymentResult.setPaymentServiceSatus(PaymentServiceStatus.NOT_SUPPORT);
             }
         }catch (Exception ex){
             LOGGER.error("cancelPayment error: {}", ex);
-            result.setMessage(ex.toString());
-            result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+            paymentResult.setMessage(ex.toString());
+            paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
         }
 
         if (LOGGER.isInfoEnabled()){
-            LOGGER.info(JsonUtil.format(result));
+            LOGGER.info(JsonUtil.format(paymentResult));
         }
 
-        return result;
+        return paymentResult;
     }
 
     /**

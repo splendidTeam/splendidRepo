@@ -61,7 +61,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         Validate.notEmpty(responseMap, "responseMap can't be null/empty!");
 
         if (LOGGER.isInfoEnabled()){
-            LOGGER.info(JsonUtil.format(sortMapByKeyAsc(responseMap)));
+            LOGGER.info("requestBody:[{}],responseMap:[{}]", requestBody, JsonUtil.format(sortMapByKeyAsc(responseMap)));
         }
 
         PaymentResult paymentResult = new PaymentResult();
