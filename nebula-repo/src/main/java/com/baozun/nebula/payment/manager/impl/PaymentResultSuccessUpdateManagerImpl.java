@@ -37,7 +37,6 @@ import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.event.PaymentSuccessEvent;
 import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
-import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.payment.manager.PaymentResultSuccessUpdateManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
@@ -129,13 +128,13 @@ public class PaymentResultSuccessUpdateManagerImpl implements PaymentResultSucce
                     //发邮件
                     sdkOrderService.sendEmailOfOrder(salesOrderCommand.getCode(), EmailConstants.PAY_ORDER_SUCCESS);
 
-                    sdkOrderService.updateOrderFinancialStatus(salesOrderCommand.getCode(), SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT);
+                    sdkOrderService.updateOrderFinancialStatus(salesOrderCommand.getCode(), SALES_ORDER_FISTATUS_FULL_PAYMENT);
 
                     //保存OMS消息发送记录(当订单有付款发生时，推送消息给到SCM) 
                     sdkMsgManager.saveMsgSendRecord(IfIdentifyConstants.IDENTIFY_PAY_SEND, salesOrderCommand.getId(), null);
 
                     //---------------------------------------------------------------------
-
+                    salesOrderCommand.setFinancialStatus(SALES_ORDER_FISTATUS_FULL_PAYMENT);
                     //since 5.3.2.22
                     ApplicationEvent event = new PaymentSuccessEvent(this, subOrdinate, salesOrderCommand);
                     eventPublisher.publish(event);
