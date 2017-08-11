@@ -14,57 +14,56 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.order.event;
+package com.baozun.nebula.event;
 
-import com.baozun.nebula.event.AbstractOrderEvent;
-import com.baozun.nebula.model.salesorder.SalesOrder;
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
 /**
- * 订单创建成功的事件.
+ * 订单取消成功的事件.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.22
  */
-public class OrderCreateSuccessEvent extends AbstractOrderEvent{
+public class OrderCancelSuccessEvent extends AbstractOrderEvent{
 
     /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = 501740044662191911L;
+    private static final long serialVersionUID = 5282663208793901202L;
 
-    /** The sales order. */
-    private SalesOrder salesOrder;
+    /** 订单号. */
+    private SalesOrderCommand salesOrderCommand;
 
     /**
-     * Instantiates a new order create success event.
+     * Instantiates a new order cancel success event.
      *
      * @param source
      *            the source
-     * @param salesOrder
-     *            the sales order
+     * @param salesOrderCommand
+     *            the sales order command
      */
-    public OrderCreateSuccessEvent(Object source, SalesOrder salesOrder){
+    public OrderCancelSuccessEvent(Object source, SalesOrderCommand salesOrderCommand){
         super(source);
-        this.salesOrder = salesOrder;
+        this.salesOrderCommand = salesOrderCommand;
     }
 
     //---------------------------------------------------------------------
 
     /**
-     * Gets the sales order.
+     * 获得 订单号.
      *
-     * @return the salesOrder
+     * @return the salesOrderCommand
      */
-    public SalesOrder getSalesOrder(){
-        return salesOrder;
+    public SalesOrderCommand getSalesOrderCommand(){
+        return salesOrderCommand;
     }
 
     /**
-     * Sets the sales order.
+     * 设置 订单号.
      *
-     * @param salesOrder
-     *            the salesOrder to set
+     * @param salesOrderCommand
+     *            the salesOrderCommand to set
      */
-    public void setSalesOrder(SalesOrder salesOrder){
-        this.salesOrder = salesOrder;
+    public void setSalesOrderCommand(SalesOrderCommand salesOrderCommand){
+        this.salesOrderCommand = salesOrderCommand;
     }
 
 }
