@@ -2,7 +2,6 @@ package com.baozun.nebula.payment.manager.impl;
 
 import static com.baozun.nebula.sdk.constants.Constants.PAY_LOG_NOTIFY_AFTER_MESSAGE;
 import static com.baozun.nebula.sdk.constants.Constants.PAY_LOG_RETURN_AFTER_MESSAGE;
-import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -21,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +35,7 @@ import com.baozun.nebula.dao.salesorder.SdkOrderDao;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.event.PayWarnningEvent;
 import com.baozun.nebula.event.PaymentEvent;
+import com.baozun.nebula.event.PaymentSuccessEvent;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.model.payment.PayWarnningLog;
@@ -55,8 +56,10 @@ import com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
+import com.baozun.nebula.sdk.manager.order.SdkOrderQueryManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponManager;
 import com.baozun.nebula.sdk.utils.MapConvertUtils;
+import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
@@ -65,6 +68,8 @@ import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatUtil;
 import com.feilong.core.Validator;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 @Transactional
 @Service("paymentManager")
@@ -146,6 +151,9 @@ public class PayManagerImpl implements PayManager{
     @Autowired(required = false)
     private SalesOrderHandler salesOrderHandler;
 
+    @Autowired
+    private SdkOrderQueryManager sdkOrderQueryManager;
+
     //---------------------------------------------------------------------
 
     @Override
@@ -203,7 +211,18 @@ public class PayManagerImpl implements PayManager{
         PaymentServiceStatus paymentServiceStatus = paymentResult.getPaymentServiceSatus();
         if (paymentServiceStatus == PaymentServiceStatus.PAYMENT_SUCCESS){
             //更新支付信息
-            paymentResultSuccessUpdateManager.updateSuccess(paymentResult.getPaymentStatusInformation(), payType);
+            PaymentServiceReturnCommand paymentServiceReturnCommand = paymentResult.getPaymentStatusInformation();
+            paymentResultSuccessUpdateManager.updateSuccess(paymentServiceReturnCommand, payType);
+
+            //since 5.3.2.22
+            String subOrdinate = paymentServiceReturnCommand.getOrderNo();//支付流水号
+
+            SalesOrderCommand salesOrderCommand = sdkOrderQueryManager.findSalesOrderCommandBySubOrdinate(subOrdinate, true);
+
+            //---------------------------------------------------------------------
+
+            ApplicationEvent event = new PaymentSuccessEvent(this, subOrdinate, salesOrderCommand);
+            eventPublisher.publish(event);
         }
     }
 
@@ -324,14 +343,15 @@ public class PayManagerImpl implements PayManager{
         //根据订单id查询出该订单的明细
         List<OrderLineCommand> orderLines = sdkOrderService.findOrderDetailList(orderId);
         if (null != orderLines && orderLines.size() > 0){
-        	//还原库存调整为有序，一定程度上预防死锁的发生
+            //还原库存调整为有序，一定程度上预防死锁的发生
             //added by D.C 2017/7/24
-     	   Collections.sort(orderLines, new Comparator<OrderLineCommand>() {
-    				@Override
-	       			public int compare(OrderLineCommand o1, OrderLineCommand o2) {
-	       				return o1.getExtentionCode().compareTo(o2.getExtentionCode());
-	       			}}
-            );
+            Collections.sort(orderLines, new Comparator<OrderLineCommand>(){
+
+                @Override
+                public int compare(OrderLineCommand o1,OrderLineCommand o2){
+                    return o1.getExtentionCode().compareTo(o2.getExtentionCode());
+                }
+            });
             for (OrderLineCommand orderLine : orderLines){
                 //加库存
                 if (orderLine.getExtentionCode() != null && orderLine.getCount() > 0){
@@ -358,14 +378,15 @@ public class PayManagerImpl implements PayManager{
         List<OrderLineCommand> orderLines = sdkOrderService.findOrderDetailList(orderId);
         if (isOms == null || !isOms){
             if (null != orderLines && orderLines.size() > 0){
-            	//还原库存调整为有序，一定程度上预防死锁的发生
+                //还原库存调整为有序，一定程度上预防死锁的发生
                 //added by D.C 2017/7/24
-         	   Collections.sort(orderLines, new Comparator<OrderLineCommand>() {
-        				@Override
- 	       			public int compare(OrderLineCommand o1, OrderLineCommand o2) {
- 	       				return o1.getExtentionCode().compareTo(o2.getExtentionCode());
- 	       			}}
-                );
+                Collections.sort(orderLines, new Comparator<OrderLineCommand>(){
+
+                    @Override
+                    public int compare(OrderLineCommand o1,OrderLineCommand o2){
+                        return o1.getExtentionCode().compareTo(o2.getExtentionCode());
+                    }
+                });
                 for (OrderLineCommand orderLine : orderLines){
                     //加库存
                     if (orderLine.getExtentionCode() != null && orderLine.getCount() > 0){
