@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +34,6 @@ import com.baozun.nebula.dao.salesorder.SdkOrderDao;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.event.PayWarnningEvent;
 import com.baozun.nebula.event.PaymentEvent;
-import com.baozun.nebula.event.PaymentSuccessEvent;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.model.payment.PayWarnningLog;
@@ -56,7 +54,6 @@ import com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.sdk.manager.order.SdkOrderQueryManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponManager;
 import com.baozun.nebula.sdk.utils.MapConvertUtils;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
@@ -131,16 +128,10 @@ public class PayManagerImpl implements PayManager{
     private PayInfoLogDao payInfoLogDao;
 
     @Autowired
-    private EventPublisher eventPublisher;
-
-    @Autowired
     private PaymentManager paymentManager;
 
     @Autowired
     private SdkOrderDao sdkOrderDao;
-
-    @Autowired
-    private PaymentResultSuccessUpdateManager paymentResultSuccessUpdateManager;
 
     @Autowired
     private SdkMataInfoManager sdkMataInfoManager;
@@ -152,7 +143,10 @@ public class PayManagerImpl implements PayManager{
     private SalesOrderHandler salesOrderHandler;
 
     @Autowired
-    private SdkOrderQueryManager sdkOrderQueryManager;
+    private PaymentResultSuccessUpdateManager paymentResultSuccessUpdateManager;
+
+    @Autowired
+    private EventPublisher eventPublisher;
 
     //---------------------------------------------------------------------
 
@@ -213,16 +207,6 @@ public class PayManagerImpl implements PayManager{
             //更新支付信息
             PaymentServiceReturnCommand paymentServiceReturnCommand = paymentResult.getPaymentStatusInformation();
             paymentResultSuccessUpdateManager.updateSuccess(paymentServiceReturnCommand, payType);
-
-            //since 5.3.2.22
-            String subOrdinate = paymentServiceReturnCommand.getOrderNo();//支付流水号
-
-            SalesOrderCommand salesOrderCommand = sdkOrderQueryManager.findSalesOrderCommandBySubOrdinate(subOrdinate, true);
-
-            //---------------------------------------------------------------------
-
-            ApplicationEvent event = new PaymentSuccessEvent(this, subOrdinate, salesOrderCommand);
-            eventPublisher.publish(event);
         }
     }
 

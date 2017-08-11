@@ -24,6 +24,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,8 @@ import com.baozun.nebula.constant.EmailConstants;
 import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.dao.payment.PayInfoDao;
 import com.baozun.nebula.dao.payment.PayInfoLogDao;
+import com.baozun.nebula.event.EventPublisher;
+import com.baozun.nebula.event.PaymentSuccessEvent;
 import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.salesorder.SalesOrder;
@@ -77,6 +80,11 @@ public class PaymentResultSuccessUpdateManagerImpl implements PaymentResultSucce
 
     @Autowired
     private SdkPayInfoQueryManager sdkPayInfoQueryManager;
+
+    @Autowired
+    private EventPublisher eventPublisher;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -126,11 +134,20 @@ public class PaymentResultSuccessUpdateManagerImpl implements PaymentResultSucce
                     //保存OMS消息发送记录(当订单有付款发生时，推送消息给到SCM) 
                     sdkMsgManager.saveMsgSendRecord(IfIdentifyConstants.IDENTIFY_PAY_SEND, salesOrderCommand.getId(), null);
 
+                    //---------------------------------------------------------------------
+
+                    //since 5.3.2.22
+                    ApplicationEvent event = new PaymentSuccessEvent(this, subOrdinate, salesOrderCommand);
+                    eventPublisher.publish(event);
                 }
             }
         }
 
+        //---------------------------------------------------------------------
+
         sdkPaymentManager.updatePayCodePayStatus(subOrdinate, new Date(), true);
+
+        //---------------------------------------------------------------------
 
         //更改用户行为
         if (memberId != null){

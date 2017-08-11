@@ -29,9 +29,9 @@ public interface PaymentResultSuccessUpdateManager{
     /**
      * 更改订单和支付详细信息
      * 
-     * @param paymentStatusInformation
+     * @param paymentServiceReturnCommand
      * @param payType
      */
-    void updateSuccess(PaymentServiceReturnCommand paymentStatusInformation,Integer payType);
+    void updateSuccess(PaymentServiceReturnCommand paymentServiceReturnCommand,Integer payType);
 
 }
