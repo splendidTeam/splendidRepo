@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.order.builder.subview;
 
-import static com.feilong.core.util.CollectionsUtil.find;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.List;
@@ -27,12 +26,15 @@ import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.manager.order.handler.DisplayTotalBuilder;
 import com.baozun.nebula.web.controller.order.builder.DefaultOrderViewStatusBuilder;
 import com.baozun.nebula.web.controller.order.builder.OrderViewStatusBuilder;
 import com.baozun.nebula.web.controller.order.builder.OrderViewStatusParam;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderBaseInfoSubViewCommand;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderViewStatus;
 import com.feilong.core.bean.PropertyUtil;
+
+import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
  * 专门用来构造 {@link OrderBaseInfoSubViewCommand}.

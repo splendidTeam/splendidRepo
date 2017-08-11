@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.order.builder.subview;
+package com.baozun.nebula.sdk.manager.order.handler;
 
 import java.math.BigDecimal;
 
@@ -26,14 +26,16 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @see com.baozun.nebula.sdk.manager.payment.PayMoneyBuilder
  * @since 5.3.2.18
+ * @since 5.3.2.22 change to repo from helix
  */
 public interface DisplayTotalBuilder{
 
     /**
-     * 
+     * 订单的总金额 = 订单的total + 运费+ 订单行的包装信息费用.
      *
      * @param salesOrderCommand
-     * @return
+     *            the sales order command
+     * @return the big decimal
      */
     BigDecimal build(SalesOrderCommand salesOrderCommand);
 }
