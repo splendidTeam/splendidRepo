@@ -39,11 +39,11 @@
     <bean id="applicationEventMulticaster" class="org.springframework.context.event.SimpleApplicationEventMulticaster">
         <property name="taskExecutor">
             <bean id="mvcAsyncThreadPoolTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-				<property name="corePoolSize" value="20" /><!--最小线程数 -->
-				<property name="maxPoolSize" value="50" /><!--最大线程数 -->
-				<property name="queueCapacity" value="1000" /><!--缓冲队列大小 -->
-				<property name="keepAliveSeconds" value="30" /><!--线程池中空闲线程的存活时间单位秒 -->
-			</bean>
+                <property name="corePoolSize" value="20" /><!--最小线程数 -->
+                <property name="maxPoolSize" value="50" /><!--最大线程数 -->
+                <property name="queueCapacity" value="1000" /><!--缓冲队列大小 -->
+                <property name="keepAliveSeconds" value="30" /><!--线程池中空闲线程的存活时间单位秒 -->
+            </bean>
         </property>
     </bean>
 
