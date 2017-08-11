@@ -43,6 +43,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.baozun.nebula.web.controller.shoppingcart.validator.CommonImmediatelyBuyFormValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineValidatorChannel;
 
 /**
  * 最常见的立即购买.
@@ -54,6 +55,8 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaImmediatelyBuyShoppingCartController.class);
+
+    //---------------------------------------------------------------------
 
     /** The sdk sku manager. */
     @Autowired
@@ -70,6 +73,8 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
     @Autowired
     @Qualifier("commonImmediatelyBuyFormValidator")
     private CommonImmediatelyBuyFormValidator commonImmediatelyBuyFormValidator;
+
+    //---------------------------------------------------------------------
 
     /**
      * (立即购买)不走普通购物车直接走购物通道.
@@ -106,7 +111,7 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
 
         Sku sku = sdkSkuManager.findSkuById(commonImmediatelyBuyForm.getSkuId());
 
-        ShoppingcartResult shoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, commonImmediatelyBuyForm.getCount());
+        ShoppingcartResult shoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, commonImmediatelyBuyForm.getCount(), ShoppingcartLineValidatorChannel.PLACE_ORDER);
 
         if (ShoppingcartResultUtil.isNotSuccess(shoppingcartResult)){
             return toNebulaReturnResult(shoppingcartResult);

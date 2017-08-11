@@ -21,6 +21,8 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ITEM_STATUS_NOT_ENABLE;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SKU_NOT_ENABLE;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SKU_NOT_EXIST;
+import static com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineValidatorChannel.SHOPPING_CART;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.Date;
 
@@ -42,7 +44,7 @@ import com.feilong.core.date.DateUtil;
 import static com.feilong.core.DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND;
 
 /**
- * The Class ShoppingcartLineOperateCommonValidatorImpl.
+ * 默认的购物车行操作的公共校验,常用于 add/update/立即购买等操作..
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月25日 下午4:48:40
@@ -55,15 +57,21 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingcartLineOperateCommonValidator.class);
 
+    //---------------------------------------------------------------------
+
     /** The sdk item manager. */
     @Autowired
     private SdkItemManager sdkItemManager;
 
     /**
+     * 自定义购物车校验.
+     * 
      * @since 5.3.2.20
      */
     @Autowired(required = false)
-    private ShoppingcartLineOperateCustomValidator shoppingcartLineOperateCustomValidator;
+    private ShoppingcartLineCustomValidator shoppingcartLineCustomValidator;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -73,6 +81,17 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
      */
     @Override
     public ShoppingcartResult validate(Sku sku,Integer count){
+        return validate(sku, count, ShoppingcartLineValidatorChannel.SHOPPING_CART);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator#validate(com.baozun.nebula.model.product.Sku, java.lang.Integer,
+     * com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineValidatorChannel)
+     */
+    @Override
+    public ShoppingcartResult validate(Sku sku,Integer count,ShoppingcartLineValidatorChannel shoppingcartLineValidatorChannel){
         //===============① 数量不能小于1===============
         Validate.isTrue(count >= 1, "count:[%s] can not <1", count);
 
@@ -121,8 +140,9 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
 
         //---------------⑦ 自定义校验-------------------------------------------------
 
-        if (null != shoppingcartLineOperateCustomValidator){
-            ShoppingcartResult customShoppingcartResult = shoppingcartLineOperateCustomValidator.validate(sku, itemCommand, count);
+        if (null != shoppingcartLineCustomValidator){
+            ShoppingcartLineCustomValidatorEntity shoppingcartLineCustomValidatorEntity = new ShoppingcartLineCustomValidatorEntity(sku, itemCommand, count);
+            ShoppingcartResult customShoppingcartResult = shoppingcartLineCustomValidator.validate(shoppingcartLineCustomValidatorEntity, defaultIfNull(shoppingcartLineValidatorChannel, SHOPPING_CART));
             if (ShoppingcartResultUtil.isNotSuccess(customShoppingcartResult)){
                 return customShoppingcartResult;
             }

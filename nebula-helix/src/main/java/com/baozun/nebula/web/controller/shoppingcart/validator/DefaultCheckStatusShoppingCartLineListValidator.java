@@ -19,7 +19,6 @@ package com.baozun.nebula.web.controller.shoppingcart.validator;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAIN_LINE_MAX_THAN_COUNT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
-import static com.feilong.core.Validator.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.LinkedHashMap;
@@ -41,7 +40,10 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartBatchR
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 
+import static com.feilong.core.Validator.isNullOrEmpty;
+
 /**
+ * 被选中的购物车行 校验.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.20
@@ -50,6 +52,8 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
 public class DefaultCheckStatusShoppingCartLineListValidator extends AbstractShoppingcartLineOperateValidator implements CheckStatusShoppingCartLineListValidator{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCheckStatusShoppingCartLineListValidator.class);
+
+    //---------------------------------------------------------------------
 
     @Autowired
     private SdkSkuManager sdkSkuManager;
@@ -60,6 +64,8 @@ public class DefaultCheckStatusShoppingCartLineListValidator extends AbstractSho
     /** The shoppingcart total line max size validator. */
     @Autowired(required = false)
     private ShoppingcartTotalLineMaxSizeValidator shoppingcartTotalLineMaxSizeValidator;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -92,8 +98,6 @@ public class DefaultCheckStatusShoppingCartLineListValidator extends AbstractSho
                 continue;
             }
             break;
-            //TODO
-            //   return toNebulaReturnResult(commandValidateShoppingcartResult, shoppingCartLineCommand.getId());
         }
 
         //---------------------------------------------------------------------
@@ -109,7 +113,7 @@ public class DefaultCheckStatusShoppingCartLineListValidator extends AbstractSho
         //FIXME 做成批量的
         Sku sku = sdkSkuManager.findSkuById(skuId);
 
-        ShoppingcartResult commandValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, shoppingCartLineCommand.getQuantity());
+        ShoppingcartResult commandValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, shoppingCartLineCommand.getQuantity(), ShoppingcartLineValidatorChannel.PLACE_ORDER);
 
         if (ShoppingcartResultUtil.isNotSuccess(commandValidateShoppingcartResult)){
             return commandValidateShoppingcartResult;

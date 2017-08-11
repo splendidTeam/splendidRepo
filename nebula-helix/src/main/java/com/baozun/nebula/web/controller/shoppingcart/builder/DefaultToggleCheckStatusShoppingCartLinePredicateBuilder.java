@@ -33,6 +33,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartInven
 import static com.feilong.core.util.predicate.BeanPredicateUtil.equalPredicate;
 
 /**
+ * 默认 全选/全不选操作时候购物车行选择器.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.14

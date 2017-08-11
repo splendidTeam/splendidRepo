@@ -171,6 +171,8 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
     @Autowired(required = false)
     private SalesOrderTypeResolver salesOrderTypeResolver;
 
+    //---------------------------------------------------------------------
+
     /**
      * @Description 创建订单.
      *              <ol>

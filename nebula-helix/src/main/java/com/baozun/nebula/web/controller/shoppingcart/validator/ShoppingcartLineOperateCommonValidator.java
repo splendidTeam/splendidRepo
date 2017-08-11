@@ -40,15 +40,48 @@ public interface ShoppingcartLineOperateCommonValidator{
      * <li>itemCommand.getLifecycle() 必须是 {@link com.baozun.nebula.sdk.constants.Constants#ITEM_ADDED_VALID_STATUS ITEM_ADDED_VALID_STATUS}</li>
      * <li>判断 <code>checkActiveBeginTime</code> 激活时间</li>
      * <li>判断商品是非赠品</li>
-     * <li>自定义校验 (since 5.3.2.20)</li>
+     * <li>如果配置了 {@link ShoppingcartLineCustomValidator},那么执行自定义校验 (since 5.3.2.20)</li>
+     * </ol>
+     * </blockquote>
+     * 
+     * <p>
+     * 内部调用 {@link #validate(Sku, Integer, ShoppingcartLineValidatorChannel)},默认使用 {@link ShoppingcartLineValidatorChannel#SHOPPING_CART}
+     * </p>
+     *
+     * @param sku
+     *            买的什么sku
+     * @param count
+     *            买了几个
+     * @return 如果检验没有错 返回null
+     * 
+     * @see #validate(Sku, Integer, ShoppingcartLineValidatorChannel)
+     */
+    ShoppingcartResult validate(Sku sku,Integer count);
+
+    /**
+     * 公共的校验.
+     * 
+     * <h3>代码流程:</h3>
+     * <blockquote>
+     * <ol>
+     * <li>count必须 {@code >=} 1</li>
+     * <li>sku必须不为null</li>
+     * <li>sku.getLifecycle() 必须等于 {@link Sku#LIFE_CYCLE_ENABLE}</li>
+     * <li>itemCommand.getLifecycle() 必须是 {@link com.baozun.nebula.sdk.constants.Constants#ITEM_ADDED_VALID_STATUS ITEM_ADDED_VALID_STATUS}</li>
+     * <li>判断 <code>checkActiveBeginTime</code> 激活时间</li>
+     * <li>判断商品是非赠品</li>
+     * <li>如果配置了 {@link ShoppingcartLineCustomValidator},那么执行自定义校验 (since 5.3.2.20)</li>
      * </ol>
      * </blockquote>
      *
      * @param sku
-     *            the sku
+     *            买的什么sku
      * @param count
-     *            the count
+     *            买了几个
+     * @param shoppingcartLineValidatorChannel
+     *            购物车行自定义校验渠道.如果值是null,那么使用默认值 {@link ShoppingcartLineValidatorChannel#SHOPPING_CART}
      * @return 如果检验没有错 返回null
+     * @since 5.3.2.22
      */
-    ShoppingcartResult validate(Sku sku,Integer count);
+    ShoppingcartResult validate(Sku sku,Integer count,ShoppingcartLineValidatorChannel shoppingcartLineValidatorChannel);
 }

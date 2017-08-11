@@ -65,6 +65,8 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
     private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
 
     /**
+     * 被选中的购物车行校验.
+     * 
      * @since 5.3.2.20
      */
     @Autowired
