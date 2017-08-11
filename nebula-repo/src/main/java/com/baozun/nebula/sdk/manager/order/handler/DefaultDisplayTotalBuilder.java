@@ -16,27 +16,15 @@
  */
 package com.baozun.nebula.sdk.manager.order.handler;
 
-import static java.math.BigDecimal.ZERO;
-
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.baozun.nebula.sdk.command.OrderLineCommand;
-import com.baozun.nebula.sdk.command.OrderLinePackageInfoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.feilong.core.lang.NumberUtil;
-import com.google.common.collect.Iterables;
-
-import static com.feilong.core.Validator.isNullOrEmpty;
-import static com.feilong.core.bean.ConvertUtil.toList;
-import static com.feilong.core.util.AggregateUtil.sum;
-import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
-import static com.feilong.core.util.CollectionsUtil.removeAll;
 
 /**
  * 计算显示的金额.
@@ -52,6 +40,9 @@ public class DefaultDisplayTotalBuilder implements DisplayTotalBuilder{
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDisplayTotalBuilder.class);
 
+    @Autowired
+    private OrderTotalPackInfoFeeBuilder orderTotalPackInfoFeeBuilder;
+
     /*
      * (non-Javadoc)
      * 
@@ -61,7 +52,7 @@ public class DefaultDisplayTotalBuilder implements DisplayTotalBuilder{
     public BigDecimal build(SalesOrderCommand salesOrderCommand){
         BigDecimal total = salesOrderCommand.getTotal();
         BigDecimal actualFreight = salesOrderCommand.getActualFreight();
-        Number totalPackInfoFee = getTotalPackInfoFee(salesOrderCommand.getOrderLines());
+        Number totalPackInfoFee = orderTotalPackInfoFeeBuilder.build(salesOrderCommand);
 
         //此处显示的金额 等于 用户需要支付的金额
         //等于 订单里面的total + 运费+ 包装费用
@@ -71,28 +62,6 @@ public class DefaultDisplayTotalBuilder implements DisplayTotalBuilder{
             LOGGER.debug("salesOrderCommand:[{}],total:[{}],actualFreight:[{}],totalPackInfoFee:[{}],displayTotal:[{}]", salesOrderCommand.getCode(), total, actualFreight, totalPackInfoFee, displayTotal);
         }
         return displayTotal;
-    }
-
-    /**
-     * 获得包装费用的总计金额
-     * 
-     * @param orderLineCommandList
-     * @return
-     */
-    //XXX 可能可以提取代码
-    private Number getTotalPackInfoFee(List<OrderLineCommand> orderLineCommandList){
-        List<List<OrderLinePackageInfoCommand>> orderLinePackageInfoCommandListList = getPropertyValueList(orderLineCommandList, "orderLinePackageInfoCommandList");
-
-        orderLinePackageInfoCommandListList = removeAll(orderLinePackageInfoCommandListList, toList(null, Collections.<OrderLinePackageInfoCommand> emptyList()));
-        if (isNullOrEmpty(orderLinePackageInfoCommandListList)){
-            LOGGER.debug("no orderLinePackageInfoCommandListList need calc package fee");
-            return ZERO;
-        }
-
-        //Iterables.concat 要求元素不能有null
-        //平铺
-        Iterable<OrderLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = Iterables.concat(orderLinePackageInfoCommandListList);
-        return sum(shoppingCartLinePackageInfoCommandList, "total");
     }
 
 }
