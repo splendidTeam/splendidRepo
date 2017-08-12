@@ -73,9 +73,16 @@ public class DefaultShoppingCartInventoryValidator implements ShoppingCartInvent
         SkuInventory inventoryInDb = sdkSkuInventoryManager.findSkuInventoryBySkuId(skuId);
         Validate.notNull(inventoryInDb, "when skuId:[%s] ,inventoryInDb can't be null!", skuId);
 
+        //---------------------------------------------------------------------
+
         Integer availableQty = inventoryInDb.getAvailableQty();
         boolean isMoreThanInventory = sumBuyCount > availableQty;
-        LOGGER.debug("input skuId:[{}],sumBuyCount:[{}] [{}] moreThanInventory availableQty:[{}]", skuId, sumBuyCount, isMoreThanInventory, availableQty);
+
+        //---------------------------------------------------------------------
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("skuId:[{}],sumBuyCount:[{}],availableQty:[{}],return :[{}]", skuId, sumBuyCount, availableQty, isMoreThanInventory);
+        }
 
         return isMoreThanInventory;
     }

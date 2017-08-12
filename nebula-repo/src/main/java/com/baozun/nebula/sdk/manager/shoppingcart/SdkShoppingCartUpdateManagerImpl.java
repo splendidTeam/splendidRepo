@@ -27,17 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
-import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
+import com.baozun.nebula.sdk.manager.shoppingcart.handler.CombinedShoppingCartLineCommandFinder;
 import com.baozun.nebula.sdk.utils.ManagerValidate;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
- * The Class SdkShoppingCartUpdateManagerImpl.
- *
+ * 专门处理购物车更新操作的业务类.
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1.9
  */
@@ -48,6 +49,8 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SdkShoppingCartUpdateManagerImpl.class);
 
+    //---------------------------------------------------------------------
+
     /** The sdk shopping cart line dao. */
     @Autowired
     private SdkShoppingCartLineDao sdkShoppingCartLineDao;
@@ -57,6 +60,11 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
 
     @Autowired
     private ShoppingCartLinePackageInfoManager shoppingCartLinePackageInfoManager;
+
+    @Autowired
+    private CombinedShoppingCartLineCommandFinder combinedShoppingCartLineCommandFinder;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -71,9 +79,13 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
 
         int result = sdkShoppingCartLineDao.updateCartLineQuantityByLineId(memberId, lineId, quantity);
         ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],update line:[{}] count:[{}]", memberId, lineId, quantity);
-    }
-    
 
+        //---------------------------------------------------------------------
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("updateCartLineQuantityByLineId success,memberId:[{}],lineId:[{}], quantity:[{}]", memberId, lineId, quantity);
+        }
+    }
 
     @Override
     public void updateCartLineQuantityAndSettlementByLineId(Long memberId,Long lineId,Integer quantity,boolean settlementState){
@@ -81,9 +93,9 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
         Validate.notNull(lineId, "lineId can't be null!");
         Validate.notNull(quantity, "quantity can't be null!");
         Validate.notNull(settlementState, "settlementState can't be null!");
-        int result = sdkShoppingCartLineDao.updateCartLineQuantityAndSettlementStateByLineId(memberId, lineId, quantity,settlementState==true?1:0);
-        ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],update line:[{}] count:[{}] settlementState:[{}]", memberId, lineId, quantity,settlementState);
-        
+        int result = sdkShoppingCartLineDao.updateCartLineQuantityAndSettlementStateByLineId(memberId, lineId, quantity, settlementState == true ? 1 : 0);
+        ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],update line:[{}] count:[{}] settlementState:[{}]", memberId, lineId, quantity, settlementState);
+
     }
 
     /*
@@ -117,6 +129,8 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
         ManagerValidate.isExpectedResult(cartLineIdList.size(), updateCount, "memberId:[{}],update lines:[{}]'s status:[{}]", memberId, cartLineIdList, settleState);
     }
 
+    //---------------------------------------------------------------------
+
     /*
      * (non-Javadoc)
      * 
@@ -129,9 +143,11 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
         //----------------------------------------------------------------------------------------------------------
-
+        //查找数据库中此时的数据
         List<ShoppingCartLineCommand> shoppingCartLineCommandListDB = sdkShoppingCartQueryManager.findShoppingCartLineCommandList(memberId);
         Validate.notEmpty(shoppingCartLineCommandListDB, "shoppingCartLineCommandListDB can't be null/empty!");
+
+        //---------------------------------------------------------------------
 
         //db 里面的操作的shoppingcartLineId 对应的ShoppingCartLineCommand
         ShoppingCartLineCommand shoppingCartLineCommandInDB = find(shoppingCartLineCommandListDB, "id", shoppingcartLineId);
@@ -148,14 +164,28 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
         //被合并,那么需要找到合并的老数据,并删掉当前行
         if (null == currentShoppingCartLineCommand){
 
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("shoppingcartLineId:[{}],currentShoppingCartLineCommand is null,will update combinedShoppingCartLineCommand", shoppingcartLineId);
+            }
+
             //找到合并的是哪条数据
-            ShoppingCartLineCommand combinedShoppingCartLineCommand = findCombinedShoppingCartLineCommand(shoppingCartLineCommandListDB, shoppingCartLineCommandList);
+            ShoppingCartLineCommand combinedShoppingCartLineCommand = combinedShoppingCartLineCommandFinder.find(shoppingCartLineCommandListDB, shoppingCartLineCommandList);
             Validate.notNull(combinedShoppingCartLineCommand, "combinedShoppingCartLineCommand can't be null!");
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug(
+                                "shoppingcartLineId:[{}],shoppingCartLineCommandList:[{}],combinedShoppingCartLine id is:[{}]", //
+                                shoppingcartLineId,
+                                JsonUtil.formatWithIncludes(shoppingCartLineCommandList, "id"),
+                                combinedShoppingCartLineCommand.getId());
+            }
 
             //修改某行数据数量并且删除另外的一行(通常用于修改购物车行销售属性的时合并购物车行的场景).
             updateCartLineQuantityAndDeleteOtherLineId(memberId, shoppingcartLineId, combinedShoppingCartLineCommand);
 
         }
+
+        //---------------------------------------------------------------------
         //如果存在,那么表示没有被合并,
         //没有被合并,那么需要更新当前行,且包装信息(目前是全删全插入)
         else{
@@ -192,26 +222,10 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
 
         int result = sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, deleteLineId);
         ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],delete line:[{}]", memberId, deleteLineId);
-    }
 
-    /**
-     * 找到被合并的行.
-     *
-     * @param shoppingCartLineCommandListDB
-     *            the shopping cart line command list DB
-     * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
-     * @return the shopping cart line command
-     */
-    private ShoppingCartLineCommand findCombinedShoppingCartLineCommand(List<ShoppingCartLineCommand> shoppingCartLineCommandListDB,List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        //循环内存list,如果发现数量和db不相同,那么返回这条数据
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-            ShoppingCartLineCommand db = find(shoppingCartLineCommandListDB, "id", shoppingCartLineCommand.getId());
-            if (db.getQuantity() != shoppingCartLineCommand.getQuantity()){
-                return shoppingCartLineCommand;
-            }
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("deleteByCartLineIdAndMemberId success,memberId:[{}],deleteLineId:[{}] ", memberId, deleteLineId);
         }
-        throw new BusinessException("not find Combined ShoppingCartLineCommand");
     }
 
     /**
@@ -234,6 +248,5 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
         int result = sdkShoppingCartLineDao.updateCartLineSkuInfo(memberId, cartLineId, newSkuId, quantity);
         ManagerValidate.isExpectedResult(1, result, "memberId:[{}],update lineId:[{}],change to newSkuId:[{}],quantity:[{}]", memberId, cartLineId, newSkuId, quantity);
     }
-
 
 }

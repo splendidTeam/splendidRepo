@@ -21,8 +21,6 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.TOTAL_MAX_THAN_QUANTITY;
-import static com.feilong.core.util.CollectionsUtil.collect;
-import static com.feilong.core.util.CollectionsUtil.find;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.List;
@@ -51,6 +49,9 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineP
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartMaxTotalQuantityValidator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
+import static com.feilong.core.util.CollectionsUtil.collect;
+import static com.feilong.core.util.CollectionsUtil.find;
+
 /**
  * 默认实现.
  *
@@ -63,6 +64,8 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingcartLineUpdateValidator.class);
+
+    //---------------------------------------------------------------------
 
     /** The sdk sku manager. */
     @Autowired
@@ -95,6 +98,8 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
      */
     @Autowired
     private ShoppingcartMaxTotalQuantityValidator shoppingcartMaxTotalQuantityValidator;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -163,6 +168,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
                         shoppingCartLineCommandList,
                         shoppingcartUpdateDetermineSameLineElementsBuilder.build(currentShoppingCartLineCommand, shoppingCartLineUpdateSkuForm));
 
+        //---------------------------------------------------------------------
         if (null == needCombinedShoppingCartLineCommand){
             LOGGER.debug("can not find need Combined ShoppingCartLineCommand,just update self line data");
 
@@ -170,7 +176,6 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
             updateCurrentShoppingCartLineCommand(currentShoppingCartLineCommand, shoppingCartLineUpdateSkuForm, targetSku);
         }else{
 
-            //---------------------------------------------------------------
             int totalQuantity = needCombinedShoppingCartLineCommand.getQuantity() + count;
             //校验单行库存
             if (shoppingcartLineUpdateValidatorConfig.getIsCheckSingleLineSkuInventory() && shoppingcartOneLineMaxQuantityValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, totalQuantity)){
@@ -180,12 +185,15 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
             //---------------------------------------------------------------
 
             needCombinedShoppingCartLineCommand.setQuantity(totalQuantity);
-            LOGGER.debug("need Combined Line:[{}],update Quantity to:[{}]", needCombinedShoppingCartLineCommand.getId(), totalQuantity);
 
             //---------------------------------------------------------------
-
             if (LOGGER.isDebugEnabled()){
-                LOGGER.debug("shoppingCartLine List:[{}] will remove current Line :[{}]", JsonUtil.formatWithIncludes(shoppingCartLineCommandList, "id"), currentShoppingCartLineCommand.getId());
+                LOGGER.debug(
+                                "find needCombined Line:[{}],update Quantity to:[{}],and shoppingCartLine List:[{}] will remove current Line :[{}]",
+                                needCombinedShoppingCartLineCommand.getId(),
+                                totalQuantity,
+                                JsonUtil.formatWithIncludes(shoppingCartLineCommandList, "id"),
+                                currentShoppingCartLineCommand.getId());
             }
 
             //如果需要合并,那么当前行删掉合并到需要合并的行 
@@ -210,7 +218,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
      * 
      * @since 5.3.2.22
      */
-    private Integer sumTotalQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentShoppingCartLineCommand,Integer count){
+    private static Integer sumTotalQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentShoppingCartLineCommand,Integer count){
         //计算修改前购物车商品总数量
         Integer currentTotalCount = ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
         //修改后购物车商品总数量=当前购物车总数量-修改的购物车行原来购买数量+修改后的数量
