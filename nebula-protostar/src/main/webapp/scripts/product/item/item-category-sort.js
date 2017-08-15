@@ -21,6 +21,7 @@ $j.extend(loxia.regional['zh-CN'], {
 	"LBAEL_ITEM_OPERATE_SUCCESS" : "操作成功",
 	"LBAEL_ITEM_OPERATE_FAILED" : "操作失败",
 	"LABEL_ITEM_SORTNO" : "排序编号",
+	"LABEL_ITEM_REPERTORY" : "商品库存",//新增商品库存
 	"LABEL_ITEM_PICURL" : "商品图片",
 	"ITEM_CONFIRM" : "确认操作",
 	"ITEM_CONFIRM_ADD_SORT" : "确定添加排序吗？",
@@ -210,7 +211,7 @@ function drawCheckbox(data, args, idx) {
 	return "<input name='chedkId' type='checkbox' class='checkId'  value='" + loxia.getObject("id", data) + "'/>";
 }
 function formatCategoryNames(data, args, idx) {
-	var propertyNameArray = loxia.getObject("categoryNames", data);
+	var propertyNameArray = loxia.getObject("categoryNames", data);//获取所属分类数据
 
 	var categoryNames = propertyNameArray;
 
@@ -316,7 +317,7 @@ $j(document).ready(function() {
 		}
 	}
 
-	// 商品列表
+	// 已排序商品列表
 	$j("#sortedTable").loxiasimpletable({
 		page : true,
 		size : 15,
@@ -341,7 +342,11 @@ $j(document).ready(function() {
 		}, {
 			name : "categoryName",
 			label : nps.i18n("LABEL_ITEM_CATEGORY"),
-			width : "22%",
+			width : "12%",
+		}, {
+			name : "repertory",//新增商品 库存字段
+			label : nps.i18n("LABEL_ITEM_REPERTORY"),
+			width : "10%",
 		}, {
 			name : "sortNo",
 			label : nps.i18n("LABEL_ITEM_SORTNO"),
@@ -354,7 +359,7 @@ $j(document).ready(function() {
 		} ],
 		dataurl : itemCtListUrl
 	});
-
+	//未排序页面
 	$j("#unsortedTable").loxiasimpletable({
 		page : true,
 		size : 15,
