@@ -76,7 +76,7 @@ public class NavigationFilter implements Filter {
             String[] keys = key.split("<>");
             String pathURI = keys[0];
             pathURI = pathURI.endsWith("/") ? pathURI.substring(0, pathURI.length() - 1) : pathURI;
-            String queryStr = keys[1];
+            String queryStr = keys.length == 2 ? keys[1] : null;
 
             FilterNavigationCommand filterNavigation = navigationHelperManager.matchNavigationByUrl(pathURI, queryStr);
 
