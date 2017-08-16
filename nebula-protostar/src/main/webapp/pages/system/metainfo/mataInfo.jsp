@@ -38,9 +38,9 @@ td.col-2 span {
 					</td>
 					
 					<!-- 搜索添加说明字段的搜索条件 -->
-					<td><label><spring:message code="navigation.list.describe"/></label></td>
+					<td><label><spring:message code="navigation.list.declare"/></label></td>
 					<td>
-						<input name="q_string_describe" type="text" loxiaType="input" ></input>
+						<input name="q_string_declare" type="text" loxiaType="input" ></input>
 					</td>
 					
 					
@@ -89,11 +89,11 @@ td.col-2 span {
 					</td>
 		        </tr>
 		        
-		          <!-- describe字段修改弹框页面 -->
+		          <!-- declare字段修改弹框页面 -->
 		        <tr>
-	       			<td><label><spring:message code="navigation.list.describe"/></label></td>
+	       			<td><label><spring:message code="navigation.list.declare"/></label></td>
 					<td>
-						<input class="input_add describe" type="text" loxiaType="input"  mandatory="true"  >
+						<input class="input_add declare" type="text" loxiaType="input"  mandatory="true"  >
 					</td>
 		        </tr>
 		        

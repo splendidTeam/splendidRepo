@@ -15,7 +15,7 @@
 						tpifo.title as name, 
 						tpic.sort_no as sortNo, 
 						tpc.name as categoryName,
-						coalesce(skuInventory.aty,0) as repertory
+						coalesce(skuInventory.aty,0) as inventory
 						from t_pd_item tpit
 						join t_pd_iteminfo tpifo on tpit.id = tpifo.item_id 
 						join t_pd_item_category tpic on tpit.id = tpic.item_id 

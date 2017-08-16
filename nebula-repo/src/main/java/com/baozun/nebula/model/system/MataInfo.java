@@ -147,7 +147,7 @@ public class MataInfo  implements Serializable {
 	 *  
 	 *  @since 5.3.2.22-mata-SNAPSHOT
 	 */
-	private String           describe;
+	private String           declare;
 	/**
 	 * VERSION
 	 */
@@ -196,13 +196,17 @@ public class MataInfo  implements Serializable {
 	public void setVersion(Date version) {
 		this.version = version;
 	}
-	
-   @Column(name = "DESCRIBE")
-    public String getDescribe(){
-        return describe;
+
+	 @Column(name = "DECLARE")
+    public String getDeclare(){
+        return declare;
     }
+
     
-    public void setDescribe(String describe){
-        this.describe = describe;
+    public void setDeclare(String declare){
+        this.declare = declare;
     }
+	
+  
+    
 }
