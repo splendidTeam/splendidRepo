@@ -16,24 +16,17 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.handler;
 
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineQuantityExtractor;
-import com.baozun.nebula.utils.ShoppingCartUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
 
 /**
- * 累计 shoppingCartLineCommandList 每行 Quantity 总和的 QuantityShoppingCartCountHandler.
- *
- * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @since 5.3.1
+ * 更新保存购物车商品数量的Cookie
+ * @author bowen.dai
+ * @since 5.3.2.23
  */
-public class SumQuantityShoppingCartCountHandler implements ShoppingCartCountHandler{
+public interface UpdateShoppingCartCountCookieHandler{
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartCountHandler#buildCount(java.util.List)
-     */
-    @Override
-    public <T extends ShoppingCartLineQuantityExtractor> int buildCount(Iterable<T> shoppingCartLineCommandList){
-        return ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
-    }
+    void update(ShoppingCartViewCommand shoppingCartViewCommand,HttpServletRequest request,HttpServletResponse response);
 }
