@@ -41,7 +41,7 @@ import static com.feilong.core.Validator.isNullOrEmpty;
  * @author bowen.dai
  * @since 5.3.2.23
  */
-@Component
+@Component("updateShoppingCartCountCookieHandler")
 public class DefaultUpdateShoppingCartCountCookieHandler implements UpdateShoppingCartCountCookieHandler{
 
     /** The shoppingcart count persister. */
