@@ -58,6 +58,8 @@ import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
 import com.feilong.tools.slf4j.Slf4jUtil;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAlipayPaymentAdaptor.class);
@@ -383,7 +385,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             // 如果获得的信息是true，则校验成功；如果获得的信息是其他，则校验失败。
             boolean result = "true".equals(notifyVerifyResult);
 
-            LOGGER.debug("validate notifyId:[{}],result:[{}]", notifyId, result);
+            LOGGER.debug("validate notifyId,result:[{}],[{}]", result, notifyId);
             return result;
         }catch (Exception e){
             LOGGER.error("", e);
@@ -422,7 +424,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         String url = alipayUrl + "?" + queryUrl;
         String returnXML = HttpClientUtil.getHttpMethodResponseBodyAsString(url, HttpMethodType.GET);
 
-        if (Validator.isNotNullOrEmpty(returnXML)){
+        if (isNotNullOrEmpty(returnXML)){
             try{
                 Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(returnXML);
                 if ("T".equals(resultMap.get("is_success"))){

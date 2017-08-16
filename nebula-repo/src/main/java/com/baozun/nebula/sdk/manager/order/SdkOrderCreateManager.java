@@ -52,13 +52,15 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
  */
 public interface SdkOrderCreateManager extends BaseManager{
 
-    String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos);
-
     /**
      * 通过商品清单下订单.
+     * 
+     * <p>
+     * 创建订单的核心思想是 ,某某人 要买什么什么东西, 收货地址 支付方式 等等是什么
+     * </p>
      *
-     * @param shoppingCartCommand
-     *            the shopping cart command
+     * @param checkStatusShoppingCartCommand
+     *            选中的购物车行信息
      * @param salesOrderCommand
      *            the sales order command
      * @param memCombos
@@ -66,12 +68,19 @@ public interface SdkOrderCreateManager extends BaseManager{
      * @return the string
      */
     //TODO 参数支持memberId 不支持memCombos
-    //创建订单的核心思想是  ,某某人 要买什么什么东西, 收货地址 支付方式 等等是什么
-    String saveOrder(
-                    ShoppingCartCommand shoppingCartCommand,
-                    SalesOrderCommand salesOrderCommand,
-                    Set<String> memCombos,
-                    SalesOrderCreateOptions salesOrderCreateOptions);
+    String saveOrder(ShoppingCartCommand checkStatusShoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos,SalesOrderCreateOptions salesOrderCreateOptions);
+
+    //-------------------------------------------------------------------------------------------------------------------------
+    /**
+     * 
+     * @param shoppingCartCommand
+     * @param salesOrderCommand
+     * @param memCombos
+     * @return
+     * @deprecated 没有被调用
+     */
+    @Deprecated
+    String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos);
 
     /**
      * 手工下订单.
@@ -84,8 +93,5 @@ public interface SdkOrderCreateManager extends BaseManager{
      * @deprecated 感觉应该可以和 {@link #saveOrder(ShoppingCartCommand, SalesOrderCommand, Set)}进行某种合并,暂时时间关系不动
      */
     @Deprecated
-    String saveManualOrder(
-                    ShoppingCartCommand shoppingCartCommand,
-                    SalesOrderCommand salesOrderCommand,
-                    SalesOrderCreateOptions salesOrderCreateOptions);
+    String saveManualOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,SalesOrderCreateOptions salesOrderCreateOptions);
 }

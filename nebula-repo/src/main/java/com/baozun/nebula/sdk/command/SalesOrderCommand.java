@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.OnLinePaymentCancelCommand;
 import com.baozun.nebula.command.OnLinePaymentCommand;
 import com.baozun.nebula.model.BaseModel;

@@ -334,6 +334,11 @@ public class PaymentServiceReturnCommand implements Serializable {
 	 * 二维码链接
 	 */
 	private String codeUrl;
+	
+    /**
+     * H5支付返回跳转链接
+     */
+    private String mwebUrl;
 
 	/**
 	 * 完整返回信息
@@ -849,5 +854,13 @@ public class PaymentServiceReturnCommand implements Serializable {
 	public void setAllMessage(String allMessage) {
 		this.allMessage = allMessage;
 	}
+
+    public String getMwebUrl(){
+        return mwebUrl;
+    }
+
+    public void setMwebUrl(String mwebUrl){
+        this.mwebUrl = mwebUrl;
+    }
 
 }

@@ -28,9 +28,9 @@ import java.io.Serializable;
  */
 public class InvoiceInfoSubForm implements Serializable {
 
-	public final static String INVOICE_TYPE_PRIVATE = "1";
+	public final static Integer INVOICE_TYPE_PRIVATE = 1;
 
-	public final static String INVOICE_TYPE_COMPANY = "2";
+	public final static Integer INVOICE_TYPE_COMPANY = 2;
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -7282842164155121566L;

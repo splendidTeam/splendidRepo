@@ -114,8 +114,8 @@ public final class ShoppingCartUtil{
         BigDecimal lineSubTotalAmt = NumberUtil.getMultiplyValue(quantity, salePrice, 2).subtract(discount);
         BigDecimal subTotalAmt = lineSubTotalAmt.compareTo(ZERO) < 0 ? ZERO : lineSubTotalAmt;
 
-        String message = "salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}*{}-{}={}]";
-        LOGGER.debug(message, salePrice, quantity, discount, salePrice, quantity, discount, subTotalAmt);
+        String message = "line:[{}],salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}*{}-{}={}]";
+        LOGGER.debug(message, shoppingCartLineCommand.getId(), salePrice, quantity, discount, salePrice, quantity, discount, subTotalAmt);
         return subTotalAmt;
     }
 

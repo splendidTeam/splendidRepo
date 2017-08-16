@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.search;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,14 @@ import java.util.List;
  *
  * @author D.C
  */
-public class FacetParameter{
+public class FacetParameter implements Serializable{
 
-	private String			name;
+	/**
+     * 
+     */
+    private static final long serialVersionUID = -5517038592868432290L;
+
+    private String			name;
 
 	private List<String>	values					= new ArrayList<String>();
 

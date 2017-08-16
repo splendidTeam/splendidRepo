@@ -16,8 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -28,8 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class AbstractShoppingcartLineOperateValidator{
 
     /** The shoppingcart one line max quantity validator. */
-    @Autowired(required = false)
-    private ShoppingcartOneLineMaxQuantityValidator shoppingcartOneLineMaxQuantityValidator;
+    @Autowired
+    protected ShoppingcartOneLineMaxQuantityValidator shoppingcartOneLineMaxQuantityValidator;
 
     /** 购物车 sku 库存校验. */
     @Autowired
@@ -37,13 +35,5 @@ public abstract class AbstractShoppingcartLineOperateValidator{
 
     //---------------------------------------------------------------------
 
-    /**
-     * 如果有配置 {@link #shoppingcartOneLineMaxQuantityValidator},那么使用他;如果没有,那么使用默认的 {@link DefaultShoppingcartOneLineMaxQuantityValidator}.
-     *
-     * @return the use shoppingcart one line max quantity validator
-     */
-    protected ShoppingcartOneLineMaxQuantityValidator getUseShoppingcartOneLineMaxQuantityValidator(){
-        return defaultIfNull(shoppingcartOneLineMaxQuantityValidator, new DefaultShoppingcartOneLineMaxQuantityValidator());
-    }
 
 }

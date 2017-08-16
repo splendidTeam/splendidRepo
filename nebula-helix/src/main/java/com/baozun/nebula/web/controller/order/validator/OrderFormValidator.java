@@ -16,9 +16,6 @@
  */
 package com.baozun.nebula.web.controller.order.validator;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.validator.routines.EmailValidator;
@@ -222,14 +219,11 @@ public class OrderFormValidator implements Validator{
     	// 发票信息验证
  		// 需要发票时候，验证发票相关信息
  		if (com.feilong.core.Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm())) {
+ 		    //是否需要发票信息不能为空
  			if (com.feilong.core.Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm().getIsNeedInvoice())) {
  				if (orderForm.getInvoiceInfoSubForm().getIsNeedInvoice()) {// 是否需要发票
-//    	 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.consignee", "consignee.field.required");// 发票收货人
-//    	 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.telphone", "telphone.field.required");// 发票联系方式
-//    	 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.address", "address.field.required");// 发票地址
- 					//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.invoiceContent", "invoiceContent.field.required");// 发票内容
- 					
- 					if (InvoiceInfoSubForm.INVOICE_TYPE_COMPANY.equals(orderForm.getInvoiceInfoSubForm().getInvoiceTitle())) {// 发票类型  个人还是公司  公司要判断抬头
+ 				    //判断发票类型
+ 					if (InvoiceInfoSubForm.INVOICE_TYPE_COMPANY.equals(orderForm.getInvoiceInfoSubForm().getInvoiceType())) {// 发票类型  个人还是公司  公司要判断抬头
  						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.invoiceTitle", "invoiceTitle.field.required");// 发票抬头
  					}
  	 			}

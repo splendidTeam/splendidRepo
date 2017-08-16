@@ -74,6 +74,7 @@ public class EmailSubscribe extends BaseModel implements Command {
 	}
 
 	@Column(name = "RECEIVER",length = 200)
+    @Index(name = "IDX_EMAIL_SUBSCRIBE_RECEIVER")
 	public String getReceiver() {
 		return receiver;
 	}

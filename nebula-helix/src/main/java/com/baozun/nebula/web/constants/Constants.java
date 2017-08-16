@@ -72,6 +72,7 @@ public class Constants{
      * @deprecated 不应该常量写死
      */
     public static final int SHOPPING_CART_SKU_ONE_LINE_COUNT = 8;
+    
 
     /** 新增商品 */
     public static final String SHOPPING_CART_ACT_ADD = "add";

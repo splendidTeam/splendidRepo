@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<bean id="PayInfoLog.findAllPayInfoLogList" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+    <bean id="PayInfoLog.findAllPayInfoLogList" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		select * from T_SO_PAYINFO_LOG 
 		       			 where lifecycle !=2
 		       		
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>	
-	
-	<bean id="PayInfoLog.findPayInfoLogListByIds" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="PayInfoLog.findPayInfoLogListByIds" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		select * from T_SO_PAYINFO_LOG where 
 		       		id in (
@@ -29,15 +29,15 @@
 		       		 -1)
 		       		
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>	
-	
-	
-	<bean id="PayInfoLog.findPayInfoLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="PayInfoLog.findPayInfoLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		select * from T_SO_PAYINFO_LOG where 
 		       			1 = 1
@@ -145,14 +145,14 @@
 				       		
 		       				
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>	
-	
-	<bean id="PayInfoLog.findPayInfoLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="PayInfoLog.findPayInfoLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		select * from T_SO_PAYINFO_LOG where 
 		       		
@@ -257,15 +257,15 @@
 				       		#end
 		       				
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>	
-	
-	
-	<bean id="PayInfoLog.enableOrDisablePayInfoLogByIds" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="PayInfoLog.enableOrDisablePayInfoLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		update T_SO_PAYINFO_LOG
 		       		set lifecycle=:state
@@ -277,14 +277,14 @@
 		       		 -1)
 		       		 
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="PayInfoLog.removePayInfoLogByIds" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="PayInfoLog.removePayInfoLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		update T_SO_PAYINFO_LOG
 		       		set lifecycle=2
@@ -296,26 +296,26 @@
 		       		 -1)
 		       		 
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="PayInfoLog.findAllEffectPayInfoLogList" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="PayInfoLog.findAllEffectPayInfoLogList" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		select * from T_SO_PAYINFO_LOG where lifecycle=1
 		       		
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-		<bean id="PayInfoLog.findEffectPayInfoLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="PayInfoLog.findEffectPayInfoLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		select * from T_SO_PAYINFO_LOG where 1=1
 		       		
@@ -415,14 +415,14 @@
 		       				#end
 		       		
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>	
-	
-	<bean id="PayInfoLog.findEffectPayInfoLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="PayInfoLog.findEffectPayInfoLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		select * from T_SO_PAYINFO_LOG where 1=1
 		       		
@@ -522,8 +522,31 @@
 		       				#end
 		       		
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>	
-	
+            </value>
+        </constructor-arg>
+    </bean>
+
+
+    <!-- 更新未支付的payInfoLog信息支付方式.. by feilong -->
+    <bean id="PayInfoLog.updateNoPayPayInfoLogPayTypeById" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
+                <![CDATA[
+                    update
+                        t_so_payinfo_log
+                    set 
+                        version = now(),
+                        modify_time=now(),
+                        pay_info = :payInfo,
+                        pay_type=:payType,
+                        thirdpaytype=:thirdPayType
+                    where
+                        id=:id
+                        and pay_success_status=false
+                ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+
 </beans>

@@ -20,13 +20,14 @@ import com.baozun.nebula.command.product.FilterNavigationCommand;
 import com.baozun.nebula.manager.navigation.NavigationHelperManager;
 import com.baozun.nebula.utils.cache.GuavaAbstractLoadingCache;
 import com.feilong.core.Validator;
+import com.feilong.servlet.http.RequestUtil;
 import com.google.common.base.Optional;
 
 /**
  * 导航的filter，将商品集合的导航跳转到对应的collection中去
  * 
  * @author long.xia
- * @author dianchao.song   添加了1分钟缓存，可以缓解每次拦截时的数据库连接的占用
+ * @author dianchao.song 添加了1分钟缓存，可以缓解每次拦截时的数据库连接的占用
  */
 public class NavigationFilter implements Filter {
 
@@ -49,10 +50,14 @@ public class NavigationFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         try{
-            Optional<String> url = cache.getValue(request.getRequestURI() + "<>" + request.getQueryString());
-            if(url.isPresent()) {
-                request.getRequestDispatcher(url.get()).forward(request, response);
-            } else {
+            if (!RequestUtil.isAjaxRequest(request)){
+                Optional<String> url = cache.getValue(request.getRequestURI() + "<>" + request.getQueryString());
+                if (url.isPresent()){
+                    request.getRequestDispatcher(url.get()).forward(request, response);
+                }else{
+                    chain.doFilter(request, response);
+                }
+            }else{
                 chain.doFilter(request, response);
             }
         }catch (ExecutionException e){

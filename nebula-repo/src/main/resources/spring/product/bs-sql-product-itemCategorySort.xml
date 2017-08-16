@@ -9,12 +9,29 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-					select tpic.id as id, tpit.code as code, tpit.pic_url as picUrl, tpifo.title as name, tpic.sort_no as sortNo, tpc.name as categoryName
-					from t_pd_item tpit, t_pd_iteminfo tpifo, t_pd_item_category tpic, t_pd_category tpc
-					where tpit.id = tpifo.item_id 
-						and tpit.isaddcategory = 1
-						and tpit.id = tpic.item_id
-						and tpic.category_id = tpc.id
+					select tpic.id as id, 
+						tpit.code as code, 
+						tpit.pic_url as picUrl, 
+						tpifo.title as name, 
+						tpic.sort_no as sortNo, 
+						tpc.name as categoryName,
+						coalesce(skuInventory.aty,0) as inventory
+						from t_pd_item tpit
+						join t_pd_iteminfo tpifo on tpit.id = tpifo.item_id 
+						join t_pd_item_category tpic on tpit.id = tpic.item_id 
+						join t_pd_category tpc on tpic.category_id = tpc.id
+						
+						left join (
+							    select sku.item_id item_id , sum(inventory.available_qty) aty 
+							    from t_pd_sku sku,t_pd_sku_inventory inventory 
+							    where sku.out_id = inventory.extention_code
+							    and sku.lifecycle=1
+							    GROUP BY sku.item_id
+						    ) skuInventory 
+						    on tpit.id = skuInventory.item_id
+							
+						where  tpit.isaddcategory = 1
+						
 						#if($sorted)
 							and tpic.sort_no is not null
 						#else
@@ -34,7 +51,7 @@
 								#end
 							)
 						#end
-					order by tpic.sort_no asc
+ 					order by tpic.sort_no asc	
 						
 				]]>
 			</value>

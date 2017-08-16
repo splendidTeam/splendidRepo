@@ -16,6 +16,9 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -31,8 +34,6 @@ import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
-
-import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 /**
  * 专门处理购物车添加操作的业务类.
@@ -100,7 +101,7 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         Validate.notNull(shoppingCartLineCommand, "shoppingCartLineCommand can't be null!");
 
         if (isUpdate(shoppingCartLineCommand)){ // 更新
-            sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, shoppingCartLineCommand.getId(), shoppingCartLineCommand.getQuantity());
+            sdkShoppingCartUpdateManager.updateCartLineQuantityAndSettlementByLineId(memberId, shoppingCartLineCommand.getId(), shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSettlementState().equals(1));
         }else{
             addCartLine(memberId, shoppingCartLineCommand);
         }
@@ -148,7 +149,10 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         shoppingCartLine.setGift(shoppingCartLineCommand.isGift());
         //shoppingCartLine.setItemId(itemId);
 
-        shoppingCartLine.setLineGroup(String.valueOf(shoppingCartLineCommand.getLineGroup()));
+        Long lineGroup = shoppingCartLineCommand.getLineGroup();
+        if (null != lineGroup){
+            shoppingCartLine.setLineGroup(String.valueOf(lineGroup));
+        }
 
         shoppingCartLine.setMemberId(memberId);
         shoppingCartLine.setPromotionId(shoppingCartLineCommand.getPromotionId());

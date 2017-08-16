@@ -60,7 +60,11 @@
 		       				#if($code)
 		       					and CODE=:code
 		       				#end
-		       			
+		       				
+		       				#if($declare)
+		       					and DECLARE like '%$declare%'
+		       				#end
+		       				
 		       				#if($value)
 		       					and VALUE=:value
 		       				#end
@@ -90,10 +94,15 @@
 		       				#if($value)
 		       					and VALUE like :value
 		       				#end
+		       				
+		       				#if($declare)
+		       					and DECLARE like '%$declare%'
+		       				#end
 		       			
 		       				#if($lifecycle)
 		       					and LIFECYCLE=:lifecycle
 		       				#end
+		       				
                  ]]>
 			</value>
 		</constructor-arg>

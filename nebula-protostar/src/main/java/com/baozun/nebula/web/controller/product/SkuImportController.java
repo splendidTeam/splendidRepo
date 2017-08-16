@@ -149,8 +149,9 @@ public class SkuImportController extends BaseController{
 	 * 批量修改价格跳转页面
 	 * @param model
 	 * @return
+	 * @deprecated 这个方法里面有对style做更新操作。逻辑也有问题。目前直接失效掉
 	 */
-	@RequestMapping(value = "/item/toImportUpdatePrice.htm")
+//	@RequestMapping(value = "/item/toImportUpdatePrice.htm")
 	public String toUpdatePrice(Model model){
 		return "/product/item/import-update-price";
 	}

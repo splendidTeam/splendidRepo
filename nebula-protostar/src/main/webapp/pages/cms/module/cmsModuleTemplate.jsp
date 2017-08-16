@@ -27,7 +27,7 @@
         <tr>
       		<td><label>模块名称</label></td>
 			<td>
-				<input name="q_sl_nameForLike" type="text" loxiaType="input" ></input>
+				<input id="q_sl_nameForLike" name="q_sl_nameForLike" type="text" loxiaType="input" ></input>
 			</td>
         </tr> 
     </table>

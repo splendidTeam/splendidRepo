@@ -57,4 +57,26 @@ public interface SdkPayInfoManager extends BaseManager{
      */
     PayInfo savePayInfo(Long orderId,int payType,BigDecimal payMoney);
 
+    /**
+     * 根据订单id,修改PayInfo的支付方式.
+     * 
+     * <p>
+     * 如果 <code>id</code> 是null,抛出 {@link NullPointerException}<br>
+     * 
+     * 如果 <code>payType</code> 是null,抛出 {@link NullPointerException}<br>
+     * 
+     * 如果 <code>payInfo</code> 是null,抛出 {@link NullPointerException}<br>
+     * 如果 <code>payInfo</code> 是blank,抛出 {@link IllegalArgumentException}<br>
+     * </p>
+     * 
+     * @param id
+     *            the id
+     * @param payType
+     *            the pay type
+     * @param payInfo
+     *            the pay info
+     * @since 5.3.2.22
+     */
+    void updateNoPayPayTypeByOrderId(Long id,Integer payType,String payInfo);
+
 }

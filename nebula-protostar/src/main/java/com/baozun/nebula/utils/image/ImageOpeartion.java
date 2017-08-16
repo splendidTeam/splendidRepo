@@ -1,5 +1,7 @@
 package com.baozun.nebula.utils.image;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -14,7 +16,7 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
 import org.slf4j.Logger;
@@ -22,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+
+import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
  * 图像操作
@@ -31,11 +35,11 @@ import com.baozun.nebula.utilities.common.ProfileConfigUtil;
  */
 public class ImageOpeartion{
 
-    private static final Logger log        = LoggerFactory.getLogger(ImageOpeartion.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImageOpeartion.class);
 
     //切换生成略缩图类型
     @SuppressWarnings("unused")
-    private static String       reduceType = "BK";
+    private static String reduceType = "BK";
 
     /**
      * 图像缩放 jpg格式 比例失调时，会剪切部分
@@ -190,7 +194,7 @@ public class ImageOpeartion{
             tag.getGraphics().drawImage(src.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH), 0, 0, null);
 
             FileOutputStream out = new FileOutputStream(imgdist);
-            
+
             ImageIO.write(tag, "jpg", out);
 
         }catch (IOException ex){
@@ -448,7 +452,7 @@ public class ImageOpeartion{
             cmd.run(opertion);
         }catch (Exception e){
             String errorMsg = String.format("图片缩放失败：%s", imgdist);
-            log.error(errorMsg, e);
+            LOGGER.error(errorMsg, e);
             throw new BusinessException(errorMsg);
         }
     }
@@ -511,12 +515,7 @@ public class ImageOpeartion{
             String[] wh = whArray[i].split("X");
             //生成略缩图
             if (wh.length >= 2)
-                reduceImg(
-                                new File(imgSrc),
-                                dirdist + fileName + "_" + (i + 1) + exp,
-                                Integer.parseInt(wh[0]),
-                                Integer.parseInt(wh[1]),
-                                reduceType);
+                reduceImg(new File(imgSrc), dirdist + fileName + "_" + (i + 1) + exp, Integer.parseInt(wh[0]), Integer.parseInt(wh[1]), reduceType);
 
         }
 
@@ -543,21 +542,18 @@ public class ImageOpeartion{
      * @return
      */
     public static String imageUrlConvert(String imgUrl,String customBaseUrl,Boolean flag){
-        if (flag){
-            if (StringUtils.isNotBlank(imgUrl) && imgUrl.toLowerCase().startsWith("http://")){
-                return imgUrl.replace(customBaseUrl, "");
-            }
-        }else{
-            if (StringUtils.isNotBlank(imgUrl)){
-                return customBaseUrl + imgUrl;
-            }
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("input imgUrl:[{}],customBaseUrl:[{}],flag:[{}]", imgUrl, customBaseUrl, flag);
         }
-        return "";
-    }
 
-    public static void main(String[] args) throws Exception{
+        if (isNullOrEmpty(imgUrl)){
+            return EMPTY;
+        }
 
-        reduceImg(new File("d:/577962-815_BL1.png"), "d:/577962-815_BL12.png", 300, 100, "PNG");
-
+        //---------------------------------------------------------------------
+        if (flag){
+            return StringUtils.removeStart(imgUrl, customBaseUrl);
+        }
+        return customBaseUrl + imgUrl;
     }
 }

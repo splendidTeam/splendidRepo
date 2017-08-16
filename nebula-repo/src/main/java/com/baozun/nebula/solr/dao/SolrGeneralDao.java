@@ -34,473 +34,467 @@ import com.baozun.nebula.solr.utils.Validator;
  * 
  */
 @Component
-public class SolrGeneralDao {
+public class SolrGeneralDao{
 
-	private static final Logger log = LoggerFactory
-			.getLogger(SolrGeneralDao.class);
+    private static final Logger log = LoggerFactory.getLogger(SolrGeneralDao.class);
 
-	@Autowired
-	protected SolrServer solrServer;
+    /**
+     * @since 5.3.2.20 change required = false
+     * @see <a href="http://jira.baozun.cn/browse/NB-817">NB-817</a>
+     */
+    @Autowired(required = false)
+    protected SolrServer solrServer;
 
-	private DocumentObjectBinder binder;
+    private DocumentObjectBinder binder;
 
-	public SolrServer getSolrServer() {
-		return solrServer;
-	}
+    public SolrServer getSolrServer(){
+        return solrServer;
+    }
 
-	public void setSolrServer(SolrServer solrServer) {
-		this.solrServer = solrServer;
-	}
+    public void setSolrServer(SolrServer solrServer){
+        this.solrServer = solrServer;
+    }
 
-	public void setBinder(DocumentObjectBinder binder) {
-		this.binder = binder;
-	}
+    public void setBinder(DocumentObjectBinder binder){
+        this.binder = binder;
+    }
 
-	/**
-	 * 保存对象集合
-	 */
-	public Boolean batchUpdateIndex(List<ItemForSolrCommand> itemList) {
-		boolean flag = false;
-		try {
-			if ((Validator.isNotNullOrEmpty(itemList))) {
-				List<String> ids = new ArrayList<String>();
-				for(ItemForSolrCommand itemForSolrCommand : itemList){
-					ids.add(String.valueOf(itemForSolrCommand.getId()));
-				}
-				solrServer.deleteById(ids);
-				solrServer.addBeans(itemList);
-				solrServer.commit();
-				flag = true;
-				log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) commint . ");
-			} else {
-				log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) error ,  itemList is null. ");
-			}
-		} catch (Exception e) {
-			try {
-				solrServer.rollback();
-			} catch (SolrServerException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			e.printStackTrace();
-			log.error("SolrGeneralDao batchUpdateIndex exception . ");
-		}
-		return flag;
-	}
-	
-	/**
-	 * 保存对象集合
-	 */
-	public Boolean updateIndex(List<ItemForSolrCommand> itemList) {
-		boolean flag = false;
-		try {
-			if ((Validator.isNotNullOrEmpty(itemList))) {
-				solrServer.addBeans(itemList);
-				solrServer.commit();
-				flag = true;
-				log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) commint . ");
-			} else {
-				log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) error ,  itemList is null. ");
-			}
-		} catch (Exception e) {
-			try {
-				solrServer.rollback();
-			} catch (SolrServerException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			e.printStackTrace();
-			log.error("SolrGeneralDao batchUpdateIndex exception . ");
-		}
-		return flag;
-	}
-	
-	public Boolean updateIndexI18n(List<ItemForSolrI18nCommand> itemList) {
-		boolean flag = false;
-		try {
-			if ((Validator.isNotNullOrEmpty(itemList))) {
-				solrServer.addBeans(itemList);
-				solrServer.commit();
-				flag = true;
-				log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) commint . ");
-			} else {
-				log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) error ,  itemList is null. ");
-			}
-		} catch (Exception e) {
-			try {
-				solrServer.rollback();
-			} catch (SolrServerException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			e.printStackTrace();
-			log.error("SolrGeneralDao batchUpdateIndex exception . ");
-		}
-		return flag;
-	}
+    /**
+     * 保存对象集合
+     */
+    public Boolean batchUpdateIndex(List<ItemForSolrCommand> itemList){
+        boolean flag = false;
+        try{
+            if ((Validator.isNotNullOrEmpty(itemList))){
+                List<String> ids = new ArrayList<String>();
+                for (ItemForSolrCommand itemForSolrCommand : itemList){
+                    ids.add(String.valueOf(itemForSolrCommand.getId()));
+                }
+                solrServer.deleteById(ids);
+                solrServer.addBeans(itemList);
+                solrServer.commit();
+                flag = true;
+                log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) commint . ");
+            }else{
+                log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) error ,  itemList is null. ");
+            }
+        }catch (Exception e){
+            try{
+                solrServer.rollback();
+            }catch (SolrServerException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }catch (IOException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            log.error("SolrGeneralDao batchUpdateIndex exception . ");
+        }
+        return flag;
+    }
 
-	/**
-	 * 根据传入的关键字进行查找所有符合要求的索引 queryString的格式为 id:123 该方法可以通用查询单个域某个值的索引
-	 * 
-	 * @param queryString
-	 * @return
-	 * @throws SolrServerException
-	 */
-	public List<ItemForSolrCommand> queryByField(String queryString,
-			String sortString, Integer startNum, Integer rowsNum)
-			throws SolrServerException {
+    /**
+     * 保存对象集合
+     */
+    public Boolean updateIndex(List<ItemForSolrCommand> itemList){
+        boolean flag = false;
+        try{
+            if ((Validator.isNotNullOrEmpty(itemList))){
+                solrServer.addBeans(itemList);
+                solrServer.commit();
+                flag = true;
+                log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) commint . ");
+            }else{
+                log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) error ,  itemList is null. ");
+            }
+        }catch (Exception e){
+            try{
+                solrServer.rollback();
+            }catch (SolrServerException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }catch (IOException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            log.error("SolrGeneralDao batchUpdateIndex exception . ");
+        }
+        return flag;
+    }
 
-		List<ItemForSolrCommand> itemForSolrCommandList = new ArrayList<ItemForSolrCommand>();
+    public Boolean updateIndexI18n(List<ItemForSolrI18nCommand> itemList){
+        boolean flag = false;
+        try{
+            if ((Validator.isNotNullOrEmpty(itemList))){
+                solrServer.addBeans(itemList);
+                solrServer.commit();
+                flag = true;
+                log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) commint . ");
+            }else{
+                log.debug("SolrGeneralDao batchUpdateIndex(List<ItemForSolrCommand> itemList) error ,  itemList is null. ");
+            }
+        }catch (Exception e){
+            try{
+                solrServer.rollback();
+            }catch (SolrServerException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }catch (IOException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            log.error("SolrGeneralDao batchUpdateIndex exception . ");
+        }
+        return flag;
+    }
 
-		if (queryString.equals("") & (sortString.equals(""))
-				|| (queryString == null) & (sortString == null)) {
-			itemForSolrCommandList = queryAll();
-			log.debug("SolrGeneralDao queryByField(String queryString,String sortString,Integer startNum,Integer rowsNum) error ,"
-					+ "  queryString is empty or null and sortString is empty or null . ");
-		} else {
-			ModifiableSolrParams params = new ModifiableSolrParams();
-			// 查询关键词，*:*代表所有属性、所有值，即所有index
-			if (queryString == null || sortString == null) {
-				itemForSolrCommandList = queryAll();
-				log.debug("SolrGeneralDao queryByField(String queryString,String sortString,Integer startNum,Integer rowsNum) error ,"
-						+ "  queryString is empty or null , sortString is empty or null . ");
-			}
-			if (queryString.equals("")) {
-				queryString = "*:*";
-			}
-			params.set("q", queryString);
-			// 分页，start=0就是从0开始，，rows=5当前返回5条记录，第二页就是变化start这个值为5就可以了。
-			if (startNum < 0) {
-				startNum = 0;
-			}
-			if (rowsNum < 1) {
-				rowsNum = 1;
-			}
-			if (startNum > rowsNum) {
-				int t = startNum;
-				startNum = rowsNum;
-				rowsNum = t;
-			}
-			params.set("start", startNum);
-			params.set("rows", rowsNum);
-			// 排序，，比如score desc，id desc(or asc)
-			if (sortString.equals("")) {
-				sortString = "score desc";
-			}
-			params.set("sort", sortString);
-			// 返回信息 * 为全部 这里是全部加上score，如果不加下面就不能使用score
-			params.set("fl", "*,score");
+    /**
+     * 根据传入的关键字进行查找所有符合要求的索引 queryString的格式为 id:123 该方法可以通用查询单个域某个值的索引
+     * 
+     * @param queryString
+     * @return
+     * @throws SolrServerException
+     */
+    public List<ItemForSolrCommand> queryByField(String queryString,String sortString,Integer startNum,Integer rowsNum) throws SolrServerException{
 
-			QueryResponse response = solrServer.query(params);
-			itemForSolrCommandList = response
-					.getBeans(ItemForSolrCommand.class);
-			log.debug("SolrGeneralDao queryByField success . ");
-		}
+        List<ItemForSolrCommand> itemForSolrCommandList = new ArrayList<ItemForSolrCommand>();
 
-		return itemForSolrCommandList;
-	}
+        if (queryString.equals("") & (sortString.equals("")) || (queryString == null) & (sortString == null)){
+            itemForSolrCommandList = queryAll();
+            log.debug("SolrGeneralDao queryByField(String queryString,String sortString,Integer startNum,Integer rowsNum) error ," + "  queryString is empty or null and sortString is empty or null . ");
+        }else{
+            ModifiableSolrParams params = new ModifiableSolrParams();
+            // 查询关键词，*:*代表所有属性、所有值，即所有index
+            if (queryString == null || sortString == null){
+                itemForSolrCommandList = queryAll();
+                log.debug("SolrGeneralDao queryByField(String queryString,String sortString,Integer startNum,Integer rowsNum) error ," + "  queryString is empty or null , sortString is empty or null . ");
+            }
+            if (queryString.equals("")){
+                queryString = "*:*";
+            }
+            params.set("q", queryString);
+            // 分页，start=0就是从0开始，，rows=5当前返回5条记录，第二页就是变化start这个值为5就可以了。
+            if (startNum < 0){
+                startNum = 0;
+            }
+            if (rowsNum < 1){
+                rowsNum = 1;
+            }
+            if (startNum > rowsNum){
+                int t = startNum;
+                startNum = rowsNum;
+                rowsNum = t;
+            }
+            params.set("start", startNum);
+            params.set("rows", rowsNum);
+            // 排序，，比如score desc，id desc(or asc)
+            if (sortString.equals("")){
+                sortString = "score desc";
+            }
+            params.set("sort", sortString);
+            // 返回信息 * 为全部 这里是全部加上score，如果不加下面就不能使用score
+            params.set("fl", "*,score");
 
-	/**
-	 * 根据传入的SolrQuery进行查询索引 范围List<ItemForSolrCommand>
-	 * 
-	 * @return
-	 * @throws SolrServerException
-	 */
-	public QueryResponse queryBysolrQuery(SolrQuery solrQuery)
-			throws SolrServerException {
-		QueryResponse response = new QueryResponse();
-		if ((Validator.isNotNullOrEmpty(solrQuery))) {
-			response = solrServer.query(solrQuery,METHOD.POST);
-			log.debug("SolrGeneralDao queryBysolrQuery(SolrQuery solrQuery) success . ");
-		}
-		return response;
+            QueryResponse response = solrServer.query(params);
+            itemForSolrCommandList = response.getBeans(ItemForSolrCommand.class);
+            log.debug("SolrGeneralDao queryByField success . ");
+        }
 
-	}
+        return itemForSolrCommandList;
+    }
 
-	/**
-	 * 以SolrDocumentList格式返回所有查询索引
-	 * 
-	 * @return
-	 * @throws SolrServerException
-	 */
-	public SolrDocumentList queryAllSolrDocumentList()
-			throws SolrServerException {
+    /**
+     * 根据传入的SolrQuery进行查询索引 范围List<ItemForSolrCommand>
+     * 
+     * @return
+     * @throws SolrServerException
+     */
+    public QueryResponse queryBysolrQuery(SolrQuery solrQuery) throws SolrServerException{
+        QueryResponse response = new QueryResponse();
+        if ((Validator.isNotNullOrEmpty(solrQuery))){
+            response = solrServer.query(solrQuery, METHOD.POST);
+            log.debug("SolrGeneralDao queryBysolrQuery(SolrQuery solrQuery) success . ");
+        }
+        return response;
 
-		SolrDocumentList solrDocumentList = new SolrDocumentList();
+    }
 
-		ModifiableSolrParams params = new ModifiableSolrParams();
-		// 查询关键词，*:*代表所有属性、所有值，即所有index
-		params.set("q", "*:*");
-		// 分页，start=0就是从0开始，，rows=5当前返回5条记录，第二页就是变化start这个值为5就可以了。
-		params.set("start", 0);
-		params.set("rows", Integer.MAX_VALUE);
-		// 排序，，如果按照id 排序，，那么将score desc 改成 id desc(or asc)
-		params.set("sort", "score desc");
-		// 返回信息 * 为全部 这里是全部加上score，如果不加下面就不能使用score
-		params.set("fl", "*,score");
+    /**
+     * 以SolrDocumentList格式返回所有查询索引
+     * 
+     * @return
+     * @throws SolrServerException
+     */
+    public SolrDocumentList queryAllSolrDocumentList() throws SolrServerException{
 
-		QueryResponse response = solrServer.query(params);
-		GroupResponse groupResponse = response.getGroupResponse();
+        SolrDocumentList solrDocumentList = new SolrDocumentList();
 
-		if (null != groupResponse) {
+        ModifiableSolrParams params = new ModifiableSolrParams();
+        // 查询关键词，*:*代表所有属性、所有值，即所有index
+        params.set("q", "*:*");
+        // 分页，start=0就是从0开始，，rows=5当前返回5条记录，第二页就是变化start这个值为5就可以了。
+        params.set("start", 0);
+        params.set("rows", Integer.MAX_VALUE);
+        // 排序，，如果按照id 排序，，那么将score desc 改成 id desc(or asc)
+        params.set("sort", "score desc");
+        // 返回信息 * 为全部 这里是全部加上score，如果不加下面就不能使用score
+        params.set("fl", "*,score");
 
-			List<GroupCommand> groupCommandList = groupResponse.getValues();
-			for (GroupCommand groupCommand : groupCommandList) {
+        QueryResponse response = solrServer.query(params);
+        GroupResponse groupResponse = response.getGroupResponse();
 
-				List<Group> groupList = groupCommand.getValues();
+        if (null != groupResponse){
 
-				for (Group group : groupList) {
-					solrDocumentList = group.getResult();
+            List<GroupCommand> groupCommandList = groupResponse.getValues();
+            for (GroupCommand groupCommand : groupCommandList){
 
-				}
+                List<Group> groupList = groupCommand.getValues();
 
-			}
+                for (Group group : groupList){
+                    solrDocumentList = group.getResult();
 
-		}
-		log.debug("SolrGeneralDao queryAll success . ");
+                }
 
-		return solrDocumentList;
-	}
+            }
 
-	public SolrDocumentList toSolrDocumentList(ModifiableSolrParams params)
-			throws SolrServerException {
-		SolrDocumentList solrDocumentList = new SolrDocumentList();
-		QueryResponse response = solrServer.query(params);
+        }
+        log.debug("SolrGeneralDao queryAll success . ");
 
-		solrDocumentList = response.getResults();
-		return solrDocumentList;
-	}
+        return solrDocumentList;
+    }
 
-	/**
-	 * 根据传入查询条件删除solr索引 queryString格式为name:abc,id:123 逗号表示条件之间为与关系
-	 * 如果只有一个条件则为“name:abc”,多个条件用逗号分隔开
-	 * 
-	 * @param queryString
-	 */
-	public void deleteByQuery(String queryString) {
-		// 由于*:*是空所有索引，为了安全起见，此处不允许执行这种格式的删除。
-		if (Validator.isNotNullOrEmpty(queryString)) {
-			try {
-				if(!queryString.equals("*:*")){
-					solrServer.deleteByQuery(queryString);
-					solrServer.commit();
-					log.debug("SolrGeneralDao deleteByQuery success . ");
-				}else{
-					log.debug("SolrGeneralDao deleteByQuery not allow delete by *:* . ");
-				}
-			} catch (SolrServerException e) {
-				e.printStackTrace();
-				log.error("SolrGeneralDao deleteByQuery SolrServerException . ");
+    public SolrDocumentList toSolrDocumentList(ModifiableSolrParams params) throws SolrServerException{
+        SolrDocumentList solrDocumentList = new SolrDocumentList();
+        QueryResponse response = solrServer.query(params);
 
-			} catch (IOException e) {
-				e.printStackTrace();
-				log.error("SolrGeneralDao deleteByQuery IOException . ");
+        solrDocumentList = response.getResults();
+        return solrDocumentList;
+    }
 
-			}
-		} else {
-			log.debug("SolrGeneralDao deleteByQuery error , queryString is null . ");
-		}
+    /**
+     * 根据传入查询条件删除solr索引 queryString格式为name:abc,id:123 逗号表示条件之间为与关系
+     * 如果只有一个条件则为“name:abc”,多个条件用逗号分隔开
+     * 
+     * @param queryString
+     */
+    public void deleteByQuery(String queryString){
+        // 由于*:*是空所有索引，为了安全起见，此处不允许执行这种格式的删除。
+        if (Validator.isNotNullOrEmpty(queryString)){
+            try{
+                if (!queryString.equals("*:*")){
+                    solrServer.deleteByQuery(queryString);
+                    solrServer.commit();
+                    log.debug("SolrGeneralDao deleteByQuery success . ");
+                }else{
+                    log.debug("SolrGeneralDao deleteByQuery not allow delete by *:* . ");
+                }
+            }catch (SolrServerException e){
+                e.printStackTrace();
+                log.error("SolrGeneralDao deleteByQuery SolrServerException . ");
 
-	}
+            }catch (IOException e){
+                e.printStackTrace();
+                log.error("SolrGeneralDao deleteByQuery IOException . ");
 
-	/**
-	 * 清空所有索引
-	 */
-	public Boolean cleanAll() {
-		boolean flag = false;
-		try {
-			solrServer.deleteByQuery("*:*");
-			solrServer.commit();
-			log.debug("SolrGeneralDao cleanAll success . ");
-			flag = true;
-		} catch (SolrServerException e) {
-			try {
-				solrServer.rollback();
-			} catch (SolrServerException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			e.printStackTrace();
-			log.error("SolrGeneralDao cleanAll SolrServerException . ");
-		} catch (IOException e) {
-			try {
-				solrServer.rollback();
-			} catch (SolrServerException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			e.printStackTrace();
-			log.error("SolrGeneralDao cleanAll IOException . ");
-		}
-		return flag;
-	}
+            }
+        }else{
+            log.debug("SolrGeneralDao deleteByQuery error , queryString is null . ");
+        }
 
-	/**
-	 * 根据传入id集合删除索引
-	 * 
-	 * @param solrId
-	 */
-	public Boolean deleteByIds(List<String> ids) {
-		boolean flag = false;
-		try {
-			if ((Validator.isNotNullOrEmpty(ids))) {
-				// 删除传入id的索引
-				for(String id:ids){
-					solrServer.deleteByQuery("id:"+id);
-				}
-				solrServer.commit();
-				log.debug("SolrGeneralDao deleteByIds success . ");
-				flag = true;
-			} else {
-				log.error("SolrGeneralDao deleteByIds error , ids is null . ");
-			}
-		} catch (SolrServerException e) {
-			try {
-				solrServer.rollback();
-			} catch (SolrServerException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			e.printStackTrace();
-			log.error("SolrGeneralDao deleteByIds SolrServerException . ");
+    }
 
-		} catch (IOException e) {
-			try {
-				solrServer.rollback();
-			} catch (SolrServerException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			e.printStackTrace();
-			log.error("SolrGeneralDao deleteByIds IOException . ");
+    /**
+     * 清空所有索引
+     */
+    public Boolean cleanAll(){
+        boolean flag = false;
+        try{
+            solrServer.deleteByQuery("*:*");
+            solrServer.commit();
+            log.debug("SolrGeneralDao cleanAll success . ");
+            flag = true;
+        }catch (SolrServerException e){
+            try{
+                solrServer.rollback();
+            }catch (SolrServerException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }catch (IOException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            log.error("SolrGeneralDao cleanAll SolrServerException . ");
+        }catch (IOException e){
+            try{
+                solrServer.rollback();
+            }catch (SolrServerException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }catch (IOException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            log.error("SolrGeneralDao cleanAll IOException . ");
+        }
+        return flag;
+    }
 
-		}
-		return flag;
-	}
+    /**
+     * 根据传入id集合删除索引
+     * 
+     * @param solrId
+     */
+    public Boolean deleteByIds(List<String> ids){
+        boolean flag = false;
+        try{
+            if ((Validator.isNotNullOrEmpty(ids))){
+                // 删除传入id的索引
+                for (String id : ids){
+                    solrServer.deleteByQuery("id:" + id);
+                }
+                solrServer.commit();
+                log.debug("SolrGeneralDao deleteByIds success . ");
+                flag = true;
+            }else{
+                log.error("SolrGeneralDao deleteByIds error , ids is null . ");
+            }
+        }catch (SolrServerException e){
+            try{
+                solrServer.rollback();
+            }catch (SolrServerException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }catch (IOException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            log.error("SolrGeneralDao deleteByIds SolrServerException . ");
 
-	/**
-	 * 
-	 * @param obj
-	 */
-	public void createOrUpdateObjectIndex(Object obj) {
+        }catch (IOException e){
+            try{
+                solrServer.rollback();
+            }catch (SolrServerException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }catch (IOException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            log.error("SolrGeneralDao deleteByIds IOException . ");
 
-		try {
+        }
+        return flag;
+    }
 
-			if (Validator.isNotNullOrEmpty(obj)) {
-				solrServer.addBean(obj);
-				solrServer.commit();
-				log.debug("SolrGeneralDao createOrUpdateObjectIndex(Object obj) commint . ");
-			} else {
-				log.debug("SolrGeneralDao createOrUpdateObjectIndex(Object obj) error ,obj is null . ");
-			}
+    /**
+     * 
+     * @param obj
+     */
+    public void createOrUpdateObjectIndex(Object obj){
 
-		} catch (Exception e) {
-			try {
-				solrServer.rollback();
-			} catch (SolrServerException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			e.printStackTrace();
-			log.error("SolrGeneralDao createOrUpdateIndex exception . ");
-		}
+        try{
 
-	}
+            if (Validator.isNotNullOrEmpty(obj)){
+                solrServer.addBean(obj);
+                solrServer.commit();
+                log.debug("SolrGeneralDao createOrUpdateObjectIndex(Object obj) commint . ");
+            }else{
+                log.debug("SolrGeneralDao createOrUpdateObjectIndex(Object obj) error ,obj is null . ");
+            }
 
-	/**
-	 * 
-	 * @param objList
-	 */
-	public void batchUpdateObjectIndex(List<Object> objList) {
-		try {
-			if (Validator.isNotNullOrEmpty(objList)) {
-				solrServer.addBeans(objList);
-				solrServer.commit();
-				log.debug("SolrGeneralDao batchUpdateObjectIndex(List<Object> objList) commint . ");
-			} else {
-				log.debug("SolrGeneralDao batchUpdateObjectIndex(List<Object> objList) error ,objList id null. ");
-			}
+        }catch (Exception e){
+            try{
+                solrServer.rollback();
+            }catch (SolrServerException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }catch (IOException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            log.error("SolrGeneralDao createOrUpdateIndex exception . ");
+        }
 
-		} catch (Exception e) {
-			try {
-				solrServer.rollback();
-			} catch (SolrServerException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			e.printStackTrace();
-			log.error("SolrGeneralDao batchUpdateIndex exception . ");
-		}
+    }
 
-	}
-	
-	/**
-	 * 查询对象集合
-	 * @return
-	 * @throws SolrServerException
-	 */
-	public List<ItemForSolrCommand> queryAll() throws SolrServerException {
-		
-		List<ItemForSolrCommand> itemForSolrCommandList = new ArrayList<ItemForSolrCommand>();
-		
-		ModifiableSolrParams params = new ModifiableSolrParams();    
-		// 查询关键词，*:*代表所有属性、所有值，即所有index    
-		params.set("q", "*:*");    
-		// 分页，start=0就是从0开始，，rows=5当前返回5条记录，第二页就是变化start这个值为5就可以了。    
-		params.set("start", 0);    
-		params.set("rows", Integer.MAX_VALUE);        
-		// 排序，，如果按照id 排序，，那么将score desc 改成 id desc(or asc)    
-		params.set("sort", "score desc");     
-		// 返回信息 * 为全部 这里是全部加上score，如果不加下面就不能使用score    
-		params.set("fl", "*,score");        
-		      
-			
-			QueryResponse response = solrServer.query(params);                
-			itemForSolrCommandList = response.getBeans(ItemForSolrCommand.class);        
-			log.debug("SolrGeneralDao queryAll success . ");
-			   
-			return itemForSolrCommandList;
-		}
+    /**
+     * 
+     * @param objList
+     */
+    public void batchUpdateObjectIndex(List<Object> objList){
+        try{
+            if (Validator.isNotNullOrEmpty(objList)){
+                solrServer.addBeans(objList);
+                solrServer.commit();
+                log.debug("SolrGeneralDao batchUpdateObjectIndex(List<Object> objList) commint . ");
+            }else{
+                log.debug("SolrGeneralDao batchUpdateObjectIndex(List<Object> objList) error ,objList id null. ");
+            }
 
-	/**
-	 * SolrQuery分组调用的方法
-	 * 
-	 * @param params
-	 * @return
-	 * @throws SolrServerException
-	 */
-	public QueryResponse query(SolrParams params) throws SolrServerException {
-		return solrServer.query(params);
-	}
+        }catch (Exception e){
+            try{
+                solrServer.rollback();
+            }catch (SolrServerException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }catch (IOException ex){
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            log.error("SolrGeneralDao batchUpdateIndex exception . ");
+        }
 
-	public DocumentObjectBinder getBinder() {
-		return solrServer.getBinder();
-	}
+    }
+
+    /**
+     * 查询对象集合
+     * 
+     * @return
+     * @throws SolrServerException
+     */
+    public List<ItemForSolrCommand> queryAll() throws SolrServerException{
+
+        List<ItemForSolrCommand> itemForSolrCommandList = new ArrayList<ItemForSolrCommand>();
+
+        ModifiableSolrParams params = new ModifiableSolrParams();
+        // 查询关键词，*:*代表所有属性、所有值，即所有index    
+        params.set("q", "*:*");
+        // 分页，start=0就是从0开始，，rows=5当前返回5条记录，第二页就是变化start这个值为5就可以了。    
+        params.set("start", 0);
+        params.set("rows", Integer.MAX_VALUE);
+        // 排序，，如果按照id 排序，，那么将score desc 改成 id desc(or asc)    
+        params.set("sort", "score desc");
+        // 返回信息 * 为全部 这里是全部加上score，如果不加下面就不能使用score    
+        params.set("fl", "*,score");
+
+        QueryResponse response = solrServer.query(params);
+        itemForSolrCommandList = response.getBeans(ItemForSolrCommand.class);
+        log.debug("SolrGeneralDao queryAll success . ");
+
+        return itemForSolrCommandList;
+    }
+
+    /**
+     * SolrQuery分组调用的方法
+     * 
+     * @param params
+     * @return
+     * @throws SolrServerException
+     */
+    public QueryResponse query(SolrParams params) throws SolrServerException{
+        return solrServer.query(params);
+    }
+
+    public DocumentObjectBinder getBinder(){
+        return solrServer.getBinder();
+    }
 }

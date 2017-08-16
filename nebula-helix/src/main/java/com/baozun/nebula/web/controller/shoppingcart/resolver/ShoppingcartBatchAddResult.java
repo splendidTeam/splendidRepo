@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -26,16 +25,12 @@ import java.util.Map;
  * @see "com.feilong.coreextension.entity.BackWarnEntity"
  * @since 5.3.2.18
  */
-public class ShoppingcartBatchAddResult implements Serializable{
+public class ShoppingcartBatchAddResult extends ShoppingcartBatchResult{
 
-    /**  */
-    private static final long serialVersionUID = 288232184048495608L;
-
-    /** 是否成功. */
-    private boolean isSuccess = false;
-
-    /** 如果有加入失败的,那么这里将返回 对应的sku id 和 原因; 成功的话 这里将是 null. */
-    private Map<Long, ShoppingcartResult> skuIdAndShoppingcartResultFailMap;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1084735225793294902L;
 
     //---------------------------------------------------------------------
     /**
@@ -50,48 +45,7 @@ public class ShoppingcartBatchAddResult implements Serializable{
      * @param skuIdAndShoppingcartResultFailMap
      */
     public ShoppingcartBatchAddResult(boolean isSuccess, Map<Long, ShoppingcartResult> skuIdAndShoppingcartResultFailMap){
-        super();
-        this.isSuccess = isSuccess;
-        this.skuIdAndShoppingcartResultFailMap = skuIdAndShoppingcartResultFailMap;
-    }
-
-    //---------------------------------------------------------------------
-    /**
-     * 获得 是否成功.
-     *
-     * @return the isSuccess
-     */
-    public boolean getIsSuccess(){
-        return isSuccess;
-    }
-
-    /**
-     * 设置 是否成功.
-     *
-     * @param isSuccess
-     *            the isSuccess to set
-     */
-    public void setIsSuccess(boolean isSuccess){
-        this.isSuccess = isSuccess;
-    }
-
-    /**
-     * 获得 如果有加入失败的,那么这里将返回 对应的sku id 和 原因; 成功的话 这里将是 null.
-     *
-     * @return the skuIdAndShoppingcartResultFailMap
-     */
-    public Map<Long, ShoppingcartResult> getSkuIdAndShoppingcartResultFailMap(){
-        return skuIdAndShoppingcartResultFailMap;
-    }
-
-    /**
-     * 设置 如果有加入失败的,那么这里将返回 对应的sku id 和 原因; 成功的话 这里将是 null.
-     *
-     * @param skuIdAndShoppingcartResultFailMap
-     *            the skuIdAndShoppingcartResultFailMap to set
-     */
-    public void setSkuIdAndShoppingcartResultFailMap(Map<Long, ShoppingcartResult> skuIdAndShoppingcartResultFailMap){
-        this.skuIdAndShoppingcartResultFailMap = skuIdAndShoppingcartResultFailMap;
+        super(isSuccess, skuIdAndShoppingcartResultFailMap);
     }
 
 }

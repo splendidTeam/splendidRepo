@@ -1,6 +1,11 @@
 package com.baozun.nebula.payment.manager.impl;
 
+import static com.baozun.nebula.sdk.constants.Constants.PAY_LOG_NOTIFY_AFTER_MESSAGE;
+import static com.baozun.nebula.sdk.constants.Constants.PAY_LOG_RETURN_AFTER_MESSAGE;
+
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +15,7 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +24,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.BeforePaymentCancelOrderCommand;
-import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.OnLinePaymentCancelCommand;
 import com.baozun.nebula.command.OnLinePaymentCommand;
 import com.baozun.nebula.command.wechat.WechatJsApiConfigCommand;
 import com.baozun.nebula.command.wechat.WechatJsApiPayCommand;
 import com.baozun.nebula.constant.EmailConstants;
-import com.baozun.nebula.constant.IfIdentifyConstants;
-import com.baozun.nebula.dao.payment.PayInfoDao;
 import com.baozun.nebula.dao.payment.PayInfoLogDao;
-import com.baozun.nebula.dao.payment.PayWarnningLogDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderDao;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.event.PayWarnningEvent;
@@ -36,27 +38,24 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.model.payment.PayWarnningLog;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
-import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
+import com.baozun.nebula.payment.manager.PaymentResultSuccessUpdateManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.handler.SalesOrderHandler;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
-import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.baozun.nebula.sdk.manager.SdkMsgManager;
-import com.baozun.nebula.sdk.manager.SdkPayWarnningLogManager;
+import com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponManager;
 import com.baozun.nebula.sdk.utils.MapConvertUtils;
-import com.baozun.nebula.utilities.common.WechatUtil;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
@@ -64,6 +63,7 @@ import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
+import com.baozun.nebula.utilities.integration.payment.wechat.WechatUtil;
 import com.feilong.core.Validator;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
@@ -72,7 +72,7 @@ import static com.feilong.core.Validator.isNotNullOrEmpty;
 @Service("paymentManager")
 public class PayManagerImpl implements PayManager{
 
-    public static final Logger log = LoggerFactory.getLogger(PayManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PayManagerImpl.class);
 
     @Value("#{meta['page.base']}")
     private String pageUrlBase = "";
@@ -83,51 +83,6 @@ public class PayManagerImpl implements PayManager{
     public static final String MEMEBER_CANCEL = "buy";
 
     public static final String SHOP_CANCEL = "seller";
-
-    @Autowired
-    private SdkPaymentManager sdkPaymentManager;
-
-    @Autowired
-    private OrderManager sdkOrderService;
-
-    @Autowired
-    private SdkPromotionCouponManager sdkPromotionCouponManager;
-
-    @Autowired
-    private SdkSkuManager sdkSkuManager;
-
-    @Autowired
-    private SdkMemberManager sdkMemberManager;
-
-    @Autowired
-    private SdkMsgManager sdkMsgManager;
-
-    @Autowired
-    private PayInfoLogDao payInfoLogDao;
-
-    @Autowired
-    private PayInfoDao payInfoDao;
-
-    @Autowired
-    private EventPublisher eventPublisher;
-
-    @Autowired
-    private PaymentManager paymentManager;
-
-    @Autowired
-    private SdkOrderDao sdkOrderDao;
-
-    @Autowired
-    private PayWarnningLogDao payWarnningLogDao;
-
-    @Autowired
-    private SdkPayWarnningLogManager sdkPayWarnningLogManager;
-
-    @Autowired
-    private SdkMataInfoManager sdkMataInfoManager;
-
-    @Autowired(required = false)
-    private SalesOrderHandler salesOrderHandler;
 
     public static final String SIGNTYPE = "MD5";
 
@@ -155,32 +110,76 @@ public class PayManagerImpl implements PayManager{
 
     private static final String ORDERNOTEXIST = "ORDERNOTEXIST";
 
+    //---------------------------------------------------------------------
+
+    @Autowired
+    private SdkPaymentManager sdkPaymentManager;
+
+    @Autowired
+    private OrderManager sdkOrderService;
+
+    @Autowired
+    private SdkPromotionCouponManager sdkPromotionCouponManager;
+
+    @Autowired
+    private SdkSkuManager sdkSkuManager;
+
+    @Autowired
+    private PayInfoLogDao payInfoLogDao;
+
+    @Autowired
+    private PaymentManager paymentManager;
+
+    @Autowired
+    private SdkOrderDao sdkOrderDao;
+
+    @Autowired
+    private SdkMataInfoManager sdkMataInfoManager;
+
+    @Autowired
+    private SdkPayInfoQueryManager sdkPayInfoQueryManager;
+
+    @Autowired(required = false)
+    private SalesOrderHandler salesOrderHandler;
+
+    @Autowired
+    private PaymentResultSuccessUpdateManager paymentResultSuccessUpdateManager;
+
+    @Autowired
+    private EventPublisher eventPublisher;
+
+    //---------------------------------------------------------------------
+
     @Override
     public void savePayInfos(SalesOrderCommand so,PaymentRequest paymentRequest,String operator){
+        Validate.notNull(so, "so can't be null!");
+        Validate.notNull(paymentRequest, "paymentRequest can't be null!");
+
+        //---------------------------------------------------------------------
+
         savePayLog(new Date(), Constants.PAY_LOG_CALL_AFTER_MESSAGE, operator, MapConvertUtils.transPaymentRequestToString(paymentRequest));
 
+        //---------------------------------------------------------------------
         //更新支付相关
         //更新t_so_payinfo
         String subOrdinate = so.getCode();
-        String paymentPeople = operator;
 
-        Map<String, Object> paraMap = new HashMap<>();
-        paraMap.put("subOrdinate", subOrdinate);
-        paraMap.put("paySuccessStatusStr", 2);//未付款
+        //---------------------------------------------------------------------
 
         //查询订单的需要支付的payInfolog
-        List<PayInfoLog> payInfoLogList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
+        List<PayInfoLog> payInfoLogList = sdkPayInfoQueryManager.findPayInfoLogListBySubOrdinate(subOrdinate, false);
 
         if (isNotNullOrEmpty(payInfoLogList)){
             for (PayInfoLog payInfoLog : payInfoLogList){
-                payInfoLog.setPaymentPeople(paymentPeople);
+                payInfoLog.setPaymentPeople(operator);
                 payInfoLogDao.save(payInfoLog);
             }
         }
 
-        //更新t_so_paycode
-        sdkPaymentManager.updatePayCodeBySubOrdinate(so.getCode(), so.getOnLinePaymentCommand().getPayType());
+        //---------------------------------------------------------------------
 
+        //更新t_so_paycode
+        sdkPaymentManager.updatePayCodeBySubOrdinate(subOrdinate, so.getOnLinePaymentCommand().getPayType());
     }
 
     /**
@@ -197,17 +196,17 @@ public class PayManagerImpl implements PayManager{
 
     @Override
     public void updatePayInfos(PaymentResult paymentResult,String operator,Integer payType,boolean flag,HttpServletRequest request){
-        if (flag){
-            savePayLog(new Date(), Constants.PAY_LOG_RETURN_AFTER_MESSAGE, operator, MapConvertUtils.transPaymentResultToString(paymentResult));
-        }else{
-            savePayLog(new Date(), Constants.PAY_LOG_NOTIFY_AFTER_MESSAGE, operator, MapConvertUtils.transPaymentResultToString(paymentResult));
-        }
+        String transPaymentResultToString = MapConvertUtils.transPaymentResultToString(paymentResult);
+        String message = flag ? PAY_LOG_RETURN_AFTER_MESSAGE : PAY_LOG_NOTIFY_AFTER_MESSAGE;
+
+        savePayLog(new Date(), message, operator, transPaymentResultToString);
+
+        //---------------------------------------------------------------------
         PaymentServiceStatus paymentServiceStatus = paymentResult.getPaymentServiceSatus();
         if (paymentServiceStatus == PaymentServiceStatus.PAYMENT_SUCCESS){
-
             //更新支付信息
-            updatePayInfos(paymentResult.getPaymentStatusInformation(), payType);
-
+            PaymentServiceReturnCommand paymentServiceReturnCommand = paymentResult.getPaymentStatusInformation();
+            paymentResultSuccessUpdateManager.updateSuccess(paymentServiceReturnCommand, payType);
         }
     }
 
@@ -239,74 +238,6 @@ public class PayManagerImpl implements PayManager{
         PaymentFactory payFactory = PaymentFactory.getInstance();
         PaymentAdaptor paymentAdaptor = payFactory.getPaymentAdaptor(PaymentFactory.PAY_TYPE_ALIPAY);
         return paymentAdaptor.isSupportClosePaymentRequest();
-    }
-
-    /**
-     * 更改订单和支付详细信息
-     * 
-     * @param result
-     * @return
-     */
-    private void updatePayInfos(PaymentServiceReturnCommand paymentStatusInformation,Integer payType){
-        Long memberId = null;
-        String subOrdinate = paymentStatusInformation.getOrderNo();//支付流水号
-        String tradeNo = paymentStatusInformation.getTradeNo();// 支付宝交易号
-        String thirdPayAccount = paymentStatusInformation.getBuyer();//买家账号
-        // 更改支付信息
-        //payinfolog
-        Map<String, Object> paraMap = new HashMap<String, Object>();
-        paraMap.put("subOrdinate", subOrdinate);
-        paraMap.put("paySuccessStatusStr", 2);//未付款
-        //查询订单的需要支付的payInfolog
-        List<PayInfoLog> payInfoLogList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
-        if (Validator.isNotNullOrEmpty(payInfoLogList)){
-            for (PayInfoLog payInfoLog : payInfoLogList){
-                //				set THIRD_PAY_NO = :thirdPayNo,MODIFY_TIME= :modifyTime,THIRD_PAY_ACCOUNT = :thirdPayAccount,PAY_SUCCESS_STATUS = :paySuccessStatus
-                payInfoLog.setThirdPayAccount(thirdPayAccount);
-                payInfoLog.setThirdPayNo(tradeNo);
-                payInfoLog.setPaySuccessStatus(true);
-                payInfoLog.setModifyTime(new Date());
-                payInfoLogDao.save(payInfoLog);
-
-                PayInfo payInfo = payInfoDao.getByPrimaryKey(payInfoLog.getPayInfoId());
-                payInfo.setThirdPayAccount(thirdPayAccount);
-                payInfo.setThirdPayNo(tradeNo);
-                payInfo.setPaySuccessStatus(true);
-                payInfo.setModifyTime(new Date());
-                payInfoDao.save(payInfo);
-
-                SalesOrderCommand salesOrderCommand = sdkOrderService.findOrderById(payInfo.getOrderId(), 1);
-
-                memberId = salesOrderCommand.getMemberId();
-                // 更改订单的财务状态
-                if (salesOrderCommand.getFinancialStatus() != SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT){
-
-                    //此处添加发邮件代码start
-                    /**
-                     * 发邮件
-                     */
-                    sdkOrderService.sendEmailOfOrder(salesOrderCommand.getCode(), EmailConstants.PAY_ORDER_SUCCESS);
-
-                    //此处添加发邮件代码end
-
-                    sdkOrderService.updateOrderFinancialStatus(salesOrderCommand.getCode(), SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT);
-
-                    //保存OMS消息发送记录(当订单有付款发生时，推送消息给到SCM) 
-                    sdkMsgManager.saveMsgSendRecord(IfIdentifyConstants.IDENTIFY_PAY_SEND, salesOrderCommand.getId(), null);
-
-                }
-            }
-        }
-
-        sdkPaymentManager.updatePayCodePayStatus(subOrdinate, new Date(), true);
-
-        //更改用户行为
-        if (memberId != null){
-            MemberConductCommand memberConductCommand = sdkMemberManager.findMemberConductCommandById(memberId);
-            memberConductCommand.setPayTime(new Date());
-            sdkMemberManager.saveMemberConduct(memberConductCommand);
-        }
-
     }
 
     /*
@@ -380,7 +311,6 @@ public class PayManagerImpl implements PayManager{
      * 
      * @param orderId
      * @param code
-     * @param financialStatus
      */
     @Override
     @Deprecated
@@ -397,6 +327,15 @@ public class PayManagerImpl implements PayManager{
         //根据订单id查询出该订单的明细
         List<OrderLineCommand> orderLines = sdkOrderService.findOrderDetailList(orderId);
         if (null != orderLines && orderLines.size() > 0){
+            //还原库存调整为有序，一定程度上预防死锁的发生
+            //added by D.C 2017/7/24
+            Collections.sort(orderLines, new Comparator<OrderLineCommand>(){
+
+                @Override
+                public int compare(OrderLineCommand o1,OrderLineCommand o2){
+                    return o1.getExtentionCode().compareTo(o2.getExtentionCode());
+                }
+            });
             for (OrderLineCommand orderLine : orderLines){
                 //加库存
                 if (orderLine.getExtentionCode() != null && orderLine.getCount() > 0){
@@ -423,6 +362,15 @@ public class PayManagerImpl implements PayManager{
         List<OrderLineCommand> orderLines = sdkOrderService.findOrderDetailList(orderId);
         if (isOms == null || !isOms){
             if (null != orderLines && orderLines.size() > 0){
+                //还原库存调整为有序，一定程度上预防死锁的发生
+                //added by D.C 2017/7/24
+                Collections.sort(orderLines, new Comparator<OrderLineCommand>(){
+
+                    @Override
+                    public int compare(OrderLineCommand o1,OrderLineCommand o2){
+                        return o1.getExtentionCode().compareTo(o2.getExtentionCode());
+                    }
+                });
                 for (OrderLineCommand orderLine : orderLines){
                     //加库存
                     if (orderLine.getExtentionCode() != null && orderLine.getCount() > 0){
@@ -453,12 +401,8 @@ public class PayManagerImpl implements PayManager{
         String ip = beforePaymentCancelOrderCommand.getClientIp();
         String operatorName = beforePaymentCancelOrderCommand.getOperatorName();
 
-        //根据订单id查找支付信息
-        Map<String, Object> paraMap = new HashMap<String, Object>();
-        paraMap.put("orderId", orderId);
-        paraMap.put("paySuccessStatusStr", 2);
         //查询订单的需要支付的payInfolog
-        List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+        List<PayInfoLog> payInfoLogs = sdkPayInfoQueryManager.findPayInfoLogListByOrderId(orderId, false);
         PayInfoLog payInfoLog = null;
         if (Validator.isNotNullOrEmpty(payInfoLogs)){
             payInfoLog = payInfoLogs.get(0);
@@ -532,7 +476,7 @@ public class PayManagerImpl implements PayManager{
 
             if (isNeedClosePay){
                 PaymentResult paymentResult = paymentManager.cancelPayment(so);
-                log.info("close payment request return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+                LOGGER.info("close payment request return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 
                 if (payType.equals(ReservedPaymentType.WECHAT) || payType.equals(ReservedPaymentType.UNIONPAY)){
                     if (ORDERNOTEXIST.equals(paymentResult.getMessage())){

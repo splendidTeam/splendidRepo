@@ -34,6 +34,7 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
+import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
@@ -42,6 +43,7 @@ import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartAddDetermineSameLineElementsBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ToggleCheckStatusShoppingCartLinePredicateBuilder;
+import com.baozun.nebula.web.controller.shoppingcart.event.ShoppingcartAddSuccessEvent;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
@@ -69,6 +71,10 @@ import static com.feilong.core.util.CollectionsUtil.select;
  * @since 5.3.1
  */
 public abstract class AbstractShoppingcartResolver implements ShoppingcartResolver{
+
+    /** The event publisher. */
+    @Autowired
+    private EventPublisher eventPublisher;
 
     /** The sdk sku manager. */
     @Autowired
@@ -98,11 +104,11 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     @Autowired
     protected ShoppingCartInventoryValidator shoppingCartInventoryValidator;
 
-    /**  */
+    /** The shoppingcart add determine same line elements builder. */
     @Autowired
     private ShoppingcartAddDetermineSameLineElementsBuilder shoppingcartAddDetermineSameLineElementsBuilder;
 
-    /**  */
+    /** The toggle check status shopping cart line predicate builder. */
     @Autowired
     private ToggleCheckStatusShoppingCartLinePredicateBuilder toggleCheckStatusShoppingCartLinePredicateBuilder;
 
@@ -144,6 +150,12 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         return addShoppingCart(memberDetails, skuIdAndCountMap, null, request, response);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#addShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.Map, com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartBatchAddOptions,
+     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     public ShoppingcartBatchAddResult addShoppingCart(MemberDetails memberDetails,Map<Long, Integer> skuIdAndCountMap,ShoppingcartBatchAddOptions shoppingcartBatchAddOptions,HttpServletRequest request,HttpServletResponse response){
         Validate.notEmpty(skuIdAndCountMap, "skuIdAndCountMap can't be null/empty!");
@@ -152,7 +164,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         //---------------------------------------------------------------------
         //批量添加的时候,如果某条失败了,是否继续.
-        boolean isSkuAddFailContinue = useShoppingcartBatchAddOptions.getIsSkuAddFailContinue();
+        boolean isSkuAddFailContinue = useShoppingcartBatchAddOptions.isFailContinue();
 
         //TODO 待重构
 
@@ -171,14 +183,23 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
+     * Do with has fail map.
+     *
      * @param memberDetails
+     *            the member details
      * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
      * @param skuIdAndCountMap
+     *            the sku id and count map
      * @param skuIdAndShoppingcartResultFailMap
+     *            the sku id and shoppingcart result fail map
      * @param isSkuAddFailContinue
+     *            the is sku add fail continue
      * @param request
+     *            the request
      * @param response
-     * @return
+     *            the response
+     * @return the shoppingcart batch add result
      * @since 5.3.2.18
      */
     private ShoppingcartBatchAddResult doWithHasFailMap(
@@ -205,12 +226,21 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
+     * 添加 shopping cart.
+     *
      * @param memberDetails
+     *            the member details
      * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
      * @param canAddSkuIdAndCountMap
+     *            the can add sku id and count map
+     * @param skuIdAndShoppingcartResultFailMap
+     *            the sku id and shoppingcart result fail map
      * @param request
+     *            the request
      * @param response
-     * @return
+     *            the response
+     * @return the shoppingcart batch add result
      * @since 5.3.2.18
      */
     private ShoppingcartBatchAddResult addShoppingCart(
@@ -240,10 +270,17 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
+     * Builds the sku id and shoppingcart result fail map.
+     *
      * @param memberDetails
+     *            the member details
      * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
      * @param skuIdAndCountMap
-     * @param useShoppingcartBatchAddOptions
+     *            the sku id and count map
+     * @param isSkuAddFailContinue
+     *            the is sku add fail continue
+     * @return the map
      * @since 5.3.2.18
      */
     private Map<Long, ShoppingcartResult> buildSkuIdAndShoppingcartResultFailMap(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> skuIdAndCountMap,boolean isSkuAddFailContinue){
@@ -257,7 +294,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             ShoppingcartResult validatorShoppingcartResult = shoppingcartLineAddValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingCartLineAddForm);
 
             //---------------------------------------------------------------------
-            if (null == validatorShoppingcartResult){
+            if (ShoppingcartResultUtil.isSuccess(validatorShoppingcartResult)){
                 continue;
             }
             //---------------------------------------------------------------------
@@ -271,9 +308,13 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
+     * Builds the to be operated shopping cart line command list.
+     *
      * @param skuIdAndCountMap
+     *            the sku id and count map
      * @param shoppingCartLineCommandList
-     * @return
+     *            the shopping cart line command list
+     * @return the list
      * @since 5.3.2.18
      */
     private List<ShoppingCartLineCommand> buildToBeOperatedShoppingCartLineCommandList(Map<Long, Integer> skuIdAndCountMap,List<ShoppingCartLineCommand> shoppingCartLineCommandList){
@@ -296,14 +337,19 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
+     * Do add shopping cart.
+     *
      * @param memberDetails
+     *            the member details
      * @param shoppingCartLineCommandList
      *            总最终数据
      * @param toBeOperatedShoppingCartLineCommandList
      *            待操作的数据
      * @param request
+     *            the request
      * @param response
-     * @return
+     *            the response
+     * @return the shoppingcart result
      * @since 5.3.2.18
      */
     protected abstract ShoppingcartResult doAddShoppingCart(
@@ -333,7 +379,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = defaultIfNullOrEmpty(getShoppingCartLineCommandList(memberDetails, request), new ArrayList<ShoppingCartLineCommand>());
         ShoppingcartResult validatorShoppingcartResult = shoppingcartLineAddValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingCartLineAddForm);
 
-        if (null != validatorShoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(validatorShoppingcartResult)){
             return validatorShoppingcartResult;
         }
 
@@ -341,6 +387,12 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingcartAddDetermineSameLineElementsBuilder.build(shoppingCartLineAddForm));
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(memberDetails, shoppingCartLineCommandList, toBeOperatedShoppingCartLineCommand, request, response);
+
+        //---------------------------------------------------------------------
+        //操作成功
+        if (ShoppingcartResultUtil.isSuccess(addShoppingCartShoppingcartResult)){
+            eventPublisher.publish(new ShoppingcartAddSuccessEvent(this, memberDetails, shoppingCartLineCommandList, toBeOperatedShoppingCartLineCommand));
+        }
 
         return postShoppingcartResult(memberDetails, addShoppingCartShoppingcartResult, shoppingCartLineCommandList, request, response);
     }
@@ -408,11 +460,14 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
     /**
      * 处理清空.
-     * 
+     *
      * @param memberDetails
+     *            the member details
      * @param request
+     *            the request
      * @param response
-     * @return
+     *            the response
+     * @return the shoppingcart result
      * @since 5.3.2.14
      */
     protected abstract ShoppingcartResult doClearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response);
@@ -452,7 +507,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             ShoppingCartLineUpdateSkuForm shoppingCartLineUpdateSkuForm = new ShoppingCartLineUpdateSkuForm();
             shoppingCartLineUpdateSkuForm.setCount(count);
             ShoppingcartResult validatorShoppingcartResult = shoppingcartLineUpdateValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, shoppingCartLineUpdateSkuForm);
-            if (null != validatorShoppingcartResult){
+            if (ShoppingcartResultUtil.isNotSuccess(validatorShoppingcartResult)){
                 return validatorShoppingcartResult;
             }
         }
@@ -477,7 +532,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         //2.校验****************************************************************
         //2.1 校验 shoppingcartLineId
         ShoppingcartResult validatorShoppingcartResult = shoppingcartLineUpdateValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, shoppingCartLineUpdateSkuForm);
-        if (null != validatorShoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(validatorShoppingcartResult)){
             return validatorShoppingcartResult;
         }
 
@@ -566,7 +621,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             //公共校验
             ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
 
-            if (null != commonValidateShoppingcartResult){
+            if (ShoppingcartResultUtil.isNotSuccess(commonValidateShoppingcartResult)){
                 return commonValidateShoppingcartResult;
             }
 
@@ -755,21 +810,24 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
     /**
      * 操作执行之后的数据处理.
-     * 
+     *
      * @param memberDetails
+     *            the member details
      * @param shoppingcartResult
      *            操作的结果
      * @param shoppingCartLineCommandList
      *            最终的购物车数据
      * @param request
+     *            the request
      * @param response
+     *            the response
      * @return 如果 null!=shoppingcartResult 直接返回;<br>
      *         否则会调用 {@link #afterOperateShoppingCart(MemberDetails, List, HttpServletRequest, HttpServletResponse)} 方法,没有异常的话,会返回 {@link ShoppingcartResult#SUCCESS}<br>
      *         如果 <code>shoppingCartLineCommandList</code> 是null或者是empty 视具体的实现,会重置cookie 购物车数量为0
      * @since 5.3.2.18
      */
     private ShoppingcartResult postShoppingcartResult(MemberDetails memberDetails,ShoppingcartResult shoppingcartResult,List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
-        if (null != shoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(shoppingcartResult)){
             return shoppingcartResult;
         }
         afterOperateShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);

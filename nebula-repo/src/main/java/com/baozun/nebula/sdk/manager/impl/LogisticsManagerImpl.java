@@ -332,13 +332,17 @@ public class LogisticsManagerImpl implements LogisticsManager{
      *            the shop id
      * @param calcFreightCommand
      *            the calc freight command
-     * @return 如果没有运费模板 返回null
+     * @return 如果没有运费模板 返回Collections.<DistributionCommand> emptyList()
      * @since 5.3.2.4
      */
     private List<DistributionCommand> getCurrentShopDistributionCommandList(Long shopId,CalcFreightCommand calcFreightCommand){
         Set<Long> distributionModeIdSet = buildDistributionModeIdSet(shopId, calcFreightCommand);
         if (isNullOrEmpty(distributionModeIdSet)){
-            return null;
+            /**
+             * 此处，解决当日达不需要运费模板的问题
+             * @since 5.3.2.22
+             */
+            return Collections.<DistributionCommand> emptyList();
         }
         //---------------------------------------------------------------------------
         // 拿到所有的物流方式 列表
@@ -347,7 +351,11 @@ public class LogisticsManagerImpl implements LogisticsManager{
         // 根据 物流方式ID 找出 支持本商铺的 DistributionCommand
         List<DistributionCommand> curShopDistributionCommandList = select(distributionCommandList, "distributionModeId", distributionModeIdSet);
         if (isNullOrEmpty(curShopDistributionCommandList)){
-            return null;
+            /**
+             * 此处，解决当日达不需要运费模板的问题
+             * @since 5.3.2.22
+             */
+            return Collections.<DistributionCommand> emptyList();
         }
         return curShopDistributionCommandList;
     }

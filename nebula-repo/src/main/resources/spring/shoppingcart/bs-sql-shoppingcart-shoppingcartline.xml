@@ -236,6 +236,21 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="ShoppingCartLine.updateCartLineQuantityAndSettlementStateByLineId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据购物车行修改购物车中物品的数量和选中状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update t_sc_shoppingcartline
+					set quantity = :quantity,
+					settlement_state = :settlementState
+					where member_id = :memberId 
+					and id = :cartLineId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 
 	<!-- 修改购物车行 -->
 	<bean id="ShoppingCartLine.updateCartLineSkuInfo" class="loxia.dao.support.DynamicQueryHolder">

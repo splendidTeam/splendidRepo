@@ -11,4 +11,5 @@
     </context:component-scan>
     <import resource="springmvc-interceptor.xml" />
     <import resource="springmvc-resolver.xml" />
+    <import resource="springmvc-EventListener.xml" />
 </beans>

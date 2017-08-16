@@ -9,17 +9,29 @@
 
 
 
-    <bean id="redisconfig" class="redis.clients.jedis.JedisPoolConfig">
-        <property name="maxActive">
-            <value type="long">#{redis['redis.MaxActive']}</value>
+   <bean id="redisconfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal">
+            <value type="long">#{redis['redis.MaxTotal']}</value>
         </property>
+
         <property name="maxIdle">
             <value type="long">#{redis['redis.MaxIdle']}</value>
         </property>
-        <property name="maxWait">
-            <value type="long">#{redis['redis.MaxWait']}</value>
+
+		<property name="minIdle">
+            <value type="long">#{redis['redis.MinIdle']}</value>
         </property>
+        
+        <property name="maxWaitMillis">
+            <value type="long">#{redis['redis.MaxWaitMillis']}</value>
+        </property>
+
+
         <property name="testOnBorrow">
+            <value type="boolean">true</value>
+        </property>
+
+        <property name="testOnReturn">
             <value type="boolean">true</value>
         </property>
     </bean>

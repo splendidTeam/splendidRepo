@@ -4,17 +4,11 @@ import static org.easymock.EasyMock.createNiceControl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -28,12 +22,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.Model;
 
 import com.baozun.nebula.manager.salesorder.SalesOrderManager;
-import com.baozun.nebula.sdk.command.PayNoCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.command.OrderCommand;
 import com.baozun.nebula.web.command.PtsSalesOrderCommand;
-import com.baozun.nebula.web.controller.salesorder.SalesOrderController;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
@@ -113,15 +109,6 @@ public class SalesOrderControllerTest {
 		assertEquals(logistics, salesOrderManager.findLogisticsByOrderId(orderId));
 	}
 
-	@Test
-	public void testGetPayNoList() {
-		Long payInfoId=1L;		
-		List<PayNoCommand> payNos=new ArrayList<PayNoCommand>();
-		EasyMock.expect(salesOrderManager.findPayNoList(payInfoId)).andReturn(payNos);
-		control.replay();
-		assertEquals(payNos, salesOrderManager.findPayNoList(payInfoId));
-		
-	}
 
 	@Test
 	public void testCreateOrder() {

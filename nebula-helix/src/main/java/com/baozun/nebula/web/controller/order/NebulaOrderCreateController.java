@@ -35,6 +35,7 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager;
+import com.baozun.nebula.sdk.manager.order.SdkOrderQueryManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
@@ -43,7 +44,9 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResolver;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
+import com.baozun.nebula.web.controller.order.resolver.SalesOrderResultUtil;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderReturnObject;
+import com.baozun.nebula.web.controller.order.resolver.SalesOrderTypeResolver;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
 import com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidator;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
@@ -125,12 +128,13 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaOrderCreateController.class);
-    
+
     /**
      * 5.3.2.18 客户端识别码规定绑定名称
+     * 
      * @since 5.3.2.18
      */
-    public static final String CLIENT_IDENTIFICATION_MECHANISMS = NebulaOrderCreateController.class.getName()+"clientIdentificationMechanisms";
+    public static final String CLIENT_IDENTIFICATION_MECHANISMS = NebulaOrderCreateController.class.getName() + "clientIdentificationMechanisms";
 
     /** 订单提交的form 校验，需要在商城 spring 相关xml 里面进行配置. */
     @Autowired
@@ -155,6 +159,19 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
 
     @Autowired
     private SalesOrderCreateValidator salesOrderCreateValidator;
+
+    @Autowired
+    private SdkOrderQueryManager sdkOrderQueryManager;
+
+    /**
+     * 订单类型处理器
+     * 
+     * @since 5.3.2.20
+     */
+    @Autowired(required = false)
+    private SalesOrderTypeResolver salesOrderTypeResolver;
+
+    //---------------------------------------------------------------------
 
     /**
      * @Description 创建订单.
@@ -198,33 +215,21 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
         }
 
         //---------------------------------------------------------------------------------
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommandWithCheckStatus(memberDetails, key, orderForm, request);
-        //---------------------------------------------------------------------------------
+        ShoppingCartCommand checkStatusShoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommandWithCheckStatus(memberDetails, key, orderForm, request);
+
         // 校验购物车信息和促销
         //TODO feilong 多张优惠券
-        String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
-        SalesOrderResult salesorderResult = salesOrderCreateValidator.validate(shoppingCartCommand, couponCode);
+        SalesOrderResult salesOrderResult = salesOrderCreateValidator.validate(checkStatusShoppingCartCommand, orderForm, request);
 
         // 如果校验失败，返回错误
-        if (salesorderResult != SalesOrderResult.SUCCESS){
-            LOGGER.error("[ORDER_CREATEORDER] {} [{}] orderForm coupon [{}] validation error. \"\"", memberDetails == null ? "Guest" : memberDetails.getGroupId().toString(), new Date(), couponCode);
-            return toNebulaReturnResult(salesorderResult);
+        if (SalesOrderResultUtil.isNotSuccess(salesOrderResult)){
+            LOGGER.error("salesOrderCreateValidator validation error,[{}]", salesOrderResult);
+            return toNebulaReturnResult(salesOrderResult);
         }
 
         //---------------------------------------------------------------------------------
 
-        if (null != shoppingCartOrderCreateBeforeHandler){
-            shoppingCartOrderCreateBeforeHandler.beforeCreateSalesOrder(shoppingCartCommand, orderForm, memberDetails, request, key);
-        }
-
-        //---------------------------------------------------------------------------------
-        SalesOrderCreateOptions salesOrderCreateOptions = buildSalesOrderCreateOptions(key);
-        Set<String> memCombos = null == memberDetails ? null : memberDetails.getMemComboList();
-
-        //----------------------新建订单-----------------------------------------------------
-        // 封装订单信息
-        SalesOrderCommand salesOrderCommand = salesOrderResolver.toSalesOrderCommand(memberDetails, orderForm, request);
-        String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memCombos, salesOrderCreateOptions);
+        String subOrdinate = create(memberDetails, key, orderForm, checkStatusShoppingCartCommand, request);
 
         //---------------------------------------------------------------------------------
         //购物车信息重置
@@ -235,8 +240,38 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
             shoppingcartOrderCreateSuccessHandler.onOrderCreateSuccess(memberDetails, request, response);
         }
 
-        //---------------------------------------------------------------------------------
         return toNebulaReturnResult(subOrdinate);
+    }
+
+    /**
+     * @param memberDetails
+     * @param key
+     * @param orderForm
+     * @param checkStatusShoppingCartCommand
+     * @param request
+     * @return
+     * @since 5.3.2.22
+     */
+    private String create(MemberDetails memberDetails,String key,OrderForm orderForm,ShoppingCartCommand checkStatusShoppingCartCommand,HttpServletRequest request){
+        //TODO 耀华的本意是什么
+
+        if (null != shoppingCartOrderCreateBeforeHandler){
+            shoppingCartOrderCreateBeforeHandler.beforeCreateSalesOrder(checkStatusShoppingCartCommand, orderForm, memberDetails, request, key);
+        }
+
+        //---------------------------------------------------------------------
+
+        SalesOrderCreateOptions salesOrderCreateOptions = buildSalesOrderCreateOptions(key);
+        Set<String> memCombos = null == memberDetails ? null : memberDetails.getMemComboList();
+
+        //----------------------新建订单-----------------------------------------------------
+        // 封装订单信息
+        SalesOrderCommand salesOrderCommand = salesOrderResolver.toSalesOrderCommand(memberDetails, orderForm, request);
+        //是否需要判断订单类型  @since 5.3.2.20
+        if (null != salesOrderTypeResolver){
+            salesOrderCommand.setOrderType(salesOrderTypeResolver.resolverOrderType(salesOrderCommand, checkStatusShoppingCartCommand));
+        }
+        return sdkOrderCreateManager.saveOrder(checkStatusShoppingCartCommand, salesOrderCommand, memCombos, salesOrderCreateOptions);
     }
 
     /**
@@ -291,7 +326,7 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
 
     protected SalesOrderReturnObject createReturnObject(String subOrdinate){
         // 通過支付流水號查詢訂單
-        SalesOrderCommand salesOrderCommand = salesOrderResolver.getSalesOrderCommand(subOrdinate);
+        SalesOrderCommand salesOrderCommand = sdkOrderQueryManager.findSalesOrderCommandBySubOrdinate(subOrdinate);
         SalesOrderReturnObject salesOrderReturnObject = new SalesOrderReturnObject();
         salesOrderReturnObject.setCode(salesOrderCommand.getCode());
         salesOrderReturnObject.setId(salesOrderCommand.getId());

@@ -31,65 +31,76 @@ import com.baozun.nebula.model.BaseModel;
 
 /**
  * 商品属性值
+ * 
  * @author 何波
  */
 @Entity
 @Table(name = "T_PD_ITEM_PROPERTIES_LANG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
-public class ItemPropertiesLang extends BaseModel {
+public class ItemPropertiesLang extends BaseModel{
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 5156981146856978609L;
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 5156981146856978609L;
 
-	/** PK. */
-	private Long id;
+    /** PK. */
+    private Long id;
 
-	private Long ItemPropertiesId;
-	/**
-	 * 商品属性值
-	 */
-	private String propertyValue;
-	/**
-	 * 语言标识
-	 */
-	private String lang;
+    /**
+     * 商品属性id
+     * 
+     * @since 5.3.2.22 属性名从ItemPropertiesId 修改为 itemPropertiesId
+     */
+    private Long itemPropertiesId;
 
-	@Id
-	@Column(name = "ID")
-	@SequenceGenerator(name = "SEQ_T_PD_ITEM_PROPERTIES_LANG", sequenceName = "SEQ_T_PD_ITEM_PROPERTIES_LANG", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_T_PD_ITEM_PROPERTIES_LANG")
-	public Long getId() {
-		return id;
-	}
+    /**
+     * 商品属性值
+     */
+    private String propertyValue;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-	@Column(name = "ITEM_PROPERTIES_ID")
+    /**
+     * 语言标识
+     */
+    private String lang;
+
+    @Id
+    @Column(name = "ID")
+    @SequenceGenerator(name = "SEQ_T_PD_ITEM_PROPERTIES_LANG",sequenceName = "SEQ_T_PD_ITEM_PROPERTIES_LANG",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_T_PD_ITEM_PROPERTIES_LANG")
+    public Long getId(){
+        return id;
+    }
+
+    public void setId(Long id){
+        this.id = id;
+    }
+
+    @Column(name = "ITEM_PROPERTIES_ID")
     @Index(name = "IDX_ITEM_PROPERTIES_LANG_ITEM_PROPERTIES_ID")
-	public Long getItemPropertiesId() {
-		return ItemPropertiesId;
-	}
+    public Long getItemPropertiesId(){
+        return itemPropertiesId;
+    }
 
-	public void setItemPropertiesId(Long itemPropertiesId) {
-		ItemPropertiesId = itemPropertiesId;
-	}
-	@Column(name = "PROPERTY_VALUE")
-	public String getPropertyValue() {
-		return propertyValue;
-	}
+    public void setItemPropertiesId(Long itemPropertiesId){
+        this.itemPropertiesId = itemPropertiesId;
+    }
 
-	public void setPropertyValue(String propertyValue) {
-		this.propertyValue = propertyValue;
-	}
-	@Column(name = "LANG")
+    @Column(name = "PROPERTY_VALUE")
+    public String getPropertyValue(){
+        return propertyValue;
+    }
+
+    public void setPropertyValue(String propertyValue){
+        this.propertyValue = propertyValue;
+    }
+
+    @Column(name = "LANG")
     @Index(name = "IDX_ITEM_PROPERTIES_LANG_LANG")
-	public String getLang() {
-		return lang;
-	}
+    public String getLang(){
+        return lang;
+    }
 
-	public void setLang(String lang) {
-		this.lang = lang;
-	}
+    public void setLang(String lang){
+        this.lang = lang;
+    }
 
 }

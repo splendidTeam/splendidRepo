@@ -3,7 +3,8 @@
 	<parent>
 		<groupId>com.baozun.nebula</groupId>
 		<artifactId>nebula</artifactId>
-		<version>5.3.2.19-tommy-SNAPSHOT</version>
+		<version>5.3.2.24-SNAPSHOT</version>
+
 	</parent>
 	
 	<artifactId>nebula-helix-shopdog</artifactId>

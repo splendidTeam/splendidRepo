@@ -69,7 +69,11 @@ public class EncryptUtil{
 
     public static final String DEFAULT_HASHSALT_ALGORITHM = "PBKDF2WithHmacSHA1";
 
-    private static EncryptUtil instance = null;
+    public static int PASSWORD_ITERATIONS = 1024;
+
+    public static int PASSWORD_KEYLENGTH = 512;
+    
+    private static EncryptUtil instance = new EncryptUtil();
 
     private Map<String, Encryptor> encryptors = new HashMap<String, Encryptor>();
 
@@ -120,9 +124,7 @@ public class EncryptUtil{
 
     }
 
-    public static synchronized EncryptUtil getInstance(){
-        if (instance == null)
-            instance = new EncryptUtil();
+    public static EncryptUtil getInstance(){
         return instance;
     }
 
@@ -134,7 +136,7 @@ public class EncryptUtil{
      * @return
      */
     public String hash(String plainText,String salt){
-        return hash(plainText, salt, DEFAULT_ITERATIONS);
+        return hash(plainText, salt, PASSWORD_ITERATIONS);
     }
 
     /**
@@ -147,7 +149,7 @@ public class EncryptUtil{
      */
     public String hashSalt(String password,String salt){
         try{
-            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(ConfigurationUtil.DEFAULT_ENCODING), DEFAULT_ITERATIONS, DEFAULT_KEYLENGTH);
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(ConfigurationUtil.DEFAULT_ENCODING), PASSWORD_ITERATIONS, PASSWORD_KEYLENGTH);
             SecretKey key = secretKeyFactory.generateSecret(spec);
             byte[] encoded = key.getEncoded();
             return base64Convertor.format(encoded);

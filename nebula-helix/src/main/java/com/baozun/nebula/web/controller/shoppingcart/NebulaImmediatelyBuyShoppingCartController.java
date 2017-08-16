@@ -40,8 +40,10 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ImmediatelyBuyShoppingCartLineCommandListFactory;
 import com.baozun.nebula.web.controller.shoppingcart.form.CommonImmediatelyBuyForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.baozun.nebula.web.controller.shoppingcart.validator.CommonImmediatelyBuyFormValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineValidatorChannel;
 
 /**
  * 最常见的立即购买.
@@ -53,6 +55,8 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaImmediatelyBuyShoppingCartController.class);
+
+    //---------------------------------------------------------------------
 
     /** The sdk sku manager. */
     @Autowired
@@ -69,6 +73,8 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
     @Autowired
     @Qualifier("commonImmediatelyBuyFormValidator")
     private CommonImmediatelyBuyFormValidator commonImmediatelyBuyFormValidator;
+
+    //---------------------------------------------------------------------
 
     /**
      * (立即购买)不走普通购物车直接走购物通道.
@@ -105,13 +111,13 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
 
         Sku sku = sdkSkuManager.findSkuById(commonImmediatelyBuyForm.getSkuId());
 
-        ShoppingcartResult shoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, commonImmediatelyBuyForm.getCount());
+        ShoppingcartResult shoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, commonImmediatelyBuyForm.getCount(), ShoppingcartLineValidatorChannel.PLACE_ORDER);
 
-        if (null != shoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(shoppingcartResult)){
             return toNebulaReturnResult(shoppingcartResult);
         }
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(commonImmediatelyBuyForm,request);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(commonImmediatelyBuyForm, request);
         String key = saveToAccessor(shoppingCartLineCommandList, request);
 
         // 跳转到订单确认页面的地址

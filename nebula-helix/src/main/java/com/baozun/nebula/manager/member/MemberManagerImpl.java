@@ -194,6 +194,8 @@ public class MemberManagerImpl implements MemberManager{
         if (codunctCommand != null){
             condCommand.setLoginTime(codunctCommand.getLoginTime());
             condCommand.setLoginIp(codunctCommand.getLoginIp());
+            //5.3.2.20 增加set客户端识别码
+            condCommand.setClientIdentificationMechanisms(codunctCommand.getClientIdentificationMechanisms()); 
         }
         sdkMemberManager.saveMemberConduct(condCommand);
     }

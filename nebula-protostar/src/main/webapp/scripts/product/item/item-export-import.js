@@ -5,7 +5,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"PROCESSING":"正在处理, 请稍后...",
 	"PROCESS_SUCCESS":"操作成功",
 	"PROCESS_FAILTRUE":"操作失败[{0}]",
-	"EXPORT_ITEM_OUT_COUNT":"最多只能导出100个商品信息"
+	"EXPORT_ITEM_OUT_COUNT":"最多只能导出[{0}]个商品信息"
 });
 
 var itemListUrl = base + '/item/itemList.htm';
@@ -119,8 +119,9 @@ $j(document).ready(function(){
 		}
 		
 		var itemCodes = $j('textarea[name="itemCodes"]').val();
-		if(itemCodes.split('\n').length > 100){
-			nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("EXPORT_ITEM_OUT_COUNT"));
+		var batchThreshold = $j('#batchThreshold').val();
+		if(itemCodes.split('\n').length > batchThreshold){
+			nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("EXPORT_ITEM_OUT_COUNT",[batchThreshold]));
 			return;
 		}
 		
@@ -137,8 +138,9 @@ $j(document).ready(function(){
 		}
 		
 		var itemCodes = $j('textarea[name="itemCodes"]').val();
-		if(itemCodes.split('\n').length > 100){
-			nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("EXPORT_ITEM_OUT_COUNT"));
+		var batchThreshold = $j('#batchThreshold').val();
+		if(itemCodes.split('\n').length > batchThreshold ){
+			nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("EXPORT_ITEM_OUT_COUNT",[batchThreshold]));
 			return;
 		}
 		

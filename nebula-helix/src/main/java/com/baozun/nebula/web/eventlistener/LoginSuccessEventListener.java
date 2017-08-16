@@ -21,8 +21,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
 
+import com.baozun.nebula.event.AbstractNebulaEventListener;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
 
@@ -31,21 +31,24 @@ import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
  * 
  * @author D.C
  */
-public class LoginSuccessEventListener implements ApplicationListener<LoginSuccessEvent> {
-	private static final Logger LOG = LoggerFactory.getLogger(LoginSuccessEventListener.class);
+public class LoginSuccessEventListener extends AbstractNebulaEventListener<LoginSuccessEvent>{
 
-	@Override
-	public void onApplicationEvent(LoginSuccessEvent event) {
-		MemberDetails memberDetails = (MemberDetails)event.getSource();
-		LOG.info("[MEM_LOGIN_SUCCESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
-		this.handler(memberDetails, event.getClientContext());
-	}
-	/**
-	 * 可扩展的处理器
-	 * @param source
-	 * @param context
-	 */
-	protected void handler(MemberDetails source, Map<String, String> context) {
-		//TODO 比如记录登录日志，处理购物车
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(LoginSuccessEventListener.class);
+
+    @Override
+    public void onApplicationEvent(LoginSuccessEvent event){
+        MemberDetails memberDetails = (MemberDetails) event.getSource();
+        LOG.info("[MEM_LOGIN_SUCCESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
+        this.handler(memberDetails, event.getClientContext());
+    }
+
+    /**
+     * 可扩展的处理器
+     * 
+     * @param source
+     * @param context
+     */
+    protected void handler(MemberDetails source,Map<String, String> context){
+        //TODO 比如记录登录日志，处理购物车
+    }
 }

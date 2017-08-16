@@ -37,7 +37,7 @@ public class OrderBaseInfoSubViewCommand extends AbstractOrderViewCommand{
      * 整单折扣 整单折扣-sum（行折扣）= 由于整单促销/商城积分形成的未分摊到行上的折扣总额
      */
     private BigDecimal discount;
-
+    
     public BigDecimal getPayableFreight(){
         return payableFreight;
     }

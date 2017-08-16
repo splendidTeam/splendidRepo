@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-		
-	<bean id="PayInfo.findPayInfoByOrderIds" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据订单号查询支付详细</description>
-		<constructor-arg>
-			<value>
+
+    <bean id="PayInfo.findPayInfoByOrderIds" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单号查询支付详细</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					SELECT
 					p.id,
@@ -31,14 +30,14 @@
 					-1
 					)
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="PayInfo.findPayInfoCommandByOrderId" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据订单Id查询支付信息 用于oms</description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="PayInfo.findPayInfoCommandByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单Id查询支付信息 用于oms</description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 					SELECT
 					p.id,
@@ -62,14 +61,14 @@
 		            WHERE p.order_id = :orderId
 
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>
-	
-	<bean id="PayInfo.findPayInfoListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
-		<description></description>
-		<constructor-arg>
-			<value>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="PayInfo.findPayInfoListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+        <description></description>
+        <constructor-arg>
+            <value>
 				<![CDATA[  
 		       		select * from T_SO_PAYINFO where 
 		       			1 = 1
@@ -154,7 +153,28 @@
 				       		
 		       				
                  ]]>
-			</value>
-		</constructor-arg>
-	</bean>	
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <!-- 根据订单id,修改PayInfo的支付方式 by feilong -->
+    <bean id="PayInfo.updateNoPayPayTypeByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据订单id,修改PayInfo的支付方式 </description>
+        <constructor-arg>
+            <value>
+                <![CDATA[
+                    update
+                        t_so_payinfo
+                    set 
+                        version = now(),
+                        pay_info = :payInfo,
+                        pay_type=:payType
+                    where
+                        id=:id
+                        and pay_success_status=false
+                ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+
 </beans>

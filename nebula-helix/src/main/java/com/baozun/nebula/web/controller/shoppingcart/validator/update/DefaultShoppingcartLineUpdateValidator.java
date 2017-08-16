@@ -20,6 +20,7 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.TOTAL_MAX_THAN_QUANTITY;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.List;
@@ -35,15 +36,17 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartUpdateNeedCombinedLineExtractor;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartUpdateDetermineSameLineElementsBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.baozun.nebula.web.controller.shoppingcart.validator.AbstractShoppingcartLineOperateValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLinePackageInfoFormListValidator;
-import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartOneLineMaxQuantityValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartMaxTotalQuantityValidator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.util.CollectionsUtil.collect;
@@ -61,6 +64,8 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingcartLineUpdateValidator.class);
+
+    //---------------------------------------------------------------------
 
     /** The sdk sku manager. */
     @Autowired
@@ -85,6 +90,16 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
     /** 购物车修改的时候相同行提取器. */
     @Autowired
     private ShoppingCartUpdateNeedCombinedLineExtractor shoppingCartUpdateNeedCombinedLineExtractor;
+
+    /**
+     * 购物车购买最大数量校验
+     * 
+     * @since 5.3.2.22
+     */
+    @Autowired
+    private ShoppingcartMaxTotalQuantityValidator shoppingcartMaxTotalQuantityValidator;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -123,16 +138,25 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
         //订单行最终修改的全量数量(必填).
         Integer count = shoppingCartLineUpdateSkuForm.getCount();
         ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(targetSku, count);
-        if (null != commonValidateShoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(commonValidateShoppingcartResult)){
             return commonValidateShoppingcartResult;
         }
 
         //---------------------------------------------------------------------------------------
 
         //2.3 单行最大数量 校验
-        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
-        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, count)){
+        if (shoppingcartOneLineMaxQuantityValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, count)){
             return ONE_LINE_MAX_THAN_COUNT;
+        }
+
+        // -----------商品总数量验证-----------------------------------------------------------------------------
+        //since 5.3.2.22
+        //计算修改后购物车商品总数量
+        Integer sumTotalQuantity = sumTotalQuantity(shoppingCartLineCommandList, currentShoppingCartLineCommand, count);
+        //校验添加后购物车商品总数是否超过规定最大数量
+        if (shoppingcartMaxTotalQuantityValidator.isGreaterThanMaxQuantity(memberDetails, sumTotalQuantity)){
+            return TOTAL_MAX_THAN_QUANTITY;
+
         }
 
         //-----------------------------------------------------------------------------------------
@@ -144,6 +168,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
                         shoppingCartLineCommandList,
                         shoppingcartUpdateDetermineSameLineElementsBuilder.build(currentShoppingCartLineCommand, shoppingCartLineUpdateSkuForm));
 
+        //---------------------------------------------------------------------
         if (null == needCombinedShoppingCartLineCommand){
             LOGGER.debug("can not find need Combined ShoppingCartLineCommand,just update self line data");
 
@@ -151,22 +176,24 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
             updateCurrentShoppingCartLineCommand(currentShoppingCartLineCommand, shoppingCartLineUpdateSkuForm, targetSku);
         }else{
 
-            //---------------------------------------------------------------
             int totalQuantity = needCombinedShoppingCartLineCommand.getQuantity() + count;
             //校验单行库存
-            if (shoppingcartLineUpdateValidatorConfig.getIsCheckSingleLineSkuInventory() && useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, totalQuantity)){
+            if (shoppingcartLineUpdateValidatorConfig.getIsCheckSingleLineSkuInventory() && shoppingcartOneLineMaxQuantityValidator.isGreaterThanMaxQuantity(memberDetails, targetSkuId, totalQuantity)){
                 return ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
             }
 
             //---------------------------------------------------------------
 
             needCombinedShoppingCartLineCommand.setQuantity(totalQuantity);
-            LOGGER.debug("need Combined Line:[{}],update Quantity to:[{}]", needCombinedShoppingCartLineCommand.getId(), totalQuantity);
 
             //---------------------------------------------------------------
-
             if (LOGGER.isDebugEnabled()){
-                LOGGER.debug("shoppingCartLine List:[{}] will remove current Line :[{}]", JsonUtil.formatWithIncludes(shoppingCartLineCommandList, "id"), currentShoppingCartLineCommand.getId());
+                LOGGER.debug(
+                                "find needCombined Line:[{}],update Quantity to:[{}],and shoppingCartLine List:[{}] will remove current Line :[{}]",
+                                needCombinedShoppingCartLineCommand.getId(),
+                                totalQuantity,
+                                JsonUtil.formatWithIncludes(shoppingCartLineCommandList, "id"),
+                                currentShoppingCartLineCommand.getId());
             }
 
             //如果需要合并,那么当前行删掉合并到需要合并的行 
@@ -181,6 +208,21 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
         }
 
         return null;
+    }
+
+    /**
+     * 计算当前购物车商品总数量(修改后)
+     * 
+     * @return
+     *         商品总数量
+     * 
+     * @since 5.3.2.22
+     */
+    private static Integer sumTotalQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentShoppingCartLineCommand,Integer count){
+        //计算修改前购物车商品总数量
+        Integer currentTotalCount = ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
+        //修改后购物车商品总数量=当前购物车总数量-修改的购物车行原来购买数量+修改后的数量
+        return currentTotalCount - currentShoppingCartLineCommand.getQuantity() + count;
     }
 
     /**

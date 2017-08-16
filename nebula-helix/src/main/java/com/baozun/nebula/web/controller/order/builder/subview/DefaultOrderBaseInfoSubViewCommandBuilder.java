@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.manager.order.handler.DisplayTotalBuilder;
 import com.baozun.nebula.web.controller.order.builder.DefaultOrderViewStatusBuilder;
 import com.baozun.nebula.web.controller.order.builder.OrderViewStatusBuilder;
 import com.baozun.nebula.web.controller.order.builder.OrderViewStatusParam;
@@ -63,7 +64,9 @@ public class DefaultOrderBaseInfoSubViewCommandBuilder implements OrderBaseInfoS
         // 订单信息
         OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
         //5.3.2.18增加了对"orderType"字段的转换
-        PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime", "logisticsStatus", "financialStatus", "total", "discount", "actualFreight", "orderType");
+        //5.3.2.20增加了对"modifyTime"字段的转换
+        //5.3.2.22增加对商品总数量字段的转换
+        PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime", "logisticsStatus", "financialStatus", "total", "discount", "actualFreight", "orderType", "modifyTime", "quantity");
 
         orderBaseInfoSubViewCommand.setOrderId(salesOrderCommand.getId());
         orderBaseInfoSubViewCommand.setOrderCode(salesOrderCommand.getCode());
