@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
+import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.constant.SMSTemplateConstants;
 import com.baozun.nebula.exception.BusinessException;
@@ -349,7 +350,14 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 			/** 设置注册会员附加信息 */
 			String clientIp = RequestUtil.getClientIp(request);
-			memberManager.setupMemberReference(memberFrontendCommand, clientIp);
+			
+			/** 客户端识别码
+			 * @since 5.3.2.18
+			 * */
+			String clientIdentificationMechanisms = (String) request.getAttribute(MemberConductCommand.CLIENT_IDENTIFICATION_MECHANISMS);
+			
+			//5.3.2.18增加参数String : clientIdentificationMechanisms
+			memberManager.setupMemberReference(memberFrontendCommand, clientIp, clientIdentificationMechanisms);
 
 			/** 用户注册 */
 			Member member = memberManager.rewriteRegister(memberFrontendCommand);

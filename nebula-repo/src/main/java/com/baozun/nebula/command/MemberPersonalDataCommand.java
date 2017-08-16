@@ -88,7 +88,10 @@ public class MemberPersonalDataCommand implements Command{
 	private String				company;
 
 	private String				interest;
-
+	/**
+	 * @Deprecated 发现MemberPersonalData中没有short1字段,在这里就Deprecated掉
+	 */
+	@Deprecated
 	private String				short1;
 
 	private String				short2;
@@ -464,11 +467,17 @@ public class MemberPersonalDataCommand implements Command{
 	public void setInterest(String interest){
 		this.interest = interest;
 	}
-
+    /**
+     * @Deprecated 发现MemberPersonalData中没有short1字段,在这里就Deprecated掉
+     */
+    @Deprecated
 	public String getShort1(){
 		return short1;
 	}
-
+    /**
+     * @Deprecated 发现MemberPersonalData中没有short1字段,在这里就Deprecated掉
+     */
+    @Deprecated
 	public void setShort1(String short1){
 		this.short1 = short1;
 	}

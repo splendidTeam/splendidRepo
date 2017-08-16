@@ -1,105 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
                         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
-	<!-- 该路径下的资源不用过滤 -->
-	<http pattern="/**/*.js" security="none" />
-	<http pattern="/**/*.swf" security="none" />
-	<http pattern="/**/*.css" security="none" />
-	<http pattern="/**/*.jpg" security="none" />
-	<http pattern="/**/*.png" security="none" />
-	<http pattern="/**/*.gif" security="none" />
-	<http pattern="/**/*.ico" security="none" />
-	<http pattern="/login.htm" security="none" />
-	
-	<beans:bean id="nebulaAuthenticationFailureHandler" class="com.baozun.nebula.web.security.auth.NebulaAuthenticationFailureHandler">
-		<beans:property name="defaultFailureUrl" value="/login.htm?type=1"/>
-		<beans:property name="UserDisabledUrl" value="/login.htm?type=2"/>
-	</beans:bean>
-	
-	<http use-expressions="true" auto-config="false" access-denied-page="/access-denied.htm" entry-point-ref="authenticationProcessingFilterEntryPoint">
-		<intercept-url pattern="/**" access="isFullyAuthenticated()" />
-		<form-login login-page="/login.htm" default-target-url='/index.htm' always-use-default-target="true" authentication-failure-handler-ref="nebulaAuthenticationFailureHandler"
-			authentication-success-handler-ref="myAuthenticationSuccessHandler" />
-		<logout invalidate-session="true" logout-success-url="/login.htm" logout-url="/logout.htm" />
+    <!-- 该路径下的资源不用过滤 -->
+    <http pattern="/**/*.js" security="none" />
+    <http pattern="/**/*.swf" security="none" />
+    <http pattern="/**/*.css" security="none" />
+    <http pattern="/**/*.jpg" security="none" />
+    <http pattern="/**/*.png" security="none" />
+    <http pattern="/**/*.gif" security="none" />
+    <http pattern="/**/*.ico" security="none" />
+    <http pattern="/login.htm" security="none" />
 
-		<session-management invalid-session-url="/timeout.htm" session-fixation-protection="migrateSession">
-			<concurrency-control max-sessions="100" error-if-maximum-exceeded="true" />
-		</session-management>
-		<custom-filter ref="myFilter" before="FILTER_SECURITY_INTERCEPTOR" />
-		<session-management session-authentication-strategy-ref="sas" />
-	</http>
-	
-	<beans:bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
-		<beans:constructor-arg name="sessionRegistry" ref="sessionRegistry" />
-		<beans:property name="maximumSessions" value="10" />
-		<!-- 防止session攻击 -->
-		<beans:property name="alwaysCreateSession" value="true" />
-		<beans:property name="migrateSessionAttributes" value="true" />
-		<!-- 同一个帐号 同时只能一个人登录 -->
-		<beans:property name="exceptionIfMaximumExceeded" value="true" />
-	</beans:bean>
-	
-	<beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
-	
-	<!-- 配置过滤器 -->
-	<beans:bean id="myFilter" class="com.baozun.nebula.web.interceptor.SecurityInterceptor">
-		<!-- 用户拥有的权限 -->
-		<beans:property name="authenticationManager" ref="myAuthenticationManager" />
-		<!-- 用户是否拥有所请求资源的权限 -->
-		<beans:property name="accessDecisionManager" ref="accessDecisionManagerImpl" />
-		<!-- 资源与权限对应关系 -->
-		<beans:property name="securityMetadataSource" ref="metadataSourceManagerImpl" />
-	</beans:bean>
-	
-	<!-- 实现了UserDetailsService的Bean -->
-	<authentication-manager alias="myAuthenticationManager">
-		<authentication-provider user-service-ref="userDetailManagerImpl">
-			<!-- 登入 密码 采用Sha加密 -->
-			<password-encoder ref="passwordEncoder">
-				<salt-source user-property="username" />
-			</password-encoder>
-		</authentication-provider>
-	</authentication-manager>
+    <beans:bean id="nebulaAuthenticationFailureHandler" class="com.baozun.nebula.web.security.auth.NebulaAuthenticationFailureHandler">
+        <beans:property name="defaultFailureUrl" value="/login.htm?type=1" />
+        <beans:property name="UserDisabledUrl" value="/login.htm?type=2" />
+    </beans:bean>
 
-	<!-- 用户的密码加密或解密 -->
-	<beans:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
-		<beans:constructor-arg value="256"></beans:constructor-arg>
-	</beans:bean>
+    <http use-expressions="true" auto-config="false" access-denied-page="/access-denied.htm" entry-point-ref="authenticationProcessingFilterEntryPoint">
+        <intercept-url pattern="/**" access="isFullyAuthenticated()" />
+        <form-login login-page="/login.htm" default-target-url='/index.htm' always-use-default-target="true" authentication-failure-handler-ref="nebulaAuthenticationFailureHandler" authentication-success-handler-ref="myAuthenticationSuccessHandler" />
+        <logout invalidate-session="true" logout-success-url="/login.htm" logout-url="/logout.htm" />
 
-	<!-- 未登录的切入点 -->
-	<beans:bean id="authenticationProcessingFilterEntryPoint" class="com.baozun.nebula.web.controller.auth.MyLoginUrlAuthenticationEntryPoint">
-		<beans:property name="loginFormUrl" value="/login.htm"></beans:property>
-	</beans:bean>
+        <session-management invalid-session-url="/timeout.htm" session-fixation-protection="migrateSession">
+            <concurrency-control max-sessions="100" error-if-maximum-exceeded="true" />
+        </session-management>
+        <custom-filter ref="myFilter" before="FILTER_SECURITY_INTERCEPTOR" />
+        <session-management session-authentication-strategy-ref="sas" />
+    </http>
 
-	<!-- 未登录的切入点 -->
-	<beans:bean id="myAuthenticationSuccessHandler" class="com.baozun.nebula.web.controller.auth.MyAuthenticationSuccessHandler">
-	</beans:bean>
-	
-	<!-- 与web.xml中配置的csrfFilter对应 -->
-	<!-- CSRF protection. Here we only include the CsrfFilter instead of all 
-		of Spring Security. See http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#csrf 
-		for more information on Spring Security's CSRF protection -->
-	<beans:bean id="csrfFilter" class="org.springframework.security.web.csrf.CsrfFilter">
-		<beans:constructor-arg>
-			<beans:bean
-				class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository" />
-		</beans:constructor-arg>
-	</beans:bean>
-	
-	<!-- 用于SecurityFilter生成SecurityWrapperMultipartRequest -->
-	<beans:bean id="multipartResolver" name="multipartResolver"
-		class="com.baozun.nebula.security.SecurityCommonsMultipartResolver">
-		<beans:property name="maxUploadSize" value="100000000" />
-	</beans:bean>
-	
-	<beans:bean class="com.baozun.nebula.security.SecurityConfig" >
-		<beans:property name="ignoreParameters">
-			<beans:set>
-				<beans:value>data</beans:value>
-				<beans:value>html</beans:value>
-			</beans:set>
-		</beans:property>
-	</beans:bean>
-	
+    <beans:bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
+        <beans:constructor-arg name="sessionRegistry" ref="sessionRegistry" />
+        <beans:property name="maximumSessions" value="10" />
+        <!-- 防止session攻击 -->
+        <beans:property name="alwaysCreateSession" value="true" />
+        <beans:property name="migrateSessionAttributes" value="true" />
+        <!-- 同一个帐号 同时只能一个人登录 -->
+        <beans:property name="exceptionIfMaximumExceeded" value="true" />
+    </beans:bean>
+
+    <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+    <!-- 配置过滤器 -->
+    <beans:bean id="myFilter" class="com.baozun.nebula.web.interceptor.SecurityInterceptor">
+        <!-- 用户拥有的权限 -->
+        <beans:property name="authenticationManager" ref="myAuthenticationManager" />
+        <!-- 用户是否拥有所请求资源的权限 -->
+        <beans:property name="accessDecisionManager" ref="accessDecisionManagerImpl" />
+        <!-- 资源与权限对应关系 -->
+        <beans:property name="securityMetadataSource" ref="metadataSourceManagerImpl" />
+    </beans:bean>
+
+    <!-- 实现了UserDetailsService的Bean -->
+    <authentication-manager alias="myAuthenticationManager">
+        <authentication-provider user-service-ref="userDetailManagerImpl">
+            <!-- 登入 密码 采用Sha加密 -->
+            <password-encoder ref="passwordEncoder">
+                <salt-source user-property="username" />
+            </password-encoder>
+        </authentication-provider>
+    </authentication-manager>
+
+    <!-- 用户的密码加密或解密 -->
+    <beans:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+        <beans:constructor-arg value="256"></beans:constructor-arg>
+    </beans:bean>
+
+    <!-- 未登录的切入点 -->
+    <beans:bean id="authenticationProcessingFilterEntryPoint" class="com.baozun.nebula.web.controller.auth.MyLoginUrlAuthenticationEntryPoint">
+        <beans:property name="loginFormUrl" value="/login.htm"></beans:property>
+    </beans:bean>
+
+    <!-- 未登录的切入点 -->
+    <beans:bean id="myAuthenticationSuccessHandler" class="com.baozun.nebula.web.controller.auth.MyAuthenticationSuccessHandler">
+    </beans:bean>
+
+    <!-- 与web.xml中配置的csrfFilter对应 -->
+    <!-- CSRF protection. Here we only include the CsrfFilter instead of all
+        of Spring Security. See http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#csrf
+        for more information on Spring Security's CSRF protection -->
+    <beans:bean id="csrfFilter" class="org.springframework.security.web.csrf.CsrfFilter">
+        <beans:constructor-arg>
+            <beans:bean class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository" />
+        </beans:constructor-arg>
+    </beans:bean>
+
+    <!-- 用于SecurityFilter生成SecurityWrapperMultipartRequest -->
+    <beans:bean id="multipartResolver" name="multipartResolver" class="com.baozun.nebula.security.SecurityCommonsMultipartResolver">
+        <beans:property name="maxUploadSize" value="100000000" />
+    </beans:bean>
+
+    <beans:bean class="com.baozun.nebula.security.SecurityConfig">
+        <beans:property name="ignoreParameters">
+            <beans:set>
+                <beans:value>data</beans:value>
+                <beans:value>html</beans:value>
+            </beans:set>
+        </beans:property>
+    </beans:bean>
+
 </beans:beans>  

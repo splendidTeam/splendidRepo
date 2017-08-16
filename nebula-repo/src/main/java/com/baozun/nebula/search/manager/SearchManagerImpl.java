@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionItemManager;

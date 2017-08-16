@@ -98,7 +98,8 @@ public class SimpleOrderViewCommandConverter extends BaseConverter<SimpleOrderVi
                         "total",
                         "discount",
                         "actualFreight",
-                        "isRate");
+                        "isRate",
+                        "orderType");
 
         List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommandList = orderLineManager.findByOrderID(simpleOrderCommand.getOrderId());
         simpleOrderViewCommand.setSimpleOrderLineSubViewCommandList(simpleOrderLineSubViewCommandList);

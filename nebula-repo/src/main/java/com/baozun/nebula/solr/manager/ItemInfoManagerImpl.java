@@ -162,7 +162,7 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 			for(BaseItemForSolrCommand baseItemForSolrCommand : baseItemForSolrCommandList){
 				// 目前仅普通商品需要刷新solr 
 				// changed by yue.ch in 2016-6-22
-				if(!Item.ITEM_TYPE_SIMPLE.equals(baseItemForSolrCommand.getType())) {
+				if(!Long.valueOf(Item.ITEM_TYPE_SIMPLE).equals(baseItemForSolrCommand.getType())) {
 					continue;
 				}
 				List<ItemPropertiesCommand> itemPropertiesForSearchList = new ArrayList<ItemPropertiesCommand>();

@@ -51,6 +51,8 @@ public class OrderLineManagerImpl implements OrderLineManager{
     @Autowired
     private SdkOrderLinePackInfoManager sdkOrderLinePackInfoManager;
 
+    //---------------------------------------------------------------
+
     @Override
     public OrderLine findByPk(Long id){
         return sdkOrderLineManager.findByPk(id);
@@ -67,6 +69,8 @@ public class OrderLineManagerImpl implements OrderLineManager{
         }
         return simpleOrderLineSubViewCommandList;
     }
+
+    //---------------------------------------------------------------
 
     /**
      * @param orderLineCommand

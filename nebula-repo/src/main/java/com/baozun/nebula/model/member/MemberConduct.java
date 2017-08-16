@@ -89,6 +89,13 @@ public class MemberConduct extends BaseModel {
 	 */
 	private BigDecimal cumulativeConAmount;
 	
+	/**
+	 * 客户端识别码
+	 * 类似ip一样的信息
+	 * @since 5.3.2.18
+	 */
+	private String clientIdentificationMechanisms;
+	
 	
 
 	
@@ -176,6 +183,26 @@ public class MemberConduct extends BaseModel {
 	public void setVersion(Date version) {
 		this.version = version;
 	}
+	/**
+	 * 获得 客户端识别码
+	 * @return clientIdentificationMechanisms
+	 * @since 5.3.2.18
+	 */
+	@Column(name = "CLIENT_IDENTIFICATION_MECHANISMS",nullable=true,unique=false)
+    public String getClientIdentificationMechanisms(){
+        return clientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 客户端识别码
+     * @param clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setClientIdentificationMechanisms(String clientIdentificationMechanisms){
+        this.clientIdentificationMechanisms = clientIdentificationMechanisms;
+    }
+	
+	
 	
 	
 }

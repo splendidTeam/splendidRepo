@@ -875,4 +875,10 @@ public class CacheManagerImpl implements CacheManager {
 		return delCount;
 	}
 	
+	@Override
+    public List<CacheItemCommand> findAllCacheItem(Map<String, Object> paraMap){
+        // 获取全部的缓存项
+        return cacheItemDao.findAllCacheItem(new BeanPropertyRowMapper<CacheItemCommand>(CacheItemCommand.class), paraMap);
+    }
+	
 }

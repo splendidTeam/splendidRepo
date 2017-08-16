@@ -44,7 +44,6 @@ import loxia.dao.Sort;
  * @author Tianlong.Zhang
  *
  */
-@Transactional
 @Service("sdkMataInfoManager")
 public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
 
@@ -98,6 +97,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
      * 保存MataInfo
      * 
      */
+    @Transactional
     public MataInfo saveMataInfo(MataInfo model){
         Long id = model.getId();
         MataInfo mataInfo = null;
@@ -181,6 +181,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
      * @param ids
      * @return
      */
+    @Transactional
     public void enableOrDisableMataInfoByIds(List<Long> ids,Integer state){
         mataInfoDao.enableOrDisableMataInfoByIds(ids, state);
         zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(SystemConfigWatchInvoke.class));
@@ -193,6 +194,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
      * @param ids
      * @return
      */
+    @Transactional
     public void removeMataInfoByIds(List<Long> ids){
         mataInfoDao.removeMataInfoByIds(ids);
         zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(SystemConfigWatchInvoke.class));

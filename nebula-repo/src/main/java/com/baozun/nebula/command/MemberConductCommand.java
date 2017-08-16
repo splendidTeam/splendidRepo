@@ -3,12 +3,16 @@ package com.baozun.nebula.command;
 import java.math.BigDecimal;
 import java.util.Date;
 
+
 public class MemberConductCommand implements Command{
 
 	/**
 	 * 
 	 */
 	private static final long	serialVersionUID	= 228221051958999914L;
+	
+	//5.3.2.18 客户端识别码规定绑定名称
+    public static final String CLIENT_IDENTIFICATION_MECHANISMS = MemberConductCommand.class.getName()+"clientIdentificationMechanisms";
 
 	/**
 	 * id
@@ -49,6 +53,13 @@ public class MemberConductCommand implements Command{
 	 * 累积消费金额
 	 */
 	private BigDecimal			cumulativeConAmount;
+	
+	/**
+     * 客户端识别码
+     * 类似ip一样的信息
+     * @since 5.3.2.18
+     */
+    private String clientIdentificationMechanisms;
 
 	public MemberConductCommand(){
 		super();
@@ -140,5 +151,23 @@ public class MemberConductCommand implements Command{
 	public void setCumulativeConAmount(BigDecimal cumulativeConAmount){
 		this.cumulativeConAmount = cumulativeConAmount;
 	}
+	
+	/**
+     * 获得 客户端识别码
+     * @return clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public String getClientIdentificationMechanisms(){
+        return clientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 客户端识别码
+     * @param clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setClientIdentificationMechanisms(String clientIdentificationMechanisms){
+        this.clientIdentificationMechanisms = clientIdentificationMechanisms;
+    }
 
 }

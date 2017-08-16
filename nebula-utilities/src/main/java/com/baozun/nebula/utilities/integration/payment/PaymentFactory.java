@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,338 +18,279 @@ import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvert
 import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorForAlipayAdaptor;
 import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorForUnionPayAdaptor;
 import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorForWechatAdaptor;
-import com.baozun.nebula.utilities.integration.payment.exception.PaymentAdaptorInitialFailureException;
 import com.baozun.nebula.utilities.integration.payment.unionpay.UnionPaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.unionpay.UnionPaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatPaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatPaymentRequest;
 
-public class PaymentFactory {
+public class PaymentFactory{
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(PaymentFactory.class);
-	
-	/** 支付宝 */
-	public static final int ALIPAY = 1;
-	
-	/** 支付宝网银 */
-	public static final int ALIPAY_BANK = 3;
-	
-	/** 支付宝信用卡 */
-	public static final int ALIPAY_CREDIT = 14;
-	
-	/** 支付宝国际卡 */
-	public static final int ALIPAY_CREDIT_INT_V = 131;
-	
-	/** 支付宝国际卡 */
-	public static final int ALIPAY_CREDIT_INT_M = 141;
-	
-	/** 微信支付 */
-	public static final int WECHAT = 4;
-	
-	/** 汇付天下 */
-	public static final int CHINAPNR = 151;
-	
-	/** 银联支付 */
-	public static final int UNIONPAY = 161;
+    private static final Logger logger = LoggerFactory.getLogger(PaymentFactory.class);
 
-	public static final String PAY_TYPE_ALIPAY = "Alipay";
+    //--------------------------------------------------------------------------------------------------------------
+    /** 支付宝 */
+    public static final int ALIPAY = 1;
 
-	public static final String PAY_TYPE_ALIPAY_BANK = "Alipay_Bank";
+    /** 支付宝网银 */
+    public static final int ALIPAY_BANK = 3;
 
-	public static final String PAY_TYPE_ALIPAY_CREDIT = "Alipay_Credit";
+    /** 支付宝信用卡 */
+    public static final int ALIPAY_CREDIT = 14;
 
-	public static final String PAY_TYPE_ALIPAY_CREDIT_INT = "Alipay_Credit_Int";
-	
-	public static final String PAY_TYPE_UNIONPAY = "unionpay";
-	
-	public static final String PAY_TYPE_CHINAPNR = "chinaPnR";
-	
-	public static final String PAY_TYPE_C = "Alipay_Credit_Int";
-	
-	public static final String PAY_TYPE_WECHAT ="Wechat";
-	
-	public static final String ALIPAYDEFAULTALIPAYCONFIG = "config/alipay.properties";
+    /** 支付宝国际卡 */
+    public static final int ALIPAY_CREDIT_INT_V = 131;
 
-	public static final String ALIPAYINTERNATIONALCREDITCARDCONFIG = "config/payment/alipay/alipay_InternationalCreditCard.properties";
-	
-	public static final String ALIPAYADDRESS = "config/payment/alipay/alipayAddress.properties";
-	
-	public static final String CHINAPNRDEFAULTALIPAYCONFIG = "config/payment/chinaPnR/chinaPnR.properties";
-	
-	public static final String UNIONPAYDEFAULTALIPAYCONFIG = "config/payment/unionpay/unionpay.properties";
-	
-	//public static final String WECHATDEFAULTALIPAYCONFIG = "/config/payment/wechat/wechat.properties";
+    /** 支付宝国际卡 */
+    public static final int ALIPAY_CREDIT_INT_M = 141;
 
-	private static PaymentFactory inst = new PaymentFactory();
+    /** 微信支付 */
+    public static final int WECHAT = 4;
 
-	private Map<String, PaymentAdaptor> paymentAdaptorMap;
+    /** 银联支付 */
+    public static final int UNIONPAY = 161;
 
-	private Map<String, String> paymentConfigMap;
+    //--------------------------------------------------------------------------------------------------------------
 
-	private Map<String, PayParamConvertorAdaptor> payParamCommandToMapAdaptorMap;
+    public static final String PAY_TYPE_ALIPAY = "Alipay";
 
-	private Map<String, PaymentRequest> paymentResultMap;
+    public static final String PAY_TYPE_ALIPAY_BANK = "Alipay_Bank";
 
-	public PaymentFactory() {
-		initPaymentConfig();
-		initPaymentAdaptorMap();
-		initPayParamCommandToMapAdaptorMap();
-		initPayParamPaymentResultMap();
-	}
+    public static final String PAY_TYPE_ALIPAY_CREDIT = "Alipay_Credit";
 
-	public static PaymentFactory getInstance() {
-		return inst;
-	}
-	
-	/**
-	 * 获得支付适配器
-	 * @param payMentType
-	 * @return
-	 */
-	public PaymentAdaptor getPaymentAdaptor(String payMentType) {
-		if (null == payMentType || payMentType.length() < 1) {
-			return null;
-		}
-		return paymentAdaptorMap.get(payMentType);
+    public static final String PAY_TYPE_ALIPAY_CREDIT_INT = "Alipay_Credit_Int";
 
-	}
+    public static final String PAY_TYPE_UNIONPAY = "unionpay";
 
-	/**
-	 * 获得转换器
-	 * @param payMentType
-	 * @return
-	 */
-	public PayParamConvertorAdaptor getPaymentCommandToMapAdaptor(
-			String payMentType) {
-		if (null == payMentType || payMentType.length() < 1) {
-			return null;
-		}
-		return payParamCommandToMapAdaptorMap.get(payMentType);
+    public static final String PAY_TYPE_WECHAT = "Wechat";
 
-	}
-	
-	/**
-	 * 获得支付结果
-	 * @param payMentType
-	 * @return
-	 */
-	public PaymentRequest getPaymentResult(
-			String payMentType) {
-		if (null == payMentType || payMentType.length() < 1) {
-			return null;
-		}
-		return paymentResultMap.get(payMentType);
+    //--------------------------------------------------------------------------------------------------------------
 
-	}
+    public static final String ALIPAYDEFAULTALIPAYCONFIG = "config/alipay.properties";
 
-	/**
-	 * 初始化转换器
-	 */
-	public void initPayParamCommandToMapAdaptorMap() {
-		payParamCommandToMapAdaptorMap = new HashMap<String, PayParamConvertorAdaptor>();
-		payParamCommandToMapAdaptorMap.put(PAY_TYPE_ALIPAY,
-				new PayParamConvertorForAlipayAdaptor());
-		payParamCommandToMapAdaptorMap.put(PAY_TYPE_ALIPAY_BANK,
-				new PayParamConvertorForAlipayAdaptor());
-		payParamCommandToMapAdaptorMap.put(PAY_TYPE_ALIPAY_CREDIT,
-				new PayParamConvertorForAlipayAdaptor());
-		payParamCommandToMapAdaptorMap.put(PAY_TYPE_ALIPAY_CREDIT_INT,
-				new PayParamConvertorForAlipayAdaptor());
-		payParamCommandToMapAdaptorMap.put(PAY_TYPE_UNIONPAY,
-				new PayParamConvertorForUnionPayAdaptor());
- 		payParamCommandToMapAdaptorMap.put(PAY_TYPE_WECHAT,
- 				new PayParamConvertorForWechatAdaptor());
-	}
-	
-	/**
-	 * 支付结果列表
-	 */
-	public void initPayParamPaymentResultMap() {
-		paymentResultMap = new HashMap<String, PaymentRequest>();
-		paymentResultMap.put(PAY_TYPE_ALIPAY, new AlipayPaymentRequest());
-		paymentResultMap.put(PAY_TYPE_ALIPAY_BANK,new AlipayPaymentRequest());
-		paymentResultMap.put(PAY_TYPE_ALIPAY_CREDIT,new AlipayPaymentRequest());
-		paymentResultMap.put(PAY_TYPE_ALIPAY_CREDIT_INT,new AlipayPaymentRequest());
-		paymentResultMap.put(PAY_TYPE_UNIONPAY,new UnionPaymentRequest());
- 		paymentResultMap.put(PAY_TYPE_WECHAT,new WechatPaymentRequest());
-	}
+    public static final String ALIPAYINTERNATIONALCREDITCARDCONFIG = "config/payment/alipay/alipay_InternationalCreditCard.properties";
 
-	/*
-	 * 初始化配置文件
-	 */
-	private void initPaymentConfig() {
-		paymentConfigMap = new HashMap<String, String>();
-		paymentConfigMap.put(PAY_TYPE_ALIPAY, ProfileConfigUtil.getProfilePath(ALIPAYDEFAULTALIPAYCONFIG));
-		paymentConfigMap.put(PAY_TYPE_ALIPAY_BANK, ALIPAYDEFAULTALIPAYCONFIG);
-		paymentConfigMap.put(PAY_TYPE_ALIPAY_CREDIT, ALIPAYDEFAULTALIPAYCONFIG);
-		paymentConfigMap.put(PAY_TYPE_ALIPAY_CREDIT_INT,
-				ALIPAYINTERNATIONALCREDITCARDCONFIG);
-		paymentConfigMap.put(PAY_TYPE_UNIONPAY,
-				UNIONPAYDEFAULTALIPAYCONFIG);
-//		paymentConfigMap.put(PAY_TYPE_WECHAT,
-//				WECHATDEFAULTALIPAYCONFIG);
-	}
+    public static final String ALIPAYADDRESS = "config/payment/alipay/alipayAddress.properties";
 
-	/*
-	 * 初始化配置参数
-	 */
-	public Properties initConfig(String payMentType)
-			throws PaymentAdaptorInitialFailureException {
+    /**
+     * @deprecated 目前银联配置文件格式参见 com.baozun.nebula.utilities.integration.payment.unionpay.AbstractUnionPaymentAdaptor.AbstractUnionPaymentAdaptor()
+     */
+    @Deprecated
+    public static final String UNIONPAYDEFAULTALIPAYCONFIG = "config/payment/unionpay/unionpay.properties";
 
-		String configFile = paymentConfigMap.get(payMentType);
-		try {
-			Properties configs = ProfileConfigUtil.findCommonPro(configFile);
-			if (null == configs.getProperty(PaymentAdaptor.PAYMENT_GATEWAY)
-					&& null == configs.getProperty("payment_gateway_front"))
-				throw new PaymentAdaptorInitialFailureException("No payment gateway address defined.");
-			return configs;
-		} catch (Exception e) {
-			logger.error("Error occurs when loading {}", configFile);
-			throw new PaymentAdaptorInitialFailureException("Load Configuration failure", e);
-		}
+    //--------------------------------------------------------------------------------------------------------------
 
-	}
+    private static PaymentFactory inst = new PaymentFactory();
 
-	/*
-	 * 初始化适配器Map
-	 */
-	private Map<String, PaymentAdaptor> initPaymentAdaptorMap() {
-		paymentAdaptorMap = new HashMap<String, PaymentAdaptor>();
-		paymentAdaptorMap.put(PAY_TYPE_ALIPAY, initAlipayPaymentAdaptor());
-		paymentAdaptorMap.put(PAY_TYPE_ALIPAY_BANK,
-				initAlipayBankPaymentAdaptor());
-		paymentAdaptorMap.put(PAY_TYPE_ALIPAY_CREDIT,
-				initAlipayCreditCardPaymentAdaptor());
-		paymentAdaptorMap.put(PAY_TYPE_ALIPAY_CREDIT_INT,
-				initAlipayInternationalCreditCardPaymentAdaptor());
-		paymentAdaptorMap.put(PAY_TYPE_UNIONPAY,
-				initUnionPaymentAdaptor());
-//		paymentAdaptorMap.put(PAY_TYPE_CHINAPNR,
-//				initChinaPnRPaymentAdaptor());
-		paymentAdaptorMap.put(PAY_TYPE_WECHAT,
-				initWechatPaymentAdaptor());
-		return paymentAdaptorMap;
-	}
+    //--------------------------------------------------------------------------------------------------------------
 
-	/*
-	 * 初始化Alipay适配器
-	 */
-	private PaymentAdaptor initAlipayPaymentAdaptor() {
-		try {
-			return new AlipayPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
-		} catch (PaymentAdaptorInitialFailureException e) {
-			logger.error("initAlipayPaymentAdaptor error: " + e.toString());
-			e.printStackTrace();
-		}
-		return null;
-	}
+    private Map<String, String> paymentConfigMap;
 
-	/*
-	 * 初始化Alipay银行卡适配器
-	 */
-	private PaymentAdaptor initAlipayBankPaymentAdaptor() {
-		try {
-			return new AlipayBankPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
-		} catch (PaymentAdaptorInitialFailureException e) {
-			logger.error("initAlipayBankPaymentAdaptor error: " + e.toString());
-			e.printStackTrace();
-		}
-		return null;
-	}
+    private Map<String, PaymentAdaptor> paymentAdaptorMap;
 
-	/*
-	 * 初始化Alipay国内信用卡适配器
-	 */
-	private PaymentAdaptor initAlipayCreditCardPaymentAdaptor() {
-		try {
-			return new AlipayCreditCardPaymentAdaptor(
-					initConfig(PAY_TYPE_ALIPAY));
-		} catch (PaymentAdaptorInitialFailureException e) {
-			logger.error("initAlipayCreditCardPaymentAdaptor error: "
-					+ e.toString());
-			e.printStackTrace();
-		}
-		return null;
-	}
+    private Map<String, PayParamConvertorAdaptor> payParamCommandToMapAdaptorMap;
 
-	/*
-	 * 初始化Alipay国外信用卡适配器
-	 */
-	private PaymentAdaptor initAlipayInternationalCreditCardPaymentAdaptor() {
-		try {
-			return new AlipayInternationalCreditCardPaymentAdaptor(
-					initConfig(PAY_TYPE_ALIPAY_CREDIT_INT));
-		} catch (PaymentAdaptorInitialFailureException e) {
-			logger.error("initAlipayInternationalCreditCardPaymentAdaptor error: "
-					+ e.toString());
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/*
-	 * 初始化银联适配器
-	 */
-	private PaymentAdaptor initUnionPaymentAdaptor() {
-		try {
-			return new UnionPaymentAdaptor(
-					initConfig(PAY_TYPE_UNIONPAY));
-		} catch (PaymentAdaptorInitialFailureException e) {
-			logger.error("initUnionPaymentAdaptor error: "
-					+ e.toString());
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/*
-	 * 初始化汇付天下适配器
-	 */
-//	private PaymentAdaptor initChinaPnRPaymentAdaptor() {
-//		try {
-//			return new ChinaPnRPaymentAdaptor(
-//					initConfig(CHINAPNRDEFAULTALIPAYCONFIG));
-//		} catch (PaymentAdaptorInitialFailureException e) {
-//			logger.error("initChinaPnRPaymentAdaptor error: "
-//					+ e.toString());
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
-	
-	/*
-	 * 初始化Wechat适配器
-	 */
-	private PaymentAdaptor initWechatPaymentAdaptor() {
-		return new WechatPaymentAdaptor();
-	}
+    /**
+     * @deprecated 没有被调用到 <br>
+     *             add javadoc by jinxin (2017年6月1日 上午11:03:07)
+     */
+    @Deprecated
+    private Map<String, PaymentRequest> paymentResultMap;
 
-	public String getPayType(Integer payType) {
-		String type = PaymentFactory.PAY_TYPE_ALIPAY;
-		switch (payType) {
-		case ALIPAY:
-			type = PaymentFactory.PAY_TYPE_ALIPAY;
-			break;
-		case ALIPAY_BANK:
-			type = PaymentFactory.PAY_TYPE_ALIPAY_BANK;
-			break;
-		case ALIPAY_CREDIT:
-			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
-			break;
-		case ALIPAY_CREDIT_INT_V:
-			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
-			break;
-		case ALIPAY_CREDIT_INT_M:
-			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
-			break;
-		case WECHAT:
-			type = PaymentFactory.PAY_TYPE_WECHAT;
-			break;
-		case UNIONPAY:
-			type = PaymentFactory.PAY_TYPE_UNIONPAY;
-			break;
-		}
-		return type;
-	}
+    //--------------------------------------------------------------------------------------------------------------
+
+    public PaymentFactory(){
+        initPaymentConfig();
+        initPaymentAdaptorMap();
+        initPayParamCommandToMapAdaptorMap();
+        initPayParamPaymentResultMap();
+    }
+
+    public static PaymentFactory getInstance(){
+        return inst;
+    }
+
+    //--------------------------------------------------------------------------------------------------------------
+
+    /**
+     * 获得支付适配器
+     * 
+     * @param payMentType
+     * @return
+     */
+    public PaymentAdaptor getPaymentAdaptor(String payMentType){
+        Validate.notBlank(payMentType, "payMentType can't be blank!");
+        return paymentAdaptorMap.get(payMentType);
+
+    }
+
+    /**
+     * 获得转换器
+     * 
+     * @param payMentType
+     * @return
+     */
+    public PayParamConvertorAdaptor getPaymentCommandToMapAdaptor(String payMentType){
+        Validate.notBlank(payMentType, "payMentType can't be blank!");
+        return payParamCommandToMapAdaptorMap.get(payMentType);
+
+    }
+
+    /**
+     * 获得支付结果
+     * 
+     * @param payMentType
+     * @return
+     * @deprecated 没有被调用到 <br>
+     *             add javadoc by jinxin (2017年6月1日 上午11:03:07)
+     */
+    @Deprecated
+    public PaymentRequest getPaymentResult(String payMentType){
+        Validate.notBlank(payMentType, "payMentType can't be blank!");
+        return paymentResultMap.get(payMentType);
+
+    }
+
+    //--------------------------------------------------------------------------------------------------------------
+
+    /**
+     * 初始化转换器
+     */
+    public void initPayParamCommandToMapAdaptorMap(){
+        payParamCommandToMapAdaptorMap = new HashMap<>();
+        payParamCommandToMapAdaptorMap.put(PAY_TYPE_ALIPAY, new PayParamConvertorForAlipayAdaptor());
+        payParamCommandToMapAdaptorMap.put(PAY_TYPE_ALIPAY_BANK, new PayParamConvertorForAlipayAdaptor());
+        payParamCommandToMapAdaptorMap.put(PAY_TYPE_ALIPAY_CREDIT, new PayParamConvertorForAlipayAdaptor());
+        payParamCommandToMapAdaptorMap.put(PAY_TYPE_ALIPAY_CREDIT_INT, new PayParamConvertorForAlipayAdaptor());
+        payParamCommandToMapAdaptorMap.put(PAY_TYPE_UNIONPAY, new PayParamConvertorForUnionPayAdaptor());
+        payParamCommandToMapAdaptorMap.put(PAY_TYPE_WECHAT, new PayParamConvertorForWechatAdaptor());
+    }
+
+    /**
+     * 支付结果列表
+     * 
+     * @deprecated 没有被调用到 <br>
+     *             add javadoc by jinxin (2017年6月1日 上午11:03:07)
+     */
+    @Deprecated
+    public void initPayParamPaymentResultMap(){
+        paymentResultMap = new HashMap<>();
+        paymentResultMap.put(PAY_TYPE_ALIPAY, new AlipayPaymentRequest());
+        paymentResultMap.put(PAY_TYPE_ALIPAY_BANK, new AlipayPaymentRequest());
+        paymentResultMap.put(PAY_TYPE_ALIPAY_CREDIT, new AlipayPaymentRequest());
+        paymentResultMap.put(PAY_TYPE_ALIPAY_CREDIT_INT, new AlipayPaymentRequest());
+        paymentResultMap.put(PAY_TYPE_UNIONPAY, new UnionPaymentRequest());
+        paymentResultMap.put(PAY_TYPE_WECHAT, new WechatPaymentRequest());
+    }
+
+    /*
+     * 初始化配置文件
+     */
+    private void initPaymentConfig(){
+        paymentConfigMap = new HashMap<>();
+        paymentConfigMap.put(PAY_TYPE_ALIPAY, ProfileConfigUtil.getProfilePath(ALIPAYDEFAULTALIPAYCONFIG));
+        paymentConfigMap.put(PAY_TYPE_ALIPAY_BANK, ALIPAYDEFAULTALIPAYCONFIG);
+        paymentConfigMap.put(PAY_TYPE_ALIPAY_CREDIT, ALIPAYDEFAULTALIPAYCONFIG);
+        paymentConfigMap.put(PAY_TYPE_ALIPAY_CREDIT_INT, ALIPAYINTERNATIONALCREDITCARDCONFIG);
+        paymentConfigMap.put(PAY_TYPE_UNIONPAY, UNIONPAYDEFAULTALIPAYCONFIG);
+    }
+
+    //--------------------------------------------------------------------------------------------------------------
+    /*
+     * 初始化配置参数
+     */
+    public Properties initConfig(String payMentType){
+        String configFile = paymentConfigMap.get(payMentType);
+        return ProfileConfigUtil.findCommonPro(configFile);
+    }
+
+    //--------------------------------------------------------------------------------------------------------------
+
+    /*
+     * 初始化适配器Map
+     */
+    private Map<String, PaymentAdaptor> initPaymentAdaptorMap(){
+        paymentAdaptorMap = new HashMap<>();
+        paymentAdaptorMap.put(PAY_TYPE_ALIPAY, initAlipayPaymentAdaptor());
+        paymentAdaptorMap.put(PAY_TYPE_ALIPAY_BANK, initAlipayBankPaymentAdaptor());
+        paymentAdaptorMap.put(PAY_TYPE_ALIPAY_CREDIT, initAlipayCreditCardPaymentAdaptor());
+        paymentAdaptorMap.put(PAY_TYPE_ALIPAY_CREDIT_INT, initAlipayInternationalCreditCardPaymentAdaptor());
+        paymentAdaptorMap.put(PAY_TYPE_UNIONPAY, initUnionPaymentAdaptor());
+        paymentAdaptorMap.put(PAY_TYPE_WECHAT, initWechatPaymentAdaptor());
+        return paymentAdaptorMap;
+    }
+
+    //--------------------------------------------------------------------------------------------------------------
+
+    /*
+     * 初始化Alipay适配器
+     */
+    private PaymentAdaptor initAlipayPaymentAdaptor(){
+        return new AlipayPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
+    }
+
+    /*
+     * 初始化Alipay银行卡适配器
+     */
+    private PaymentAdaptor initAlipayBankPaymentAdaptor(){
+        return new AlipayBankPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
+    }
+
+    /*
+     * 初始化Alipay国内信用卡适配器
+     */
+    private PaymentAdaptor initAlipayCreditCardPaymentAdaptor(){
+        return new AlipayCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
+    }
+
+    /*
+     * 初始化Alipay国外信用卡适配器
+     */
+    private PaymentAdaptor initAlipayInternationalCreditCardPaymentAdaptor(){
+        return new AlipayInternationalCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY_CREDIT_INT));
+    }
+
+    /*
+     * 初始化银联适配器
+     */
+    private PaymentAdaptor initUnionPaymentAdaptor(){
+        //不需要传配置参数, 内部已经实现了
+        return new UnionPaymentAdaptor();
+    }
+
+    /*
+     * 初始化Wechat适配器
+     */
+    private PaymentAdaptor initWechatPaymentAdaptor(){
+        return new WechatPaymentAdaptor();
+    }
+
+    //--------------------------------------------------------------------------------------------------------------
+
+    public String getPayType(Integer payType){
+        String type = PaymentFactory.PAY_TYPE_ALIPAY;
+        switch (payType) {
+            case ALIPAY:
+                type = PaymentFactory.PAY_TYPE_ALIPAY;
+                break;
+            case ALIPAY_BANK:
+                type = PaymentFactory.PAY_TYPE_ALIPAY_BANK;
+                break;
+            case ALIPAY_CREDIT:
+                type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
+                break;
+            case ALIPAY_CREDIT_INT_V:
+                type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
+                break;
+            case ALIPAY_CREDIT_INT_M:
+                type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
+                break;
+            case WECHAT:
+                type = PaymentFactory.PAY_TYPE_WECHAT;
+                break;
+            case UNIONPAY:
+                type = PaymentFactory.PAY_TYPE_UNIONPAY;
+                break;
+        }
+        return type;
+    }
 }

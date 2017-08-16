@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +51,15 @@ import com.baozun.nebula.utils.EmailParamEnciphermentUtil;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.feilong.core.Alphabet;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.Validator;
 import com.feilong.core.util.RandomUtil;
 import com.feilong.core.util.RegexUtil;
+
+import static com.feilong.core.Alphabet.DECIMAL_AND_LETTERS;
+import static com.feilong.core.RegexPattern.EMAIL;
+import static com.feilong.core.RegexPattern.MOBILEPHONE;
+import static com.feilong.core.Validator.isNullOrEmpty;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -63,28 +69,30 @@ import loxia.dao.Sort;
 @Service("membManager")
 public class MemberManagerImpl implements MemberManager{
 
-    private static final Logger   LOGGER      = LoggerFactory.getLogger(MemberManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MemberManagerImpl.class);
 
     @Autowired
-    private SdkMemberManager      sdkMemberManager;
+    private SdkMemberManager sdkMemberManager;
 
     @Autowired
-    private SdkItemManager        sdkItemManager;
+    private SdkItemManager sdkItemManager;
 
     @Autowired
-    private EmailCheckManager     emailCheckManager;
+    private EmailCheckManager emailCheckManager;
 
     @Autowired
     private MemberPersonalDataDao memberPersonalDataDao;
 
     @Autowired
-    private EventPublisher        eventPublisher;
+    private EventPublisher eventPublisher;
 
     @Autowired
-    private MemberDao             memberDao;
+    private MemberDao memberDao;
 
     @Value("#{meta['page.base']}")
-    private String                pageUrlBase = "";
+    private String pageUrlBase = "";
+
+    //---------------------------------------------------------------
 
     @Override
     public MemberPersonalData findMemberPersonData(Long memberId){
@@ -280,14 +288,12 @@ public class MemberManagerImpl implements MemberManager{
             List<RateCommand> reateList = ratePage.getItems();
             for (RateCommand rate : reateList){
                 itemIds.add(rate.getItemId());
-
             }
 
             Map<Long, List<ItemImage>> map = new HashMap<Long, List<ItemImage>>();
             List<ItemImageCommand> itemImageCommandList = sdkItemManager.findItemImagesByItemIds(itemIds, ItemImage.IMG_TYPE_LIST);
             for (ItemImageCommand itemImageCommand : itemImageCommandList){
                 map.put(itemImageCommand.getItemId(), itemImageCommand.getItemIamgeList());
-
             }
 
             for (RateCommand rate : reateList){
@@ -295,56 +301,72 @@ public class MemberManagerImpl implements MemberManager{
             }
             ratePage.setItems(reateList);
         }
-
         return ratePage;
     }
 
     @Override
-    public MemberCommand login(MemberFrontendCommand memberCommand)
-                    throws UserNotExistsException,UserExpiredException,PasswordNotMatchException{
-        MemberCommand member = findMemberCommandByLoginName(memberCommand.getLoginName());
+    public MemberCommand login(MemberFrontendCommand memberFrontendCommand) throws UserNotExistsException,UserExpiredException,PasswordNotMatchException{
+        String loginName = memberFrontendCommand.getLoginName();
 
-        if (member == null){
+        MemberCommand memberCommandDb = findMemberCommandByLoginName(loginName);
+        if (memberCommandDb == null){
             throw new UserNotExistsException();
         }
-      //盐值为空时走原来验证逻辑，验证通过使用新的加密算法生成新的密码，然后保存盐值和新密码 add by ruichao.gao
-    	if(Validator.isNullOrEmpty(member.getSalt())){
-    		 String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
-    	        if (!encodePassword.equals(member.getPassword())){
-    	            throw new PasswordNotMatchException();
-    	        }
-    	        
-    	      //生成新的盐值，用新的加密算法进行加密，
-    			String salt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
-    			String pwd = EncryptUtil.getInstance().hashSalt(memberCommand.getPassword(), salt);
-    			//保存密码和盐值
-    			Member mem = memberDao.findMemberById(member.getId());
-    			mem.setSalt(salt);
-    			mem.setPassword(pwd);
-    			memberDao.save(mem);
-    	}else{
-    		String encodePassword = EncryptUtil.getInstance().hashSalt(memberCommand.getPassword(), member.getSalt());
-    		 if (!encodePassword.equals(member.getPassword())){
- 	            throw new PasswordNotMatchException();
- 	        }
-    	}
-       
+
+        //---------------------------------------------------------------
+
+        //盐值为空时走原来验证逻辑，验证通过使用新的加密算法生成新的密码，然后保存盐值和新密码 add by ruichao.gao
+
+        //传过来的密码
+        String inputPassword = memberFrontendCommand.getPassword();
+        String memberCommandSalt = memberCommandDb.getSalt();
+
+        //---------------------------------------------------------------
+        EncryptUtil encryptUtil = EncryptUtil.getInstance();
+
+        //数据库中的密码
+        String dbPassword = memberCommandDb.getPassword();
+
+        Long memberId = memberCommandDb.getId();
+        if (isNullOrEmpty(memberCommandSalt)){
+            String encodePassword = encryptUtil.hash(inputPassword, memberCommandDb.getLoginName());
+            if (!encodePassword.equals(dbPassword)){
+                throw new PasswordNotMatchException();
+            }
+
+            //---------------------------------------------------------------
+
+            //生成新的盐值，用新的加密算法进行加密，
+            String salt = RandomUtil.createRandomFromString(DECIMAL_AND_LETTERS, 88);
+            String pwd = encryptUtil.hashSalt(inputPassword, salt);
+
+            //---------------------------------------------------------------
+            //保存密码和盐值
+            Member member = memberDao.findMemberById(memberId);
+            member.setSalt(salt);
+            member.setPassword(pwd);
+            memberDao.save(member);
+        }else{
+            String encodePassword = encryptUtil.hashSalt(inputPassword, memberCommandSalt);
+            if (!encodePassword.equals(dbPassword)){
+                throw new PasswordNotMatchException();
+            }
+        }
+
         // 保存用户行为信息
-        saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
-        return member;
+        saveLoginMemberConduct(memberFrontendCommand.getMemberConductCommand(), memberId);
+        return memberCommandDb;
     }
 
     @Override
     public MemberCommand findMemberCommandByLoginName(String loginName){
-        MemberCommand member;
-        if (RegexUtil.matches(RegexPattern.MOBILEPHONE, loginName)){
-            member = sdkMemberManager.findMemberByLoginMobile(loginName);
-        }else if (RegexUtil.matches(RegexPattern.EMAIL, loginName)){
-            member = sdkMemberManager.findMemberByLoginEmail(loginName);
-        }else{
-            member = sdkMemberManager.findMemberByLoginName(loginName);
+        if (RegexUtil.matches(MOBILEPHONE, loginName)){
+            return sdkMemberManager.findMemberByLoginMobile(loginName);
         }
-        return member;
+        if (RegexUtil.matches(EMAIL, loginName)){
+            return sdkMemberManager.findMemberByLoginEmail(loginName);
+        }
+        return sdkMemberManager.findMemberByLoginName(loginName);
     }
 
     @Deprecated
@@ -408,7 +430,7 @@ public class MemberManagerImpl implements MemberManager{
         MemberPersonalData personData = new MemberPersonalData();
         personData = (MemberPersonalData) ConvertUtils.convertTwoObject(personData, memberCommand.getMemberPersonalDataCommand());
         if (null == personData){
-            personData = new MemberPersonalData();   
+            personData = new MemberPersonalData();
         }
         personData.setId(memberId);
 
@@ -421,16 +443,15 @@ public class MemberManagerImpl implements MemberManager{
                 }
             }
         }
-        
+
         if (StringUtils.isNotBlank(memberCommand.getMobile())){
             personData.setMobile(memberCommand.getMobile());
         }
-        
+
         if (StringUtils.isNotBlank(memberCommand.getEmail())){
             personData.setEmail(memberCommand.getEmail());
         }
-        
-        
+
         // loginMobile不为null,则写入persondata
         if (StringUtils.isNotBlank(memberCommand.getLoginMobile())){
             personData.setMobile(memberCommand.getLoginMobile());
@@ -492,7 +513,7 @@ public class MemberManagerImpl implements MemberManager{
     public NebulaReturnResult checkRegisterData(MemberFrontendCommand mfc){
         DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
         defaultReturnResult.setResult(true);
-        
+
         Map<String, String> returnObject = new HashMap<String, String>();
 
         // 验证email
@@ -536,7 +557,7 @@ public class MemberManagerImpl implements MemberManager{
      * java.lang.String)
      */
     @Override
-    public void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp){
+    public void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp,String clientIdentificationMechanisms){
         // 生命周期：未激活状态
         memberFrontendCommand.setLifecycle(Member.LIFECYCLE_UNACTIVE);
         // 来源：自注册
@@ -548,6 +569,9 @@ public class MemberManagerImpl implements MemberManager{
         Date registerTime = new Date();
 
         MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
+        
+        //5.3.2.18增加对客户端识别码设置
+        conductCommand.setClientIdentificationMechanisms(clientIdentificationMechanisms);
 
         memberFrontendCommand.setMemberConductCommand(conductCommand);
 

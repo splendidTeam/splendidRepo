@@ -41,7 +41,7 @@ import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.manager.navigation.NavigationHelperManager;
 import com.baozun.nebula.manager.system.AbstractCacheBuilder;
 import com.baozun.nebula.model.baseinfo.Navigation;
@@ -461,6 +461,10 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 		for (Map.Entry<Long, List<ItemProperties>> entry : itemPropertiesMap.entrySet()) {
 			pvIds = null;
 			Property property = sdkPropertyManager.findPropertyById(entry.getKey());
+			if(Validator.isNullOrEmpty(property)){
+			    LOG.info("can't find property by id,propertyId is :{}",entry.getKey());
+			    continue;
+			}
 			//判断是否为销售属性，即是否为颜色和尺码
 			//之后的面包屑，在精确判断时，是不应该判断尺码和颜色的，因为销售属性是sku纬度的;而面包屑只要item纬度的property
 			if(Validator.isNotNullOrEmpty(property.getIsSaleProp())&&!property.getIsSaleProp()){

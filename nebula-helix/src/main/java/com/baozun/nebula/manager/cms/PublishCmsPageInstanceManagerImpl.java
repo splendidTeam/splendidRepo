@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.command.cms.CmsPageInstanceVersionCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.manager.TimeInterval;
+import com.feilong.core.TimeInterval;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
 import com.baozun.nebula.model.cms.CmsTemplateHtml;

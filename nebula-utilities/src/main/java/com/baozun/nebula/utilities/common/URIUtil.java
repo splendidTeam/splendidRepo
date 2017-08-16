@@ -4,12 +4,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.feilong.core.CharsetType;
+import com.feilong.core.net.ParamUtil;
+import com.feilong.core.util.MapUtil;
+
+import static com.feilong.core.bean.ConvertUtil.toMap;
 
 /**
  * 处理url uri 等
@@ -22,59 +28,26 @@ public final class URIUtil{
     private static final Logger log = LoggerFactory.getLogger(URIUtil.class);
 
     /**
-     * 拼接url(如果charsetType 是null,则原样拼接,如果不是空,则返回安全的url)
+     * 拼接url
      * 
      * @param before
      *            ?前面的部分
      * @param paramMap
      *            参数map value将会被 toString
      * @param charsetType
-     *            编码,如果为空 不name 和value 不进行编码
+     *            编码
      * @return
      */
     public static String getEncodedUrl(Map<String, ?> paramMap,String charsetType){
-        // map 不是空 表示 有参数
-        String before = "";
-        if (Validator.isNotNullOrEmpty(paramMap)){
-            StringBuilder builder = new StringBuilder("");
-            builder.append(paramMap.get("action"));
-            builder.append("?");
-            int i = 0;
-            int size = paramMap.size();
-            for (Map.Entry<String, ?> entry : paramMap.entrySet()){
-                i++;
-                if (!entry.getKey().equals("action")){
-                    String key = entry.getKey();
-                    // 兼容特殊情况
-                    Object value = entry.getValue();
-                    if (null == value){
-                        value = "";
-                        log.warn("the param key:[{}] value is null", key);
-                    }
+        Validate.notEmpty(paramMap, "paramMap can't be null/empty!");
+        Validate.notEmpty(charsetType, "charsetType can't be null/empty!");
 
-                    if (Validator.isNotNullOrEmpty(charsetType)){
-                        // 统统先强制 decode 再 encode
-                        // 浏览器兼容问题
-                        key = encode(decode(key, charsetType), charsetType);
-                        if (!"".equals(value)){
-                            value = encode(decode(value.toString(), charsetType), charsetType);
-                        }
-                    }
+        //---------------------------------------------------------------
 
-                    builder.append(key);
-                    builder.append("=");
-                    builder.append(value);
+        String action = (String) paramMap.get("action");
+        Map<String, String> subMapExcludeKeysa = toMap(MapUtil.getSubMapExcludeKeys(paramMap, "action"), String.class, String.class);
+        return ParamUtil.addParameterSingleValueMap(action, subMapExcludeKeysa, charsetType);
 
-                    // 最后一个& 不拼接
-                    if (i < size){
-                        builder.append("&");
-                    }
-                }
-            }
-
-            return builder.toString();
-        }
-        return before;
     }
 
     /**

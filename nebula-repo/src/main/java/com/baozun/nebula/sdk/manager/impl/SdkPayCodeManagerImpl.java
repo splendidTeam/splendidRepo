@@ -19,8 +19,6 @@ package com.baozun.nebula.sdk.manager.impl;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +28,8 @@ import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
 
 /**
- *
+ * 处理 PayCode 的业务类.
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午4:56:19
  * @since 5.3.1
@@ -51,11 +50,15 @@ public class SdkPayCodeManagerImpl implements SdkPayCodeManager{
     @Override
     public void savaPayCode(String subOrdinate,BigDecimal payMoney){
         PayCode payCode = new PayCode();
+
         payCode.setPayMoney(payMoney);
         payCode.setPayNumerical(payMoney);
+
         payCode.setPaySuccessStatus(false);
         payCode.setSubOrdinate(subOrdinate);
+
         payCode.setCreateTime(new Date());
+
         payCodeDao.save(payCode);
     }
 }

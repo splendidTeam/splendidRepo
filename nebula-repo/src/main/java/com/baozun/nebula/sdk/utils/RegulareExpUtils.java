@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.feilong.core.RegexPattern;
 /**
  * 
  * @deprecated pls use {@link com.feilong.core.RegexUtil} {@link com.feilong.core.RegexPattern} 
@@ -14,7 +15,7 @@ public class RegulareExpUtils {
 
 	public static final String EMAIL_REG = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";
 	
-	public static final String MOBILE_REG="^((13[0-9])|(14[0-9])|(15[0-9])|(18[0-9]))\\d{8}$";
+	public static final String MOBILE_REG=RegexPattern.MOBILEPHONE;
 	/**
 	 * 是手机号码返回true
 	 * 

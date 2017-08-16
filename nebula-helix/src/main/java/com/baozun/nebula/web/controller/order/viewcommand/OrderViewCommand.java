@@ -36,6 +36,8 @@ public class OrderViewCommand extends BaseViewCommand{
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -290693655189583423L;
 
+    //---------------------------------------------------------------
+
     /** 基本信息. */
     private OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand;
 
@@ -56,6 +58,8 @@ public class OrderViewCommand extends BaseViewCommand{
 
     /** 每个订单行. */
     private List<OrderLineSubViewCommand> orderLineSubViewCommandList;
+
+    //---------------------------------------------------------------
 
     /**
      * 获得 基本信息.

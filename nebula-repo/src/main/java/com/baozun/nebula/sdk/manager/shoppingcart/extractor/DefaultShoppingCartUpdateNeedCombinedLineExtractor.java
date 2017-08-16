@@ -21,6 +21,8 @@ import static org.apache.commons.collections4.PredicateUtils.notPredicate;
 import java.util.List;
 
 import org.apache.commons.collections4.PredicateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -37,6 +39,9 @@ import static com.feilong.core.util.predicate.BeanPredicateUtil.equalPredicate;
 @Component("shoppingCartUpdateNeedCombinedLineExtractor")
 public class DefaultShoppingCartUpdateNeedCombinedLineExtractor implements ShoppingCartUpdateNeedCombinedLineExtractor{
 
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingCartUpdateNeedCombinedLineExtractor.class);
+
     /*
      * (non-Javadoc)
      * 
@@ -45,14 +50,29 @@ public class DefaultShoppingCartUpdateNeedCombinedLineExtractor implements Shopp
     @Override
     public ShoppingCartLineCommand extractor(List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingcartUpdateDetermineSameLineElements shoppingcartUpdateDetermineSameLineElements){
         //skuid相同 lineGroup相同  relatedItemId相同
-        return find(shoppingCartLineCommandList, PredicateUtils.<ShoppingCartLineCommand> allPredicate(//
-                        equalPredicate("skuId", shoppingcartUpdateDetermineSameLineElements.getSkuId()),
-                        equalPredicate("lineGroup", shoppingcartUpdateDetermineSameLineElements.getLineGroup()),
-                        equalPredicate("relatedItemId", shoppingcartUpdateDetermineSameLineElements.getRelatedItemId()),
+        Long skuId = shoppingcartUpdateDetermineSameLineElements.getSkuId();
+        Long lineGroup = shoppingcartUpdateDetermineSameLineElements.getLineGroup();
+        Long relatedItemId = shoppingcartUpdateDetermineSameLineElements.getRelatedItemId();
+        Long currentLineId = shoppingcartUpdateDetermineSameLineElements.getCurrentLineId();
+
+        ShoppingCartLineCommand needCombinedLine = find(shoppingCartLineCommandList, PredicateUtils.<ShoppingCartLineCommand> allPredicate(//
+                        equalPredicate("skuId", skuId),
+                        equalPredicate("lineGroup", lineGroup),
+                        equalPredicate("relatedItemId", relatedItemId),
 
                         new BeanPredicate<>("shoppingCartLinePackageInfoCommandList", new ShoppingCartLinePackageInfoPredicate(shoppingcartUpdateDetermineSameLineElements.getPackageInfoElementList())),
 
-                        notPredicate(equalPredicate("id", shoppingcartUpdateDetermineSameLineElements.getCurrentLineId()))// 不是当前行
+                        notPredicate(equalPredicate("id", currentLineId))// 不是当前行
         ));
+
+        //---------------------------------------------------------------
+        // not find
+        if (null == needCombinedLine){
+            LOGGER.debug("can't find needCombinedLine,when skuId:[{}],lineGroup:[{}],relatedItemId:[{}],currentLineId:[{}]", skuId, lineGroup, relatedItemId, currentLineId);
+        }else{
+            LOGGER.debug("find needCombinedLine:[{}],when skuId:[{}],lineGroup:[{}],relatedItemId:[{}],currentLineId:[{}]", needCombinedLine.getId(), skuId, lineGroup, relatedItemId, currentLineId);
+        }
+
+        return needCombinedLine;
     }
 }

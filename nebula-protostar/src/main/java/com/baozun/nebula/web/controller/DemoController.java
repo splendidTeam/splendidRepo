@@ -255,12 +255,6 @@ public class DemoController  {
 		//cacheManager.pushToListHead("pushList","t3");
 		System.out.println("pop:"+cacheManager.popListHead("pushList"));
 		
-		List<String> strList=cacheManager.findLists("pushList", 0, Long.MAX_VALUE);
-		
-		for(String str:strList){
-			System.out.println(str);
-		}
-		//System.out.println(user.getEmail());
 		
 		 return "success";
 	} 

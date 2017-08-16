@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.factory;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.controller.shoppingcart.form.BundleImmediatelyBuyForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
@@ -23,7 +25,7 @@ import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
 public class BundleImmediatelyBuyAdaptor extends OneShoppingCartLineCommandImmediatelyBuyAdaptor{
 
     @Override
-    protected ShoppingCartLineCommand buildShoppingCartLineCommand(ImmediatelyBuyForm immediatelyBuyForm){
+    protected ShoppingCartLineCommand buildShoppingCartLineCommand(ImmediatelyBuyForm immediatelyBuyForm , HttpServletRequest request){
         BundleImmediatelyBuyForm immediatelyBuyBundleForm = (BundleImmediatelyBuyForm) immediatelyBuyForm;
 
         Long relatedItemId = immediatelyBuyBundleForm.getRelatedItemId();

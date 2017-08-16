@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:loxia="http://loxia.benjamin.cn/schema/core"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p" xmlns:loxia="http://loxia.benjamin.cn/schema/core"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
@@ -12,56 +9,51 @@
 		http://loxia.benjamin.cn/schema/core http://loxia.benjamin.cn/schema/core/loxia-spring-ext.xsd
 		">
 
-	<loxia:dao-config base-package="com.baozun.**.dao" />
-	<bean id="sessionFactory"
-		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<property name="hibernateProperties">
-			<util:properties location="classpath:config/hibernate.properties"></util:properties>
-		</property>
-		<property name="packagesToScan" value="com.baozun.**.model" />
-		<property name="mappingLocations">
-			<list>
-				<value>classpath*:META-INF/*hql-*.xml</value>
-			</list>
-		</property>
-	</bean>
+    <loxia:dao-config base-package="com.baozun.**.dao" />
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="hibernateProperties">
+            <util:properties location="classpath:config/hibernate.properties"></util:properties>
+        </property>
+        <property name="packagesToScan" value="com.baozun.**.model" />
+        <property name="mappingLocations">
+            <list>
+                <value>classpath*:META-INF/*hql-*.xml</value>
+            </list>
+        </property>
+    </bean>
 
-	<!--dataSource -->
-	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-		 p:driverClass="#{meta['dataSource.driverClassName']}">
-		<property name="jdbcUrl">
-			<value><![CDATA[#{meta['dataSource.url']}]]></value>
-		</property>
-		<property name="user" value="#{meta['dataSource.username']}"></property>
-		<property name="password">
-			<value><![CDATA[#{meta['dataSource.password']}]]></value>
-		</property>
-		<property name="minPoolSize" value="#{meta['dataSource.minPoolSize']}" />
-		<property name="maxPoolSize" value="#{meta['dataSource.maxPoolSize']}" />
-		<property name="initialPoolSize"
-			value="#{meta['dataSource.initialPoolSize']}" />
+    <!--dataSource -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" p:driverClass="#{meta['dataSource.driverClassName']}">
+        <property name="jdbcUrl">
+            <value><![CDATA[#{meta['dataSource.url']}]]></value>
+        </property>
+        <property name="user" value="#{meta['dataSource.username']}"></property>
+        <property name="password">
+            <value><![CDATA[#{meta['dataSource.password']}]]></value>
+        </property>
+        <property name="minPoolSize" value="#{meta['dataSource.minPoolSize']}" />
+        <property name="maxPoolSize" value="#{meta['dataSource.maxPoolSize']}" />
+        <property name="initialPoolSize" value="#{meta['dataSource.initialPoolSize']}" />
 
-		<property name="maxIdleTime" value="#{meta['dataSource.maxIdleTime']}" />
+        <property name="maxIdleTime" value="#{meta['dataSource.maxIdleTime']}" />
 
-		<!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
-		<property name="acquireIncrement"
-			value="#{meta['dataSource.acquireIncrement']}" />
-		<property name="idleConnectionTestPeriod"
-			value="#{meta['dataSource.idleConnectionTestPeriod']}" />
-		<property name="preferredTestQuery">
-			<value><![CDATA[#{meta['dataSource.preferredTestQuery']}]]></value>
-		</property>
-	</bean>
+        <!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
+        <property name="acquireIncrement" value="#{meta['dataSource.acquireIncrement']}" />
+        <property name="idleConnectionTestPeriod" value="#{meta['dataSource.idleConnectionTestPeriod']}" />
+        <property name="preferredTestQuery">
+            <value><![CDATA[#{meta['dataSource.preferredTestQuery']}]]></value>
+        </property>
+    </bean>
 
-	<bean id="pageQueryProvider" class="loxia.dao.support.PostgreSqlPageQueryProvider" />
+    <bean id="pageQueryProvider" class="loxia.dao.support.PostgreSqlPageQueryProvider" />
 
-	<bean class="loxia.dao.support.XmlDynamicNamedQueryProvider">
-		<property name="configFileList">
-			<list>
-				<value>classpath*:spring/**/bs-sql-*.xml</value>
-				<value>classpath*:spring/**/shop-sql-*.xml</value>
-			</list>
-		</property>
-	</bean>
+    <bean class="loxia.dao.support.XmlDynamicNamedQueryProvider">
+        <property name="configFileList">
+            <list>
+                <value>classpath*:spring/**/bs-sql-*.xml</value>
+                <value>classpath*:spring/**/shop-sql-*.xml</value>
+            </list>
+        </property>
+    </bean>
 </beans>

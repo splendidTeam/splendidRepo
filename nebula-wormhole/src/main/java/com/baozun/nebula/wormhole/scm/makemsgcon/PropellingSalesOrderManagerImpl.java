@@ -78,6 +78,9 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 
         salesOrderV5.setInvoiceTitle(salesOrderCommand.getReceiptTitle());
         salesOrderV5.setInvoiceContent(salesOrderCommand.getReceiptContent());
+        //纳税人识别码和发票类型
+        salesOrderV5.setBusinessType(salesOrderCommand.getReceiptType());
+        salesOrderV5.setTaxPayerId(salesOrderCommand.getTaxPayerId());
 
         //商品总金额该金额为整单最终实际货款.(不包含运费且未扣减虚拟货币[实际支付金额])不含运费的客户端显示最终金额
         salesOrderV5.setTotalActual(salesOrderCommand.getTotal());
@@ -118,6 +121,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 
         return propellingCommonManager.saveMsgBody(ConvertUtil.toList(salesOrderV5), msgSendRecord.getId());
     }
+
 
     private static BigDecimal getPayDiscount(SalesOrderCommand salesOrderCommand){
         //不是支付宝和货到付款的金额总和

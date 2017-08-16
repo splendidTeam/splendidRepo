@@ -145,7 +145,16 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                 salesOrderCommand.setReceiptConsignee(invoiceInfoSubForm.getConsignee());
                 salesOrderCommand.setReceiptAddress(invoiceInfoSubForm.getAddress());
                 salesOrderCommand.setReceiptTelphone(invoiceInfoSubForm.getTelphone());
+                //5.3.2.18 增加对taxPayerId ：纳税人识别码的转换
                 salesOrderCommand.setTaxPayerId(invoiceInfoSubForm.getTaxPayerId());
+                //5.3.2.18 增加对companyAddress ：公司地址的转换
+                salesOrderCommand.setCompanyAddress(invoiceInfoSubForm.getCompanyAddress());
+                //5.3.2.18 增加对companyPhone ：公司电话的转换
+                salesOrderCommand.setCompanyPhone(invoiceInfoSubForm.getCompanyPhone());
+                //5.3.2.18 增加对accountBankName ：开户银行名称的转换
+                salesOrderCommand.setAccountBankName(invoiceInfoSubForm.getAccountBankName());
+                //5.3.2.18 增加对accountBankNumber ：开户银行账号的转换
+                salesOrderCommand.setAccountBankNumber(invoiceInfoSubForm.getAccountBankNumber());
             }
         }
     }
@@ -187,6 +196,8 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         salesOrderCommand.setMemberName(isGuest ? EMPTY : defaultIfNullOrEmpty(memberDetails.getLoginEmail(), memberDetails.getLoginMobile()));
         salesOrderCommand.setBuyerName(shippingInfoSubForm.getBuyerName());
         salesOrderCommand.setBuyerTel(shippingInfoSubForm.getBuyerTel());
+        //5.3.2.18增加对客户端识别码属性设置
+        salesOrderCommand.setClientIdentificationMechanisms((String)request.getAttribute(SalesOrderCommand.CLIENT_IDENTIFICATION_MECHANISMS));
     }
 
     /**

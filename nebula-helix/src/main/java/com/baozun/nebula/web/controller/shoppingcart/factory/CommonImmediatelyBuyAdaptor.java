@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.factory;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.controller.shoppingcart.form.CommonImmediatelyBuyForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
@@ -29,13 +31,14 @@ import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
 public class CommonImmediatelyBuyAdaptor extends OneShoppingCartLineCommandImmediatelyBuyAdaptor{
 
     @Override
-    protected ShoppingCartLineCommand buildShoppingCartLineCommand(ImmediatelyBuyForm immediatelyBuyForm){
+    protected ShoppingCartLineCommand buildShoppingCartLineCommand(ImmediatelyBuyForm immediatelyBuyForm,HttpServletRequest request){
         CommonImmediatelyBuyForm commonImmediatelyBuyForm = (CommonImmediatelyBuyForm) immediatelyBuyForm;
         ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
 
         shoppingCartLineCommand.setSkuId(commonImmediatelyBuyForm.getSkuId());
         shoppingCartLineCommand.setQuantity(commonImmediatelyBuyForm.getCount());
-
+        //购物车行中放入misc字段的值  @since 5.3.2.18
+        shoppingCartLineCommand.setMisc((String) request.getAttribute(ImmediatelyBuyShoppingCartLineCommandListFactory.REQUEST_ATTRIBUTE_MISC));
         //选中
         shoppingCartLineCommand.setSettlementState(1);
         return shoppingCartLineCommand;

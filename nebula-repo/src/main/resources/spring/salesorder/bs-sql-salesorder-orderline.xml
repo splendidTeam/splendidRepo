@@ -25,7 +25,8 @@
 					so.TYPE,
 					so.GROUP_ID as groupId,
 					so.EVALUATION_STATUS as evaluationStatus,
-					so.SNAPSHOT
+					so.SNAPSHOT,
+					so.MISC as misc
 					from 
 					t_so_orderline as so 
 					where 
@@ -57,6 +58,7 @@
 					so.GROUP_ID as groupId,
 					so.EVALUATION_STATUS as evaluationStatus,
 					so.SNAPSHOT,
+					so.MISC as misc,
 					tpi.code as productCode
 					
 					from t_so_orderline as so 
@@ -94,7 +96,8 @@
 					so.TYPE,
 					so.GROUP_ID as groupId,
 					so.EVALUATION_STATUS as evaluationStatus,
-					so.SNAPSHOT
+					so.SNAPSHOT,
+					so.MISC as misc
 					from t_so_orderline as so
 					where
 					 	so.ID in(  
@@ -160,6 +163,7 @@
 					so.GROUP_ID as groupId,
 					so.EVALUATION_STATUS as evaluationStatus,
 					so.SNAPSHOT,
+					so.MISC as misc,
 					item.code as productCode
 					from 
 					t_so_orderline as so 
@@ -214,7 +218,8 @@
 					so.TYPE,
 					so.GROUP_ID as groupId,
 					so.EVALUATION_STATUS as evaluationStatus,
-					so.SNAPSHOT
+					so.SNAPSHOT,
+					so.MISC as misc
 					from 
 					t_so_orderline as so 
                  ]]>

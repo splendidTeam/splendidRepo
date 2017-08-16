@@ -52,7 +52,7 @@ public class DefaultShoppingcartUpdateDetermineSameLineElementsBuilder implement
         shoppingcartUpdateDetermineSameLineElements.setLineGroup(currentShoppingCartLineCommand.getLineGroup());
         shoppingcartUpdateDetermineSameLineElements.setPackageInfoElementList(collect(shoppingCartLineUpdateSkuForm.getPackageInfoFormList(), PackageInfoElement.class, "type", "featureInfo"));
         shoppingcartUpdateDetermineSameLineElements.setRelatedItemId(currentShoppingCartLineCommand.getRelatedItemId());
-        shoppingcartUpdateDetermineSameLineElements.setSkuId(defaultIfNull(currentShoppingCartLineCommand.getSkuId(), currentShoppingCartLineCommand.getSkuId()));
+        shoppingcartUpdateDetermineSameLineElements.setSkuId(defaultIfNull(shoppingCartLineUpdateSkuForm.getNewSkuId(), currentShoppingCartLineCommand.getSkuId()));
         return shoppingcartUpdateDetermineSameLineElements;
     }
 

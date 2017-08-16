@@ -124,6 +124,15 @@ abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
     private List<OrderLinePackageInfoViewCommand> orderLinePackageInfoViewCommandList;
 
     //-------------------------------------------
+    
+  //***************************************************************************************************
+
+    /** 杂项 可以存放商品信息. 
+     * @since 5.3.2.18
+     * */
+    private String misc;
+
+    //**********************************************************************************************
 
     /**
      * 获得 orderline行的唯一标识,那么此处的id={@link OrderLine#id}.
@@ -450,5 +459,23 @@ abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
      */
     public void setGroupId(Integer groupId){
         this.groupId = groupId;
+    }
+    
+    /**
+     * 获取 杂项信息
+     * @return String
+     * @since 5.3.2.18
+     */
+    public String getMisc(){
+        return misc;
+    }
+
+    /**
+     * 设置 杂项信息
+     * @param String
+     * @since 5.3.2.18
+     */
+    public void setMisc(String misc){
+        this.misc = misc;
     }
 }

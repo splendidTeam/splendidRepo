@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +29,7 @@ import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
  * 
  */
 public class ExtendedLocaleChangeInterceptor extends LocaleChangeInterceptor {
-
+    
 	private String paramName = DEFAULT_PARAM_NAME;
 	
 	/**
@@ -47,14 +48,21 @@ public class ExtendedLocaleChangeInterceptor extends LocaleChangeInterceptor {
 	@Autowired
 	private ChooseOptionManager chooseOptionManager;
 	
+	private AtomicBoolean initialized = new AtomicBoolean(false);
+	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-		//初始化langs
-		initLangs();
-		
-		//初始化langAlias
-		initLangAlias();
+	    /**
+	     * 只初始化一次，无论langs和langAlias是否有值
+	     */
+	    if(!initialized.get()) {
+    		//初始化langs
+    		initLangs();
+    		//初始化langAlias
+    		initLangAlias();
+    		initialized.set(true);
+	    }
 		
 		String newLocale = null;
 		try {

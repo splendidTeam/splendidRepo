@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.OnLinePaymentCancelCommand;
 import com.baozun.nebula.command.OnLinePaymentCommand;
 import com.baozun.nebula.model.BaseModel;
@@ -36,6 +37,9 @@ public class SalesOrderCommand extends BaseModel{
 
     /** The Constant serialVersionUID. */
     private static final long           serialVersionUID = 4539781027280506601L;
+    
+    //5.3.2.18 客户端识别码规定绑定名称
+    public static final String CLIENT_IDENTIFICATION_MECHANISMS = SalesOrderCommand.class.getName()+"clientIdentificationMechanisms";
 
     /** PK. */
     private Long                        id;
@@ -179,6 +183,13 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 下单ip. */
     private String                      ip;
+    
+    /** 
+     * 客户端识别码.
+     * 类似用户ip地址
+     * @since 5.3.2.18
+     *  */
+    private String             clientIdentificationMechanisms ;
 
     /** 应付运费. */
     private BigDecimal                  payableFreight;
@@ -215,6 +226,31 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 发票内容. */
     private String                      receiptContent;
+    
+    /** 纳税人识别码 . 
+     * @since 5.3.2.18
+     * */
+    private String                      taxPayerId;
+    
+    /** 公司地址.
+     * @since 5.3.2.18
+     *  */
+    private String                      companyAddress;
+    
+    /** 公司电话.
+     * @since 5.3.2.18
+     *  */
+    private String                      companyPhone;
+    
+    /** 开户银行名称.
+     * @since 5.3.2.18
+     *  */
+    private String                      accountBankName;
+    
+    /** 开户银行账号. 
+     * @since 5.3.2.18
+     * */
+    private String                      accountBankNumber;
 
     /** 备注. */
     private String                      remark;
@@ -280,11 +316,6 @@ public class SalesOrderCommand extends BaseModel{
     /** 多语言. */
     private String                      lang;
     
-    /**
-     * 纳税人识别码 .
-     * 纳税人识别码是税务登记证上的号，每个企业的识别号都是唯一的
-     * */
-    private String 						taxPayerId;
 
     /**
      * 获得 物流方式 *.
@@ -840,6 +871,24 @@ public class SalesOrderCommand extends BaseModel{
     public void setIp(String ip){
         this.ip = ip;
     }
+    
+    /**
+     * 获得 客户端识别码
+     * @return clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public String getClientIdentificationMechanisms(){
+        return clientIdentificationMechanisms;
+    }
+
+    /**
+     * 设置 客户端识别码
+     * @param clientIdentificationMechanisms
+     * @since 5.3.2.18
+     */
+    public void setClientIdentificationMechanisms(String clientIdentificationMechanisms){
+        this.clientIdentificationMechanisms = clientIdentificationMechanisms;
+    }
 
     /**
      * 获得 应付运费.
@@ -953,6 +1002,101 @@ public class SalesOrderCommand extends BaseModel{
      */
     public void setReceiptContent(String receiptContent){
         this.receiptContent = receiptContent;
+    }
+    
+    /**
+     * 获得 纳税人识别码
+     * @return the 获取纳税人识别码
+     * @since 5.3.2.18
+     */
+    public String getTaxPayerId(){
+        return taxPayerId;
+    }
+
+    /**
+     * 设置 纳税人识别码
+     * @param taxPayerId
+     *              the new 纳税人识别码
+     * @since 5.3.2.18
+     */
+    public void setTaxPayerId(String taxPayerId){
+        this.taxPayerId = taxPayerId;
+    }
+    
+    /**
+     * 获得 公司地址
+     * @return the 公司地址
+     * @since 5.3.2.18
+     */
+    public String getCompanyAddress(){
+        return companyAddress;
+    }
+
+    /**
+     * 设置 公司地址
+     * @param companyAddress
+     *              the new 公司地址
+     * @since 5.3.2.18
+     */
+    public void setCompanyAddress(String companyAddress){
+        this.companyAddress = companyAddress;
+    }
+
+    /**
+     * 获得 公司电话
+     * @return the 公司电话
+     * @since 5.3.2.18
+     */
+    public String getCompanyPhone(){
+        return companyPhone;
+    }
+
+    /**
+     * 设置 公司电话
+     * @param companyPhone
+     *              the new 公司电话
+     * @since 5.3.2.18
+     */
+    public void setCompanyPhone(String companyPhone){
+        this.companyPhone = companyPhone;
+    }
+
+    /**
+     * 获得 开户银行名称
+     * @return the 开户银行名称
+     * @since 5.3.2.18
+     */
+    public String getAccountBankName(){
+        return accountBankName;
+    }
+
+    /**
+     * 设置 开户银行名称
+     * @param accountBankName
+     *              the new 开户银行名称
+     * @since 5.3.2.18
+     */
+    public void setAccountBankName(String accountBankName){
+        this.accountBankName = accountBankName;
+    }
+
+    /**
+     * 获得 开户银行账号
+     * @return the 开户银行账号
+     * @since 5.3.2.18
+     */
+    public String getAccountBankNumber(){
+        return accountBankNumber;
+    }
+
+    /**
+     * 设置 开户银行账号
+     * @param accountBankNumber
+     *              the new 开户银行账号
+     * @since 5.3.2.18
+     */
+    public void setAccountBankNumber(String accountBankNumber){
+        this.accountBankNumber = accountBankNumber;
     }
 
     /**
@@ -1705,15 +1849,5 @@ public class SalesOrderCommand extends BaseModel{
     public void setContactId(Long contactId){
         this.contactId = contactId;
     }
-
-	
-	public String getTaxPayerId(){
-		return taxPayerId;
-	}
-	
-	
-	public void setTaxPayerId(String taxPayerId){
-		this.taxPayerId = taxPayerId;
-	}
 
 }

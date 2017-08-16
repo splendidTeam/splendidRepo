@@ -98,7 +98,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
         //            return toNebulaReturnResult(shoppingcartResult);
         //        }
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(bundleImmediatelyBuyForm);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(bundleImmediatelyBuyForm,request);
         String key = saveToAccessor(shoppingCartLineCommandList, request);
 
         String checkoutUrl = getImmediatelyBuyCheckoutUrl(key, request);

@@ -1,61 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:encryption="http://www.jasypt.org/schema/encryption"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:encryption="http://www.jasypt.org/schema/encryption"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.jasypt.org/schema/encryption http://www.baozun.com/schema/encryption/jasypt-spring31-encryption-1.xsd">
 
-	<aop:aspectj-autoproxy />
-	<context:annotation-config />
+    <aop:aspectj-autoproxy />
+    <context:annotation-config />
 
-	<import resource="spring/spring-dao.xml" />
-	<import resource="spring/spring-manager.xml" />
-	<import resource="spring/spring-message.xml" />
-	<import resource="spring/spring-mail.xml" />
-	<import resource="spring/spring-schedu.xml" />
-	<import resource="spring/spring-solr.xml" />
-	<import resource="spring/spring-redis.xml" />
-	<import resource="spring/spring-curator-zk.xml" />
-	<import resource="spring/spring-activeMq.xml" />
+    <import resource="spring/spring-dao.xml" />
+    <import resource="spring/spring-manager.xml" />
+    <import resource="spring/spring-message.xml" />
+    <import resource="spring/spring-mail.xml" />
+    <import resource="spring/spring-schedu.xml" />
+    <import resource="spring/spring-solr.xml" />
+    <import resource="spring/spring-redis.xml" />
+    <import resource="spring/spring-curator-zk.xml" />
+    <import resource="spring/spring-activeMq.xml" />
 
-	<bean
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location">
-			<value>classpath:config/metainfo.properties</value>
-		</property>
-	</bean>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>classpath:config/metainfo.properties</value>
+        </property>
+    </bean>
 
-	<!-- 配置文件加密工具 start -->
-	<bean id="environmentVariablesConfiguration"
-		class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
-		<property name="algorithm" value="PBEWITHSHA256AND256BITAES-CBC-BC" />
-		<property name="passwordEnvName" value="${passwordEnvName}" />
-	</bean>
-	
-	<bean id="bouncyCastleProvider" class="org.bouncycastle.jce.provider.BouncyCastleProvider" />
+    <!-- 配置文件加密工具 start -->
+    <bean id="environmentVariablesConfiguration" class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+        <property name="algorithm" value="PBEWITHSHA256AND256BITAES-CBC-BC" />
+        <property name="passwordEnvName" value="${passwordEnvName}" />
+    </bean>
 
-	<bean id="configurationEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
-		<property name="provider" ref="bouncyCastleProvider" />
-		<property name="config" ref="environmentVariablesConfiguration" />
-	</bean>
-	<bean class="com.baozun.nebula.utilities.common.ProfileConfigUtil">
-		<property name="stringEncryptor" ref="configurationEncryptor" />
-	</bean>
-	<!-- 配置文件加密工具 end -->
+    <bean id="bouncyCastleProvider" class="org.bouncycastle.jce.provider.BouncyCastleProvider" />
 
-	<encryption:encryptable-properties
-		id="meta" encryptor="configurationEncryptor" location="classpath:config/metainfo.properties" />
-	<encryption:encryptable-properties
-		id="solr" encryptor="configurationEncryptor" location="classpath:config/solr.properties" />
-	<encryption:encryptable-properties
-		id="redis" encryptor="configurationEncryptor" location="classpath:config/redis.properties" />
-	<encryption:encryptable-properties
-		id="mq" encryptor="configurationEncryptor" location="classpath:config/MQ.properties" />
-		
+    <bean id="configurationEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+        <property name="provider" ref="bouncyCastleProvider" />
+        <property name="config" ref="environmentVariablesConfiguration" />
+    </bean>
+    <bean class="com.baozun.nebula.utilities.common.ProfileConfigUtil">
+        <property name="stringEncryptor" ref="configurationEncryptor" />
+    </bean>
+    <!-- 配置文件加密工具 end -->
+
+    <encryption:encryptable-properties id="meta" encryptor="configurationEncryptor" location="classpath:config/metainfo.properties" />
+    <encryption:encryptable-properties id="solr" encryptor="configurationEncryptor" location="classpath:config/solr.properties" />
+    <encryption:encryptable-properties id="redis" encryptor="configurationEncryptor" location="classpath:config/redis.properties" />
+    <encryption:encryptable-properties id="mq" encryptor="configurationEncryptor" location="classpath:config/MQ.properties" />
 </beans>

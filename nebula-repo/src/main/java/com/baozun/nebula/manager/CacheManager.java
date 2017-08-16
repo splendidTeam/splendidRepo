@@ -381,6 +381,11 @@ public interface CacheManager{
 	 */
 	public int removeByPrefix(String key);
 	
-	
+	/**
+     * 获取全部缓存项
+     * 
+     * @since 5.3.2.18 remove RowMapper rowMapper, param
+     */
+    List<CacheItemCommand> findAllCacheItem(Map<String, Object> paraMap);
 	
 }

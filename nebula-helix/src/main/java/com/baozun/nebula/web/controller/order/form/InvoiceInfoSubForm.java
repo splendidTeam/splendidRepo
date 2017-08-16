@@ -18,6 +18,7 @@ package com.baozun.nebula.web.controller.order.form;
 
 import java.io.Serializable;
 
+
 /**
  * 发票信息.
  * 
@@ -37,7 +38,7 @@ public class InvoiceInfoSubForm implements Serializable {
 	/** 是否需要发票. */
 	private boolean isNeedInvoice;
 
-	/****** 1:个人 2:公司 ****/
+	/****** 1:个人 2:公司   3:增值税发票****/
 	private Integer invoiceType;
 
 	/** 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司. */
@@ -174,56 +175,100 @@ public class InvoiceInfoSubForm implements Serializable {
 	public void setNeedInvoice(boolean isNeedInvoice) {
 		this.isNeedInvoice = isNeedInvoice;
 	}
-
 	
-	public String getTaxPayerId(){
-		return taxPayerId;
-	}
+	/**
+     * 获得 纳税人识别码
+     * @return the 获取纳税人识别码
+     * @since 5.3.2.18
+     */
+    public String getTaxPayerId(){
+        return taxPayerId;
+    }
 
-	
-	public void setTaxPayerId(String taxPayerId){
-		this.taxPayerId = taxPayerId;
-	}
+    /**
+     * 设置 纳税人识别码
+     * @param taxPayerId
+     *              the new 纳税人识别码
+     * @since 5.3.2.18
+     */
+    public void setTaxPayerId(String taxPayerId){
+        this.taxPayerId = taxPayerId;
+    }
+    
+    /**
+     * 获得 公司地址
+     * @return the 公司地址
+     * @since 5.3.2.18
+     */
+    public String getCompanyAddress(){
+        return companyAddress;
+    }
 
-	
-	public String getCompanyAddress(){
-		return companyAddress;
-	}
+    /**
+     * 设置 公司地址
+     * @param companyAddress
+     *              the new 公司地址
+     * @since 5.3.2.18
+     */
+    public void setCompanyAddress(String companyAddress){
+        this.companyAddress = companyAddress;
+    }
 
-	
-	public void setCompanyAddress(String companyAddress){
-		this.companyAddress = companyAddress;
-	}
+    /**
+     * 获得 公司电话
+     * @return the 公司电话
+     * @since 5.3.2.18
+     */
+    public String getCompanyPhone(){
+        return companyPhone;
+    }
 
-	
-	public String getCompanyPhone(){
-		return companyPhone;
-	}
+    /**
+     * 设置 公司电话
+     * @param companyPhone
+     *              the new 公司电话
+     * @since 5.3.2.18
+     */
+    public void setCompanyPhone(String companyPhone){
+        this.companyPhone = companyPhone;
+    }
 
-	
-	public void setCompanyPhone(String companyPhone){
-		this.companyPhone = companyPhone;
-	}
+    /**
+     * 获得 开户银行名称
+     * @return the 开户银行名称
+     * @since 5.3.2.18
+     */
+    public String getAccountBankName(){
+        return accountBankName;
+    }
 
-	
-	public String getAccountBankName(){
-		return accountBankName;
-	}
+    /**
+     * 设置 开户银行名称
+     * @param accountBankName
+     *              the new 开户银行名称
+     * @since 5.3.2.18
+     */
+    public void setAccountBankName(String accountBankName){
+        this.accountBankName = accountBankName;
+    }
 
-	
-	public void setAccountBankName(String accountBankName){
-		this.accountBankName = accountBankName;
-	}
+    /**
+     * 获得 开户银行账号
+     * @return the 开户银行账号
+     * @since 5.3.2.18
+     */
+    public String getAccountBankNumber(){
+        return accountBankNumber;
+    }
 
-	
-	public String getAccountBankNumber(){
-		return accountBankNumber;
-	}
-
-	
-	public void setAccountBankNumber(String accountBankNumber){
-		this.accountBankNumber = accountBankNumber;
-	}
-
+    /**
+     * 设置 开户银行账号
+     * @param accountBankNumber
+     *              the new 开户银行账号
+     * @since 5.3.2.18
+     */
+    public void setAccountBankNumber(String accountBankNumber){
+        this.accountBankNumber = accountBankNumber;
+    }
 	
 }

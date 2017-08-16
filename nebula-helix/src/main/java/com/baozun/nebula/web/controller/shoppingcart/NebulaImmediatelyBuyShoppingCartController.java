@@ -111,7 +111,7 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
             return toNebulaReturnResult(shoppingcartResult);
         }
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(commonImmediatelyBuyForm);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(commonImmediatelyBuyForm,request);
         String key = saveToAccessor(shoppingCartLineCommandList, request);
 
         // 跳转到订单确认页面的地址
