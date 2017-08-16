@@ -31,6 +31,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
 import com.baozun.nebula.sdk.command.SkuProperty;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineQuantityExtractor;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
@@ -46,7 +47,7 @@ import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewC
  * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager#findShoppingCartLinesByMemberId(Long, Integer)
  * @since 5.3.1
  */
-public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
+public class ShoppingCartLineSubViewCommand extends BaseViewCommand implements ShoppingCartLineQuantityExtractor{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -6308223304441399376L;
@@ -330,6 +331,7 @@ public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
      *
      * @return the quantity
      */
+    @Override
     public Integer getQuantity(){
         return quantity;
     }

@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,9 +39,13 @@ import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewC
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.handler.UncheckedInvalidStateShoppingCartLineHandler;
+import com.baozun.nebula.web.controller.shoppingcart.handler.UpdateShoppingCartCountCookieHandler;
+import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLineSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
+import com.google.common.collect.Iterables;
 
 /**
  * 购物车控制器.
@@ -133,6 +138,14 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
     @Autowired
     private UncheckedInvalidStateShoppingCartLineHandler uncheckedInvalidStateShoppingCartLineHandler;
 
+    /**
+     * 更新保存购物车商品数量的Cookie
+     * 
+     * @since 5.3.2.23
+     */
+    @Autowired
+    private UpdateShoppingCartCountCookieHandler updateShoppingCartCountCookieHandler;
+
     //**********************************showShoppingCart************************************************
 
     /**
@@ -149,12 +162,16 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      * @RequestMapping(value = "/shoppingcart", method = RequestMethod.GET)
      */
     public String showShoppingCart(@LoginMember MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,Model model){
+
         ShoppingCartViewCommand shoppingCartViewCommand = buildShoppingCartViewCommand(memberDetails, request);
 
         //将状态不对的 选中状态的订单行 变成不选中. 
         uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand, request, response);
+        //更新cookie里保存的购物车中商品总数量
+        updateShoppingCartCountCookieHandler.update(shoppingCartViewCommand, request, response);
 
         model.addAttribute("shoppingCartViewCommand", shoppingCartViewCommand);
+
         return "shoppingcart.shoppingcart";
     }
 

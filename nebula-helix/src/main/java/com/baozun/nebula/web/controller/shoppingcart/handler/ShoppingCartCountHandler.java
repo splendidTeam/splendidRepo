@@ -16,9 +16,7 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.handler;
 
-import java.util.List;
-
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineQuantityExtractor;
 
 /**
  * 专门来处理购物车数量的.
@@ -34,9 +32,10 @@ public interface ShoppingCartCountHandler{
 
     /**
      * 构造 count.
+     * @param <T>
      * 
      * @param shoppingCartLineCommandList
      * @return 如果 <code>shoppingCartLineCommandList</code> 是null或者empty,返回 0<br>
      */
-    int buildCount(List<ShoppingCartLineCommand> shoppingCartLineCommandList);
+    <T extends ShoppingCartLineQuantityExtractor> int buildCount(Iterable<T> shoppingCartLineCommandList);
 }

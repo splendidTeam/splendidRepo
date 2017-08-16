@@ -16,12 +16,10 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.persister;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineQuantityExtractor;
 
 /**
  * 购物车数量 持久化.
@@ -34,15 +32,16 @@ public interface ShoppingcartCountPersister{
 
     /**
      * 保存.
-     *
-     * @param shoppingCartLineCommandList
+     * @param <T>
+     * 
+     * @param shoppingCartLineSubViewCommandList
      *            the need change checked command list
      * @param request
      *            the request
      * @param response
      *            the response
      */
-    void save(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response);
+    <T extends ShoppingCartLineQuantityExtractor> void save(Iterable<T> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response);
 
     /**
      * 清空(通常用在用户退出之后调用).

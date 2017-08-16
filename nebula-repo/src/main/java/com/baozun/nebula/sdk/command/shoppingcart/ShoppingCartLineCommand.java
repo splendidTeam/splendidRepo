@@ -44,7 +44,7 @@ import com.baozun.nebula.sdk.command.SkuProperty;
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand
  */
-public class ShoppingCartLineCommand extends BaseModel{
+public class ShoppingCartLineCommand extends BaseModel implements ShoppingCartLineQuantityExtractor{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -5071101827860973497L;
@@ -405,6 +405,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @return the 购物数量
      */
+    @Override
     public Integer getQuantity(){
         return quantity;
     }

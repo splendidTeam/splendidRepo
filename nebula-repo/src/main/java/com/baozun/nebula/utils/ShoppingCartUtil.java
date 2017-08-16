@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.utils;
 
+import static com.feilong.core.Validator.isNullOrEmpty;
 import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.ZERO;
 
@@ -34,14 +35,13 @@ import org.slf4j.LoggerFactory;
 import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineQuantityExtractor;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.lang.ObjectUtil;
 import com.feilong.core.util.AggregateUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPredicateUtil;
-
-import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
  * 购物车工具类.
@@ -152,6 +152,7 @@ public final class ShoppingCartUtil{
 
     /**
      * 统计传入的 <code>shoppingCartLineCommandList</code> ,里面购买的商品数量.
+     * @param <T>
      *
      * @param shoppingCartLineCommandList
      *            the shopping cart lines
@@ -159,7 +160,7 @@ public final class ShoppingCartUtil{
      *         否则累加每个元素的 quantity 属性 之和
      * @see com.feilong.core.util.AggregateUtil#sum(Iterable, String)
      */
-    public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+    public static <T extends ShoppingCartLineQuantityExtractor> int getSumQuantity(Iterable<T> shoppingCartLineCommandList){
         return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : AggregateUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
     }
 
