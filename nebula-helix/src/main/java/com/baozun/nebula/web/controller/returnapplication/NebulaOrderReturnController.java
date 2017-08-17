@@ -2,9 +2,7 @@ package com.baozun.nebula.web.controller.returnapplication;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,8 +21,8 @@ import com.baozun.nebula.command.ReturnLineCommand;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodesFoo;
-import com.baozun.nebula.manager.returnapplication.ReturnApplicationManager;
 import com.baozun.nebula.manager.returnapplication.ReturnApplicationLineManager;
+import com.baozun.nebula.manager.returnapplication.ReturnApplicationManager;
 import com.baozun.nebula.model.returnapplication.ReturnApplication;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
@@ -37,6 +35,7 @@ import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
+import com.baozun.nebula.web.controller.returnapplication.resolver.ReturnApplicationBuilder;
 import com.baozun.nebula.web.controller.returnapplication.resolver.ReturnApplicationResolver;
 import com.baozun.nebula.web.controller.returnapplication.validator.ReturnApplicationCreateValidator;
 import com.baozun.nebula.web.controller.returnapplication.validator.ReturnApplicationPrivilegeValidator;
@@ -119,6 +118,14 @@ public class NebulaOrderReturnController extends BaseController{
     
     @Autowired
     private SdkReturnApplicationLineManager sdkReturnApplicationLineManager;
+    
+    /** 这个需要在spring.xml中配置上对应的 */
+    @Autowired
+    private ReturnApplicationBuilder returnApplicationBuilder;
+    
+    @Autowired
+    private ReturnApplicationBuilder customReturnApplicationBuilder;
+
 
     /**
      * 
@@ -160,16 +167,35 @@ public class NebulaOrderReturnController extends BaseController{
         
         SalesOrderCommand salesOrderCommand = orderManager.findOrderById(returnOrderForm.getOrderId(), null);
 
-        // 如果是换货，需要处理换货物流对象
-        ReturnApplicationCommand returnCommand = returnApplicationResolver.toReturnApplicationCommand(memberDetails, returnOrderForm, salesOrderCommand);
-
-        returnCommand = sdkReturnApplicationManager.createReturnApplication(returnCommand, salesOrderCommand);
-
-        return toNebulaReturnResult(salesOrderCommand,returnCommand,defaultReturnResult);
+        List<ReturnApplicationCommand>  returnApplications = null;
         
+        // 官网如果有自己定义构造器使用官网的构造器
+        if ( Validator.isNotNullOrEmpty(customReturnApplicationBuilder) ) {
+        	returnApplications = customReturnApplicationBuilder.buildReturnApplicationCommands(memberDetails, returnOrderForm, salesOrderCommand);
+        } else {
+        	returnApplications = returnApplicationBuilder.buildReturnApplicationCommands(memberDetails, returnOrderForm, salesOrderCommand);
+        }
         
+        List<ReturnApplicationCommand> returnAppComs = sdkReturnApplicationManager.createReturnApplications(returnApplications, salesOrderCommand);
+
+
+        return backNebulaReturnResult(returnAppComs, defaultReturnResult);
 
     }
+    
+    private NebulaReturnResult backNebulaReturnResult( List<ReturnApplicationCommand> returnAppComs, DefaultReturnResult returnResult ){
+        // TODO by zl.shi js 这里是不是要做相应的修改？
+        returnResult.setReturnObject(returnAppComs);
+        if (Validator.isNullOrEmpty(returnAppComs)){
+            LOGGER.error("[NebulaOrderReturnController] {} [{}] returnOrder save error. \"\"");
+            DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+            defaultResultMessage.setMessage("create.returnApplication.error");
+            returnResult.setResultMessage(defaultResultMessage);
+            returnResult.setResult(false);
+        }
+        return returnResult;
+    }
+    
 
     private NebulaReturnResult toNebulaReturnResult(SalesOrderCommand salesOrderCommand, ReturnApplicationCommand returnCommand , DefaultReturnResult returnResult){
         returnResult.setReturnObject(returnCommand);

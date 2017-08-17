@@ -1,5 +1,6 @@
 package com.baozun.nebula.sdk.manager.returnapplication;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,18 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         return returnCommand;
 
     }
+    
+    
+    @Override
+    public List<ReturnApplicationCommand> createReturnApplications( List<ReturnApplicationCommand>  returnApplications, SalesOrderCommand orderCommand ) {
+        List<ReturnApplicationCommand> returnAppComs = new ArrayList<ReturnApplicationCommand>();
+        for ( ReturnApplicationCommand returnCommand : returnApplications ) {
+        	returnAppComs.add( this.createReturnApplication(returnCommand, orderCommand) );
+        }
+        
+        return returnAppComs;
+    }
+    
 
     /**
      * 退换货申请表 对象保存

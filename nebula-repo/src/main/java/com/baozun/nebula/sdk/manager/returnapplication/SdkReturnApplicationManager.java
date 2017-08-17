@@ -65,5 +65,15 @@ public interface SdkReturnApplicationManager {
 	 * @return
 	 */
 	public List<ReturnApplicationCommand> findReturnApplicationCommandsByIds(List<Long> ids);
+
+	/**
+	 * 创建多个退换货订单
+	 * @param returnApplications
+	 * @param orderCommand
+	 * @return
+	 * @author zl.shi
+	 */
+	List<ReturnApplicationCommand> createReturnApplications(List<ReturnApplicationCommand> returnApplications,
+			SalesOrderCommand orderCommand);
 	
 }
