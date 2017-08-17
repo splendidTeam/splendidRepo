@@ -102,22 +102,27 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
     private Map<String, Integer> buildExtentionCodeAndCountMap(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         Map<String, Integer> extentionCodeAndCountMap = new HashMap<String, Integer>();
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-            //如果直推礼品库存数小于购买量时，扣减现有库存
-            Integer quantity = shoppingCartLineCommand.getQuantity();
-            if (ShoppingCartUtil.isNoNeedChoiceGift(shoppingCartLineCommand)){//是否是不需要用户选择的礼品.
-                //下架
-                if (!shoppingCartLineCommand.isValid() && shoppingCartLineCommand.getValidType() == 1){
-                    continue;
+            //如果是赠品，不减库存
+            if(shoppingCartLineCommand.getIsGift()){
+                continue;
+            }else{
+              //如果直推礼品库存数小于购买量时，扣减现有库存
+                Integer quantity = shoppingCartLineCommand.getQuantity();
+                if (ShoppingCartUtil.isNoNeedChoiceGift(shoppingCartLineCommand)){//是否是不需要用户选择的礼品.
+                    //下架
+                    if (!shoppingCartLineCommand.isValid() && shoppingCartLineCommand.getValidType() == 1){
+                        continue;
+                    }
+                    Integer stock = shoppingCartLineCommand.getStock();
+                    if (null == stock || stock <= 0){
+                        continue;
+                    }else if (stock < quantity){
+                        shoppingCartLineCommand.setQuantity(stock);
+                    }
                 }
-                Integer stock = shoppingCartLineCommand.getStock();
-                if (null == stock || stock <= 0){
-                    continue;
-                }else if (stock < quantity){
-                    shoppingCartLineCommand.setQuantity(stock);
-                }
+                ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
+                sdkShoppingCartLineCommandBehaviour.organizeExtentionCodeAndCountMapForDeductSkuInventory(shoppingCartLineCommand, extentionCodeAndCountMap);
             }
-            ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
-            sdkShoppingCartLineCommandBehaviour.organizeExtentionCodeAndCountMapForDeductSkuInventory(shoppingCartLineCommand, extentionCodeAndCountMap);
         }
         return extentionCodeAndCountMap;
     }

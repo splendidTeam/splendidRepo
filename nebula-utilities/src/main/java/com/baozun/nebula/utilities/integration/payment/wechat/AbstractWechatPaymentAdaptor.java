@@ -39,6 +39,7 @@ import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyC
 import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
+
 import static com.feilong.core.util.SortUtil.sortMapByKeyAsc;
 
 public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
@@ -222,7 +223,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor{
         if ("SUCCESS".equals(responseMap.get(WechatResponseKeyConstants.RETURN_CODE))){
             if ("SUCCESS".equals(responseMap.get(WechatResponseKeyConstants.RESULT_CODE))){
                 String resSign = WechatUtil.makeSign(responseMap, excludes, WechatConfig.PAY_SIGN_KEY);
-
+                
                 if (responseMap.get(WechatResponseKeyConstants.SIGN).equals(resSign)){
                     /**
                      * trade_state为交易状态

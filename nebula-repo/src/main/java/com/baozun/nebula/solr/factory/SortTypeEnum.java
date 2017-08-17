@@ -8,6 +8,8 @@ import com.feilong.core.lang.EnumUtil;
  * @author 冯明雷
  * @version 1.0
  * @time 2016年4月22日  下午5:38:04
+ * @author zl.shi
+ * @since zl.shi: 2017.5.5
  */
 public enum SortTypeEnum{
 
@@ -40,29 +42,101 @@ public enum SortTypeEnum{
 			return new SolrOrderSort[] {new SolrOrderSort("sale_price", SolrOrderSort.DESC) };
 		}
 	},
-	/** 最近上架时间升序. */
-	ONSHELVESTIME_ASC("newest_asc"){
+	/** 
+	 * 最近上架时间升序. 
+	 *	@since Nebula5.3.2.14 
+	 **/
+	ONSHELVESTIME_ASC("onshelves_asc"){
+
+		public SolrOrderSort[] getSolrOrderSort(){
+			return new SolrOrderSort[] {new SolrOrderSort("listTime", SolrOrderSort.ASC) };
+		}
+	},
+	
+	/** 最近上架时间倒序. 
+	 * @since Nebula5.3.2.14
+	 */
+	ONSHELVESTIME_DESC("onshelves_desc"){
+
+		public SolrOrderSort[] getSolrOrderSort(){
+			return new SolrOrderSort[] {new SolrOrderSort("listTime", SolrOrderSort.DESC) };
+		}
+	},
+	
+	/** 最近更新商品时间升序  
+	 * @since Nebula5.3.2.14
+	 */
+	NEWEST_ASC("newest_asc"){
 
 		public SolrOrderSort[] getSolrOrderSort(){
 			return new SolrOrderSort[] {new SolrOrderSort("activeBeginTime", SolrOrderSort.ASC) };
 		}
 	},
 	
-	/** 最近上架时间倒序. */
-	ONSHELVESTIME_DESC("newest_desc"){
+	/** 最近更新商品时间倒序. 
+	 *@since Nebula5.3.2.14 
+	 */
+	NEWEST_DESC("newest_desc"){
 
 		public SolrOrderSort[] getSolrOrderSort(){
 			return new SolrOrderSort[] {new SolrOrderSort("activeBeginTime", SolrOrderSort.DESC) };
 		}
 	},
 	
-	/** 默认排序 店铺权重，上架时间 */
+	/** 
+	 * 默认排序 店铺权重，品类系数
+	 * @since Nebula5.3.2.14
+	 */
     DEFAULT_ORDER("default_order"){
 
         public SolrOrderSort[] getSolrOrderSort(){
-            return new SolrOrderSort[] {new SolrOrderSort("activeBeginTime", SolrOrderSort.DESC) };
+            return new SolrOrderSort[] {new SolrOrderSort("default_sort", SolrOrderSort.DESC) };
         }
-    };
+    },
+    
+    /**
+     * 折扣升序
+     * @since Nebula5.3.2.14
+     */
+    DISCOUNT_ASC("dynamic_sort_discount_asc"){
+
+        public SolrOrderSort[] getSolrOrderSort(){
+            return new SolrOrderSort[] {new SolrOrderSort("dynamic_sort_discount", SolrOrderSort.ASC) };
+        }
+    },
+    
+    /**
+     * 折扣降序
+     * @since Nebula5.3.2.14
+     */
+    DISCOUNT_DESC("dynamic_sort_discount_desc"){
+
+        public SolrOrderSort[] getSolrOrderSort(){
+            return new SolrOrderSort[] {new SolrOrderSort("dynamic_sort_discount", SolrOrderSort.DESC) };
+        }
+    },
+    /**
+     * 手机专项价格降序
+     * @since Nebula5.3.2.14
+     */
+    MOBILEPRICE_DESC("dynamic_sort__mobile_exclusive_price_desc"){
+
+        public SolrOrderSort[] getSolrOrderSort(){
+            return new SolrOrderSort[] {new SolrOrderSort("dynamic_sort__mobile_exclusive_price", SolrOrderSort.DESC) };
+        }
+    },
+    
+    /**
+     * 手机专项价格升序
+     * @since Nebula5.3.2.14
+     */
+    MOBILEPRICE_ASC("dynamic_sort__mobile_exclusive_price_asc"){
+
+        public SolrOrderSort[] getSolrOrderSort(){
+            return new SolrOrderSort[] {new SolrOrderSort("dynamic_sort__mobile_exclusive_price", SolrOrderSort.ASC) };
+        }
+    }
+    ;
 
 	/**
 	 * Instantiates a new sort type enum.

@@ -47,19 +47,11 @@ public class SMSManagerImpl implements SMSManager{
 	@Override
 	public boolean send(SMSCommand smsCommand,String captcha,int validity){
 
-		// 验证手机号码格式
-		String mobile = smsCommand.getMobile();
-		if (!RegexUtil.matches(RegexPattern.MOBILEPHONE, mobile)){
-			return false;
-		}
-
-		smsCommand.addVar("captcha", captcha);
-		// 发送短信
-		SendResult sendResult = sdkSMSManager.send(smsCommand);
+        boolean result = sdkSMSManager.send(smsCommand, captcha);
 		// 发送短信成功，保存captcha到redies
-		if (sendResult.equals(SendResult.SUCESS)){
-			String businessCode = SMS_REGISTER_CAPTCHA_CODE + mobile;
-			tokenManager.saveToken(businessCode, mobile, validity, captcha);
+        if (SendResult.SUCESS.equals(result)){
+			String businessCode = SMS_REGISTER_CAPTCHA_CODE + smsCommand.getMobile();
+			tokenManager.saveToken(businessCode, smsCommand.getMobile(), validity, captcha);
 			return true;
 		}else{
 			return false;
@@ -74,21 +66,13 @@ public class SMSManagerImpl implements SMSManager{
 	 */
 	@Override
 	public boolean send(SMSCommand smsCommand,CaptchaType type,int length,int validity,String businessCode){
-		// 根据要生成的验证码类型和长度生成captcha
-		String captcha = createSMSCaptcha(type, length);
-
-		// 验证手机号码格式
-		String mobile = smsCommand.getMobile();
-		if (!RegexUtil.matches(RegexPattern.MOBILEPHONE, mobile)){
-			return false;
-		}
-
-		smsCommand.addVar("captcha", captcha);
-		// 发送短信
-		SendResult sendResult = sdkSMSManager.send(smsCommand);
+	    
+	    String captcha = createSMSCaptcha(type, length);
+	    
+	    boolean result = sdkSMSManager.send(smsCommand, captcha);
 		// 发送短信成功，保存captcha到redies
-		if (sendResult.equals(SendResult.SUCESS)){
-			tokenManager.saveToken(businessCode, mobile, validity, captcha);
+		if (SendResult.SUCESS.equals(result)){
+			tokenManager.saveToken(businessCode, smsCommand.getMobile(), validity, captcha);
 			return true;
 		}else{
 			return false;

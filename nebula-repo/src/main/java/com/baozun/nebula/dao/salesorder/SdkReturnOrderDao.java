@@ -21,7 +21,8 @@ public interface SdkReturnOrderDao extends GenericEntityDao<ReturnOrderApp, Long
 
     @NativeUpdate
     Integer updateReturnOrders(@QueryParam("handleId") Long handleId,@QueryParam("code") String code,@QueryParam("state") Integer state,@QueryParam("feedback") String feedback,@QueryParam("modifyTime") Date modifyTime);
-
+	
     @NativeQuery(model = ReturnOrderCommand.class)
     ReturnOrderCommand findReturnOrderAppByCode(@QueryParam("orderCode") String orderCode);
+
 }

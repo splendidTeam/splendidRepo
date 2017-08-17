@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.order;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -141,7 +142,10 @@ public class NebulaOrderConfirmController extends NebulaAbstractTransactionContr
      */
     public String showTransactionCheck(@LoginMember MemberDetails memberDetails,@RequestParam(value = "key",required = false) String key,HttpServletRequest request,@SuppressWarnings("unused") HttpServletResponse response,Model model){
         List<ContactCommand> contactCommandList = contactCommandListBuilder.build(memberDetails);
-        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
+        
+        /**tommy项目 shoppingcart到checkout页面，这里couponList如果为null，后面则不能赋值使用，by binrui.dong 2017.06.08**/
+        List<String> couponList = new ArrayList<String>();
+        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, couponList, request);
 
         if (null != confirmBeforeHandler){
             confirmBeforeHandler.beforeOrderConfirm(shoppingCartCommand, memberDetails, request, key);

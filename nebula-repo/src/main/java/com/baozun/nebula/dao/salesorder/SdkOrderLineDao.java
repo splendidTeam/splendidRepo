@@ -236,4 +236,6 @@ public interface SdkOrderLineDao extends GenericEntityDao<OrderLine, Long>{
      */
     @NativeQuery(clazzes = Integer.class,alias = "count")
     Integer findHistoryOrderCountItemByNotItemIds(@QueryParam("itemIds") List<Long> itemIds,@QueryParam("shopId") Long shopId,@QueryParam("memberId") Long memberId);
+    
+    
 }

@@ -18,6 +18,7 @@ package com.baozun.nebula.sdk.manager.shoppingcart.handler;
 
 import java.util.List;
 
+import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 
@@ -35,4 +36,15 @@ public interface PromotionBriefBuilder{
      * @return
      */
     List<PromotionBrief> getPromotionBriefList(ShoppingCartCommand shoppingCartCommand);
+    
+    /**
+     * 根据购物车获取粗过滤的活动
+     * <br>采用人群和商品过滤
+     *	@param shoppingCartCommand
+     *	@return 活动id
+     *	<p>binrui.dong
+     *  <p>2017年4月19日 下午3:29:19
+     */
+    List<PromotionCommand> getCoarsePromotionBriefList(ShoppingCartCommand shoppingCartCommand);
+    
 }

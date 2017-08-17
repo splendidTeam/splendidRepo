@@ -214,6 +214,11 @@ public class MemberPersonalData extends BaseModel{
 	 * 1 接收 0 不接收
 	 */
 	private Integer				receiveMail;
+	
+	/**
+	 * 保留字段短
+	 */
+	private String				short1;
 
 	/**
 	 * 保留字段短
@@ -353,7 +358,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "COUNTRY_ID")
-    @Index(name = "IDX_PERSONAL_DATA_COUNTRY_ID")
+	@Index(name = "IDX_PERSONAL_DATA_COUNTRY_ID")
 	public Long getCountryId(){
 		return countryId;
 	}
@@ -363,7 +368,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "PROVINCE_ID")
-    @Index(name = "IDX_PERSONAL_DATA_PROVINCE_ID")
+	@Index(name = "IDX_PERSONAL_DATA_PROVINCE_ID")
 	public Long getProvinceId(){
 		return provinceId;
 	}
@@ -373,7 +378,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "CITY_ID")
-    @Index(name = "IDX_PERSONAL_DATA_CITY_ID")
+	@Index(name = "IDX_PERSONAL_DATA_CITY_ID")
 	public Long getCityId(){
 		return cityId;
 	}
@@ -383,7 +388,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "AREA_ID")
-    @Index(name = "IDX_PERSONAL_DATA_AREA_ID")
+	@Index(name = "IDX_PERSONAL_DATA_AREA_ID")
 	public Long getAreaId(){
 		return areaId;
 	}
@@ -393,7 +398,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "TOWN_ID")
-    @Index(name = "IDX_PERSONAL_DATA_TOWN_ID")
+	@Index(name = "IDX_PERSONAL_DATA_TOWN_ID")
 	public Long getTownId(){
 		return townId;
 	}
@@ -475,7 +480,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "EMAIL")
-    @Index(name = "IDX_PERSONAL_DATA_EMAIL")
+	@Index(name = "IDX_PERSONAL_DATA_EMAIL")
 	public String getEmail(){
 		return email;
 	}
@@ -485,7 +490,7 @@ public class MemberPersonalData extends BaseModel{
 	}
 
 	@Column(name = "MOBILE")
-    @Index(name = "IDX_PERSONAL_DATA_MOBILE")
+	@Index(name = "IDX_PERSONAL_DATA_MOBILE")
 	public String getMobile(){
 		return mobile;
 	}
@@ -591,6 +596,17 @@ public class MemberPersonalData extends BaseModel{
 
 	public void setPostCode(String postCode){
 		this.postCode = postCode;
+	}
+	
+
+	@Column(name = "SHORT1")
+	public String getShort1(){
+		return short1;
+	}
+
+	
+	public void setShort1(String short1){
+		this.short1 = short1;
 	}
 
 	@Column(name = "SHORT2")

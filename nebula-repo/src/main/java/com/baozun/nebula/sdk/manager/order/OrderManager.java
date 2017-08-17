@@ -488,4 +488,5 @@ public interface OrderManager extends BaseManager{
      * @return the all distribution mode
      */
     public List<DistributionMode> getAllDistributionMode();
+    
 }

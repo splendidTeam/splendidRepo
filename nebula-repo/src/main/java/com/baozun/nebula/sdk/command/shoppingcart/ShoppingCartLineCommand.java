@@ -370,6 +370,16 @@ public class ShoppingCartLineCommand extends BaseModel implements ShoppingCartLi
     public boolean isGift(){
         return isGift;
     }
+    
+    /**
+     * EL表达式无法渠道isGift()方法值，必须按JavaBean规范getIsGift()取值
+     * 
+     * @return
+     * since2017年5月10日
+     */
+    public boolean getIsGift(){
+        return isGift;
+    }
 
     /**
      * 设置 gift.
@@ -378,6 +388,16 @@ public class ShoppingCartLineCommand extends BaseModel implements ShoppingCartLi
      *            the gift
      */
     public void setGift(boolean isGift){
+        this.isGift = isGift;
+    }
+    
+    /**
+     * EL表达式无法渠道isGift()方法值，必须按JavaBean规范getIsGift()取值
+     * 
+     * @param isGift
+     * since2017年5月10日
+     */
+    public void setIsGift(boolean isGift){
         this.isGift = isGift;
     }
 

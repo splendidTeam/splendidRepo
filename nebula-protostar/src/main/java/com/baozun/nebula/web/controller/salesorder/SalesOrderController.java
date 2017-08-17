@@ -86,7 +86,6 @@ public class SalesOrderController extends BaseController{
 
     @Autowired
     private SdkShoppingCartManager                   sdkShoppingCartManager;
-
     @Autowired
     private SdkShoppingCartCommandBuilder            sdkShoppingCartCommandBuilder;
 

@@ -176,6 +176,8 @@ public class OrderManagerImpl implements OrderManager{
 
     @Autowired
     private SdkOrderLinePackInfoManager sdkOrderLinePackInfoManager;
+    
+    private SdkOrderDao orderDao;
 
     //---------------------------------------------------------------
 
@@ -1034,4 +1036,5 @@ public class OrderManagerImpl implements OrderManager{
     private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
         sdkSecretManager.decrypt(salesOrderCommand, new String[] { "name", "buyerName", "country", "province", "city", "area", "town", "address", "postcode", "tel", "buyerTel", "mobile", "email" });
     }
+
 }

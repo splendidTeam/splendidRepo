@@ -55,4 +55,22 @@ public interface SdkShoppingCartCommandBuilder extends BaseManager{
                     CalcFreightCommand calcFreightCommand,
                     List<String> coupons,
                     Set<String> memberComIds);
+    
+    /**
+     *  不执行促销引擎， 获取购物车
+     *	@param memberId
+     *	@param shoppingCartLines
+     *	@param calcFreightCommand
+     *	@param coupons
+     *	@param memberComIds
+     *	@return
+     *	<p>binrui.dong
+     *  <p>2017年4月19日 下午5:37:00
+     */
+    ShoppingCartCommand buildShoppingCartCommandWithoutPromotion(
+                    Long memberId,
+                    List<ShoppingCartLineCommand> shoppingCartLines,
+                    CalcFreightCommand calcFreightCommand,
+                    List<String> coupons,
+                    Set<String> memberComIds);
 }

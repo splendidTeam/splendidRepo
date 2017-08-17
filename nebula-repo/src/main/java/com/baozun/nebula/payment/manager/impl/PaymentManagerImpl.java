@@ -52,17 +52,14 @@ public class PaymentManagerImpl implements PaymentManager{
     }
 
     /**
+     * <h3>
+     * 建议用于通用支付接口调用，启用原createPayment(SalesOrderCommand order)方法。</br>
+     * SalesOrderCommand对象具有不易于扩展性，主要耦合基于原始商城订单支付，难以兼容shopdog或同一支付接口，不同形式调用（比如支付宝PC支付，还可以直接二维码支付）</br>
+     * 如需扩展参数，可以直接注入additionParams中，拼接paymentURL时会将MAP中所有参数带上
+     * </h3>
      * 
-     * @Description
-     *              <p>
-     *              建议用于通用支付接口调用，启用原createPayment(SalesOrderCommand
-     *              order)方法。</br>
-     *              SalesOrderCommand对象具有不易于扩展性，主要耦合基于原始商城订单支付，难以兼容shopdog或同一支付接口
-     *              ，不同形式调用（比如支付宝PC支付，还可以直接二维码支付）</br>
-     *              如需扩展参数，可以直接注入additionParams中，拼接paymentURL时会将MAP中所有参数带上
-     *              </p>
-     * @param additionParams
-     *            调用前可将SalesOrderCommand使用PropertyUtil.describe()方法转亦成Map
+     * @param orderParams
+     *            调用前可将SalesOrderCommand使用SalesOrderCommandToPaymentParamsConverter.convert(salesOrderCommand)方法转亦成Map
      * @param payType
      *            即SalesOrderCommand.getOnLinePaymentCommand().getPayType()</br>
      * @return PaymentRequest
@@ -241,6 +238,22 @@ public class PaymentManagerImpl implements PaymentManager{
         }
     }
 
+    /**
+     * 
+     * mobile同步回调获取返回支付结果<br>
+     * 
+     * <h3>
+     * 注意事项：<br>
+     * 该方法的AbstractAlipayPaymentAdaptor实现具有一个问题：<br>
+     * 当支付成功后，PaymentResult.PaymentServiceSatus返回值为PaymentServiceStatus.SUCCESS<br>
+     * 不同于支付宝同一类产品其他的接口成功返回值为PaymentServiceStatus.PAYMENT_SUCCESS<br>
+     * 这样会导致外层判断无法一致！且需要另行单独判断Mobile 同步回调返回值！<br>
+     * <h3>
+     * 
+     * @param request
+     * @param paymentType
+     * @return
+     */
     @Override
     public PaymentResult getPaymentResultForSynOfWap(HttpServletRequest request,String paymentType){
         PaymentFactory paymentFactory = PaymentFactory.getInstance();
