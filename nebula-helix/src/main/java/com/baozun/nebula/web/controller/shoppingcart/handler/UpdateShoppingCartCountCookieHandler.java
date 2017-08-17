@@ -24,7 +24,7 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
 /**
  * 更新保存购物车商品数量的Cookie
  * <p>
- * 该接口可以通过传入ShoppingCartViewCommand获取ShoppingCartLineSubViewCommand然后通过ShoppingcartCountPersister计算购物车中购买的商品总数量
+ * 该接口可以通过传入ShoppingCartViewCommand获取ShoppingCartLineSubViewCommand然后通过ShoppingcartCountPersister计算购物车中购买的商品总数量并更新对应的Cookie
  * </p>
  * <h4>设计目的和使用场景</h4>
  * <p>
@@ -32,7 +32,7 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
  * 主要是为了简化控制层代码并且增加灵活性所以将方法提取成了接口
  * </p>
  * @see com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand
- * @see com.baozun.nebula.web.controller.shoppingcart.persister
+ * @see com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister
  * @author bowen.dai
  * @since 5.3.2.23
  */
