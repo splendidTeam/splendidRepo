@@ -121,7 +121,7 @@ public class NebulaOrderReturnController extends BaseController{
     
     /** 这个需要在spring.xml中配置上对应的 */
     @Autowired
-    private ReturnApplicationBuilder returnApplicationBuilder;
+    private ReturnApplicationBuilder defaultReturnApplicationBuilder;
     
     @Autowired
     private ReturnApplicationBuilder customReturnApplicationBuilder;
@@ -169,11 +169,11 @@ public class NebulaOrderReturnController extends BaseController{
 
         List<ReturnApplicationCommand>  returnApplications = null;
         
-        // 官网如果有自己定义构造器使用官网的构造器
+        // 官网如果有自己定义builder使用官网的builder
         if ( Validator.isNotNullOrEmpty(customReturnApplicationBuilder) ) {
         	returnApplications = customReturnApplicationBuilder.buildReturnApplicationCommands(memberDetails, returnOrderForm, salesOrderCommand);
         } else {
-        	returnApplications = returnApplicationBuilder.buildReturnApplicationCommands(memberDetails, returnOrderForm, salesOrderCommand);
+        	returnApplications = defaultReturnApplicationBuilder.buildReturnApplicationCommands(memberDetails, returnOrderForm, salesOrderCommand);
         }
         
         List<ReturnApplicationCommand> returnAppComs = sdkReturnApplicationManager.createReturnApplications(returnApplications, salesOrderCommand);

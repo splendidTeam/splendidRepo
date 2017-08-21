@@ -22,12 +22,12 @@ import com.baozun.nebula.web.controller.order.form.ReturnOrderForm;
 import com.feilong.core.Validator;
 
 /**
- * 
+ * nebula默认的builder，根据页面提交的表单信息创建退换货订单。默认退货单和换货单是分开创建。如果一个用户订单同时退货和换货会创建一个退货单和一个换货单。
  * @author zl.shi
- *
+ * @since 2017.8.21
  */
-@Service("returnApplicationBuilder")
-public class ReturnApplicationBuilderImpl implements ReturnApplicationBuilder {
+@Service("defaultReturnApplicationBuilder")
+public class DefaultReturnApplicationBuilderImpl implements ReturnApplicationBuilder {
 	
 	@Autowired
 	private SdkOrderLineDao sdkOrderLineDao;
