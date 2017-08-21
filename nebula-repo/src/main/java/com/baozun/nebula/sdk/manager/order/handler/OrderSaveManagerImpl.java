@@ -50,14 +50,14 @@ public class OrderSaveManagerImpl implements OrderSaveManager{
 
     /** The sdk order dao. */
     @Autowired
-    private SdkOrderDao             sdkOrderDao;
+    private SdkOrderDao sdkOrderDao;
 
     /** The order code creator. */
     @Autowired(required = false)
     private OrderCodeCreatorManager orderCodeCreatorManager;
 
     /** The Constant SEPARATOR_FLAG. */
-    private static final String     SEPARATOR_FLAG = "\\|\\|";
+    private static final String SEPARATOR_FLAG = "\\|\\|";
 
     /*
      * (non-Javadoc)
@@ -71,7 +71,7 @@ public class OrderSaveManagerImpl implements OrderSaveManager{
 
         ConvertUtils.convertTwoObject(salesOrder, salesOrderCommand);
         // 生成订单号
-        String orderCode = orderCodeCreatorManager.createOrderCodeBySource(salesOrderCommand.getSource());
+        String orderCode = orderCodeCreatorManager.createOrderCode(shopId, salesOrderCommand);
         if (orderCode == null){
             throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
         }
