@@ -23,6 +23,7 @@ import com.feilong.core.Validator;
 
 /**
  * nebula默认的builder，根据页面提交的表单信息创建退换货订单。默认退货单和换货单是分开创建。如果一个用户订单同时退货和换货会创建一个退货单和一个换货单。
+ * <P>官网可以自定义实现ReturnApplicationBuilder接口@Service("customReturnApplicationBuilder")
  * @author zl.shi
  * @since 2017.8.21
  */
@@ -46,8 +47,13 @@ public class DefaultReturnApplicationBuilderImpl implements ReturnApplicationBui
 		ReturnApplicationCommand returnAppCommand = buildReturnReturnApplication( returnOrderForm, salesOrder, memberDetails.getMemberId() );
 		ReturnApplicationCommand changeAppCommand = buildChangeReturnApplication( returnOrderForm, salesOrder, memberDetails.getMemberId() );
 		
-		returnApplicationComs.add( returnAppCommand );
-		returnApplicationComs.add( changeAppCommand );
+		if ( Validator.isNotNullOrEmpty(returnAppCommand) ) {
+			returnApplicationComs.add( returnAppCommand );
+		}
+		
+		if ( Validator.isNotNullOrEmpty(changeAppCommand) ) {
+			returnApplicationComs.add( changeAppCommand );
+		}
 		
 		return returnApplicationComs;
 	}
@@ -59,6 +65,11 @@ public class DefaultReturnApplicationBuilderImpl implements ReturnApplicationBui
 	 * @return
 	 */
 	public ReturnApplicationCommand buildReturnReturnApplication( ReturnOrderForm returnOrderForm, SalesOrderCommand salesOrder, Long memberId ) {
+		
+		// 如果退换货订单行中没有退货类型的订单行就不构建退货订单
+		if ( !this.checkHasReReturnAppLine(returnOrderForm) ) {
+			return null;
+		}
 		
 		ReturnApplication returnApplication = buildSimpleReturnApplication( returnOrderForm, salesOrder, memberId, ReturnApplication.SO_RETURN_TYPE_RETURN, "" );
 		
@@ -79,6 +90,11 @@ public class DefaultReturnApplicationBuilderImpl implements ReturnApplicationBui
 	 * @return
 	 */
 	public ReturnApplicationCommand buildChangeReturnApplication( ReturnOrderForm returnOrderForm, SalesOrderCommand salesOrder, Long memberId ) {
+		
+		// 如果退换货订单行中没有换货类型的订单行就不构建换货订单
+		if ( !this.checkHasChangeReturnAppLine(returnOrderForm) ) {
+			return null;
+		}
 		
 		ReturnApplication returnApplication = buildSimpleReturnApplication( returnOrderForm, salesOrder, memberId, ReturnApplication.SO_RETURN_TYPE_EXCHANGE, "" );
 		
@@ -119,7 +135,7 @@ public class DefaultReturnApplicationBuilderImpl implements ReturnApplicationBui
 	
 	
 	/**
-	 * 对退换货
+	 * 对退换货订单设置退款，<p>计算方式：所有退货订单行的退款相加
 	 */
 	public void setReimburse( ReturnApplication returnApplication, List<ReturnApplicationLine> returnLineList ) {
 		
@@ -242,5 +258,43 @@ public class DefaultReturnApplicationBuilderImpl implements ReturnApplicationBui
 		return returnApplication;
 	}
 	
+	
+	/**
+	 * 检测表单中是否存在换货的订单行
+	 * @param returnOrderForm
+	 * @return false 表示不存在
+	 */
+	public boolean checkHasChangeReturnAppLine( ReturnOrderForm returnOrderForm ) {
+		return checkHasTypeReturnAppLine( returnOrderForm, ReturnApplication.SO_RETURN_TYPE_EXCHANGE );
+		
+	}
+	
+	/**
+	 * 检测表单中是否存在退货的订单行
+	 * @param returnOrderForm
+	 * @return false 表示不存在
+	 */
+	public boolean checkHasReReturnAppLine( ReturnOrderForm returnOrderForm ) {
+		return checkHasTypeReturnAppLine( returnOrderForm, ReturnApplication.SO_RETURN_TYPE_RETURN );
+		
+	}
+	
+	
+	/**
+	 * 检测表单订单行中是否存在指定的类型
+	 * @param returnOrderForm
+	 * @param type
+	 * @return false 表示不存在
+	 */
+	public boolean checkHasTypeReturnAppLine( ReturnOrderForm returnOrderForm, Integer type ) {
+		for ( int i = 0; i < returnOrderForm.getLineIdSelected().length; i++ ) {
+			
+			if ( type.equals(returnOrderForm.getReturnType()[i]) ) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 }

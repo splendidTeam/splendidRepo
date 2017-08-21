@@ -123,7 +123,8 @@ public class NebulaOrderReturnController extends BaseController{
     @Autowired
     private ReturnApplicationBuilder defaultReturnApplicationBuilder;
     
-    @Autowired
+    @Autowired(required = false)
+    @Qualifier("customReturnApplicationBuilder")
     private ReturnApplicationBuilder customReturnApplicationBuilder;
 
 
