@@ -1,22 +1,13 @@
 package com.baozun.nebula.sdk.manager.payment;
 
-import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.api.salesorder.DefaultOrderCodeCreatorManager;
-import com.baozun.nebula.api.salesorder.OrderCodeCreatorManager;
 import com.baozun.nebula.dao.payment.PayCodeDao;
 import com.baozun.nebula.dao.payment.PayInfoDao;
 import com.baozun.nebula.dao.payment.PayInfoLogDao;
@@ -24,15 +15,10 @@ import com.baozun.nebula.dao.payment.PaymentLogDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.model.payment.PayCode;
-import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.sdk.command.PayInfoCommand;
-import com.baozun.nebula.sdk.command.SalesOrderCommand;
-import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
 import com.baozun.nebula.sdk.manager.SdkPayInfoQueryManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.feilong.core.Validator;
 
 /**
  * 
@@ -43,16 +29,11 @@ import com.feilong.core.Validator;
 @Service("sdkPaymentManager")
 public class SdkPaymentManagerImpl implements SdkPaymentManager{
 
-    /** The Constant log. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SdkPaymentManagerImpl.class);
-
     @Autowired
     private PaymentLogDao paymentLogDao;
 
     @Autowired
     private PayInfoDao payInfoDao;
-
-    private OrderCodeCreatorManager creator;
 
     @Autowired
     private PayCodeDao payCodeDao;
@@ -60,19 +41,8 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
     @Autowired
     private PayInfoLogDao payInfoLogDao;
 
-    /** The sdk pay code manager. */
-    @Autowired
-    private SdkPayCodeManager sdkPayCodeManager;
-
     @Autowired
     private SdkPayInfoQueryManager sdkPayInfoQueryManager;
-
-    @Value("#{meta['orderCodeCreator']}")
-    private String orderCodeCreatorPath = "com.baozun.nebula.api.salesorder.DefaultOrderCodeCreatorManager";
-
-    public SdkPaymentManagerImpl(){
-        creator = this.getOrderCodeCreator();
-    }
 
     @Override
     public void savePaymentLog(Date createTime,String message,String operator,String returnVal){
@@ -89,81 +59,6 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
             payInfoLog.setModifyTime(new Date());
             payInfoLogDao.save(payInfoLog);
         }
-    }
-
-    @Override
-    public String savePayCodeInfo(List<SalesOrderCommand> sos){
-        String subOrdinate = creator.createOrderSerialNO();
-        if (StringUtils.isBlank(subOrdinate)){
-            LOGGER.info("generate orderCode failure");
-            throw new BusinessException(ErrorCodes.SYSTEM_ERROR);
-        }
-
-        BigDecimal totalPayMoney = new BigDecimal(0.0);
-        for (SalesOrderCommand so : sos){
-
-            Map<String, Object> paraMap = new HashMap<String, Object>();
-            paraMap.put("orderId", so.getId());
-            paraMap.put("paySuccessStatusStr", 2);
-            List<PayInfo> payInfoList = payInfoDao.findPayInfoListByQueryMap(paraMap);
-            if (payInfoList != null){
-                for (PayInfo payInfo : payInfoList){
-                    PayInfoLog payInfoLog = new PayInfoLog();
-                    payInfoLog.setPayMoney(payInfo.getPayMoney());
-                    payInfoLog.setPayNumerical(payInfo.getPayMoney());
-                    payInfoLog.setCreateTime(new Date());
-                    payInfoLog.setOrderId(payInfo.getOrderId());
-                    payInfoLog.setPaySuccessStatus(false);
-                    payInfoLog.setSubOrdinate(subOrdinate);
-                    payInfoLog.setCallCloseStatus(false);
-                    payInfoLog.setPayInfoId(payInfo.getId());
-                    //此处保留之前的支付方式 /*如要修改支付方式 请修改payInfo里面的payType payInfo*/
-                    payInfoLog.setPayType(payInfo.getPayType());
-                    payInfoLog.setPayInfo(payInfo.getPayInfo());
-
-                    Properties pro = ProfileConfigUtil.findCommonPro("config/payMentInfo.properties");
-                    String payInfoStr = payInfo.getPayInfo();
-                    String payType = pro.getProperty(payInfoStr + ".payType").trim();
-
-                    if (Validator.isNotNullOrEmpty(payType)){
-                        payInfoLog.setThirdPayType(Integer.parseInt(payType));
-                    }
-                    payInfoLogDao.save(payInfoLog);
-
-                    totalPayMoney = totalPayMoney.add(payInfo.getPayMoney());
-                }
-            }
-        }
-
-        totalPayMoney = totalPayMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
-        sdkPayCodeManager.savaPayCode(subOrdinate, totalPayMoney);
-        return subOrdinate;
-    }
-
-    private OrderCodeCreatorManager getOrderCodeCreator(){
-        // TODO 可以考虑使用 com.baozun.nebula.utils.spring.SpringUtil 来动态加载bean
-        // 不用反射的方式
-        if (creator != null){
-            return creator;
-        }
-
-        creator = getDefaultCreator();
-
-        try{
-
-            String className = orderCodeCreatorPath;
-            @SuppressWarnings("unchecked")
-            Class<OrderCodeCreatorManager> cls = (Class<OrderCodeCreatorManager>) Class.forName(className);
-            creator = cls.newInstance();
-        }catch (Exception e){
-            LOGGER.error("getDefined Creator error" + e.getMessage());
-            e.printStackTrace();
-        }
-        return creator;
-    }
-
-    private OrderCodeCreatorManager getDefaultCreator(){
-        return new DefaultOrderCodeCreatorManager();
     }
 
     @Override

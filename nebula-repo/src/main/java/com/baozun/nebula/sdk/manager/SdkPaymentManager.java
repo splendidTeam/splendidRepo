@@ -8,7 +8,6 @@ import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.sdk.command.PayInfoCommand;
-import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
 /**
  * 
@@ -36,14 +35,6 @@ public interface SdkPaymentManager extends BaseManager{
      * @return
      */
     void upPayInfoCallCloseStaBySubOrdinate(Long orderId,Boolean callCloseStatus,Date modifyTime);
-
-    /**
-     * 保存支付订单号信息(t_so_paycode)以及订单支付信息(t_so_payinfo)
-     * 
-     * @param sos
-     * @return
-     */
-    String savePayCodeInfo(List<SalesOrderCommand> sos);
 
     /**
      * 根据支付订单号(t_so_paycode subordinate)更改支付类型
