@@ -184,8 +184,14 @@ public class NebulaOrderReturnController extends BaseController{
 
     }
     
+    
+    /**
+     * 返回提交退换货订单结果
+     * @param returnAppComs
+     * @param returnResult
+     * @return
+     */
     private NebulaReturnResult backNebulaReturnResult( List<ReturnApplicationCommand> returnAppComs, DefaultReturnResult returnResult ){
-        // TODO by zl.shi js 这里是不是要做相应的修改？
         returnResult.setReturnObject(returnAppComs);
         if (Validator.isNullOrEmpty(returnAppComs)){
             LOGGER.error("[NebulaOrderReturnController] {} [{}] returnOrder save error. \"\"");
@@ -198,17 +204,6 @@ public class NebulaOrderReturnController extends BaseController{
     }
     
 
-    private NebulaReturnResult toNebulaReturnResult(SalesOrderCommand salesOrderCommand, ReturnApplicationCommand returnCommand , DefaultReturnResult returnResult){
-        returnResult.setReturnObject(returnCommand);
-        if (Validator.isNullOrEmpty(returnCommand)){
-            LOGGER.error("[NebulaOrderReturnController] {} [{}] returnOrder save error. \"\"");
-            DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
-            defaultResultMessage.setMessage("create.returnApplication.error");
-            returnResult.setResultMessage(defaultResultMessage);
-            returnResult.setResult(false);
-        }
-        return returnResult;
-    }
 
 
     /**
