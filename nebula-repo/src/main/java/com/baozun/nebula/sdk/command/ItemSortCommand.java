@@ -44,6 +44,13 @@ public class ItemSortCommand  implements Command{
 	 */
 	private String picUrl;
 	
+	/**
+     * 商品库存
+     */
+    private String repertory;
+    
+    
+	
 	public Long getId() {
 		return id;
 	}
@@ -91,5 +98,20 @@ public class ItemSortCommand  implements Command{
 	public void setPicUrl(String picUrl) {
 		this.picUrl = picUrl;
 	}
+
+    
+    public String getRepertory(){
+        return repertory;
+    }
+
+    
+    public void setRepertory(String repertory){
+        this.repertory = repertory;
+    }
+
+    
+    public static long getSerialversionuid(){
+        return serialVersionUID;
+    }
 	
 }
