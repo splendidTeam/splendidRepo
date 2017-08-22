@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		
+	<bean id="SysItemOperateLog.findItemOperaterLog" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页查询商品操作日志 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select
+		       			*
+		       		from
+		       			t_sys_item_operate_log t
+		       		where 1=1 
+			       	#if($id)
+						and t.id = :id
+					#end
+					#if($targetId)
+						and t.target_id = :targetId
+					#end
+					#if($optId)
+						and t.opt_id = :optId
+					#end
+					#if($optType)
+						and t.opt_type = :optType
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+		
+</beans>

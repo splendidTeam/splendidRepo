@@ -1372,7 +1372,9 @@
 				     order by  o.CREATE_TIME DESC
 					
                  ]]>
-            </value>
-        </constructor-arg>
-    </bean>
+
+			</value>
+		</constructor-arg>
+	</bean>
+
 </beans>

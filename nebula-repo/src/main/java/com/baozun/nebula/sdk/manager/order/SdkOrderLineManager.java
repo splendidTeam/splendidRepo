@@ -31,4 +31,10 @@ public interface SdkOrderLineManager extends BaseManager{
     OrderLine findByPk(Long id);
 
     List<OrderLineCommand> findOrderLinesByOrderId(Long orderId);
+
+    /**
+     * @author yaohua.wang@baozun.cn 
+     * @since Nebula 5.3.2.20
+     */
+    List<OrderLineCommand> findOrderLinesByLineIds(List<Long> lineIds);
 }

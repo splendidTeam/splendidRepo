@@ -43,6 +43,7 @@ import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.wormhole.mq.entity.logistics.LogisticDetailV5;
 import com.baozun.nebula.wormhole.mq.entity.logistics.LogisticTrackingV5;
 import com.baozun.nebula.wormhole.scm.timing.SyncCommonManager;
+import com.feilong.core.Validator;
 
 /**
  * LogisticTrackingManagerImpl
@@ -153,12 +154,19 @@ public class LogisticTrackingManagerImpl implements LogisticTrackingManager {
             logistics.setOrderId(oCommand.getId());
             List<LogisticDetailV5> details=logisticTracking.getDetails();
             for(LogisticDetailV5 detail:details){
-                if(null!=logistics.getTrackingDescription()){
-                    logistics.setTrackingDescription(logistics.getTrackingDescription() + "<br/>" + DateUtil.format(detail.getOpTime(), "yyyy-MM-dd HH:mm") + " " + detail.getRemark());
-                }else{
-                    logistics.setTrackingDescription(DateUtil.format(detail.getOpTime(), "yyyy-MM-dd HH:mm") + " " +detail.getRemark());
+                StringBuilder description = new StringBuilder();
+                if(Validator.isNotNullOrEmpty(logistics.getTrackingDescription())){
+                    description.append(logistics.getTrackingDescription() + "<br/>");
                 }
-                logistics.setVersion(detail.getOpTime());
+                if(Validator.isNotNullOrEmpty(detail.getOpTime())){
+                    description.append(DateUtil.format(detail.getOpTime(), "yyyy-MM-dd HH:mm"));
+                    logistics.setVersion(detail.getOpTime());
+                }else{
+                    logistics.setVersion(new Date());
+                }
+                if(Validator.isNotNullOrEmpty(detail.getRemark())){
+                    description.append(" " + detail.getRemark());
+                }
             }
         }
         

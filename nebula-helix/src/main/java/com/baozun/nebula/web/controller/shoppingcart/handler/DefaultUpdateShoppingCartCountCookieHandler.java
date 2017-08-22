@@ -37,7 +37,9 @@ import com.google.common.collect.Iterables;
 import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
- * 
+ * UpdateShoppingCartCountCookieHandler默认实现类
+ * 通过传入ShoppingCartViewCommand计算购物车中购买的商品总数量并更新Cookie
+ * 目前不需要商城重新实现
  * @author bowen.dai
  * @since 5.3.2.23
  */
