@@ -392,7 +392,7 @@ public class ItemSolrSettingManagerImpl implements ItemSolrSettingManager{
     private List<Long> buildItemIdsForSolr(List<String> itemCodeList,Long shopId,boolean isDelete){
         List<Item> itemList = itemDao.findItemListByCodes(itemCodeList, shopId);
 
-        if (isDelete){
+        if (isDelete){//since 5.3.2.25
             return getPropertyValueList(itemList, "id");
         }
 
