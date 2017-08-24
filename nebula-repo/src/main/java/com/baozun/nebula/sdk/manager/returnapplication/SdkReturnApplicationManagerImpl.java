@@ -153,17 +153,17 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         Assert.notNull(returnCode, "returnCode is null");
         Assert.notNull(lastModifier, "lastModifier is null ");
         Assert.notNull(status, "Status is null ");
-        Assert.notNull(description, "审核备注不能为空");
+        Assert.notNull(description, messageSource.getMessage(ReturnApplicationI18nMessgeConstants.EXCEPTION_REVIEW_NOTE_CANNOT_EMPTY, null, LocaleContextHolder.getLocale()));
         // 当审核通过时，允许客户退回商品，同时将退款状态改为待处理
         Date now = new Date();
         ReturnApplication returnapp = returnApplicationDao.findApplicationByCode(returnCode);
         if (returnapp == null){
             //throw new Exception("对应的申请单不存在");
-        	throw new Exception(messageSource.getMessage("", null, LocaleContextHolder.getLocale()));
+        	throw new Exception(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.EXCEPTION_FORM_IS_NOT_FOUND, null, LocaleContextHolder.getLocale()));
         }
         //审核通过时必须填写退货地址
         if (status.intValue() == ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY && returnAddress == ""){
-            throw new Exception("退货地址为空");
+            throw new Exception(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.EXCEPTION_RETURN_ADDRESS_IS_NULL, null, LocaleContextHolder.getLocale()));
         }else{
             returnapp.setReturnAddress(returnAddress);
         }
@@ -175,7 +175,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(status.intValue()) && ReturnApplication.SO_RETURN_STATUS_AUDITING.equals(returnapp.getStatus())){// 审核通过
             // status为2时，表示已进行审核操作，需要判断当前退货单是否已审核过
             if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(returnapp.getStatus()) || ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(returnapp.getStatus())){
-                throw new BusinessException("对应的申请单已审核，请刷新页面 ");
+                throw new BusinessException(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.EXCEPTION_FORM_IS_AUDIT_FLUSH_PAGE, null, LocaleContextHolder.getLocale()));
             }else{
                 returnapp.setStatus(ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY);// 审核通过
             }
@@ -183,7 +183,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(status) && returnapp.getStatus() == ReturnApplication.SO_RETURN_STATUS_AUDITING){// 审核退回
             // status为1时，表示已进行审核操作，需要判断当前退货单是否已审核过
             if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(returnapp.getStatus()) || returnapp.getStatus() == ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN){
-                throw new BusinessException("对应的申请单已审核，请刷新页面 ");
+            	throw new BusinessException(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.EXCEPTION_FORM_IS_AUDIT_FLUSH_PAGE, null, LocaleContextHolder.getLocale()));
             }else{
                 returnapp.setStatus(ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN);
             }
@@ -214,27 +214,27 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         List<OrderReturnCommand> orderReturn = returnApplicationDao.findExpInfo(sorts, paraMap);
         for(OrderReturnCommand returnCommand :orderReturn){
             if(ReturnApplication.SO_RETURN_TYPE_RETURN.equals(returnCommand.getType())){
-                returnCommand.setBusinessType("退货");
+                returnCommand.setBusinessType(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.MESSAGE_TYPE_SALES_RETURN, null, LocaleContextHolder.getLocale()));
             }else{
-                returnCommand.setBusinessType("换货");
+                returnCommand.setBusinessType(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.MESSAGE_TYPE_EXCHANGE, null, LocaleContextHolder.getLocale()));
             }
             if (ReturnApplication.SO_RETURN_STATUS_AUDITING.equals(returnCommand.getStatus())){
-                returnCommand.setBusinessStatus("待审核");
+                returnCommand.setBusinessStatus(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.MESSAGE_STATUS_CHECK_PENDING, null, LocaleContextHolder.getLocale()));
             }
             if (ReturnApplication.SO_RETURN_STATUS_REFUS_RETURN.equals(returnCommand.getStatus())){
-                returnCommand.setBusinessStatus("拒绝退换货");
+                returnCommand.setBusinessStatus(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.MESSAGE_STATUS_REFUSED, null, LocaleContextHolder.getLocale()));
             }
             if (ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY.equals(returnCommand.getStatus())){
-                returnCommand.setBusinessStatus("退回中");
+                returnCommand.setBusinessStatus(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.MESSAGE_STATUS_IN_THE_BACK, null, LocaleContextHolder.getLocale()));
             }
             /*if (ReturnApplication.SO_RETURN_STATUS_DELIVERIED.equals(returnCommand.getStatus())){
                 returnCommand.setBusinessStatus("已发货");
             }*/
             if (ReturnApplication.SO_RETURN_STATUS_AGREE_REFUND.equals(returnCommand.getStatus())){
-                returnCommand.setBusinessStatus("同意退换货");
+                returnCommand.setBusinessStatus(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.MESSAGE_STATUS_AGREE, null, LocaleContextHolder.getLocale()));
             }
             if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(returnCommand.getStatus())){
-                returnCommand.setBusinessStatus("已完成");
+                returnCommand.setBusinessStatus(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.MESSAGE_STATUS_COMPLETED, null, LocaleContextHolder.getLocale()));
             }
             if (Validator.isNotNullOrEmpty(returnReasonResolver)){
             	returnReasonResolver.getReasonResolver(returnCommand);
@@ -260,7 +260,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         Date now = new Date();
         ReturnApplication returnapp = returnApplicationDao.findApplicationByCode(returnCode);
         if (returnapp == null){
-            throw new Exception("对应的申请单不存在");
+            throw new Exception(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.EXCEPTION_FORM_IS_NOT_FOUND, null, LocaleContextHolder.getLocale()));
         }
         returnapp.setLastModifyUser(lastModifier);
         returnapp.setApprover(lastModifier);
@@ -286,7 +286,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
                 returnapp.setStatus(ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE);
             }
         }else{
-            throw new BusinessException("物流状态异常！");
+            throw new BusinessException(messageSource.getMessage(ReturnApplicationI18nMessgeConstants.EXCEPTION_LOGISTICS_STATUS, null, LocaleContextHolder.getLocale()));
         }
         returnApplicationDao.save(returnapp);
     }
