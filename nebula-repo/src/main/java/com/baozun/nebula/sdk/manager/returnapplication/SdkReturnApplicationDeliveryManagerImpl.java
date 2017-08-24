@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import com.baozun.nebula.dao.returnapplication.SdkSoReturnApplicationDeliveryInfoDao;
 import com.baozun.nebula.model.returnapplication.ReturnApplicationDeliveryInfo;
 
-@Service("soReturnApplicationDeliveryManager")
+@Service("sdkReturnApplicationDeliveryManager")
 public class SdkReturnApplicationDeliveryManagerImpl implements SdkReturnApplicationDeliveryManager{
 	
 	@Autowired

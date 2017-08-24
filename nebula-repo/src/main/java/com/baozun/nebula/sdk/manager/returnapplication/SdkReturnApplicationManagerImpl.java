@@ -8,6 +8,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -36,7 +38,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     private SdkReturnApplicationDao returnApplicationDao;
 
     @Autowired
-    private SdkReturnApplicationLineManager soReturnLineManager;
+    private SdkReturnApplicationLineManager sdkReturnApplicationLineManager;
     
     @Autowired(required=false)
     private ReturnRefundManager  returnRefundManager;
@@ -44,6 +46,8 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
     @Autowired(required=false)
     private ReturnReasonResolver    returnReasonResolver;
     
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private SdkSoReturnApplicationDeliveryInfoDao sdkReturnApplicationDeliveryInfoDao;
@@ -92,7 +96,7 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         for (ReturnApplicationLine line : returnLines){
             line.setReturnOrderId(returnApplication.getId());
         }
-        returnLines = soReturnLineManager.saveReturnLine(returnLines);
+        returnLines = sdkReturnApplicationLineManager.saveReturnLine(returnLines);
 
         returnCommand.setReturnLineList(returnLines);
         returnCommand.setReturnApplication(returnApplication);
@@ -154,7 +158,8 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
         Date now = new Date();
         ReturnApplication returnapp = returnApplicationDao.findApplicationByCode(returnCode);
         if (returnapp == null){
-            throw new Exception("对应的申请单不存在");
+            //throw new Exception("对应的申请单不存在");
+        	throw new Exception(messageSource.getMessage("", null, LocaleContextHolder.getLocale()));
         }
         //审核通过时必须填写退货地址
         if (status.intValue() == ReturnApplication.SO_RETURN_STATUS_TO_DELIVERY && returnAddress == ""){
@@ -231,7 +236,9 @@ public class SdkReturnApplicationManagerImpl implements SdkReturnApplicationMana
             if (ReturnApplication.SO_RETURN_STATUS_RETURN_COMPLETE.equals(returnCommand.getStatus())){
                 returnCommand.setBusinessStatus("已完成");
             }
-            returnReasonResolver.getReasonResolver(returnCommand);
+            if (Validator.isNotNullOrEmpty(returnReasonResolver)){
+            	returnReasonResolver.getReasonResolver(returnCommand);
+            }
         }
         return orderReturn;
     }

@@ -22,7 +22,7 @@ import com.feilong.core.Validator;
  *
  */
 @Transactional
-@Service("soReturnLineManager")
+@Service("sdkReturnApplicationLineManager")
 public class SdkReturnApplicationLineManagerImpl implements SdkReturnApplicationLineManager {
 
 	private static final Logger	log	= LoggerFactory.getLogger(SdkReturnApplicationLineManagerImpl.class);
@@ -31,6 +31,7 @@ public class SdkReturnApplicationLineManagerImpl implements SdkReturnApplication
 	
     @Autowired(required=false)
     private ReturnLineReasonResolver returnLineReasonResolver;
+    
 	@Override
 	public List<ReturnApplicationLine> saveReturnLine(List<ReturnApplicationLine> soReturnLine) {
 		List<ReturnApplicationLine> returnLines=new ArrayList<ReturnApplicationLine>();
@@ -45,7 +46,7 @@ public class SdkReturnApplicationLineManagerImpl implements SdkReturnApplication
 	@Override
 	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderIds(List<Long> returnOrderIds) {
 		List<ReturnLineCommand> soReturnLines = soReturnLineDao.findSoReturnLinesByReturnOrderIds(returnOrderIds);
-		if(Validator.isNotNullOrEmpty(soReturnLines)){
+		if(Validator.isNotNullOrEmpty(soReturnLines) && Validator.isNotNullOrEmpty(returnLineReasonResolver)){
 		    for(ReturnLineCommand returnLineCommand:soReturnLines){
 		        returnLineReasonResolver.getReturnLineReason(returnLineCommand);
 	        }

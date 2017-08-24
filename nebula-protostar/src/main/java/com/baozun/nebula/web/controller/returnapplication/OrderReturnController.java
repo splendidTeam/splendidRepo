@@ -68,7 +68,7 @@ public class OrderReturnController extends BaseController{
     private Logger logger = LoggerFactory.getLogger(OrderReturnController.class);
 
     @Autowired
-    private SdkReturnApplicationLineManager sdkReturnLineManager;
+    private SdkReturnApplicationLineManager sdkReturnApplicationLineManager;
 
     @Autowired
     private OrderManager orderManager;
@@ -86,7 +86,7 @@ public class OrderReturnController extends BaseController{
     private SdkReturnApplicationManager sdkReturnApplicationManager;
 
     @Autowired
-    private SdkReturnApplicationDeliveryManager returnApplicationDeliveryManager;
+    private SdkReturnApplicationDeliveryManager sdkReturnApplicationDeliveryManager;
 
     @Autowired
     private ReturnOrderAppManager returnOrderAppManager;
@@ -142,11 +142,11 @@ public class OrderReturnController extends BaseController{
         // 查询退货单关联的订单行
         List<Long> ids = new ArrayList<Long>();
         ids.add(id);
-        List<ReturnLineCommand> soLine = sdkReturnLineManager.findSoReturnLinesByReturnOrderIds(ids);
+        List<ReturnLineCommand> soLine = sdkReturnApplicationLineManager.findSoReturnLinesByReturnOrderIds(ids);
         ReturnApplication app = sdkReturnApplicationManager.findByApplicationId(id);
         //如果是换货，查询换货物流
         if (ReturnApplication.SO_RETURN_TYPE_EXCHANGE.equals(app.getType())){
-            ReturnApplicationDeliveryInfo returnDeliveryInfo = returnApplicationDeliveryManager.findDeliveryInfoByReturnId(app.getId());
+            ReturnApplicationDeliveryInfo returnDeliveryInfo = sdkReturnApplicationDeliveryManager.findDeliveryInfoByReturnId(app.getId());
             model.addAttribute("deliveryInfo", returnDeliveryInfo);
         }
         model.addAttribute("SoReturnLine", soLine);
