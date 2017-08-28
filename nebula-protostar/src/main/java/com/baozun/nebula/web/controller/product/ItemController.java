@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -119,6 +120,7 @@ import com.baozun.nebula.sdk.manager.SdkItemSortScoreManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
+import com.baozun.nebula.sdk.manager.system.SysItemOperateLogManager;
 import com.baozun.nebula.solr.manager.ItemSolrManager;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utils.InputStreamCacher;
@@ -204,6 +206,9 @@ public class ItemController extends BaseController {
 	
 	@Autowired
 	private ChooseOptionManager	chooseOptionManager;
+	
+	@Autowired
+	private SysItemOperateLogManager saveSysItemOperateLog;
 
 	/**
 	 * 上传图片的域名
@@ -1699,7 +1704,20 @@ public class ItemController extends BaseController {
 		ids.add(itemId);
 
 		UserDetails userDetails = this.getUserDetails();
+		
+		//==================下架日志添加
+		
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.saveSysOperateLog(itemId,userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + itemId);
+		}
+		
+		//==================下架日志添加
+		
 		Integer result = itemManager.enableOrDisableItemByIds(ids, state, userDetails.getUsername());
+		
 		if (result < 1) {
 			if (state != 1) {
 				throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DISABLED_FAIL);
@@ -1728,7 +1746,32 @@ public class ItemController extends BaseController {
 			ids.add(Long.parseLong(str));
 		}
 		UserDetails userDetails = this.getUserDetails();
+		
+		//==================上架日志添加
+		
+		
+		//记录商品修改日志
+		if(null != ids && ids.size()  > 0){
+			
+			for (Long itemId : ids) {
+				
+				try{
+					
+					saveSysItemOperateLog.saveSysOperateLog(itemId,userDetails.getUserId(), 1l);
+					
+				}catch(Exception e){
+					
+					log.debug("记录修改操作日志失败,商品Id:" + itemId);
+				}
+				
+			}
+			
+		}
+		
+		//==================上架日志添加
+		
 		Integer result = itemManager.enableOrDisableItemByIds(ids, state, userDetails.getUsername());
+		
 		if (result < 1) {
 			if (state != 1) {
 				throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DISABLED_FAIL);
@@ -1769,8 +1812,32 @@ public class ItemController extends BaseController {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 			activeBeginTime = format.parse(activeBeginTimeStr);
 		}
+		
+		//==================批量定时上架日志添加
+		//记录商品修改日志
+		if(null != ids && ids.size()  > 0){
+			
+			Long userId = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+            if(userId == null){
+            	userId = -1l;
+            }
+            
+			for (Long itemId : ids) {
+				
+				try{
+					saveSysItemOperateLog.saveSysOperateLog(itemId,userId, 1l);
+				}catch(Exception e){
+					
+					log.debug("记录修改操作日志失败,商品Id:" + itemId);
+				}
+				
+			}
+			
+		}
+		
+		//==================上架日志添加
+		
 		itemManager.activeItemByIds(ids, activeBeginTime);
-
 		return SUCCESS;
 	}
 
@@ -1826,6 +1893,7 @@ public class ItemController extends BaseController {
 
 		try {
 			List<Item> itemList = itemManager.importItemFromFileI18n(file.getInputStream(), shopId);
+			
 			// 刷solr
 			if (Validator.isNotNullOrEmpty(itemList)) {
 				List<Long> idList = new ArrayList<Long>();
@@ -2626,6 +2694,13 @@ public class ItemController extends BaseController {
 		Item item = itemManager.createOrUpdateSimpleItem(itemCommand, propertyValueIds, categoriesIds, defaultCategoryId, iProperties,
 				skuPropertyCommandArray);
 
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)) {
 			List<Long> itemIdsForSolr = new ArrayList<Long>();
 			itemIdsForSolr.add(item.getId());
@@ -2670,6 +2745,15 @@ public class ItemController extends BaseController {
 		// 保存商品
 		Item item = itemManager.createOrUpdateBundleItem(itemCommand, command, categoriesIds, defaultCategoryId);
 
+		
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
+		
 		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
 		backWarnEntity.setErrorCode(item.getId().intValue());
 		return backWarnEntity;
@@ -2712,7 +2796,15 @@ public class ItemController extends BaseController {
 		// 保存商品
 		Item item = itemLangManager.createOrUpdateSimpleItem(itemCommand, propertyValueIds, categoriesIds, defaultCategoryId, 
 				iProperties, skuPropertyCommandArray);
-
+		
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
+		
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)) {
 			List<Long> itemIdsForSolr = new ArrayList<Long>();
 			itemIdsForSolr.add(item.getId());
@@ -2760,6 +2852,13 @@ public class ItemController extends BaseController {
 		// 保存商品
 		Item item = itemLangManager.createOrUpdateBundleItem(itemCommand, command, categoriesIds, defaultCategoryId);
 
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
 		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
 		backWarnEntity.setErrorCode(item.getId().intValue());
 		return backWarnEntity;
@@ -2797,7 +2896,14 @@ public class ItemController extends BaseController {
 
 		// 保存商品
 		Item item = itemLangManager.createOrUpdateGroupItem(itemCommand, command, categoriesIds, defaultCategoryId);
-
+		
+		try{
+			//记录商品修改日志
+			saveSysItemOperateLog.saveSysOperateLog(item.getId(),userDetails.getUserId(), 1l);
+		}catch(Exception e){
+			log.debug("记录修改操作日志失败,商品Id:" + item.getId());
+		}
+		
 		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
 		backWarnEntity.setErrorCode(item.getId().intValue());
 		return backWarnEntity;

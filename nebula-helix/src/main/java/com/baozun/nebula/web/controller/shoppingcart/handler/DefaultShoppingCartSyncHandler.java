@@ -18,6 +18,7 @@ package com.baozun.nebula.web.controller.shoppingcart.handler;
 
 import static com.feilong.core.util.CollectionsUtil.collect;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
@@ -32,6 +33,7 @@ import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.PackageInfoElement;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameLineExtractor;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartAddDetermineSameLineElements;
+import com.feilong.core.Validator;
 import com.baozun.nebula.web.controller.shoppingcart.builder.DefaultShoppingcartOneLineMaxQuantityBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartOneLineMaxQuantityBuilder;
 
@@ -80,13 +82,24 @@ public class DefaultShoppingCartSyncHandler implements ShoppingCartSyncHandler{
         //出现并发问题的影响: 可能用户购物车会出现2条相同的数据, 影响是个人, 但也可个人删除
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandListInDB = sdkShoppingCartQueryManager.findShoppingCartLineCommandList(memberId);
-
+       
+        List<Long> careIds=new ArrayList<Long>();
+        if(Validator.isNotNullOrEmpty(shoppingCartLineCommandListInDB)){
+            for(ShoppingCartLineCommand shoppingCartLineCommand :shoppingCartLineCommandListInDB){
+                careIds.add(shoppingCartLineCommand.getId());
+            }
+        }
+        //游客登陆后将会把账户购物车中的购物车行勾选去掉
+        if(null!=careIds && careIds.size()>0){
+    		sdkShoppingCartUpdateManager.updateCartLineSettlementState(memberId, careIds, false);
+        }
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
             if (shoppingCartLineCommand.isGift()){ // 不同步赠品数据
                 continue;
             }
             syncShoppingCart(memberId, shoppingCartLineCommand, shoppingCartLineCommandListInDB);
         }
+       
     }
 
     /**

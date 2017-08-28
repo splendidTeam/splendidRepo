@@ -88,4 +88,9 @@ public class PromotionBriefBuilderImpl implements PromotionBriefBuilder{
                         shoppingCartCommand.getCurrentTime());
     }
 
+    @Override
+    public List<PromotionCommand> getCoarsePromotionBriefList(ShoppingCartCommand shoppingCartCommand){       
+        return getPromotionCommandList(shoppingCartCommand);
+    }
+
 }

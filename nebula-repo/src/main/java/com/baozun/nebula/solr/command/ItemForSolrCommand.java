@@ -391,7 +391,14 @@ public class ItemForSolrCommand implements Serializable {
 	@Field("dynamic_colorref_*")
 	private Map<String, List<String>> dynamicColorRefMap;
 
-
+	
+    /**
+     * 动态排序字段，用于扩展默认排序以外的排序
+     */
+    @Field("dynamic_sort_*")
+    private Map<String, Long> dynamicSortMap;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -938,6 +945,20 @@ public class ItemForSolrCommand implements Serializable {
 	public void setNavigationTree(List<String> navigationTree) {
 		this.navigationTree = navigationTree;
 	}
+
+    /**
+     * @return the dynamicSortMap
+     */
+    public Map<String, Long> getDynamicSortMap(){
+        return dynamicSortMap;
+    }
+
+    /**
+     * @param dynamicSortMap the dynamicSortMap to set
+     */
+    public void setDynamicSortMap(Map<String, Long> dynamicSortMap){
+        this.dynamicSortMap = dynamicSortMap;
+    }
 
 
 //	public void setPosition(List<Integer> position) {

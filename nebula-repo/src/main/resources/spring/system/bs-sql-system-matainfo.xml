@@ -61,8 +61,8 @@
 		       					and CODE=:code
 		       				#end
 		       				
-		       				#if($describe)
-		       					and DESCRIBE like '%$describe%'
+		       				#if($declare)
+		       					and DECLARE like '%$declare%'
 		       				#end
 		       				
 		       				#if($value)
@@ -95,8 +95,8 @@
 		       					and VALUE like :value
 		       				#end
 		       				
-		       				#if($describe)
-		       					and DESCRIBE like '%$describe%'
+		       				#if($declare)
+		       					and DECLARE like '%$declare%'
 		       				#end
 		       			
 		       				#if($lifecycle)

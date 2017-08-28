@@ -20,6 +20,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,9 +38,11 @@ import com.baozun.nebula.manager.baseinfo.ShopManager;
 import com.baozun.nebula.manager.product.ItemExportImportManager;
 import com.baozun.nebula.model.product.Industry;
 import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.sdk.manager.system.SysItemOperateLogManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.solr.manager.ItemSolrManager;
 import com.baozun.nebula.utils.InputStreamCacher;
+import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
@@ -69,6 +72,9 @@ public class ItemExportImportController extends BaseController{
     @Autowired
     private PropertyDao             propertyDao;
 
+	@Autowired
+	private SysItemOperateLogManager saveSysItemOperateLog;
+    
     /**
      * 转到商品导出和导入页面
      * 
@@ -184,75 +190,93 @@ public class ItemExportImportController extends BaseController{
         return "json";
     }
 
-    /**
-     * 导入商品
-     * 
-     * @param industryId
-     * @param mFile
-     * @return
-     */
-    @RequestMapping(value = "/item/itemImport.json",method = RequestMethod.POST)
-    @ResponseBody
-    public BackWarnEntity itemImport(HttpServletRequest request,HttpServletResponse response){
-        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-        MultipartFile file = multipartRequest.getFile("excelFile");
-        BackWarnEntity result = new BackWarnEntity(Boolean.TRUE, "");
-
-        Long shopId = shopManager.getShopId(getUserDetails());
-        InputStreamCacher cacher = null;
-        try{
-            cacher = new InputStreamCacher(file.getInputStream());
-            List<Long> itemIdsForSolr = itemExportImportManager.itemImport(cacher.getInputStream(), shopId);
-            // 更新商品索引信息
-            if (itemIdsForSolr != null && !itemIdsForSolr.isEmpty()){
-                if (log.isDebugEnabled()){
-                    log.debug("update item solr index item id list is {}", itemIdsForSolr.toString());
-                }
-
-                Boolean isSuccess = Boolean.FALSE;
-                boolean i18n = LangProperty.getI18nOnOff();
-                if (i18n){
-                    isSuccess = itemSolrManager.saveOrUpdateItemI18n(itemIdsForSolr);
-                }else{
-                    isSuccess = itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
-                }
-
-                if (!isSuccess){
-                    throw new BusinessException(ErrorCodes.SOLR_SETTING_UPDATE_FAIL);
-                }
-            }
-        }catch (IOException e){
-            e.printStackTrace();
-        }catch (BusinessException e){
-            Boolean flag = Boolean.TRUE;
-            List<String> errorMessages = new ArrayList<String>();
-            BusinessException linkedException = e;
-            while (flag){
-                String message = "";
-                if (linkedException.getErrorCode() == 0){
-                    message = linkedException.getMessage();
-                }else{
-                    if (linkedException.getArgs() == null){
-                        message = getMessage(linkedException.getErrorCode());
-                    }else{
-                        message = getMessage(linkedException.getErrorCode(), linkedException.getArgs());
-                    }
-
-                }
-                errorMessages.add(message);
-                if (linkedException.getLinkedException() == null){
-                    flag = Boolean.FALSE;
-                }else{
-                    linkedException = linkedException.getLinkedException();
-                }
-            }
-            //String userFilekey = addErrorInfo(errorMessages, cacher, response, name);
-            //返回信息
-            result.setIsSuccess(Boolean.FALSE);
-            result.setDescription(errorMessages.toString());
-            //rs.put("userFilekey", userFilekey);
-        }
-        return result;
-    }
+	/**
+	 * 导入商品
+	 * @param industryId
+	 * @param mFile
+	 * @return
+	 */
+	@RequestMapping(value = "/item/itemImport.json", method = RequestMethod.POST)
+	@ResponseBody
+	public BackWarnEntity itemImport(HttpServletRequest request, HttpServletResponse response){
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		MultipartFile file = multipartRequest.getFile("excelFile");
+		BackWarnEntity result = new BackWarnEntity(Boolean.TRUE, "");
+		
+		Long shopId = shopManager.getShopId(getUserDetails());
+		InputStreamCacher cacher = null;
+		try {
+			cacher = new InputStreamCacher(file.getInputStream());
+			List<Long> itemIdsForSolr = itemExportImportManager.itemImport(cacher.getInputStream(), shopId);
+			
+			//记录商品修改日志
+			if (itemIdsForSolr != null && !itemIdsForSolr.isEmpty()) {
+				
+				Long userId = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+	            if(userId == null){
+	            	userId = -1l;
+	            }
+	            
+				for (Long itemId : itemIdsForSolr) {
+					try{
+						//记录商品修改日志
+						saveSysItemOperateLog.saveSysOperateLog(itemId,userId, 3l);
+					}catch(Exception e){
+						log.debug("记录修改操作日志失败,商品Id:" + itemId);
+					}
+				}
+			}
+			
+			// 更新商品索引信息
+			if (itemIdsForSolr != null && !itemIdsForSolr.isEmpty()) {
+				if (log.isDebugEnabled()) {
+					log.debug("update item solr index item id list is {}", itemIdsForSolr.toString());
+				}
+				
+				Boolean isSuccess = Boolean.FALSE;
+				boolean i18n = LangProperty.getI18nOnOff();
+				if(i18n){
+					isSuccess = itemSolrManager.saveOrUpdateItemI18n(itemIdsForSolr);
+				}else{
+					isSuccess = itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
+				}
+				
+				if(!isSuccess){
+					throw new BusinessException(ErrorCodes.SOLR_SETTING_UPDATE_FAIL);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (BusinessException e){
+			Boolean flag = Boolean.TRUE;
+			List<String> errorMessages = new ArrayList<String>();
+			BusinessException linkedException = e;
+			while(flag){
+				String message = "";
+				if(linkedException.getErrorCode() == 0){
+					message = linkedException.getMessage();
+				}else{
+					if(linkedException.getArgs() == null){
+						message = getMessage(linkedException.getErrorCode());
+					}else{
+						message = getMessage(linkedException.getErrorCode(), linkedException.getArgs());
+					}
+					
+				}
+				errorMessages.add(message);
+				if(linkedException.getLinkedException() == null){
+					flag = Boolean.FALSE;
+				}else{
+					linkedException = linkedException.getLinkedException();
+				}
+			}
+			//String userFilekey = addErrorInfo(errorMessages, cacher, response, name);
+			//返回信息
+			result.setIsSuccess(Boolean.FALSE);
+			result.setDescription(errorMessages.toString());
+			//rs.put("userFilekey", userFilekey);
+		}
+		return result;
+	}
 
 }

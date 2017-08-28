@@ -282,4 +282,5 @@ public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
                     @QueryParam("logisticsProviderName") String logisticsProviderName,
                     @QueryParam("transCode") String transCode,
                     @QueryParam("modifyTime") Date modifyTime);
+
 }

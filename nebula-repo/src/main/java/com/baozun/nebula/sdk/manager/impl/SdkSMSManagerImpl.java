@@ -35,8 +35,10 @@ import com.baozun.nebula.dao.system.SmsSendLogDao;
 import com.baozun.nebula.model.system.SmsSendLog;
 import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.feilong.core.RegexPattern;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
+import com.feilong.core.util.RegexUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
@@ -79,6 +81,26 @@ public class SdkSMSManagerImpl implements SdkSMSManager{
         return getSendResult(resultMap);
     }
 
+    @Override
+    public boolean send(SMSCommand smsCommand,String captcha){
+
+        // 验证手机号码格式
+        String mobile = smsCommand.getMobile();
+        if (!RegexUtil.matches(RegexPattern.MOBILEPHONE, mobile)){
+            return false;
+        }
+
+        smsCommand.addVar("captcha", captcha);
+        // 发送短信
+        SendResult sendResult = send(smsCommand);
+        // 发送短信成功，保存captcha到redies
+        if (sendResult.equals(SendResult.SUCESS)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
     /**
      * 构建hub接口的入参SmsCommand
      * 
@@ -152,4 +174,5 @@ public class SdkSMSManagerImpl implements SdkSMSManager{
 
         return sendResult;
     }
+
 }

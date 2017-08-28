@@ -47,7 +47,7 @@ public class ItemSortCommand  implements Command{
 	/**
      * 商品库存
      */
-    private String repertory;
+    private Integer inventory;
     
     
 	
@@ -100,18 +100,19 @@ public class ItemSortCommand  implements Command{
 	}
 
     
-    public String getRepertory(){
-        return repertory;
-    }
-
-    
-    public void setRepertory(String repertory){
-        this.repertory = repertory;
-    }
-
-    
     public static long getSerialversionuid(){
         return serialVersionUID;
     }
+
+    
+    public Integer getInventory(){
+        return inventory;
+    }
+
+    
+    public void setInventory(Integer inventory){
+        this.inventory = inventory;
+    }
+    
 	
 }

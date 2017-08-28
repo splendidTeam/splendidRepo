@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SdkReturnApplicationLineDao.findSoReturnLinesByReturnOrderIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过退货单编号查询退货订单行</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+					DISTINCT
+					 soline.RETURN_ORDERID as RETURNORDERID,
+					 soline.RTN_EXTENTIONCODE as RTNEXTENTIONCODE,
+					 soline.CHG_EXTENTIONCODE as CHGEXTENTIONCODE,
+					 soline.QTY as QTY,
+					 soline.SO_LINEID as SOLINEID,
+					 soline.PACKAGE_LINE_ID as PACKAGELINEID,
+					 soline.RETURN_REASON as RETURNREASON,
+					 soline.CREATE_TIME as CREATETIME,
+					 soline.IMGNAME as  IMGNAME,
+				     soline.MEMO as MEMO,
+					 soline.RETURN_PRICE as RETURNPRICE,
+				     soline.TYPE as TYPE,
+				     line.item_name as productName,
+				     item.code as itemCode,
+				     line.extention_code as extentionCode
+				  from T_SO_RETURN_APPLICATION_LINE soline 
+						left join T_SO_ORDERLINE LINE
+								on soline.so_lineid=line.id
+						left join t_pd_item item
+								on line.item_id=item.id
+			     	where  soline.return_orderid in(
+					#foreach($return_orderid in $returnOrderIds)
+    					$return_orderid,
+					 #end
+		       		 -1)
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SdkReturnApplicationLineDao.findReturnLinesByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>BY退换货行ID集合查询退换货行</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+					soline.RETURN_ORDERID as RETURNORDERID,
+					soline.RTN_EXTENTIONCODE as RTNEXTENTIONCODE,
+					soline.CHG_EXTENTIONCODE as CHGEXTENTIONCODE,
+					soline.QTY as QTY,
+					soline.SO_LINEID as SOLINEID,
+					soline.PACKAGE_LINE_ID as PACKAGELINEID,
+					soline.RETURN_REASON as RETURNREASON,
+					soline.CREATE_TIME as CREATETIME,
+					soline.IMGNAME as  IMGNAME,
+					soline.MEMO as MEMO,
+					soline.RETURN_PRICE as RETURNPRICE,
+					soline.TYPE as TYPE
+				from T_SO_RETURN_APPLICATION_LINE soline 
+			    where soline.id in(
+					#foreach($return_line_id in $returnLinesIds)
+    					$return_line_id,
+					#end
+		       		-1)
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

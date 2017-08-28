@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 退换货(申请单) -->
+	<bean id="SdkReturnApplicationDao.findByApplicationId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ApplicationId查询SoReturnApplication</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+					application.*
+			    from 
+			    	t_so_return_application application where application.id = :id
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SdkReturnApplicationDao.findLastApplicationByOrderLineId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据orderLineId 查询退换货订单</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+				  application.*
+			    from t_so_return_application application 
+			       where
+			       application.id = (
+			         select t1.return_orderid from  t_so_return_application_line t1 left join t_so_orderline t2 on t1.so_lineid = t2.id 
+			         where t2.id =:orderLineId  order by t1.create_time desc 
+			       )
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="SdkReturnApplicationDao.findLastApplicationByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据orderId 查询退换货订单</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+				  application.*
+			    from t_so_return_application application 
+			       where application.so_order_id=:orderId
+			        order by application.create_time desc
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="SdkReturnApplicationDao.countItemByOrderLineIdAndStatus" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据orderlineid和退货状态 统计 普通商品 （当前订单行） 对应的退货单行商品的数量</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select sum(line.qty) qty
+				  from t_so_return_application_line line
+				  inner join t_so_return_application app 
+				  on app.id = line.return_orderid
+				   where line.so_lineid =:orderLineId
+					     and app.status in (#foreach($sta in $statusArr)$sta,#end-1999);
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+	<!-- 退换货(申请单) -->
+	<bean id="SdkReturnApplicationDao.findSoReturnAppsByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据退单ids查询SoReturnApplications</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+				 application.*
+			    from t_so_return_application application where application.id 
+			    in (
+			       		#foreach( $id in $returnIds )
+	    					$id,
+					    #end
+				-1);
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SdkReturnApplicationDao.findByApplicationByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据memberId查询SoReturnApplication</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+					*
+			         from t_so_return_application  where member_id = :memberid 
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 后台管理退换货 -->
+	<bean id="SdkReturnApplicationDao.findByCodeOrName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ApplicationId查询SoReturnApplication</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+				 application.*
+			    from t_so_return_application application 
+			     where 1=1 
+			        #if($code)
+					AND application.return_application_code =:code
+					#end
+					#if($loginName)
+					AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name =:loginName AND member.id=application.member_id)
+					#end
+					#if($soOrderCode)
+					AND application.so_order_code =:soOrderCode
+					#end
+					#if($status)
+					AND application.status =:status
+					#end
+					#if($refundStatus)
+					AND application.refund_status =:refundStatus
+					#end
+					#if($type)
+					AND application.type =:type
+					#end
+				ORDER BY application.id desc
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<!-- pts分页条件查询管理退换货 -->
+	<bean id="SdkReturnApplicationDao.findReturnByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据查询条件查询SoReturnApplication</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+				 application.*
+			    from t_so_return_application application
+			     where 1=1 
+			     	#if($loginName)
+					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name LIKE '$loginName' AND member.id=application.member_id)
+					#end
+			        #if($returnCode)
+						AND application.return_application_code LIKE '$returnCode'
+					#end
+					#if($oderCode)
+						AND application.so_order_code LIKE '$oderCode'
+					#end
+					#if($Logname)
+						AND application.trans_name LIKE '$Logname'
+					#end
+					#if($LogCode)
+						AND application.trans_code LIKE '$LogCode'
+					#end
+					#if($status)
+						AND application.status =:status
+					#end
+					#if($startDate)
+		       			and application.create_time >= :startDate
+		       		#end
+		       		#if($endDate)
+		       			and (application.create_time - INTERVAL '1 day') <= :endDate
+		       		#end
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="SdkReturnApplicationDao.findApplicationByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据退货单编号查询退货单</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select a.* 
+				from t_so_return_application a 
+				where a.return_application_code = :code
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- pts分页条件查询管理退换货 -->
+	<bean id="SdkReturnApplicationDao.findExpInfo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据查询条件查询orderReturnCommand信息（用于导出excel表）</description>
+		<constructor-arg>
+			<value><![CDATA[
+			select DISTINCT
+				application.OMS_CODE as platformOMSCode,member.login_name as refundPayee,
+				application.SO_ORDER_CODE as soOrderCode,
+				application.RETURN_PRICE as returnPrice,application.status as status ,application.approver as approver,
+				application.approvetime as approveTime,application.create_time as createTime,application.TRANS_CODE as TRANSCODE,
+				application.trans_Name as transName,application.RETURN_REASON  as returnReason,application.type as type
+			    from  t_so_return_application application 
+			    left join t_so_salesorder salesorder
+			    	on application.so_order_id=salesorder.id
+				left join t_mem_member member
+			    	on salesorder.member_id=member.id
+			     where 1=1 
+			     	#if($returnOrderCode)
+			     		AND application.return_application_code  like '$returnOrderCode'
+			     	#end
+			     	#if($loginName)
+					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_name like '$loginName' AND member.id=application.member_id)
+					#end
+			        #if($returnCode)
+						AND application.oms_code like '$returnCode'
+					#end
+					#if($oderCode)
+						AND application.so_order_code like '$oderCode'
+					#end
+					#if($Logname)
+						AND application.trans_name like '$Logname'
+					#end
+					#if($LogCode)
+						AND application.trans_code like '$LogCode'
+					#end
+					#if($status)
+						AND application.status =:status
+					#end
+					#if($startDate)
+		       			and application.create_time >= :startDate
+		       		#end
+		       		#if($endDate)
+		       			and (application.create_time - INTERVAL '1 day') <= :endDate
+		       		#end
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+		
+	<bean id="SdkReturnApplicationDao.findApplicationByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id查询退货单</description>
+		<constructor-arg>
+			<value><![CDATA[
+				SELECT * 
+				  from  t_so_return_application where so_order_id=:orderId
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="SdkReturnApplicationDao.findApplicationByParam" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据查询条件获取退货单</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select 
+				 application.*
+			    from t_so_return_application application
+			     where 1=1 
+			     	#if($returnOrderCode)
+			     		AND application.return_application_code = :returnOrderCode
+			     	#end
+			        #if($returnCode)
+						AND application.oms_code = :returnCode
+					#end
+					#if($orderCode)
+						AND application.so_order_code = :orderCode
+					#end
+					#if($Logname)
+						AND application.trans_name =:Logname
+					#end
+					#if($LogCode)
+						AND application.trans_code =:LogCode
+					#end
+					#if($status)
+						AND application.status =:status
+					#end
+					#if($startDate)
+		       			and application.create_time >= :startDate
+		       		#end
+		       		#if($endDate)
+		       			and application.create_time <= :endDate
+		       		#end
+		       		#if($startApproveDate)
+		       			and application.approve_time >= :startApproveDate
+		       		#end
+		       		#if($endApproveDate)
+		       			and application.approve_time <= :endApproveDate
+		       		#end
+		       		#if($returnPrice)
+		       			and application.return_price = :returnPrice
+		       		#end
+		       		#if($returnAccount)
+		       			and application.return_account = :returnAccount
+		       		#end
+		       		#if($orderId)
+		       			and application.so_order_id = :orderId
+		       		#end
+		       		#if($type)
+		       			and application.type = :type
+		       		#end
+		       		#if($refundType)
+		       			and application.refund_type = :refundType
+		       		#end
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SdkReturnApplicationDao.findByStatusAndSyntype" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value><![CDATA[
+				select * from t_so_return_Application where (type = 1 or type = 2) and syntype = :syntype and status = :status
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SdkReturnApplicationDao.findByStatus" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据状态查询退换货信息</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select * from t_so_return_Application where (type = 1 or type = 2) and status = :status
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SdkReturnApplicationDao.findByOmsCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据退换货单SoReturnApplication的编码platformcode查询SoReturnApplication
+		</description>
+		<constructor-arg>
+			<value><![CDATA[
+				SELECT application.*
+				FROM t_so_return_application application
+				WHERE application.oms_code = :omsCode
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="SdkReturnApplicationDao.findReturnApplicationCommandByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据退换货单id集合查询退货单
+		</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select * from t_so_return_application app
+					left join 
+					     T_SO_RETURN_APPLICATION_DELIVERYINFO delivery
+				     on
+				         app.id=delivery.retrunApplicationId
+					LEFT JOIN 
+					     t_so_return_application_line line
+					 on 
+					     app.id=line.return_orderid
+					where id in(
+					#foreach($id in $ids)
+    					$id,
+					 #end
+		       		 -1)
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

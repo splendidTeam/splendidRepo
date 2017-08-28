@@ -86,7 +86,7 @@ public class DefaultOrderLineV5ListBuilder implements OrderLineV5ListBuilder{
         orderLineV5.setBsSkuName(orderLineCommand.getItemName());
         orderLineV5.setQty(orderLineCommand.getCount());
         //是否赠品 
-        orderLineV5.setIsPrezzie(orderLineCommand.getType() != Constants.ITEM_TYPE_SALE);
+        orderLineV5.setIsPrezzie(!Constants.ITEM_TYPE_SALE.equals(orderLineCommand.getType()));
         //保修时长(按月计)
         orderLineV5.setWarrantyMonths(null);
 

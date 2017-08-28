@@ -6,9 +6,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +29,10 @@ import com.baozun.nebula.model.member.MemberGroup;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.controller.BaseController;
+import com.feilong.core.Validator;
+
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 
 
@@ -198,5 +199,19 @@ public class MemberController extends BaseController {
 		return result;
 	}
 	 
+	
+	@RequestMapping("/member/findMemberById.json")
+    @ResponseBody
+    public MemberPersonalDataCommand  findMemberById(@RequestParam("memberId") Long memberId) {
+	    if(memberId==-1){
+            return null;
+        }
+	    MemberPersonalDataCommand memberPersonalDataCommand = memberManager.findMemberById(memberId);
+	    if(Validator.isNotNullOrEmpty(memberPersonalDataCommand)){
+	        return memberPersonalDataCommand;
+	    }
+	    return null;
+           
+    }
 
 }
