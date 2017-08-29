@@ -18,8 +18,6 @@ package com.baozun.nebula.web.controller.shoppingcart.form;
 
 import java.util.List;
 
-import com.baozun.nebula.web.controller.BaseForm;
-
 /**
  * 购物车行 添加的form.
  * 
@@ -34,19 +32,10 @@ import com.baozun.nebula.web.controller.BaseForm;
  * @see com.baozun.nebula.model.shoppingcart.ShoppingCartLine
  * @since 5.3.2.13
  */
-public class ShoppingCartLineAddForm extends BaseForm{
+public class ShoppingCartLineAddForm extends AbstractCommonAddForm{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -1175182005329799871L;
-
-    /** 买的哪个skuid(必填). */
-    private Long skuId;
-
-    /** 买几个(必填). */
-    private Integer count;
-
-    /** 包装信息. */
-    private List<PackageInfoForm> packageInfoFormList;
 
     /**
      * 
@@ -74,63 +63,6 @@ public class ShoppingCartLineAddForm extends BaseForm{
         super();
         this.skuId = skuId;
         this.count = count;
-        this.packageInfoFormList = packageInfoFormList;
-    }
-
-    /**
-     * 获得 买的哪个skuid(必填).
-     *
-     * @return the skuId
-     */
-    public Long getSkuId(){
-        return skuId;
-    }
-
-    /**
-     * 设置 买的哪个skuid(必填).
-     *
-     * @param skuId
-     *            the skuId to set
-     */
-    public void setSkuId(Long skuId){
-        this.skuId = skuId;
-    }
-
-    /**
-     * 获得 买几个(必填).
-     *
-     * @return the count
-     */
-    public Integer getCount(){
-        return count;
-    }
-
-    /**
-     * 设置 买几个(必填).
-     *
-     * @param count
-     *            the count to set
-     */
-    public void setCount(Integer count){
-        this.count = count;
-    }
-
-    /**
-     * 获得 包装信息.
-     *
-     * @return the packageInfoFormList
-     */
-    public List<PackageInfoForm> getPackageInfoFormList(){
-        return packageInfoFormList;
-    }
-
-    /**
-     * 设置 包装信息.
-     *
-     * @param packageInfoFormList
-     *            the packageInfoFormList to set
-     */
-    public void setPackageInfoFormList(List<PackageInfoForm> packageInfoFormList){
         this.packageInfoFormList = packageInfoFormList;
     }
 
