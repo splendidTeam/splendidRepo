@@ -28,11 +28,13 @@ import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddFor
 public interface ShoppingCartLineCommandBuilder{
 
     /**
-     * 基于传入的add form和extentionCode 来构造一条 ShoppingCartLineCommand
-     * 
+     * 基于传入的add form和extentionCode 来构造一条 ShoppingCartLineCommand.
+     *
      * @param shoppingCartLineAddForm
+     *            the shopping cart line add form
      * @param extentionCode
-     * @return
+     *            the extention code
+     * @return the shopping cart line command
      */
     ShoppingCartLineCommand build(ShoppingCartLineAddForm shoppingCartLineAddForm,String extentionCode);
 }
