@@ -54,6 +54,8 @@ public class DefaultOrderLinePackInfoCreateManager implements OrderLinePackInfoC
     @Autowired
     private SdkOrderLinePackageInfoDao sdkOrderLinePackageInfoDao;
 
+    //---------------------------------------------------------------------
+
     /*
      * (non-Javadoc)
      * 
@@ -64,8 +66,10 @@ public class DefaultOrderLinePackInfoCreateManager implements OrderLinePackInfoC
         Validate.notNull(orderLine, "orderLine can't be null!");
         Validate.notNull(shoppingCartLineCommand, "shoppingCartLineCommand can't be null!");
 
+        //---------------------------------------------------------------------
         List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList();
 
+        //没有包装信息
         if (isNullOrEmpty(shoppingCartLinePackageInfoCommandList)){
             LOGGER.debug("orderLine:[{}] don't has shoppingCartLinePackageInfoCommandList,no need to save OrderLine PackInfo", orderLine.getId());
             return;
@@ -75,24 +79,40 @@ public class DefaultOrderLinePackInfoCreateManager implements OrderLinePackInfoC
         Long orderLineId = orderLine.getId();
 
         for (ShoppingCartLinePackageInfoCommand shoppingCartLinePackageInfoCommand : shoppingCartLinePackageInfoCommandList){
-            Long packageInfoId = shoppingCartLinePackageInfoCommand.getPackageInfoId();
-
-            if (packageInfoId == null){//添加 package  可能是立即购买
-                LOGGER.debug("shoppingCartLinePackageInfoCommand no packageInfoId,may be isImmediatelyBuy,will save savePackageInfo");
-
-                PackageInfo packageInfo = packageInfoManager.savePackageInfo(shoppingCartLinePackageInfoCommand);
-                packageInfoId = packageInfo.getId();
-            }
+            Long packageInfoId = determinePackageInfoId(shoppingCartLinePackageInfoCommand);
 
             OrderLinePackageInfo orderLinePackageInfo = buildOrderLinePackageInfo(orderLineId, packageInfoId);
             sdkOrderLinePackageInfoDao.save(orderLinePackageInfo);
 
             if (LOGGER.isDebugEnabled()){
-                LOGGER.debug("save OrderLinePackageInfo:{}", JsonUtil.format(orderLinePackageInfo));
+                LOGGER.debug("save OrderLinePackageInfo:[{}]", JsonUtil.format(orderLinePackageInfo));
             }
         }
         LOGGER.debug("save OrderLine:[{}],packInfo over~~", orderLineId);
     }
+
+    /**
+     * 判断packageInfoId.
+     * 
+     * @param shoppingCartLinePackageInfoCommand
+     * @return 如果 {@link ShoppingCartLinePackageInfoCommand#getPackageInfoId()} 不是null,表示是购物车模式的, 那么直接拿这个数据保存;<br>
+     *         如果是null 标识是立即购买模式的, 那么会插入一条数据,拿返回的结果id
+     * @since 5.3.2.27
+     */
+    private Long determinePackageInfoId(ShoppingCartLinePackageInfoCommand shoppingCartLinePackageInfoCommand){
+        Long packageInfoId = shoppingCartLinePackageInfoCommand.getPackageInfoId();
+        if (null != packageInfoId){
+            return packageInfoId;
+        }
+
+        //添加 package  可能是立即购买
+        LOGGER.debug("shoppingCartLinePackageInfoCommand no packageInfoId,may be isImmediatelyBuy,will save savePackageInfo");
+
+        PackageInfo packageInfo = packageInfoManager.savePackageInfo(shoppingCartLinePackageInfoCommand);
+        return packageInfo.getId();
+    }
+
+    //---------------------------------------------------------------------
 
     /**
      * @param orderLineId
