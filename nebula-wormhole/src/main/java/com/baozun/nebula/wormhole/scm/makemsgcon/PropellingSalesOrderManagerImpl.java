@@ -101,9 +101,9 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         salesOrderV5.setPayDiscount(getPayDiscount(salesOrderCommand));
 
         //卖家备注
-        salesOrderV5.setSellerMemo(getRemark(salesOrderCommand.getRemark(),"sellerMemo"));
-        //买家备注
-        salesOrderV5.setBuyerMemo(getRemark(salesOrderCommand.getRemark(),"buyerMemo"));
+        salesOrderV5.setSellerMemo(null);
+        //买家家备注
+        salesOrderV5.setBuyerMemo(salesOrderCommand.getRemark());
 
         //订单行
         salesOrderV5.setOrderLines(orderLineV5ListBuilder.buildOrderLineV5List(salesOrderCommand));
@@ -129,6 +129,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         return propellingCommonManager.saveMsgBody(ConvertUtil.toList(salesOrderV5), msgSendRecord.getId());
     }
     
+    @SuppressWarnings("unused")
     private String getRemark(String remark,String type){
         if(Validator.isNullOrEmpty(remark)){
             return null;
