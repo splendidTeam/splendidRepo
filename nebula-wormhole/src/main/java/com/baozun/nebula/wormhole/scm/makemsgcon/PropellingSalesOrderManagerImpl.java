@@ -4,7 +4,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.json.JSONObject;
+
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +23,14 @@ import com.baozun.nebula.wormhole.mq.entity.order.OrderStatusV5;
 import com.baozun.nebula.wormhole.mq.entity.order.SalesOrderV5;
 import com.baozun.nebula.wormhole.mq.entity.pay.PaymentInfoV5;
 import com.baozun.nebula.wormhole.scm.handler.PropellingSalesOrderHandler;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;
 
 @Transactional
 @Service("propellingSalesOrderManager")
 public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderManager{
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOrderLineProductPackageV5Builder.class);
 
     @Autowired
     private OrderManager sdkOrderService;
@@ -66,7 +73,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 
         SalesOrderV5 salesOrderV5 = new SalesOrderV5();
 
-      //纳税人识别码和发票类型
+        //纳税人识别码和发票类型
         salesOrderV5.setBusinessType(salesOrderCommand.getReceiptType());
         salesOrderV5.setTaxPayerId(salesOrderCommand.getTaxPayerId());
         
@@ -94,9 +101,9 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         salesOrderV5.setPayDiscount(getPayDiscount(salesOrderCommand));
 
         //卖家备注
-        salesOrderV5.setSellerMemo(null);
-        //买家家备注
-        salesOrderV5.setBuyerMemo(salesOrderCommand.getRemark());
+        salesOrderV5.setSellerMemo(getRemark(salesOrderCommand.getRemark(),"sellerMemo"));
+        //买家备注
+        salesOrderV5.setBuyerMemo(getRemark(salesOrderCommand.getRemark(),"buyerMemo"));
 
         //订单行
         salesOrderV5.setOrderLines(orderLineV5ListBuilder.buildOrderLineV5List(salesOrderCommand));
@@ -120,6 +127,31 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         }
 
         return propellingCommonManager.saveMsgBody(ConvertUtil.toList(salesOrderV5), msgSendRecord.getId());
+    }
+    
+    private String getRemark(String remark,String type){
+        if(Validator.isNullOrEmpty(remark)){
+            return null;
+        }
+        JSONObject jsonRemark = new JSONObject();
+        try{
+            jsonRemark = JSONObject.fromObject(remark);
+        }catch (Exception e){
+            LOGGER.warn("订单备注非json格式。");
+            //卖家备注 返回整条备注信息
+            if("sellerMemo".equals(type)){
+                return remark;
+            }
+            return null;
+        }
+        return jsonRemark.getString(type);
+    }
+
+    public static void main(String[] args){
+        String remark = "dasfd";
+        JSONObject jsonRemark = JSONObject.fromObject(remark);
+        System.out.println(jsonRemark.getString("sellerMemo"));
+        System.out.println(jsonRemark.getString("buyerMemo"));
     }
 
 

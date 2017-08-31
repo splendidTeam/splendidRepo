@@ -93,6 +93,8 @@ public class ShippingInfoSubForm implements Serializable{
     /** 指定类型 ,参见 {@link com.baozun.nebula.model.salesorder.Consignee#getAppointType()} */
     private String            appointType;
 
+    /** 买家备注 */
+    private String remark;
     //***************************************************************************
     //XXX feilong 地址别名 String alias, 目前数据库还不支持
 
@@ -409,6 +411,15 @@ public class ShippingInfoSubForm implements Serializable{
     
     public void setContactId(Long contactId){
         this.contactId = contactId;
+    }
+
+    
+    public String getRemark(){
+        return remark;
+    }
+
+    public void setRemark(String remark){
+        this.remark = remark;
     }
 
 }
