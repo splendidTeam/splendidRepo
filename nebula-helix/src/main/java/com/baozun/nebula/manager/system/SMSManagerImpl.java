@@ -11,10 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.sdk.manager.SdkSMSManager;
-import com.baozun.nebula.sdk.manager.SdkSMSManager.SendResult;
-import com.feilong.core.RegexPattern;
 import com.feilong.core.util.RandomUtil;
-import com.feilong.core.util.RegexUtil;
 
 /**
  * 短信校验码‘发送’;
@@ -49,14 +46,13 @@ public class SMSManagerImpl implements SMSManager{
 
         boolean result = sdkSMSManager.send(smsCommand, captcha);
 		// 发送短信成功，保存captcha到redies
-        if (SendResult.SUCESS.equals(result)){
+       // if (SendResult.SUCESS.equals(result)){
+       if (result){
 			String businessCode = SMS_REGISTER_CAPTCHA_CODE + smsCommand.getMobile();
 			tokenManager.saveToken(businessCode, smsCommand.getMobile(), validity, captcha);
 			return true;
-		}else{
-			return false;
-		}
-
+		} 
+		return false;
 	}
 
 	/*
@@ -71,12 +67,12 @@ public class SMSManagerImpl implements SMSManager{
 	    
 	    boolean result = sdkSMSManager.send(smsCommand, captcha);
 		// 发送短信成功，保存captcha到redies
-		if (SendResult.SUCESS.equals(result)){
+		//if (SendResult.SUCESS.equals(result)){
+		if (result){    
 			tokenManager.saveToken(businessCode, smsCommand.getMobile(), validity, captcha);
 			return true;
-		}else{
-			return false;
 		}
+		return false;
 	}
 
 	/**
