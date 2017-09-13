@@ -130,21 +130,17 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
     }
     
     private String getRemark(String remark,String type){
-        if(Validator.isNullOrEmpty(remark)){
-            return null;
-        }
-        JSONObject jsonRemark = new JSONObject();
-        try{
-            jsonRemark = JSONObject.fromObject(remark);
-        }catch (Exception e){
-            LOGGER.warn("订单备注非json格式。");
-            //卖家备注 返回整条备注信息
-            if("sellerMemo".equals(type)){
-                return remark;
+        String bosRemark = "";
+        if(Validator.isNotNullOrEmpty(remark)){
+            try{
+                JSONObject jsonRemark = new JSONObject();
+                jsonRemark = JSONObject.fromObject(remark);
+                bosRemark = jsonRemark.getString(type);
+            }catch (Exception e){
+                LOGGER.warn("订单备注格式错误,remark:{}",remark);
             }
-            return null;
         }
-        return jsonRemark.getString(type);
+        return bosRemark;
     }
 
     public static void main(String[] args){
