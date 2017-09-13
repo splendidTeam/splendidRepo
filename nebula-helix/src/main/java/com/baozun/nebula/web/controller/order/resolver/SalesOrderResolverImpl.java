@@ -23,6 +23,7 @@ import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,7 +197,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         salesOrderCommand.setMemberName(isGuest ? EMPTY : defaultIfNullOrEmpty(memberDetails.getLoginEmail(), memberDetails.getLoginMobile()));
         salesOrderCommand.setBuyerName(shippingInfoSubForm.getBuyerName());
         salesOrderCommand.setBuyerTel(shippingInfoSubForm.getBuyerTel());
-        //salesOrderCommand.setRemarks(Arrays.asList(shippingInfoSubForm.getRemark()));
+        salesOrderCommand.setRemarks(Arrays.asList(shippingInfoSubForm.getRemark()));
         //5.3.2.18增加对客户端识别码属性设置
         salesOrderCommand.setClientIdentificationMechanisms((String)request.getAttribute(SalesOrderCommand.CLIENT_IDENTIFICATION_MECHANISMS));
     }
