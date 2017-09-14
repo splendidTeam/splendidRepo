@@ -209,7 +209,7 @@ public class OrderManagerImpl implements OrderManager{
         }
         String code = salesOrderCommand.getCode();
         //---------------------------------------------------------------
-        if (1 == type){
+        if (Validator.isNotNullOrEmpty(type) && 1 == type){
             LOGGER.debug("begin decrypt order:[{}] ~~", code);
             //type为1时将查处收货人信息，此时解密
             decryptSalesOrderCommand(salesOrderCommand);

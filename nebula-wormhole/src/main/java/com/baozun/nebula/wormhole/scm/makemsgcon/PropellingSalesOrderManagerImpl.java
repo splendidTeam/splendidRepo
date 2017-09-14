@@ -143,14 +143,6 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         return bosRemark;
     }
 
-    public static void main(String[] args){
-        String remark = "dasfd";
-        JSONObject jsonRemark = JSONObject.fromObject(remark);
-        System.out.println(jsonRemark.getString("sellerMemo"));
-        System.out.println(jsonRemark.getString("buyerMemo"));
-    }
-
-
     private static BigDecimal getPayDiscount(SalesOrderCommand salesOrderCommand){
         //不是支付宝和货到付款的金额总和
         BigDecimal payDiscount = BigDecimal.ZERO;
