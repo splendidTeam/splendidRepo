@@ -43,6 +43,7 @@ label.selected { font-weight:bold; padding:3px 6px 3px; margin-right:12px; backg
 					<li class="memberbase">SKU 1. 商品的导出</li>
 					<li class="memberbase">SKU 2. 商品的导入</li>
 				</ul>
+				<input type="hidden" id="batchThreshold" value="${batchThreshold}" />
 				<div class="tag-change-content">
 					<div class="tag-change-in">
 				        <form id="exportItemForm" action="${ pagebase }/item/itemExport.htm" method="post">
@@ -120,7 +121,7 @@ label.selected { font-weight:bold; padding:3px 6px 3px; margin-right:12px; backg
 				                    <div class="textarea_info"> <span class="red">非必填项！</span><br>
 				                      <br>为空，导出部分只有字段标题，没有数据。<br>填写商品编码，导出部分含有商品的已有数据。<br>
 				                      <br>
-				                      <strong>最多填写100条数据</strong>，每条编码换行填写，格式如下：<br>
+				                      <strong>最多填写${batchThreshold}条数据</strong>，每条编码换行填写，格式如下：<br>
 				                      Nb_Sample_Code_001<br>
 				                      Nb_Sample_Code_002<br>
 				                      Nb_Sample_Code_003<br>
@@ -214,6 +215,7 @@ label.selected { font-weight:bold; padding:3px 6px 3px; margin-right:12px; backg
 				                </div>
 				                
 				              </div>
+				              
 				              <div class="dashedwp">
 				                <div class="ui-block-line">
 				                  <label><b>具体商品编码</b></label>
@@ -222,7 +224,7 @@ label.selected { font-weight:bold; padding:3px 6px 3px; margin-right:12px; backg
 				                    <div class="textarea_info"> <span class="red">非必填项！</span><br>
 				                      <br>为空，导出部分只有字段标题，没有数据。<br>填写商品编码，导出部分含有商品的已有数据。<br>
 				                      <br>
-				                      <strong>最多填写100条数据</strong>，每条编码换行填写，格式如下：<br>
+				                      <strong>最多填写${batchThreshold}条数据</strong>，每条编码换行填写，格式如下：<br>
 				                      Nb_Sample_Code_001<br>
 				                      Nb_Sample_Code_002<br>
 				                      Nb_Sample_Code_003<br>

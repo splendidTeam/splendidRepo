@@ -299,7 +299,7 @@ public interface OrderManager extends BaseManager{
      * @param id
      *            the id
      * @param type
-     *            the type
+     *            type为1时将查处收货人信息，此时解密
      * @return the sales order command
      */
     public SalesOrderCommand findOrderById(Long id,Integer type);
@@ -470,13 +470,7 @@ public interface OrderManager extends BaseManager{
      * @param date
      *            the date
      */
-    public void updateLogisticsInfo(
-                    String orderCode,
-                    BigDecimal actualFreight,
-                    String logisticsProviderCode,
-                    String logisticsProviderName,
-                    String transCode,
-                    Date date);
+    public void updateLogisticsInfo(String orderCode,BigDecimal actualFreight,String logisticsProviderCode,String logisticsProviderName,String transCode,Date date);
 
     /**
      * 查询coupon.
@@ -494,4 +488,5 @@ public interface OrderManager extends BaseManager{
      * @return the all distribution mode
      */
     public List<DistributionMode> getAllDistributionMode();
+    
 }

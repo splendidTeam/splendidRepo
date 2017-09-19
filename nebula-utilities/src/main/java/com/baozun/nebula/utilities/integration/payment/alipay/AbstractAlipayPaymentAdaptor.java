@@ -55,7 +55,10 @@ import com.baozun.nebula.utilities.integration.payment.exception.PaymentExceptio
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
 import com.baozun.nebula.utilities.io.http.HttpMethodType;
 import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 import com.feilong.tools.slf4j.Slf4jUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
 
@@ -382,7 +385,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
             // 如果获得的信息是true，则校验成功；如果获得的信息是其他，则校验失败。
             boolean result = "true".equals(notifyVerifyResult);
 
-            LOGGER.debug("validate notifyId:[{}],result:[{}]", notifyId, result);
+            LOGGER.debug("validate notifyId,result:[{}],[{}]", result, notifyId);
             return result;
         }catch (Exception e){
             LOGGER.error("", e);
@@ -421,7 +424,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         String url = alipayUrl + "?" + queryUrl;
         String returnXML = HttpClientUtil.getHttpMethodResponseBodyAsString(url, HttpMethodType.GET);
 
-        if (Validator.isNotNullOrEmpty(returnXML)){
+        if (isNotNullOrEmpty(returnXML)){
             try{
                 Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(returnXML);
                 if ("T".equals(resultMap.get("is_success"))){
@@ -490,9 +493,13 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
         String result = HttpClientUtil.getHttpMethodResponseBodyAsStringIgnoreCharSet(paymentRequest.getRequestURL(), HttpMethodType.GET, _INPUT_CHARSET);
         Validate.notBlank(result, "result can't be blank!");
 
+        LOGGER.info("result:{}", result);
+
         try{
             result = java.net.URLDecoder.decode(result, _INPUT_CHARSET);
             String[] params = result.split("&");
+
+            //---------------------------------------------------------------------
 
             Map<String, String> map = new HashMap<>();
             for (String param : params){
@@ -500,6 +507,12 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor{
                 String val = param.replace(param.split("=")[0].toString() + "=", "");
                 map.put(key, val);
             }
+
+            if (LOGGER.isInfoEnabled()){
+                LOGGER.info("map:{}", JsonUtil.format(map));
+            }
+
+            //---------------------------------------------------------------------
 
             //手机WAP端授权结果
             PaymentResult paymentResult = getPaymentResultForMobileCreateDirect(map);

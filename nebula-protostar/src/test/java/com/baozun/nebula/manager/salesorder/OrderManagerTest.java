@@ -2,12 +2,7 @@ package com.baozun.nebula.manager.salesorder;
 
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,12 +13,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.baozun.nebula.command.MemberCommand;
-import com.baozun.nebula.model.salesorder.PayNo;
-import com.baozun.nebula.sdk.command.PayNoCommand;
 import com.baozun.nebula.utils.JsonFormatUtil;
 import com.baozun.nebula.web.command.OrderCommand;
 import com.baozun.nebula.web.command.PtsSalesOrderCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * 
@@ -52,13 +48,6 @@ public class OrderManagerTest {
 		
 	}
 	
-	
-	@Test
-	public void testfindPayNoList(){
-		OrderCommand orderCommand= salesOrderManager.findOrderByCode(testCode);
-		List<PayNoCommand> payNos=salesOrderManager.findPayNoList(orderCommand.getSalesOrderCommand().getId());
-	    log.info("---------------"+payNos.size());
-	}
 	
 	@Test
 	public void testFindOrderListByQueryMapWithPage(){

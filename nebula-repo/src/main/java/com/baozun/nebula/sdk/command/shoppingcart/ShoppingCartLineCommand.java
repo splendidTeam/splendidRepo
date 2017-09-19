@@ -44,7 +44,7 @@ import com.baozun.nebula.sdk.command.SkuProperty;
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand
  */
-public class ShoppingCartLineCommand extends BaseModel{
+public class ShoppingCartLineCommand extends BaseModel implements ShoppingCartLineQuantityExtractor{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -5071101827860973497L;
@@ -220,6 +220,21 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     /** 用户不参与选择时，直接推送礼品的样数；用户参与选择时，直接推送礼品的样数. */
     private Integer giftCountLimited;
+    
+
+    /**
+     * hanssem扩展字段
+     * @return
+     */
+    
+    /*** 单个商品重量(如果是按照重量计费)*/
+    private Double            weight;
+    
+    /*** 单个商品体积*/
+    private Double volume;
+    
+    /**物流方式id*/
+    private Long distributionModeId;
 
     /**
      * 对应的包装信息.
@@ -243,8 +258,15 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 商城自定义参数，nebula不控制. */
     private Map<String, Object> customParamMap;
 
+    /**
+     * 杂项 可以存放商品信息.
+     * 
+     * @since 5.3.2.18
+     */
+    private String misc;
+
     //**********************************************************************************************
-    
+
     /**
      * 是否可见 1可见 /0不可见 *.
      * 
@@ -252,14 +274,6 @@ public class ShoppingCartLineCommand extends BaseModel{
      */
     @Deprecated
     private Integer visibleMark;
-
-    /**
-     * 是否有库存 1有库存 0无库存 *.
-     * 
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private Integer stockMark;
 
     /**
      * 折扣单价-不包含整单优惠分摊.
@@ -280,22 +294,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     private List<Long> lableIds;
 
     /**
-     * The brand id.
-     * 
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private String brandId;
-
-    /**
-     * The store id.
-     * 
-     * @deprecated 目前值就＝ {@link #shopId},重复了,而且没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private long storeId;
-
-    /**
      * The indstry id.
      * 
      * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
@@ -303,60 +301,12 @@ public class ShoppingCartLineCommand extends BaseModel{
     @Deprecated
     private Long indstryId;
 
-    /**
-     * The state.
-     * 
-     * @deprecated 没有用到, by feilong 2016-07-13
-     */
-    @Deprecated
-    private String state;
-
-    //***************************************************************************************************
-
-    /**
-     * 库房id .
-     * 
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    @Deprecated
-    private Long wareHoseId;
-
-    /**
-     * 库房名称 .
-     * 
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    @Deprecated
-    private String wareHoseName;
-    
-  //***************************************************************************************************
-
-    /** 杂项 可以存放商品信息. 
-     * @since 5.3.2.18
-     * */
-    private String misc;
-
     //**********************************************************************************************
     /**
      * 获得 promotion ids.
      *
      * @return the promotion ids
      */
-    
-    /**
-     * hanssem扩展字段
-     * @return
-     */
-    
-    /*** 单个商品重量(如果是按照重量计费)*/
-    private Double            weight;
-    
-    /*** 单个商品体积*/
-    private Double volume;
-    
-    /**物流方式id*/
-    private Long distributionModeId;
-    
     public String getPromotionIds(){
         String tmp = "";
         if (this.promotionList != null){
@@ -435,6 +385,16 @@ public class ShoppingCartLineCommand extends BaseModel{
     public boolean isGift(){
         return isGift;
     }
+    
+    /**
+     * EL表达式无法渠道isGift()方法值，必须按JavaBean规范getIsGift()取值
+     * 
+     * @return
+     * since2017年5月10日
+     */
+    public boolean getIsGift(){
+        return isGift;
+    }
 
     /**
      * 设置 gift.
@@ -443,6 +403,16 @@ public class ShoppingCartLineCommand extends BaseModel{
      *            the gift
      */
     public void setGift(boolean isGift){
+        this.isGift = isGift;
+    }
+    
+    /**
+     * EL表达式无法渠道isGift()方法值，必须按JavaBean规范getIsGift()取值
+     * 
+     * @param isGift
+     * since2017年5月10日
+     */
+    public void setIsGift(boolean isGift){
         this.isGift = isGift;
     }
 
@@ -470,6 +440,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @return the 购物数量
      */
+    @Override
     public Integer getQuantity(){
         return quantity;
     }
@@ -683,29 +654,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 brand id.
-     *
-     * @return the brand id
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public String getBrandId(){
-        return brandId;
-    }
-
-    /**
-     * 设置 brand id.
-     *
-     * @param brandId
-     *            the brand id
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public void setBrandId(String brandId){
-        this.brandId = brandId;
-    }
-
-    /**
      * 获得 category list.
      *
      * @return the category list
@@ -722,29 +670,6 @@ public class ShoppingCartLineCommand extends BaseModel{
      */
     public void setCategoryList(List<Long> categoryList){
         this.categoryList = categoryList;
-    }
-
-    /**
-     * 获得 store id.
-     *
-     * @return the store id
-     * @deprecated 目前值就＝ {@link #getShopId()},重复了,而且没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public long getStoreId(){
-        return storeId;
-    }
-
-    /**
-     * 设置 store id.
-     *
-     * @param storeId
-     *            the store id
-     * @deprecated 目前值就＝ {@link #getShopId()},重复了,而且没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public void setStoreId(long storeId){
-        this.storeId = storeId;
     }
 
     /**
@@ -768,29 +693,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     @Deprecated
     public void setIndstryId(Long indstryId){
         this.indstryId = indstryId;
-    }
-
-    /**
-     * 获得 state.
-     *
-     * @return the state
-     * @deprecated 没有用到, by feilong 2016-07-13
-     */
-    @Deprecated
-    public String getState(){
-        return state;
-    }
-
-    /**
-     * 设置 state.
-     *
-     * @param state
-     *            the state
-     * @deprecated 没有用到, by feilong 2016-07-13
-     */
-    @Deprecated
-    public void setState(String state){
-        this.state = state;
     }
 
     /**
@@ -853,52 +755,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 库房id.
-     *
-     * @return the 库房id
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    @Deprecated
-    public Long getWareHoseId(){
-        return wareHoseId;
-    }
-
-    /**
-     * 设置 库房id .
-     *
-     * @param wareHoseId
-     *            the new 库房id
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    @Deprecated
-    public void setWareHoseId(Long wareHoseId){
-        this.wareHoseId = wareHoseId;
-    }
-
-    /**
-     * 获得 库房名称 .
-     *
-     * @return the 库房名称
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    @Deprecated
-    public String getWareHoseName(){
-        return wareHoseName;
-    }
-
-    /**
-     * 设置 库房名称 .
-     *
-     * @param wareHoseName
-     *            the new 库房名称
-     * @deprecated 没有引用, by feilong 2016-07-13
-     */
-    @Deprecated
-    public void setWareHoseName(String wareHoseName){
-        this.wareHoseName = wareHoseName;
-    }
-
-    /**
      * 获得 是否可见 1可见 /0不可见 *.
      *
      * @return the 是否可见 1可见 /0不可见 *
@@ -938,29 +794,6 @@ public class ShoppingCartLineCommand extends BaseModel{
      */
     public void setLimitMark(Integer limitMark){
         this.limitMark = limitMark;
-    }
-
-    /**
-     * 获得 是否有库存 1有库存 0无库存 *.
-     *
-     * @return the 是否有库存 1有库存 0无库存 *
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public Integer getStockMark(){
-        return stockMark;
-    }
-
-    /**
-     * 设置 是否有库存 1有库存 0无库存 *.
-     *
-     * @param stockMark
-     *            the new 是否有库存 1有库存 0无库存 *
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    public void setStockMark(Integer stockMark){
-        this.stockMark = stockMark;
     }
 
     /**
@@ -1467,37 +1300,9 @@ public class ShoppingCartLineCommand extends BaseModel{
         this.shoppingCartLinePackageInfoCommandList = shoppingCartLinePackageInfoCommandList;
     }
 
-    
-    public Double getWeight(){
-        return weight;
-    }
-
-    
-    public void setWeight(Double weight){
-        this.weight = weight;
-    }
-
-    
-    public Double getVolume(){
-        return volume;
-    }
-
-    
-    public void setVolume(Double volume){
-        this.volume = volume;
-    }
-
-    
-    public Long getDistributionModeId(){
-        return distributionModeId;
-    }
-
-    
-    public void setDistributionModeId(Long distributionModeId){
-        this.distributionModeId = distributionModeId;
-    }
     /**
      * 获取 杂项信息
+     * 
      * @return String
      * @since 5.3.2.18
      */
@@ -1507,11 +1312,35 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     /**
      * 设置 杂项信息
+     * 
      * @param String
      * @since 5.3.2.18
      */
     public void setMisc(String misc){
         this.misc = misc;
     }
-    
+
+    public Double getWeight(){
+        return weight;
+    }
+
+    public void setWeight(Double weight){
+        this.weight = weight;
+    }
+
+    public Double getVolume(){
+        return volume;
+    }
+
+    public void setVolume(Double volume){
+        this.volume = volume;
+    }
+
+    public Long getDistributionModeId(){
+        return distributionModeId;
+    }
+
+    public void setDistributionModeId(Long distributionModeId){
+        this.distributionModeId = distributionModeId;
+    }
 }

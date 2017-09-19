@@ -18,9 +18,15 @@ package com.baozun.nebula.web.controller.shoppingcart.factory;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.web.controller.shoppingcart.form.CommonImmediatelyBuyForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLinePackageInfoFormListValidator;
+
+import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
  * The Class CommonImmediatelyBuyAdaptor.
@@ -30,9 +36,22 @@ import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
  */
 public class CommonImmediatelyBuyAdaptor extends OneShoppingCartLineCommandImmediatelyBuyAdaptor{
 
+    /**
+     * 包装信息的校验.
+     * 
+     * @since 5.3.2.27
+     */
+    @Autowired
+    private ShoppingcartLinePackageInfoFormListValidator shoppingcartLinePackageInfoFormListValidator;
+
     @Override
     protected ShoppingCartLineCommand buildShoppingCartLineCommand(ImmediatelyBuyForm immediatelyBuyForm,HttpServletRequest request){
         CommonImmediatelyBuyForm commonImmediatelyBuyForm = (CommonImmediatelyBuyForm) immediatelyBuyForm;
+
+        shoppingcartLinePackageInfoFormListValidator.validator(commonImmediatelyBuyForm.getPackageInfoFormList());
+
+        //TODO 校验
+
         ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
 
         shoppingCartLineCommand.setSkuId(commonImmediatelyBuyForm.getSkuId());
@@ -41,6 +60,10 @@ public class CommonImmediatelyBuyAdaptor extends OneShoppingCartLineCommandImmed
         shoppingCartLineCommand.setMisc((String) request.getAttribute(ImmediatelyBuyShoppingCartLineCommandListFactory.REQUEST_ATTRIBUTE_MISC));
         //选中
         shoppingCartLineCommand.setSettlementState(1);
+
+        //@since 5.3.2.27
+        shoppingCartLineCommand.setShoppingCartLinePackageInfoCommandList(collect(commonImmediatelyBuyForm.getPackageInfoFormList(), ShoppingCartLinePackageInfoCommand.class));
+
         return shoppingCartLineCommand;
     }
 }

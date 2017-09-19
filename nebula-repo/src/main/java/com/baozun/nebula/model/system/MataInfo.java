@@ -27,7 +27,7 @@ import org.hibernate.annotations.OptimisticLockType;
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class MataInfo  implements Serializable {
 
-	/**
+    /**
 	 * 
 	 */
 	private static final long serialVersionUID = -2173055594374651709L;
@@ -170,6 +170,10 @@ public class MataInfo  implements Serializable {
 	
 	
 	/**
+	 * 批量修改商品的时候，如果修改了价格是否同步到sku上面去
+	 */
+	public static final String BATCH_UPDATE_ITEM_PRICE_TO_SKU = "BATCH_UPDATE_ITEM_PRICE_TO_SKU";
+	/**
 	 * PK
 	 */
 	private Long				id;
@@ -182,10 +186,17 @@ public class MataInfo  implements Serializable {
 	 */
 	private String value;
 	/**
-	 * 生命周期
+	 * 生命周期   
+	 * 
 	 */
 	private Integer 			lifecycle;
 	
+	/**
+	 *  字段说明
+	 *  
+	 *  @since 5.3.2.22-mata-SNAPSHOT
+	 */
+	private String           declare;
 	/**
 	 * VERSION
 	 */
@@ -197,7 +208,8 @@ public class MataInfo  implements Serializable {
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	
+    public void setId(Long id) {
 		this.id = id;
 	}
 	@Column(name = "CODE")
@@ -208,7 +220,7 @@ public class MataInfo  implements Serializable {
 	public void setCode(String code) {
 		this.code = code;
 	}
-	@Column(name = "VALUE")
+	@Column(name = "VALUE",length = 4000)
 	public String getValue() {
 		return value;
 	}
@@ -233,4 +245,17 @@ public class MataInfo  implements Serializable {
 	public void setVersion(Date version) {
 		this.version = version;
 	}
+
+	 @Column(name = "DECLARE")
+    public String getDeclare(){
+        return declare;
+    }
+
+    
+    public void setDeclare(String declare){
+        this.declare = declare;
+    }
+	
+  
+    
 }

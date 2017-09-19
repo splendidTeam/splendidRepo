@@ -18,6 +18,9 @@ package com.baozun.nebula.web.controller.shoppingcart.validator;
 
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +40,9 @@ import static com.feilong.core.util.CollectionsUtil.select;
 @Component("shoppingCartInventoryValidator")
 public class DefaultShoppingCartInventoryValidator implements ShoppingCartInventoryValidator{
 
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingCartInventoryValidator.class);
+
     @Autowired
     private SdkSkuInventoryManager sdkSkuInventoryManager;
 
@@ -47,11 +53,37 @@ public class DefaultShoppingCartInventoryValidator implements ShoppingCartInvent
      */
     @Override
     public boolean isMoreThanInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId){
-        SkuInventory inventoryInDb = sdkSkuInventoryManager.findSkuInventoryBySkuId(skuId);
-
         //相同 skuId 所有的 lines
         List<ShoppingCartLineCommand> sameSkuIdLines = select(shoppingCartLineCommandList, "skuId", skuId);
-        Integer sumStock = ShoppingCartUtil.getSumQuantity(sameSkuIdLines);
-        return sumStock > inventoryInDb.getAvailableQty();
+        Integer sumBuyCount = ShoppingCartUtil.getSumQuantity(sameSkuIdLines);
+
+        return isMoreThanInventory(skuId, sumBuyCount);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartInventoryValidator#isMoreThanInventory(long, int)
+     */
+    @Override
+    public boolean isMoreThanInventory(long skuId,int sumBuyCount){
+        Validate.isTrue(sumBuyCount > 0, "sumBuyCount:[%s] must > 0", sumBuyCount);
+
+        //---------------------------------------------------------------------
+        SkuInventory inventoryInDb = sdkSkuInventoryManager.findSkuInventoryBySkuId(skuId);
+        Validate.notNull(inventoryInDb, "when skuId:[%s] ,inventoryInDb can't be null!", skuId);
+
+        //---------------------------------------------------------------------
+
+        Integer availableQty = inventoryInDb.getAvailableQty();
+        boolean isMoreThanInventory = sumBuyCount > availableQty;
+
+        //---------------------------------------------------------------------
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug("skuId:[{}],sumBuyCount:[{}],availableQty:[{}],return :[{}]", skuId, sumBuyCount, availableQty, isMoreThanInventory);
+        }
+
+        return isMoreThanInventory;
     }
 }

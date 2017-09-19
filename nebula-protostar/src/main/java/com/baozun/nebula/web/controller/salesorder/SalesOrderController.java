@@ -41,7 +41,6 @@ import com.baozun.nebula.model.system.ChooseOption;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
-import com.baozun.nebula.sdk.command.PayNoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.SkuCommand;
@@ -92,7 +91,6 @@ public class SalesOrderController extends BaseController{
 
     @Autowired
     private SdkShoppingCartManager                   sdkShoppingCartManager;
-
     @Autowired
     private SdkShoppingCartCommandBuilder            sdkShoppingCartCommandBuilder;
 
@@ -287,29 +285,6 @@ public class SalesOrderController extends BaseController{
 
     }
 
-    /**
-     * 异步加载支付流水信息
-     * 
-     * @param payInfoId
-     * @return
-     */
-    @RequestMapping(value = "/order/getPayNoList.json")
-    @ResponseBody
-    public List<PayNoCommand> getPayNoList(String payInfoId){
-        List<PayNoCommand> payNos = null;
-        if (StringUtils.isNotBlank(payInfoId)){
-            try{
-                payNos = salesOrderManager.findPayNoList(Long.valueOf(payInfoId));
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-        if (payNos == null){
-            payNos = new ArrayList<PayNoCommand>();
-        }
-        return payNos;
-
-    }
 
     /**
      * 跳转到订单创建页面

@@ -1,13 +1,12 @@
 package com.baozun.nebula.manager.salesorder;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,7 +32,6 @@ import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderLogDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderStatusLogDao;
-import com.baozun.nebula.dao.salesorder.SdkPayNoDao;
 import com.baozun.nebula.dao.system.ChooseOptionDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
@@ -48,7 +46,6 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.model.salesorder.OrderLog;
 import com.baozun.nebula.model.salesorder.OrderStatusLog;
-import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.system.ChooseOption;
 import com.baozun.nebula.payment.manager.PayManager;
@@ -60,7 +57,6 @@ import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.ItemSkuCommand;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.PayInfoCommand;
-import com.baozun.nebula.sdk.command.PayNoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
@@ -74,10 +70,11 @@ import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
+import com.baozun.nebula.utils.cache.GuavaAbstractLoadingCache;
 import com.baozun.nebula.web.command.OrderCommand;
 import com.baozun.nebula.web.command.PtsSalesOrderCommand;
 import com.feilong.core.Validator;
-import com.feilong.servlet.http.RequestUtil;
+import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -106,9 +103,6 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 
 	@Autowired
 	private MemberDao				memberDao;
-
-	@Autowired
-	private SdkPayNoDao				sdkPayNoDao;
 
 	@Autowired
 	private SdkOrderLogDao			sdkOrderLogDao;
@@ -377,17 +371,6 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 		}
 	}
 
-	@Override
-	public List<PayNoCommand> findPayNoList(Long payInfoId){
-		List<PayNoCommand> payNoCommands = null;
-		try{
-			payNoCommands = sdkPayNoDao.findPayNosByPayInfoId(payInfoId);
-		}catch (Exception e){
-			e.printStackTrace();
-			payNoCommands = new ArrayList<PayNoCommand>();
-		}
-		return payNoCommands;
-	}
 
 	/**
 	 * 查询订单列表
@@ -410,12 +393,12 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 
 		List<PtsSalesOrderCommand> qItems = result.getItems();
 
-		List<String> groupCodes = new ArrayList<String>();
-		groupCodes.add(logisticCode);
-		groupCodes.add(financialCode);
-		groupCodes.add(payTypeCode);
-		groupCodes.add(orderSourceCode);
-		List<ChooseOption> optionList = chooseOptionDao.findChooseOptionValue(groupCodes);
+		
+		List<ChooseOption> optionList = null;
+		try {
+			optionList = cache.getValue("ChooseOption").get();
+		} catch (ExecutionException e) {
+		}
 
 		Map<String, String> optionMap = new HashMap<String, String>();
 		for (ChooseOption co : optionList){
@@ -438,6 +421,23 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 
 		return result;
 	}
+	
+	
+	/**
+	 * 启用10分钟缓存
+	 */
+	private GuavaAbstractLoadingCache<String, Optional<List<ChooseOption>>> cache = new GuavaAbstractLoadingCache<String, Optional<List<ChooseOption>>>(
+			1, 600) {
+		@Override
+		protected Optional<List<ChooseOption>> fetchData(String key) {
+			List<String> groupCodes = new ArrayList<String>();
+			groupCodes.add(logisticCode);
+			groupCodes.add(financialCode);
+			groupCodes.add(payTypeCode);
+			groupCodes.add(orderSourceCode);
+			return Optional.fromNullable(chooseOptionDao.findChooseOptionValue(groupCodes));
+		}
+	};
 
 	@Override
 	public LogisticsCommand findLogisticsByOrderId(Long orderId){

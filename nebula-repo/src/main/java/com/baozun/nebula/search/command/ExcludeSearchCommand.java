@@ -1,5 +1,6 @@
 package com.baozun.nebula.search.command;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,9 +8,14 @@ import java.util.List;
  * @author jumbo
  *
  */
-public class ExcludeSearchCommand {
+public class ExcludeSearchCommand implements Serializable{
 
 	/**
+     * 
+     */
+    private static final long serialVersionUID = -6731508427868503982L;
+
+    /**
 	 * 字段名称，对应solr中的字段
 	 */
 	private String	fieldName;

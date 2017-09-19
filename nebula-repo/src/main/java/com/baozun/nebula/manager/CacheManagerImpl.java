@@ -880,5 +880,4 @@ public class CacheManagerImpl implements CacheManager {
         // 获取全部的缓存项
         return cacheItemDao.findAllCacheItem(new BeanPropertyRowMapper<CacheItemCommand>(CacheItemCommand.class), paraMap);
     }
-	
 }

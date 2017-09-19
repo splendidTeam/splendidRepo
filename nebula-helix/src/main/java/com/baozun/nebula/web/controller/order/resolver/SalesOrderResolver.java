@@ -16,10 +16,7 @@
  */
 package com.baozun.nebula.web.controller.order.resolver;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.web.MemberDetails;
@@ -42,33 +39,6 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
  * <td>封装订单信息</td>
  * </tr>
  * 
- * <tr valign="top">
- * <td>
- * {@link #buildShoppingCartForOrder(MemberDetails memberDetails,SalesOrderCommand salesOrderCommand, HttpServletRequest request)
- * buildeShoppingCartForOrder}</td>
- * <td>获得用户的购物车信息</td>
- * </tr>
- * 
- * <tr valign="top">
- * <td>{@link #getSalesOrderCommand(String subOrdinate) getSalesOrderCommand}
- * </td>
- * <td>通过支付流水号获取订单信息</td>
- * </tr>
- * 
- * <tr valign="top">
- * <td>
- * {@link #updateCookieShoppingcart(List, HttpServletRequest, HttpServletResponse) updateCookieShoppingcart}
- * </td>
- * <td>游客下单成功后更新cookie中的购物车数据</td>
- * </tr>
- * 
- * <tr valign="top">
- * <td>
- * {@link #updateCookieShoppingcartCount(MemberDetails memberDetails, HttpServletRequest request, HttpServletResponse response)
- * updateCookieShoppingcartCount}
- * </td>
- * <td>游客下单成功后更新cookie中的购物车商品数量</td>
- * </tr>
  * 
  * </table>
  * </blockquote>
@@ -93,13 +63,5 @@ public interface SalesOrderResolver{
      * @return 返回封装之后的SalesOrderCommand
      */
     SalesOrderCommand toSalesOrderCommand(MemberDetails memberDetails,OrderForm orderForm,HttpServletRequest request);
-
-    /**
-     * 通过支付流水号查询订单
-     * 
-     * @param subOrdinate
-     * @return
-     */
-    SalesOrderCommand getSalesOrderCommand(String subOrdinate);
 
 }

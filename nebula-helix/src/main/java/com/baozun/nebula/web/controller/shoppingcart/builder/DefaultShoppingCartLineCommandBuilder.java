@@ -18,8 +18,6 @@ package com.baozun.nebula.web.controller.shoppingcart.builder;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,14 +28,13 @@ import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddFor
 import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
+ * 默认的 {@link ShoppingCartLineCommand} 构造器.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.14
  */
 @Component("shoppingCartLineCommandBuilder")
 public class DefaultShoppingCartLineCommandBuilder implements ShoppingCartLineCommandBuilder{
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingCartLineCommandBuilder.class);
 
     @Autowired
     private ShoppingCartLineSettlementStateBuilder shoppingCartLineSettlementStateBuilder;

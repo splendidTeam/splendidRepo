@@ -45,7 +45,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.13
  */
-abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
+public abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
 
     /**  */
     private static final long serialVersionUID = -8855859594846278253L;
@@ -133,7 +133,22 @@ abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
     private String misc;
 
     //**********************************************************************************************
-
+    
+  //***********************评价信息*****************************************************
+    /** 评价状态.
+     * @since 5.3.2.20
+     *  */
+    private Integer evaluationStatus;
+    
+    
+  //**********************************************************************************************
+    
+  //**********************************************************************************************
+    /** 折扣 
+     * @since 5.3.2.22
+     * */
+    private BigDecimal discount;
+  //**********************************************************************************************
     /**
      * 获得 orderline行的唯一标识,那么此处的id={@link OrderLine#id}.
      *
@@ -478,4 +493,45 @@ abstract class AbstractOrderLineSubViewCommand extends BaseViewCommand{
     public void setMisc(String misc){
         this.misc = misc;
     }
+
+    /**
+     * 获取评价状态
+     * @return Integer
+     * @since 5.3.2.20
+     */
+    public Integer getEvaluationStatus(){
+        return evaluationStatus;
+    }
+
+    /**
+     * 设置 评价状态
+     * @param Integer
+     *          the evaluationStatus to set
+     * @since 5.3.2.20
+     */
+    public void setEvaluationStatus(Integer evaluationStatus){
+        this.evaluationStatus = evaluationStatus;
+    }
+
+    /**
+     * 获取 折扣
+     * @return BigDecimal
+     * @since 5.3.2.22
+     */
+    public BigDecimal getDiscount(){
+        return discount;
+    }
+
+    /**
+     * 设置 折扣
+     * @param BigDecimal
+     *          the discount to set
+     * @since 5.3.2.22
+     */
+    public void setDiscount(BigDecimal discount){
+        this.discount = discount;
+    }
+    
+    
+    
 }

@@ -255,4 +255,22 @@
 			<cell position="D3" dataName="salePrice"  mandatory="false" type="bigdecimal"/>
 		</block>
 	</sheet>
+	
+	<!-- 退货单导出 -->
+	<sheet name="exportReturn">
+		<block start="A5" end="O5" dataName="expReturnList"  loop="true" loopClass="com.baozun.nebula.command.OrderReturnCommand">
+			<cell position="A5" dataName="soOrderCode" mandatory="false" type="string"/>
+			<cell position="B5" dataName="refundPayee" mandatory="false" type="string"/>
+			<cell position="C5" dataName="platformOMSCode"  mandatory="false" type="string"/>
+			<cell position="D5" dataName="returnPrice"  mandatory="false" type="bigdecimal"/>
+			<cell position="E5" dataName="businessStatus"  mandatory="false" type="string"/>
+			<cell position="F5" dataName="approver"  mandatory="false" type="string"/>
+			<cell position="G5" dataName="approveTime"  mandatory="false" type="string"/>
+			<cell position="H5" dataName="createTime"  mandatory="false" type="string"/>
+			<cell position="I5" dataName="transCode"  mandatory="false" type="string"/>
+			<cell position="J5" dataName="transName"  mandatory="false" type="string"/>
+			<cell position="K5" dataName="returnReason"  mandatory="false" type="string"/>
+			<cell position="L5" dataName="businessType"  mandatory="false" type="string"/>
+		</block>
+	</sheet>
 </sheets>

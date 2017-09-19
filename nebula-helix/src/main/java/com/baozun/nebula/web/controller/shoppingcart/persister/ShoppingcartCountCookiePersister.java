@@ -16,12 +16,10 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.persister;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineQuantityExtractor;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartCountHandler;
 import com.feilong.accessor.cookie.CookieAccessor;
 
@@ -37,7 +35,9 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
     private ShoppingCartCountHandler shoppingCartCountHandler;
 
     /** cookie寄存器. */
-    private CookieAccessor           cookieAccessor;
+    private CookieAccessor cookieAccessor;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -46,7 +46,7 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public void save(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
+    public <T extends ShoppingCartLineQuantityExtractor> void save(Iterable<T> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
         String count = "" + shoppingCartCountHandler.buildCount(shoppingCartLineCommandList);
         cookieAccessor.save(count, response);
     }
@@ -61,6 +61,8 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
     public void clear(HttpServletRequest request,HttpServletResponse response){
         cookieAccessor.remove(response);
     }
+
+    //---------------------------------------------------------------------
 
     /**
      * 设置 cookie寄存器.

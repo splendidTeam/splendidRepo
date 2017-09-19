@@ -20,6 +20,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,8 +38,11 @@ import com.baozun.nebula.manager.baseinfo.ShopManager;
 import com.baozun.nebula.manager.product.ItemExportImportManager;
 import com.baozun.nebula.model.product.Industry;
 import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.sdk.manager.system.SysItemOperateLogManager;
+import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.solr.manager.ItemSolrManager;
 import com.baozun.nebula.utils.InputStreamCacher;
+import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
@@ -49,128 +53,143 @@ import com.feilong.core.Validator;
  * @author chenguang.zhou 2015年5月28日
  */
 @Controller
-public class ItemExportImportController extends BaseController {
+public class ItemExportImportController extends BaseController{
 
-	private static final Logger		log	= LoggerFactory.getLogger(ItemExportImportController.class);
+    private static final Logger     log = LoggerFactory.getLogger(ItemExportImportController.class);
+
+    @Autowired
+    private ShopManager             shopManager;
+
+    @Autowired
+    private ItemExportImportManager itemExportImportManager;
+
+    @Autowired
+    private ItemSolrManager         itemSolrManager;
+
+    @Autowired
+    private SdkMataInfoManager      sdkMataInfoManager;
+
+    @Autowired
+    private PropertyDao             propertyDao;
 
 	@Autowired
-	private ShopManager				shopManager;
+	private SysItemOperateLogManager saveSysItemOperateLog;
+    
+    /**
+     * 转到商品导出和导入页面
+     * 
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/item/itemExportImport.htm",method = RequestMethod.GET)
+    public String itemExprotImport(Model model){
+        Sort[] sorts = Sort.parse("id desc");
+        // 获取行业信息
+        List<Industry> industryList = shopManager.findAllIndustryList(sorts);
 
-	@Autowired
-	private ItemExportImportManager	itemExportImportManager;
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("isSaleProp", true);
+        List<Property> propertyList = propertyDao.findEffectPropertyListByQueryMap(map);
 
-	@Autowired
-	private ItemSolrManager			itemSolrManager;
-	
-	@Autowired
-	private PropertyDao propertyDao;
+        model.addAttribute("industryList", industryList);
+        model.addAttribute("propertyList", propertyList);
+        
+        String batchThreshold = sdkMataInfoManager.findValue("batch.update.item.threshold");
+        if(Validator.isNullOrEmpty(batchThreshold)){
+            batchThreshold = "100";
+        }
+        model.addAttribute("batchThreshold", batchThreshold);
+        
+        return "product/item/item-export-import";
+    }
 
-	/**
-	 * 转到商品导出和导入页面
-	 * 
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/item/itemExportImport.htm", method = RequestMethod.GET)
-	public String itemExprotImport(Model model) {
-		Sort[] sorts = Sort.parse("id desc");
-		// 获取行业信息
-		List<Industry> industryList = shopManager.findAllIndustryList(sorts);
-		
-		Map<String,Object> map=new HashMap<String, Object>();
-		map.put("isSaleProp", true);
-		List<Property>  propertyList = propertyDao.findEffectPropertyListByQueryMap(map);
-		
-		model.addAttribute("industryList", industryList);
-		model.addAttribute("propertyList", propertyList);
-		return "product/item/item-export-import";
-	}
+    /**
+     * 获取行业的属性
+     * 
+     * @param industryId
+     * @return
+     */
+    @RequestMapping(value = "/item/findPropertyByIndustryId.json",method = RequestMethod.POST)
+    @ResponseBody
+    public BackWarnEntity findPropertyByIndustryId(@RequestParam("industryId") Long industryId){
+        BackWarnEntity result = new BackWarnEntity(true, null);
+        Sort[] sorts = new Sort[1];
+        sorts[0] = new Sort("p.id", "asc");
+        List<Property> propertyList = shopManager.findPropertyListByIndustryId(industryId, sorts);
 
-	/**
-	 * 获取行业的属性
-	 * 
-	 * @param industryId
-	 * @return
-	 */
-	@RequestMapping(value = "/item/findPropertyByIndustryId.json", method = RequestMethod.POST)
-	@ResponseBody
-	public BackWarnEntity findPropertyByIndustryId(@RequestParam("industryId") Long industryId) {
-		BackWarnEntity result = new BackWarnEntity(true, null);
-		Sort[] sorts = new Sort[1];
-		sorts[0] = new Sort("p.id", "asc");
-		List<Property> propertyList = shopManager.findPropertyListByIndustryId(industryId, sorts);
-		
-		List<Property> notSalesList = new ArrayList<Property>();
-		
-		if (Validator.isNotNullOrEmpty(propertyList)){
-			for (Property property : propertyList){
-				if (!property.getIsSaleProp()){
-					notSalesList.add(property);
-				}
-			}
-		}
-		
-		result.setDescription(propertyList);
-		return result;
+        List<Property> notSalesList = new ArrayList<Property>();
 
-	}
+        if (Validator.isNotNullOrEmpty(propertyList)){
+            for (Property property : propertyList){
+                if (!property.getIsSaleProp()){
+                    notSalesList.add(property);
+                }
+            }
+        }
 
-	/**
-	 * 商品导出或模板导出
-	 * 
-	 * @param industryId
-	 * @param selectCodes
-	 * @param itemCodes
-	 * @param request
-	 * @param response
-	 */
-	@RequestMapping(value = "/item/itemExport.htm", method = RequestMethod.POST)
-	@ResponseBody
-	public String itemExport(@RequestParam("industryId") Long industryId,
-			@RequestParam("selectCodes") String[] selectCodes,
-			@RequestParam(value = "itemCodes", required = false) String itemCodes,
-			HttpServletRequest request, HttpServletResponse response) {
-		
-		Long shopId = shopManager.getShopId(getUserDetails());
-		String path = "excel/tplt-item-export-import.xls";
-		File file = new File(Thread.currentThread().getContextClassLoader().getResource(path).getPath());
-		if (log.isDebugEnabled()) {
-			log.debug("selected properties have {}.", Arrays.asList(selectCodes).toString());
-			log.debug("export item excel file path is {}.", file.getPath());
-		}
+        result.setDescription(propertyList);
+        return result;
 
-		String fileName = file.getName();
-		OutputStream outputStream = null;
+    }
 
-		// HttpServletResponse Header设置
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Pragma", "no-cache");
-		response.setDateHeader("Expires", -1);
-		
-		try {
-			response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
-			outputStream = response.getOutputStream();
-			HSSFWorkbook xls = itemExportImportManager.itemExport(shopId, industryId, selectCodes, itemCodes, file);
-			if(xls != null){
-				xls.write(outputStream);
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}finally{
-			if(outputStream != null){
-				try {
-					outputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		return "json";
-	}
-	
+    /**
+     * 商品导出或模板导出
+     * 
+     * @param industryId
+     * @param selectCodes
+     * @param itemCodes
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/item/itemExport.htm",method = RequestMethod.POST)
+    @ResponseBody
+    public String itemExport(
+            @RequestParam("industryId") Long industryId,
+            @RequestParam("selectCodes") String[] selectCodes,
+            @RequestParam(value = "itemCodes",required = false) String itemCodes,
+            HttpServletRequest request,
+            HttpServletResponse response){
+
+        Long shopId = shopManager.getShopId(getUserDetails());
+        String path = "excel/tplt-item-export-import.xls";
+        File file = new File(Thread.currentThread().getContextClassLoader().getResource(path).getPath());
+        if (log.isDebugEnabled()){
+            log.debug("selected properties have {}.", Arrays.asList(selectCodes).toString());
+            log.debug("export item excel file path is {}.", file.getPath());
+        }
+
+        String fileName = file.getName();
+        OutputStream outputStream = null;
+
+        // HttpServletResponse Header设置
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", -1);
+
+        try{
+            response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
+            outputStream = response.getOutputStream();
+            HSSFWorkbook xls = itemExportImportManager.itemExport(shopId, industryId, selectCodes, itemCodes, file);
+            if (xls != null){
+                xls.write(outputStream);
+            }
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+        }catch (IOException e){
+            e.printStackTrace();
+        }finally{
+            if (outputStream != null){
+                try{
+                    outputStream.close();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return "json";
+    }
+
 	/**
 	 * 导入商品
 	 * @param industryId
@@ -189,6 +208,25 @@ public class ItemExportImportController extends BaseController {
 		try {
 			cacher = new InputStreamCacher(file.getInputStream());
 			List<Long> itemIdsForSolr = itemExportImportManager.itemImport(cacher.getInputStream(), shopId);
+			
+			//记录商品修改日志
+			if (itemIdsForSolr != null && !itemIdsForSolr.isEmpty()) {
+				
+				Long userId = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+	            if(userId == null){
+	            	userId = -1l;
+	            }
+	            
+				for (Long itemId : itemIdsForSolr) {
+					try{
+						//记录商品修改日志
+						saveSysItemOperateLog.saveSysOperateLog(itemId,userId, 3l);
+					}catch(Exception e){
+						log.debug("记录修改操作日志失败,商品Id:" + itemId);
+					}
+				}
+			}
+			
 			// 更新商品索引信息
 			if (itemIdsForSolr != null && !itemIdsForSolr.isEmpty()) {
 				if (log.isDebugEnabled()) {

@@ -31,6 +31,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"confirm_active_meta":"确定要生效系统参数",
 	"active_success":"生效成功",
 	"code":"参数",
+	"declare":"参数说明",
 	"value":"参数值",
 	"status":"状态"
 });
@@ -185,12 +186,17 @@ $j(document).ready(function() {
 			{
 				name : "code",
 				label : nps.i18n("code"),
-				width : "20%"
+				width : "15%"
+			},
+			{
+				name : "declare",
+				label : nps.i18n("declare"),
+				width : "25%"
 			},
 			{
 				name : "value",
 				label : nps.i18n("value"),
-				width : "50%"
+				width : "40%"
 			},
 			{
 				name : "lifecycle",
@@ -200,7 +206,7 @@ $j(document).ready(function() {
 			},
 			{
 				label :nps.i18n("drawEditor"),
-				width : "20%", 			 
+				width : "10%", 			 
 				template:"drawEditor" 
 			}],
 		dataurl : urlList
@@ -256,6 +262,7 @@ $j(document).ready(function() {
 		 }
 		 $j(".proto-dialog-content .code").val(data.code);
 		 $j(".proto-dialog-content .value").val(data.value);
+		 $j(".proto-dialog-content .declare").val(data.declare);//参数说明
 		 $j("#confirm_warning").attr("disabled",false); 
 		 $j(".proto-dialog-content .code").attr("readonly",true);
 		 $j("#wc_title").text(nps.i18n("meta-edit"));
@@ -270,9 +277,12 @@ $j(document).ready(function() {
 		 var id = $j("#dialog-meta-select").attr("wid");;
 		 var code = $j(".proto-dialog-content .code").val();
 		 var value = $j(".proto-dialog-content .value").val();
+		 var declare = $j(".proto-dialog-content .declare").val();//参数说明
+		 
 		 var json = {
 				 'code':code,
-				 'value':value
+				 'value':value,
+				 'declare':declare
 		 };
 		 if(id!=null && id!=""){
 			 json.id = id;

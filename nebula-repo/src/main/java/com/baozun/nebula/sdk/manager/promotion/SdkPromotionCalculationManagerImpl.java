@@ -752,7 +752,7 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
         }
         //如果有整单的条件Coupon，需要把Coupon下传到行上去
         for (PromotionSettingDetail detail : details){
-            if (couponCodesCondition != null && detail.getAffectSKUDiscountAMTList() != null){
+            if (couponCodesCondition != null && detail.getAffectSKUDiscountAMTList() != null && couponCodesCondition.size()>0){
                 for (PromotionSKUDiscAMTBySetting sku : detail.getAffectSKUDiscountAMTList()){
                     if (sku.getCouponCodes() == null)
                         sku.setCouponCodes(couponCodesCondition);

@@ -33,6 +33,7 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 
 /**
  * 购物车Base控制器.
@@ -134,6 +135,7 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
         ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
+
     //**********************************updateShoppingCartCount************************************************
 
     /**
@@ -342,7 +344,7 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
      * @return the nebula return result
      */
     protected NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult){
-        if (ShoppingcartResult.SUCCESS != shoppingcartResult){
+        if (ShoppingcartResultUtil.isNotSuccess(shoppingcartResult)){
             DefaultReturnResult result = new DefaultReturnResult();
             result.setResult(false);
 

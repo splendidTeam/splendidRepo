@@ -16,12 +16,16 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
+import static com.feilong.core.util.CollectionsUtil.find;
+
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,8 +33,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
-
-import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
  * 游客操作购物车.
@@ -42,10 +44,15 @@ import static com.feilong.core.util.CollectionsUtil.find;
  */
 @Component("guestShoppingcartResolver")
 public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
-
+    private static final Logger LOGGER  = LoggerFactory.getLogger(GuestShoppingcartResolver.class);
+ 
     /** The cookie shoppingcart. */
     @Autowired
     private GuestShoppingcartPersister guestShoppingcartPersister;
+    
+    
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -54,7 +61,14 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
      */
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request){
-        return guestShoppingcartPersister.load(request);
+        try{
+            return guestShoppingcartPersister.load(request);
+        }catch(IllegalArgumentException e){
+            LOGGER.error("",e);
+        }
+        //如果捕捉到异常则返回null
+        return null;
+        
     }
 
     /*
@@ -65,6 +79,22 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
      */
     @Override
     protected ShoppingcartResult doAddShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
+        return commonUpdate(shoppingCartLineCommandList, request, response);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doAddShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, java.util.List, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    protected ShoppingcartResult doAddShoppingCart(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
         return commonUpdate(shoppingCartLineCommandList, request, response);
     }
 

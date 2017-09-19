@@ -16,11 +16,11 @@
  */
 package com.baozun.nebula.utilities.integration.payment.alipay;
 
-import java.util.Map;
+import java.util.Properties;
+
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 
 import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
-import static com.feilong.core.util.ResourceBundleUtil.getResourceBundle;
-import static com.feilong.core.util.ResourceBundleUtil.toMap;
 
 /**
  * 封装了 支付宝 mobile 使用的参数值.
@@ -34,8 +34,7 @@ import static com.feilong.core.util.ResourceBundleUtil.toMap;
  */
 public final class AlipayMobileParams{
 
-    /** <code>{@value}</code> */
-    private static final Map<String, String> ALIPAY_CONFIG_MAP = toMap(getResourceBundle("config/alipay"));
+    private static final Properties ALIPAY_CONFIG_PROPERTIES = ProfileConfigUtil.findCommonPro("config/alipay.properties");
 
     //---------------------------------------------------------------
 
@@ -58,7 +57,7 @@ public final class AlipayMobileParams{
      * </ul>
      * </blockquote>
      */
-    public static final String GATEWAY = defaultIfNullOrEmpty(ALIPAY_CONFIG_MAP.get("payment_gateway_mobile"), ALIPAY_CONFIG_MAP.get("payment_gateway"));
+    public static final String GATEWAY = defaultIfNullOrEmpty(ALIPAY_CONFIG_PROPERTIES.getProperty("payment_gateway_mobile"), ALIPAY_CONFIG_PROPERTIES.getProperty("payment_gateway"));
 
     /**
      * PARTNER (不解释).
@@ -79,7 +78,7 @@ public final class AlipayMobileParams{
      * </ul>
      * </blockquote>
      */
-    public static final String PARTNER = defaultIfNullOrEmpty(ALIPAY_CONFIG_MAP.get("param_partner_mobile"), ALIPAY_CONFIG_MAP.get("param.partner"));
+    public static final String PARTNER = defaultIfNullOrEmpty(ALIPAY_CONFIG_PROPERTIES.getProperty("param_partner_mobile"), ALIPAY_CONFIG_PROPERTIES.getProperty("param.partner"));
 
     /**
      * KEY (不解释).
@@ -100,7 +99,7 @@ public final class AlipayMobileParams{
      * </ul>
      * </blockquote>
      */
-    public static final String KEY = defaultIfNullOrEmpty(ALIPAY_CONFIG_MAP.get("param_key_mobile"), ALIPAY_CONFIG_MAP.get("param.key"));
+    public static final String KEY = defaultIfNullOrEmpty(ALIPAY_CONFIG_PROPERTIES.getProperty("param_key_mobile"), ALIPAY_CONFIG_PROPERTIES.getProperty("param.key"));
 
     /**
      * 卖家收款账号.
@@ -121,7 +120,7 @@ public final class AlipayMobileParams{
      * </ul>
      * </blockquote>
      */
-    public static final String SELLER_EMAIL = defaultIfNullOrEmpty(ALIPAY_CONFIG_MAP.get("param_seller_email_mobile"), ALIPAY_CONFIG_MAP.get("param.seller_email"));
+    public static final String SELLER_EMAIL = defaultIfNullOrEmpty(ALIPAY_CONFIG_PROPERTIES.getProperty("param_seller_email_mobile"), ALIPAY_CONFIG_PROPERTIES.getProperty("param.seller_email"));
 
     //---------------------------------------------------------------
 

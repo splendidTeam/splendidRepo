@@ -36,6 +36,8 @@ public class HasInventoryShoppingCartLinePredicate implements Predicate<Shopping
     /** The shopping cart inventory validator. */
     private ShoppingCartInventoryValidator shoppingCartInventoryValidator;
 
+    //---------------------------------------------------------------------
+
     /**
      * @param shoppingCartLineCommandList
      * @param shoppingCartInventoryValidator
@@ -44,6 +46,8 @@ public class HasInventoryShoppingCartLinePredicate implements Predicate<Shopping
         this.shoppingCartLineCommandList = shoppingCartLineCommandList;
         this.shoppingCartInventoryValidator = shoppingCartInventoryValidator;
     }
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)

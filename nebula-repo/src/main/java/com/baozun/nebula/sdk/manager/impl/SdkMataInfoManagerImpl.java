@@ -104,6 +104,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
         if (id != null){
             MataInfo dbModel = findMataInfoById(id);
             dbModel.setValue(model.getValue());
+            dbModel.setDeclare(model.getDeclare());
             mataInfo = mataInfoDao.save(dbModel);
         }else{
             String code = model.getCode();

@@ -16,9 +16,7 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.handler;
 
-import java.util.List;
-
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineQuantityExtractor;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 
 /**
@@ -35,7 +33,7 @@ public class SumQuantityShoppingCartCountHandler implements ShoppingCartCountHan
      * @see com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartCountHandler#buildCount(java.util.List)
      */
     @Override
-    public int buildCount(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+    public <T extends ShoppingCartLineQuantityExtractor> int buildCount(Iterable<T> shoppingCartLineCommandList){
         return ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
     }
 }

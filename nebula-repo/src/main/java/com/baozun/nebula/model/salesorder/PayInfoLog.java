@@ -31,12 +31,13 @@ import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
+
 /**
  * 支付详细的log
  * 因为支付流水每次都会重刷
  * 所以需要找到支付流水对应的支付详细，所以使用log表记录
  * 
- * @author 
+ * @author
  * @creattime 2013-11-20
  */
 @Entity
@@ -44,323 +45,314 @@ import com.baozun.nebula.model.BaseModel;
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PayInfoLog extends BaseModel{
 
+    private static final long serialVersionUID = -3350505308978769968L;
 
-	private static final long serialVersionUID = -3350505308978769968L;
+    /**
+     * @deprecated 没有被调用啊 since 5.3.2.22
+     */
+    @Deprecated
+    public static Integer COUPON_PAY = 101;
 
-	public static Integer COUPON_PAY = 101;
-	
-	/** PK. */
-	private Long				id;
-	
-	/** 订单id */
-	private Long				orderId;
-	
-	/**
-	 * 支付详细id
-	 */
-	private Long				payInfoId;
-	
-	/** 支付数值 */
-	private BigDecimal			payNumerical;
-	
-	/** 支付金额 */
-	private BigDecimal			payMoney;
-	
-	/** 支付类型 */
-	private Integer				payType;
-	
-	/** 付款详情 */
-	private String				payInfo;
-	
-	/** 
-	 * 第三方支付类型
-	 * 如： 支付宝内部类型  用于支付宝内部使用
-	 * 
-	 */
-	private Integer				thirdPayType ;
-	
-	/** 第三方支付流水 */
-	private String				thirdPayNo;
-	
-	/** 第三方支付帐号 */
-	private String				thirdPayAccount ;
-	
-	/** 修改时间 */
-	private Date				modifyTime;
-	
-	/** version*/
-	private Date				version;
-	
-	/** 是否支付成功状态 **/
-	private Boolean 			paySuccessStatus;
-	
-	/** 拆单号 **/
-	private String 				subOrdinate;
-	
-	/** 付款人 **/
-	private String 				paymentPeople;
-	
-	private Date 				createTime;
-	
-	/** 是否已经成功调用取消交易接口  true表示已经成功调用 false表示为调用或者未成功调用**/
-	private Boolean 			callCloseStatus;
-	
-	private String 				picUrl;
-	
-	private String 				bankCode;
-	
-	
-	/** 代表分期支付的期数 **/
-	private Integer             periods; 
-	
-	/** 代表分期金额 **/
-	private BigDecimal			amount;
-	
-	/** 代表分期手续费 **/
-	private BigDecimal			poundage;
-	
-	
-	@Id
-	@Column(name = "ID")
-	@SequenceGenerator(name = "SEQ_T_SO_PAYINFO_LOG",sequenceName = "S_T_SO_PAYINFO_LOG",allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_T_SO_PAYINFO_LOG")
-	public Long getId() {
-		return id;
-	}
+    /** PK. */
+    private Long id;
 
+    /** 订单id */
+    private Long orderId;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-	
-	
-	@Column(name = "PAY_INFO_ID")
+    /**
+     * 支付详细id
+     */
+    private Long payInfoId;
+
+    /** 支付类型 */
+    private Integer payType;
+
+    /** 付款详情 */
+    private String payInfo;
+
+    //---------------------------------------------------------------------
+
+    /** 是否支付成功状态 **/
+    private Boolean paySuccessStatus;
+
+    /** 拆单号 **/
+    private String subOrdinate;
+
+    //---------------------------------------------------------------------
+    /**
+     * 第三方支付类型
+     * 如： 支付宝内部类型 用于支付宝内部使用
+     * 
+     */
+    private Integer thirdPayType;
+
+    /** 第三方支付流水 */
+    private String thirdPayNo;
+
+    /** 第三方支付帐号 */
+    private String thirdPayAccount;
+
+    //---------------------------------------------------------------------
+
+    /** 支付数值 */
+    private BigDecimal payNumerical;
+
+    /** 支付金额 */
+    private BigDecimal payMoney;
+
+    //---------------------------------------------------------------------
+
+    /** 付款人 **/
+    private String paymentPeople;
+
+    /** 是否已经成功调用取消交易接口 true表示已经成功调用 false表示为调用或者未成功调用 **/
+    private Boolean callCloseStatus;
+
+    //---------------------------------------------------------------------
+
+    private String picUrl;
+
+    private String bankCode;
+
+    /** 代表分期支付的期数 **/
+    private Integer periods;
+
+    /** 代表分期金额 **/
+    private BigDecimal amount;
+
+    /** 代表分期手续费 **/
+    private BigDecimal poundage;
+
+    //---------------------------------------------------------------------
+    private Date createTime;
+
+    /** 修改时间 */
+    private Date modifyTime;
+
+    /** version */
+    private Date version;
+
+    //---------------------------------------------------------------------
+
+    @Id
+    @Column(name = "ID")
+    @SequenceGenerator(name = "SEQ_T_SO_PAYINFO_LOG",sequenceName = "S_T_SO_PAYINFO_LOG",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_T_SO_PAYINFO_LOG")
+    public Long getId(){
+        return id;
+    }
+
+    public void setId(Long id){
+        this.id = id;
+    }
+
+    @Column(name = "PAY_INFO_ID")
     @Index(name = "IDX_PAYINFO_LOG_PAY_INFO_ID")
-	public Long getPayInfoId() {
-		return payInfoId;
-	}
+    public Long getPayInfoId(){
+        return payInfoId;
+    }
 
+    public void setPayInfoId(Long payInfoId){
+        this.payInfoId = payInfoId;
+    }
 
-	public void setPayInfoId(Long payInfoId) {
-		this.payInfoId = payInfoId;
-	}
-
-
-	@Column(name = "ORDER_ID")
+    @Column(name = "ORDER_ID")
     @Index(name = "IDX_PAYINFO_LOG_ORDER_ID")
-	public Long getOrderId() {
-		return orderId;
-	}
+    public Long getOrderId(){
+        return orderId;
+    }
 
+    public void setOrderId(Long orderId){
+        this.orderId = orderId;
+    }
 
-	public void setOrderId(Long orderId) {
-		this.orderId = orderId;
-	}
+    @Column(name = "PAY_NUMERICAL")
+    public BigDecimal getPayNumerical(){
+        return payNumerical;
+    }
 
-	@Column(name = "PAY_NUMERICAL")
-	public BigDecimal getPayNumerical() {
-		return payNumerical;
-	}
+    public void setPayNumerical(BigDecimal payNumerical){
+        this.payNumerical = payNumerical;
+    }
 
+    @Column(name = "PAY_MONEY")
+    public BigDecimal getPayMoney(){
+        return payMoney;
+    }
 
-	public void setPayNumerical(BigDecimal payNumerical) {
-		this.payNumerical = payNumerical;
-	}
+    public void setPayMoney(BigDecimal payMoney){
+        this.payMoney = payMoney;
+    }
 
-	@Column(name = "PAY_MONEY")
-	public BigDecimal getPayMoney() {
-		return payMoney;
-	}
-
-
-	public void setPayMoney(BigDecimal payMoney) {
-		this.payMoney = payMoney;
-	}
-
-	@Column(name = "PAY_TYPE")
+    @Column(name = "PAY_TYPE")
     @Index(name = "IDX_PAYINFO_LOG_PAY_TYPE")
-	public Integer getPayType() {
-		return payType;
-	}
+    public Integer getPayType(){
+        return payType;
+    }
 
+    public void setPayType(Integer payType){
+        this.payType = payType;
+    }
 
-	public void setPayType(Integer payType) {
-		this.payType = payType;
-	}
+    @Column(name = "PAY_INFO")
+    public String getPayInfo(){
+        return payInfo;
+    }
 
-	@Column(name = "PAY_INFO")
-	public String getPayInfo() {
-		return payInfo;
-	}
+    public void setPayInfo(String payInfo){
+        this.payInfo = payInfo;
+    }
 
+    @Column(name = "THIRD_PAY_NO")
+    public String getThirdPayNo(){
+        return thirdPayNo;
+    }
 
-	public void setPayInfo(String payInfo) {
-		this.payInfo = payInfo;
-	}
-	
-	@Column(name = "THIRD_PAY_NO")
-	public String getThirdPayNo() {
-		return thirdPayNo;
-	}
+    public void setThirdPayNo(String thirdPayNo){
+        this.thirdPayNo = thirdPayNo;
+    }
 
-	public void setThirdPayNo(String thirdPayNo) {
-		this.thirdPayNo = thirdPayNo;
-	}
+    @Column(name = "THIRD_PAY_ACCOUNT")
+    public String getThirdPayAccount(){
+        return thirdPayAccount;
+    }
 
-	@Column(name = "THIRD_PAY_ACCOUNT")
-	public String getThirdPayAccount() {
-		return thirdPayAccount;
-	}
+    public void setThirdPayAccount(String thirdPayAccount){
+        this.thirdPayAccount = thirdPayAccount;
+    }
 
+    @Column(name = "MODIFY_TIME")
+    public Date getModifyTime(){
+        return modifyTime;
+    }
 
-	public void setThirdPayAccount(String thirdPayAccount) {
-		this.thirdPayAccount = thirdPayAccount;
-	}
+    public void setModifyTime(Date modifyTime){
+        this.modifyTime = modifyTime;
+    }
 
+    @Column(name = "VERSION")
+    public Date getVersion(){
+        return version;
+    }
 
-	@Column(name = "MODIFY_TIME")
-	public Date getModifyTime() {
-		return modifyTime;
-	}
+    public void setVersion(Date version){
+        this.version = version;
+    }
 
-
-	public void setModifyTime(Date modifyTime) {
-		this.modifyTime = modifyTime;
-	}
-
-
-	@Column(name = "VERSION")
-	public Date getVersion() {
-		return version;
-	}
-
-
-	public void setVersion(Date version) {
-		this.version = version;
-	}
-
-	@Column(name = "PAY_SUCCESS_STATUS")
+    @Column(name = "PAY_SUCCESS_STATUS")
     @Index(name = "IDX_PAYINFO_LOG_PAY_SUCCESS_STATUS")
-	public Boolean getPaySuccessStatus() {
-		return paySuccessStatus;
-	}
+    public Boolean getPaySuccessStatus(){
+        return paySuccessStatus;
+    }
 
-	public void setPaySuccessStatus(Boolean paySuccessStatus) {
-		this.paySuccessStatus = paySuccessStatus;
-	}
+    public void setPaySuccessStatus(Boolean paySuccessStatus){
+        this.paySuccessStatus = paySuccessStatus;
+    }
 
-	@Column(name = "SUB_ORDINATE")
+    @Column(name = "SUB_ORDINATE")
     @Index(name = "IDX_PAYINFO_LOG_PAY_SUB_ORDINATE")
-	public String getSubOrdinate() {
-		return subOrdinate;
-	}
+    public String getSubOrdinate(){
+        return subOrdinate;
+    }
 
-	public void setSubOrdinate(String subOrdinate) {
-		this.subOrdinate = subOrdinate;
-	}
-	
-	@Column(name="PAYMENT_PEOPLE")
-	public String getPaymentPeople() {
-		return paymentPeople;
-	}
-	
-	public void setPaymentPeople(String paymentPeople) {
-		this.paymentPeople = paymentPeople;
-	}
+    public void setSubOrdinate(String subOrdinate){
+        this.subOrdinate = subOrdinate;
+    }
 
-	@Column(name="CREATE_TIME")
-	public Date getCreateTime() {
-		return createTime;
-	}
+    @Column(name = "PAYMENT_PEOPLE")
+    public String getPaymentPeople(){
+        return paymentPeople;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public void setPaymentPeople(String paymentPeople){
+        this.paymentPeople = paymentPeople;
+    }
 
+    @Column(name = "CREATE_TIME")
+    public Date getCreateTime(){
+        return createTime;
+    }
 
-	@Column(name="CALL_CLOSE_STATUS")
+    public void setCreateTime(Date createTime){
+        this.createTime = createTime;
+    }
+
+    @Column(name = "CALL_CLOSE_STATUS")
     @Index(name = "IDX_PAYINFO_LOG_PAY_CALL_CLOSE_STATUS")
-	public Boolean getCallCloseStatus() {
-		return callCloseStatus;
-	}
+    public Boolean getCallCloseStatus(){
+        return callCloseStatus;
+    }
 
+    public void setCallCloseStatus(Boolean callCloseStatus){
+        this.callCloseStatus = callCloseStatus;
+    }
 
-	public void setCallCloseStatus(Boolean callCloseStatus) {
-		this.callCloseStatus = callCloseStatus;
-	}
+    public String getPicUrl(){
+        return picUrl;
+    }
 
+    public void setPicUrl(String picUrl){
+        this.picUrl = picUrl;
+    }
 
-	public String getPicUrl() {
-		return picUrl;
-	}
+    public String getBankCode(){
+        return bankCode;
+    }
 
+    public void setBankCode(String bankCode){
+        this.bankCode = bankCode;
+    }
 
-	public void setPicUrl(String picUrl) {
-		this.picUrl = picUrl;
-	}
+    public Integer getThirdPayType(){
+        return thirdPayType;
+    }
 
-	public String getBankCode() {
-		return bankCode;
-	}
+    public void setThirdPayType(Integer thirdPayType){
+        this.thirdPayType = thirdPayType;
+    }
 
-	public void setBankCode(String bankCode) {
-		this.bankCode = bankCode;
-	}
+    /**
+     * @return amount
+     * @date 2016年2月18日 下午3:10:36
+     */
+    @Column(name = "AMOUNT")
+    public BigDecimal getAmount(){
+        return amount;
+    }
 
+    /**
+     * @param amount
+     *            要设置的 amount
+     * @date 2016年2月18日 下午3:10:36
+     */
+    public void setAmount(BigDecimal amount){
+        this.amount = amount;
+    }
 
-	public Integer getThirdPayType() {
-		return thirdPayType;
-	}
+    /**
+     * @return poundage
+     * @date 2016年2月18日 下午3:10:36
+     */
+    @Column(name = "POUNDAGE")
+    public BigDecimal getPoundage(){
+        return poundage;
+    }
 
+    /**
+     * @param poundage
+     *            要设置的 poundage
+     * @date 2016年2月18日 下午3:10:36
+     */
+    public void setPoundage(BigDecimal poundage){
+        this.poundage = poundage;
+    }
 
-	public void setThirdPayType(Integer thirdPayType) {
-		this.thirdPayType = thirdPayType;
-	}
-	
+    @Column(name = "PERIODS")
+    public Integer getPeriods(){
+        return periods;
+    }
 
-	/** 
-	 * @return amount 
-	 * @date 2016年2月18日 下午3:10:36 
-	 */
-	@Column(name = "AMOUNT")
-	public BigDecimal getAmount() {
-		return amount;
-	}
-
-
-	/** 
-	 * @param amount 要设置的 amount 
-	 * @date 2016年2月18日 下午3:10:36 
-	 */
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
-	}
-
-
-	/** 
-	 * @return poundage 
-	 * @date 2016年2月18日 下午3:10:36 
-	 */
-	@Column(name = "POUNDAGE")
-	public BigDecimal getPoundage() {
-		return poundage;
-	}
-
-
-	/** 
-	 * @param poundage 要设置的 poundage 
-	 * @date 2016年2月18日 下午3:10:36 
-	 */
-	public void setPoundage(BigDecimal poundage) {
-		this.poundage = poundage;
-	}
-	
-	@Column(name = "PERIODS")
-	public Integer getPeriods(){
-		return periods;
-	}
-	
-	public void setPeriods(Integer periods){
-		this.periods = periods;
-	}
+    public void setPeriods(Integer periods){
+        this.periods = periods;
+    }
 }

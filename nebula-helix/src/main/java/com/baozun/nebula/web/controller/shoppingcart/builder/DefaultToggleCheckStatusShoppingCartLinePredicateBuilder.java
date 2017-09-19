@@ -33,6 +33,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartInven
 import static com.feilong.core.util.predicate.BeanPredicateUtil.equalPredicate;
 
 /**
+ * 默认 全选/全不选操作时候购物车行选择器.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.14
@@ -63,6 +64,8 @@ public class DefaultToggleCheckStatusShoppingCartLinePredicateBuilder implements
         if (!checkStatus){//如果全不选,那么我们找到选中的购物车行
             return settlementStatePredicate;
         }
+
+        //---------------------------------------------------------------------
         //如果是全选, 那么异常状态的就不需要选中了
         return PredicateUtils.allPredicate(//
                         settlementStatePredicate,

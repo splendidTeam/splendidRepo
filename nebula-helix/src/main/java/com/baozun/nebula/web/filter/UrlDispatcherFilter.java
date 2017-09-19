@@ -68,15 +68,13 @@ public class UrlDispatcherFilter implements Filter{
 		
 		String path = httpServletRequest.getRequestURI();
 		
-
-		Map<String,CmsPageInstance> urlMap= SdkCmsPageInstanceManagerImpl.urlMap;
 		String key = path;
 		if(supportType != null){
 			key = path+"-"+supportType;
 		}
-		CmsPageInstance pageInstance = urlMap.get(key);
+		CmsPageInstance pageInstance = SdkCmsPageInstanceManagerImpl.urlMap.get(key);
 		if(pageInstance == null){
-			 pageInstance = urlMap.get(path+"-"+0);
+			 pageInstance = SdkCmsPageInstanceManagerImpl.urlMap.get(path+"-"+0);
 			 log.debug("cms信息未找到:"+"["+key+"]"+"["+path+"-"+0+"]");
 		}
         //包含自定义的url

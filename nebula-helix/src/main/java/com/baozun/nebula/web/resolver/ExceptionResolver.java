@@ -126,9 +126,9 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver {
         Object[] args = businessException.getArgs();
 
         String message = messageSource.getMessage(key, args, key, LocaleContextHolder.getLocale());
-
-        LOGGER.error("errorCode:{},key:{},args:{},message:{}", errorCode, key, args, message);
-
+        if(LOGGER.isDebugEnabled()) {
+        	LOGGER.debug("errorCode:{},key:{},args:{},message:{}", errorCode, key, args, message);
+        }
         BusinessException result = new BusinessException(errorCode, message);
         result.setArgs(args);
         if (businessException.getLinkedException() != null){

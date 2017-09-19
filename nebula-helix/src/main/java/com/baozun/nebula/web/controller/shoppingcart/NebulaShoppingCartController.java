@@ -38,6 +38,7 @@ import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewC
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.handler.UncheckedInvalidStateShoppingCartLineHandler;
+import com.baozun.nebula.web.controller.shoppingcart.handler.UpdateShoppingCartCountCookieHandler;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
@@ -133,6 +134,14 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
     @Autowired
     private UncheckedInvalidStateShoppingCartLineHandler uncheckedInvalidStateShoppingCartLineHandler;
 
+    /**
+     * 更新保存购物车商品数量的Cookie
+     * 
+     * @since 5.3.2.23
+     */
+    @Autowired
+    private UpdateShoppingCartCountCookieHandler updateShoppingCartCountCookieHandler;
+
     //**********************************showShoppingCart************************************************
 
     /**
@@ -142,18 +151,23 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      *            the member details
      * @param request
      *            the request
+     * @param response
      * @param model
      *            the model
      * @return the string
      * @RequestMapping(value = "/shoppingcart", method = RequestMethod.GET)
      */
     public String showShoppingCart(@LoginMember MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,Model model){
+
         ShoppingCartViewCommand shoppingCartViewCommand = buildShoppingCartViewCommand(memberDetails, request);
 
         //将状态不对的 选中状态的订单行 变成不选中. 
-        uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand,request,response);
+        uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand, request, response);
+        //更新cookie里保存的购物车中商品总数量
+        updateShoppingCartCountCookieHandler.update(shoppingCartViewCommand, request, response);
 
         model.addAttribute("shoppingCartViewCommand", shoppingCartViewCommand);
+
         return "shoppingcart.shoppingcart";
     }
 
@@ -195,7 +209,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      * <li>通常而言不同的商城其实包装信息不同</li>
      * <li>价格等因子理论上都是内部计算(不可以通过url传输)</li>
      * </ol>
-     * 所以此处设置为 protected 作用域, 此方法一般不直接mapping url 地址, 而是url地址解析到mapping方法,再调用这个方法
+     * 此方法一般不直接mapping url 地址, 而是url地址解析到mapping方法,再调用这个方法
      * </blockquote>
      *
      * @param memberDetails
@@ -209,7 +223,8 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      * @param model
      *            the model
      * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
-     * 
+     * @see #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse, Model)
+     * @see #addShoppingCartBatch(MemberDetails, Long[], Integer, HttpServletRequest, HttpServletResponse, Model)
      * @since 5.3.2.13
      * @RequestMapping(value = "/shoppingcart/addcart", method = RequestMethod.POST)
      */
@@ -251,7 +266,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      *            the model
      * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
      * 
-     * @see <a href="http://jira.baozun.cn/browse/NB-367">NB-367</a>
+     * @see <a href="http://jira.baozun.cn/browse/NB-367">购物车添加修改商品尺码的功能</a>
      * @since 5.3.2.3
      * @RequestMapping(value = "/shoppingcart/updateline", method = RequestMethod.POST)
      */

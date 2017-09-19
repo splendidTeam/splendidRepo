@@ -16,6 +16,9 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -27,14 +30,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
+import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-
 /**
- *
+ * 专门处理购物车添加操作的业务类.
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.13
  */
@@ -44,6 +47,8 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
 
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SdkShoppingCartAddManagerImpl.class);
+
+    //---------------------------------------------------------------------
 
     /** The sdk shopping cart line dao. */
     @Autowired
@@ -57,6 +62,23 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     @Autowired
     private ShoppingCartLinePackageInfoManager shoppingCartLinePackageInfoManager;
 
+    //---------------------------------------------------------------------
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartAddManager#addOrUpdateCartLine(java.lang.Long, java.util.List)
+     */
+    @Override
+    public void addOrUpdateCartLine(Long memberId,List<ShoppingCartLineCommand> toBeOperatedShoppingCartLineCommandList) throws NativeUpdateRowCountNotEqualException{
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notEmpty(toBeOperatedShoppingCartLineCommandList, "shoppingCartLineCommand can't be null!");
+
+        for (ShoppingCartLineCommand shoppingCartLineCommand : toBeOperatedShoppingCartLineCommandList){
+            addOrUpdateCartLine(memberId, shoppingCartLineCommand);
+        }
+    }
+
     /**
      * 添加或者更新购物车.
      * 
@@ -64,7 +86,12 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
      * 如果有，就修改数量<br>
      * 如果没有，就添加一条记录
      * </p>
-     *
+     * 
+     * <p>
+     * 如果 <code>memberId</code> 是null,抛出 {@link NullPointerException}<br>
+     * 如果 <code>shoppingCartLineCommand</code> 是null,抛出 {@link NullPointerException}<br>
+     * </p>
+     * 
      * @param memberId
      * @param shoppingCartLineCommand
      */
@@ -74,28 +101,10 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         Validate.notNull(shoppingCartLineCommand, "shoppingCartLineCommand can't be null!");
 
         if (isUpdate(shoppingCartLineCommand)){ // 更新
-            sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, shoppingCartLineCommand.getId(), shoppingCartLineCommand.getQuantity());
+            sdkShoppingCartUpdateManager.updateCartLineQuantityAndSettlementByLineId(memberId, shoppingCartLineCommand.getId(), shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSettlementState().equals(1));
         }else{
             addCartLine(memberId, shoppingCartLineCommand);
         }
-    }
-
-    /**
-     * 判断请求是都是更新请求.
-     * 
-     * <p>
-     * 目前的逻辑是,如果有 lineId 那么判断为更新;<br>
-     * 通常 新增的行是没有lineid的(游客的另说,游客登录同步请看{@link SdkShoppingCartSyncManager})<br>
-     * 那么有 lineId 的行就是修改了<br>
-     * 
-     * --上述逻辑是简单粗暴的做法
-     * </p>
-     *
-     * @param shoppingCartLineCommand
-     * @return
-     */
-    protected boolean isUpdate(ShoppingCartLineCommand shoppingCartLineCommand){
-        return null != shoppingCartLineCommand.getId();
     }
 
     /*
@@ -105,6 +114,9 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
      */
     @Override
     public void addCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand){
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notNull(shoppingCartLineCommand, "shoppingCartLineCommand can't be null!");
+
         ShoppingCartLine shoppingCartLine = saveShoppingCartLine(memberId, shoppingCartLineCommand);
 
         // 保存包装信息
@@ -137,7 +149,10 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         shoppingCartLine.setGift(shoppingCartLineCommand.isGift());
         //shoppingCartLine.setItemId(itemId);
 
-        shoppingCartLine.setLineGroup(String.valueOf(shoppingCartLineCommand.getLineGroup()));
+        Long lineGroup = shoppingCartLineCommand.getLineGroup();
+        if (null != lineGroup){
+            shoppingCartLine.setLineGroup(String.valueOf(lineGroup));
+        }
 
         shoppingCartLine.setMemberId(memberId);
         shoppingCartLine.setPromotionId(shoppingCartLineCommand.getPromotionId());
@@ -148,20 +163,23 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         shoppingCartLine.setSkuId(shoppingCartLineCommand.getSkuId());
         return sdkShoppingCartLineDao.save(shoppingCartLine);
 
-        //        int insertShoppingCartLineResult = sdkShoppingCartLineDao.insertShoppingCartLine(
-        //                        extentionCode,
-        //                        shoppingCartLineCommand.getSkuId(),
-        //                        shoppingCartLineCommand.getQuantity(),
-        //                        memberId,
-        //                        new Date(),
-        //                        shoppingCartLineCommand.getSettlementState(),
-        //                        shoppingCartLineCommand.getShopId(),
-        //                        shoppingCartLineCommand.isGift(),
-        //                        shoppingCartLineCommand.getPromotionId(),
-        //                        shoppingCartLineCommand.getLineGroup());
-        //        if (1 != insertShoppingCartLineResult){
-        //            LOGGER.error("insertShoppingCartLine memberId:[{}],extentionCode:[{}],result is:[{}], not expected 1", memberId, extentionCode, insertShoppingCartLineResult);
-        //            throw new NativeUpdateRowCountNotEqualException(1, insertShoppingCartLineResult);
-        //        }
+    }
+
+    /**
+     * 判断请求是都是更新请求.
+     * 
+     * <p>
+     * 目前的逻辑是,如果有 lineId 那么判断为更新;<br>
+     * 通常 新增的行是没有lineid的(游客的另说,游客登录同步请看{@link SdkShoppingCartSyncManager})<br>
+     * 那么有 lineId 的行就是修改了<br>
+     * 
+     * --上述逻辑是简单粗暴的做法
+     * </p>
+     *
+     * @param shoppingCartLineCommand
+     * @return
+     */
+    protected boolean isUpdate(ShoppingCartLineCommand shoppingCartLineCommand){
+        return null != shoppingCartLineCommand.getId();
     }
 }

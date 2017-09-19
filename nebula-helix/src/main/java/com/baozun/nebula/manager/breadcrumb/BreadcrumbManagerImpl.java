@@ -26,8 +26,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import loxia.dao.Sort;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +38,9 @@ import com.baozun.nebula.command.product.FilterNavigationCommand;
 import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
+import com.baozun.nebula.manager.AbstractCacheBuilder;
 import com.baozun.nebula.manager.CacheManager;
-import com.feilong.core.TimeInterval;
 import com.baozun.nebula.manager.navigation.NavigationHelperManager;
-import com.baozun.nebula.manager.system.AbstractCacheBuilder;
 import com.baozun.nebula.model.baseinfo.Navigation;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.ItemCategory;
@@ -62,8 +59,11 @@ import com.baozun.nebula.search.FacetFilterHelper;
 import com.baozun.nebula.search.ItemCollectionContext;
 import com.baozun.nebula.search.command.MetaDataCommand;
 import com.baozun.nebula.utilities.common.LangUtil;
+import com.feilong.core.TimeInterval;
 import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
+
+import loxia.dao.Sort;
 
 /**   
  * 面包屑

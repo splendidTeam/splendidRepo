@@ -46,16 +46,18 @@ public class PayInfo extends BaseModel{
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -3350505308978769968L;
 
-    /** The coupon pay. */
+    /**
+     * @deprecated 没有被调用啊 since 5.3.2.22
+     */@Deprecated
     public static Integer     COUPON_PAY       = 101;
 
     /** PK. */
     private Long              id;
 
-    /** 有效支付（开始）实践. */
+    /** 有效支付（开始）时间. */
     private Date              payStartTime;
 
-    /** 有效支付（结束）实践. */
+    /** 有效支付（结束）时间. */
     private Date              payEndTime;
 
     /** 订单id. */
@@ -413,9 +415,9 @@ public class PayInfo extends BaseModel{
     }
 
     /**
-     * 获得 有效支付（开始）实践.
+     * 获得 有效支付（开始）时间.
      *
-     * @return the 有效支付（开始）实践
+     * @return the 有效支付（开始）时间
      */
     @Column(name = "PAY_START_TIME")
     public Date getPayStartTime(){
@@ -423,19 +425,19 @@ public class PayInfo extends BaseModel{
     }
 
     /**
-     * 设置 有效支付（开始）实践.
+     * 设置 有效支付（开始）时间.
      *
      * @param payStartTime
-     *            the new 有效支付（开始）实践
+     *            the new 有效支付（开始）时间
      */
     public void setPayStartTime(Date payStartTime){
         this.payStartTime = payStartTime;
     }
 
     /**
-     * 获得 有效支付（结束）实践.
+     * 获得 有效支付（结束）时间.
      *
-     * @return the 有效支付（结束）实践
+     * @return the 有效支付（结束）时间
      */
     @Column(name = "PAY_END_TIME")
     public Date getPayEndTime(){
@@ -443,10 +445,10 @@ public class PayInfo extends BaseModel{
     }
 
     /**
-     * 设置 有效支付（结束）实践.
+     * 设置 有效支付（结束）时间.
      *
      * @param payEndTime
-     *            the new 有效支付（结束）实践
+     *            the new 有效支付（结束）时间
      */
     public void setPayEndTime(Date payEndTime){
         this.payEndTime = payEndTime;

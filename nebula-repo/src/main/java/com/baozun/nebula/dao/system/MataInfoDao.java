@@ -90,7 +90,7 @@ public interface MataInfoDao extends GenericEntityDao<MataInfo,Long>{
 	void removeMataInfoByIds(@QueryParam("ids")List<Long> ids);
 	
 	/**
-	 * 获取有效的MataInfo列表
+	 * 获取有效的MataInfo列表     
 	 * lifecycle =1
 	 * @param ids
 	 * @return

@@ -1,5 +1,6 @@
 package com.baozun.nebula.search.command;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,9 +9,11 @@ import com.baozun.nebula.search.FacetParameter;
 import com.baozun.nebula.search.FacetTagType;
 import com.feilong.core.Validator;
 
-public class SearchCommand{
+public class SearchCommand implements Serializable{
 
-	/**
+    private static final long serialVersionUID = 3866989544366696112L;
+
+    /**
 	 * 搜索关键字
 	 */
 	private String						searchWord;

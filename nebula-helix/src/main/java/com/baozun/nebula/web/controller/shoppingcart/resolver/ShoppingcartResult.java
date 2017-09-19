@@ -18,13 +18,15 @@ package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
 /**
  * 购物车操作的结果.
- *
- * @author jumbo
+ * 
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
 public enum ShoppingcartResult{
 
     /** 成功. */
     SUCCESS,
+
+    //---------------------------------------------------------------------
 
     /** sku不存在. */
     SKU_NOT_EXIST,
@@ -56,6 +58,12 @@ public enum ShoppingcartResult{
 
     /** 超过库存数. */
     MAX_THAN_INVENTORY,
+    
+    /** 购买总商品数量超过最大限制.
+     * 
+     * @since 5.3.2.22
+     *  */
+    TOTAL_MAX_THAN_QUANTITY,
 
     // ******************删除*************************************************
 
@@ -67,7 +75,18 @@ public enum ShoppingcartResult{
     /** 基于 shoppingcart line 查找SHOPPING_CART_LINE_COMMAND 可能已经被删掉了 （比如 打开了双窗口）. */
     SHOPPING_CART_LINE_COMMAND_NOT_FOUND,
 
+    //---------------------------------------------------------------------
+
     /** 数据库层操作失败. */
-    OPERATE_ERROR;
+    OPERATE_ERROR,
+
+    //-------------------自定义校验-----------------------------------------
+
+    /**
+     * 自定义校验时候的失败.
+     * 
+     * @since 5.3.2.20
+     */
+    CUSTOM_FAIL;
 
 }

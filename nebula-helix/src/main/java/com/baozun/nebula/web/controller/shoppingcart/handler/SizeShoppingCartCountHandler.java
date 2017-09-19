@@ -18,9 +18,9 @@ package com.baozun.nebula.web.controller.shoppingcart.handler;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
 
-import java.util.List;
+import org.apache.commons.collections4.IterableUtils;
 
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineQuantityExtractor;
 
 /**
  * 计算 shoppingCartLineCommandList size的 QuantityShoppingCartCountHandler.
@@ -36,7 +36,7 @@ public class SizeShoppingCartCountHandler implements ShoppingCartCountHandler{
      * @see com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartCountHandler#buildCount(java.util.List)
      */
     @Override
-    public int buildCount(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : shoppingCartLineCommandList.size();
+    public <T extends ShoppingCartLineQuantityExtractor> int buildCount(Iterable<T> shoppingCartLineCommandList){
+        return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : IterableUtils.size(shoppingCartLineCommandList);
     }
 }

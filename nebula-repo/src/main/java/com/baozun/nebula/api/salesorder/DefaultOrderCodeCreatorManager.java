@@ -16,10 +16,12 @@
  */
 package com.baozun.nebula.api.salesorder;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang3.Validate;
+
 import com.baozun.nebula.dao.salesorder.SdkOrderDao;
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.utils.spring.SpringUtil;
 import com.feilong.core.DatePattern;
 import com.feilong.core.date.DateUtil;
@@ -36,19 +38,32 @@ import com.feilong.core.date.DateUtil;
 public class DefaultOrderCodeCreatorManager implements OrderCodeCreatorManager{
 
     /** 前台下单. */
-    private static String SOURCE_FRONTED          = "BN";
+    private static String SOURCE_FRONTED = "BN";
 
     /** 后台下单. */
     private static String SOURCE_CUSTOMER_SERVICE = "BC";
 
     /** 手工单. */
-    private static String SOURCE_HANDLE           = "BH";
+    private static String SOURCE_HANDLE = "BH";
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.api.salesorder.OrderCodeCreatorManager#createOrderCode(java.lang.Long, com.baozun.nebula.sdk.command.SalesOrderCommand)
+     */
+    @Override
+    public String createOrderCode(Long shopId,SalesOrderCommand salesOrderCommand){
+        Validate.notNull(salesOrderCommand, "salesOrderCommand can't be null!");
+        Validate.notNull(salesOrderCommand.getSource(), "salesOrderCommand.getSource() can't be null!");
+        return createOrderCodeBySource(salesOrderCommand.getSource());
+    }
 
     /*
      * (non-Javadoc)
      * 
      * @see com.baozun.nebula.api.sales.OrderCodeCreator#createOrderCodeBySource(java.lang.Integer)
      */
+    @Deprecated
     @Override
     public String createOrderCodeBySource(Integer source){
         SdkOrderDao sdkOrderDao = (SdkOrderDao) SpringUtil.getBean(SdkOrderDao.class);

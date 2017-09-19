@@ -1,5 +1,7 @@
 package com.baozun.nebula.curator.invoke;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.date.DateExtensionUtil.formatDuration;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.util.Date;
@@ -14,15 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.command.i18n.LangProperty;
-import com.baozun.nebula.curator.watcher.IWatcherInvoke;
 import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
-
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-import static com.feilong.core.date.DateExtensionUtil.formatDuration;
 
 import loxia.dao.Sort;
 
@@ -30,9 +28,9 @@ import loxia.dao.Sort;
  * @see com.baozun.nebula.zk.I18nLangWatchInvoke
  * 
  * @author chengchao
- *
+ * @author D.C 2017/8/10 凌晨 初始化取消睡眠
  */
-public class I18nLangWatchInvoke implements IWatcherInvoke{
+public class I18nLangWatchInvoke extends AbstractWatchInvoke{
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(I18nLangWatchInvoke.class);
@@ -49,10 +47,10 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
     @Override
     public void invoke(String path,byte[] data){
         LOGGER.info(path + ":invoke");
-        try{
-            TimeUnit.SECONDS.sleep(3);
-        }catch (InterruptedException e){
-            LOGGER.error(e.getMessage());
+        if (!this.initialized.compareAndSet(false, true)){
+            try{
+                TimeUnit.SECONDS.sleep(3);
+            }catch (InterruptedException e){}
         }
         sdkI18nLangManager.loadI18nLangs();
 
@@ -85,8 +83,8 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
         // 顺序 ,一般先有父 再有 子
         Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
         for (String language : languageList){
-            if (LOGGER.isInfoEnabled()){
-                LOGGER.info("begin load language:[{}] address", language);
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("begin load language:[{}] address", language);
             }
 
             Date beginDate = new Date();

@@ -21,6 +21,8 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ITEM_STATUS_NOT_ENABLE;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SKU_NOT_ENABLE;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SKU_NOT_EXIST;
+import static com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineValidatorChannel.SHOPPING_CART;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.Date;
 
@@ -36,14 +38,13 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.feilong.core.date.DateUtil;
-
-import static com.feilong.core.Validator.isNullOrEmpty;
 
 import static com.feilong.core.DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND;
 
 /**
- * The Class ShoppingcartLineOperateCommonValidatorImpl.
+ * 默认的购物车行操作的公共校验,常用于 add/update/立即购买等操作..
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月25日 下午4:48:40
@@ -56,9 +57,21 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingcartLineOperateCommonValidator.class);
 
+    //---------------------------------------------------------------------
+
     /** The sdk item manager. */
     @Autowired
     private SdkItemManager sdkItemManager;
+
+    /**
+     * 自定义购物车校验.
+     * 
+     * @since 5.3.2.20
+     */
+    @Autowired(required = false)
+    private ShoppingcartLineCustomValidator shoppingcartLineCustomValidator;
+
+    //---------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -68,13 +81,24 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
      */
     @Override
     public ShoppingcartResult validate(Sku sku,Integer count){
+        return validate(sku, count, ShoppingcartLineValidatorChannel.SHOPPING_CART);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator#validate(com.baozun.nebula.model.product.Sku, java.lang.Integer,
+     * com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineValidatorChannel)
+     */
+    @Override
+    public ShoppingcartResult validate(Sku sku,Integer count,ShoppingcartLineValidatorChannel shoppingcartLineValidatorChannel){
         //===============① 数量不能小于1===============
-        Validate.isTrue(count >= 1, "count:%s can not <1", count);
+        Validate.isTrue(count >= 1, "count:[%s] can not <1", count);
 
         //===============② 判断sku是否存在===============
-        if (isNullOrEmpty(sku)){
+        if (null == sku){
             //XXX feilong change to exception
-            LOGGER.error("sku not exist!!!!!!");
+            LOGGER.error("sku is null, not exist!!!");
             return SKU_NOT_EXIST;
         }
 
@@ -113,6 +137,18 @@ public class DefaultShoppingcartLineOperateCommonValidator implements Shoppingca
             LOGGER.warn("item:[{}] is gift don't need operate,return [ITEM_IS_GIFT]", itemCode);
             return ITEM_IS_GIFT;
         }
+
+        //---------------⑦ 自定义校验-------------------------------------------------
+
+        if (null != shoppingcartLineCustomValidator){
+            ShoppingcartLineCustomValidatorEntity shoppingcartLineCustomValidatorEntity = new ShoppingcartLineCustomValidatorEntity(sku, itemCommand, count);
+            ShoppingcartResult customShoppingcartResult = shoppingcartLineCustomValidator.validate(shoppingcartLineCustomValidatorEntity, defaultIfNull(shoppingcartLineValidatorChannel, SHOPPING_CART));
+            if (ShoppingcartResultUtil.isNotSuccess(customShoppingcartResult)){
+                return customShoppingcartResult;
+            }
+        }
+
         return null;
     }
+
 }

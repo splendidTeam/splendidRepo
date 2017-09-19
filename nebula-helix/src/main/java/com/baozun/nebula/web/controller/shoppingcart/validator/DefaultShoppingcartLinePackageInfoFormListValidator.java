@@ -19,8 +19,6 @@ package com.baozun.nebula.web.controller.shoppingcart.validator;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
@@ -28,14 +26,13 @@ import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 /**
+ * 默认的 校验购物车行表单包装信息 校验器.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.13
  */
 @Component("shoppingcartLinePackageInfoFormListValidator")
 public class DefaultShoppingcartLinePackageInfoFormListValidator implements ShoppingcartLinePackageInfoFormListValidator{
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingcartLinePackageInfoFormListValidator.class);
 
     /*
      * (non-Javadoc)
@@ -44,11 +41,15 @@ public class DefaultShoppingcartLinePackageInfoFormListValidator implements Shop
      */
     @Override
     public void validator(List<PackageInfoForm> packageInfoFormList){
+
         if (isNotNullOrEmpty(packageInfoFormList)){
             for (PackageInfoForm packageInfoForm : packageInfoFormList){
                 Validate.notNull(packageInfoForm, "packageInfoForm can't be null!");
 
+                //包装类型不能是 null
                 Validate.notNull(packageInfoForm.getType(), "packageInfoForm type can't be null!");
+
+                //包装金额不能是 null
                 Validate.notNull(packageInfoForm.getTotal(), "packageInfoForm total can't be null!");
             }
         }

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.curator.ZkOperator;
-import com.baozun.nebula.curator.watcher.IWatcherInvoke;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManager;
 
@@ -18,49 +17,50 @@ import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManager;
  * 
  * @see com.baozun.nebula.zk.UrlMapWatchInvoke
  * @author chengchao
- *
+ * @author D.C 2017/8/10 凌晨 初始化取消睡眠
  */
-public class UrlMapWatchInvoke implements IWatcherInvoke {
+public class UrlMapWatchInvoke extends AbstractWatchInvoke{
 
-	private Logger LOG = LoggerFactory.getLogger(SystemConfigWatchInvoke.class);
-	
-	@Autowired
-	private SdkCmsPageInstanceManager sdkCmsPageInstanceManager;
-	@Autowired
-	private CacheManager				cacheManager;
+    private Logger LOGGER = LoggerFactory.getLogger(SystemConfigWatchInvoke.class);
 
-	@Autowired
-	private ZkOperator zkOperator;
-	
-	@Override
-	public void invoke(String path, byte[] data) {
-		LOG.info(path+":invoke");
-		//获取urlmap载入到内存中
-		//有时候pts修改的事务还未提交，这里就接到通知了，所以取urlmap时，这里先暂停3秒
-		try {
-			TimeUnit.SECONDS.sleep(3);
-		} catch (InterruptedException e) {
-			LOG.error(e.getMessage());
-		}
-		sdkCmsPageInstanceManager.loadUrlMap();
-		
-		byte[] datas;
-		try {
-			datas = zkOperator.getData(path);
-			LOG.info("urlmap:"+datas.length);
-			String s_data = new String(datas);
-			if(s_data!=null && s_data.length()>0){
-				if(s_data.startsWith("#")){
-					s_data=s_data.substring(1);
-					cacheManager.removeMapValue(CacheKeyConstant.CMS_PAGE_KEY, s_data);
-				}
-			}
-		} catch (KeeperException e) {
-			LOG.error(e.getMessage(), e);
-		} catch (InterruptedException e) {
-			LOG.error(e.getMessage(), e);
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-	}
+    @Autowired
+    private SdkCmsPageInstanceManager sdkCmsPageInstanceManager;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    @Autowired
+    private ZkOperator zkOperator;
+
+    @Override
+    public void invoke(String path,byte[] data){
+        LOGGER.info(path + ":invoke");
+        //获取urlmap载入到内存中
+        //有时候pts修改的事务还未提交，这里就接到通知了，所以取urlmap时，这里先暂停3秒
+        if (!this.initialized.compareAndSet(false, true)){
+            try{
+                TimeUnit.SECONDS.sleep(3);
+            }catch (InterruptedException e){}
+        }
+        sdkCmsPageInstanceManager.loadUrlMap();
+
+        byte[] datas;
+        try{
+            datas = zkOperator.getData(path);
+            LOGGER.info("urlmap:" + datas.length);
+            String s_data = new String(datas);
+            if (s_data != null && s_data.length() > 0){
+                if (s_data.startsWith("#")){
+                    s_data = s_data.substring(1);
+                    cacheManager.removeMapValue(CacheKeyConstant.CMS_PAGE_KEY, s_data);
+                }
+            }
+        }catch (KeeperException e){
+            LOGGER.error(e.getMessage(), e);
+        }catch (InterruptedException e){
+            LOGGER.error(e.getMessage(), e);
+        }catch (Exception e){
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
 }

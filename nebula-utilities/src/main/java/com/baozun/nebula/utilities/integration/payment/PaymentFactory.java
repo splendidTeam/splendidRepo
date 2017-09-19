@@ -25,7 +25,7 @@ import com.baozun.nebula.utilities.integration.payment.wechat.WechatPaymentReque
 
 public class PaymentFactory{
 
-    private static final Logger logger = LoggerFactory.getLogger(PaymentFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentFactory.class);
 
     //--------------------------------------------------------------------------------------------------------------
     /** 支付宝 */
@@ -65,17 +65,14 @@ public class PaymentFactory{
 
     //--------------------------------------------------------------------------------------------------------------
 
+    
     public static final String ALIPAYDEFAULTALIPAYCONFIG = "config/alipay.properties";
 
     public static final String ALIPAYINTERNATIONALCREDITCARDCONFIG = "config/payment/alipay/alipay_InternationalCreditCard.properties";
 
     public static final String ALIPAYADDRESS = "config/payment/alipay/alipayAddress.properties";
 
-    /**
-     * @deprecated 目前银联配置文件格式参见 com.baozun.nebula.utilities.integration.payment.unionpay.AbstractUnionPaymentAdaptor.AbstractUnionPaymentAdaptor()
-     */
-    @Deprecated
-    public static final String UNIONPAYDEFAULTALIPAYCONFIG = "config/payment/unionpay/unionpay.properties";
+    public static final String UNIONPAYDEFAULTALIPAYCONFIG = "config/unionpay.properties";
 
     //--------------------------------------------------------------------------------------------------------------
 
@@ -195,15 +192,6 @@ public class PaymentFactory{
     }
 
     //--------------------------------------------------------------------------------------------------------------
-    /*
-     * 初始化配置参数
-     */
-    public Properties initConfig(String payMentType){
-        String configFile = paymentConfigMap.get(payMentType);
-        return ProfileConfigUtil.findCommonPro(configFile);
-    }
-
-    //--------------------------------------------------------------------------------------------------------------
 
     /*
      * 初始化适配器Map
@@ -225,36 +213,64 @@ public class PaymentFactory{
      * 初始化Alipay适配器
      */
     private PaymentAdaptor initAlipayPaymentAdaptor(){
-        return new AlipayPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
+        String type = PAY_TYPE_ALIPAY;
+        Properties properties = loadProperties(type);
+
+        return null == properties ? null : new AlipayPaymentAdaptor(properties);
     }
 
     /*
      * 初始化Alipay银行卡适配器
      */
     private PaymentAdaptor initAlipayBankPaymentAdaptor(){
-        return new AlipayBankPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
+        String type = PAY_TYPE_ALIPAY;
+        Properties properties = loadProperties(type);
+
+        return null == properties ? null : new AlipayBankPaymentAdaptor(properties);
     }
 
     /*
      * 初始化Alipay国内信用卡适配器
      */
     private PaymentAdaptor initAlipayCreditCardPaymentAdaptor(){
-        return new AlipayCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY));
+        String type = PAY_TYPE_ALIPAY;
+        Properties properties = loadProperties(type);
+
+        return null == properties ? null : new AlipayCreditCardPaymentAdaptor(properties);
     }
 
     /*
      * 初始化Alipay国外信用卡适配器
      */
     private PaymentAdaptor initAlipayInternationalCreditCardPaymentAdaptor(){
-        return new AlipayInternationalCreditCardPaymentAdaptor(initConfig(PAY_TYPE_ALIPAY_CREDIT_INT));
+        String type = PAY_TYPE_ALIPAY_CREDIT_INT;
+        Properties properties = loadProperties(type);
+        return null == properties ? null : new AlipayInternationalCreditCardPaymentAdaptor(properties);
+    }
+
+    /**
+     * @param type
+     * @return 如果读不到配置文件,那么返回null
+     * @since 5.3.2.18
+     */
+    private Properties loadProperties(String type){
+        String configFile = paymentConfigMap.get(type);
+
+        try{
+            return ProfileConfigUtil.findCommonPro(configFile);
+        }catch (Exception e){
+            LOGGER.warn("can not load configFile:" + configFile, e);
+            return null;
+        }
     }
 
     /*
      * 初始化银联适配器
      */
     private PaymentAdaptor initUnionPaymentAdaptor(){
-        //不需要传配置参数, 内部已经实现了
-        return new UnionPaymentAdaptor();
+        String type = PAY_TYPE_UNIONPAY;
+        Properties properties = loadProperties(type);
+        return null == properties ? null : new UnionPaymentAdaptor(properties);
     }
 
     /*
@@ -267,30 +283,22 @@ public class PaymentFactory{
     //--------------------------------------------------------------------------------------------------------------
 
     public String getPayType(Integer payType){
-        String type = PaymentFactory.PAY_TYPE_ALIPAY;
         switch (payType) {
             case ALIPAY:
-                type = PaymentFactory.PAY_TYPE_ALIPAY;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY;
             case ALIPAY_BANK:
-                type = PaymentFactory.PAY_TYPE_ALIPAY_BANK;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY_BANK;
             case ALIPAY_CREDIT:
-                type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
             case ALIPAY_CREDIT_INT_V:
-                type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
             case ALIPAY_CREDIT_INT_M:
-                type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
-                break;
+                return PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
             case WECHAT:
-                type = PaymentFactory.PAY_TYPE_WECHAT;
-                break;
+                return PaymentFactory.PAY_TYPE_WECHAT;
             case UNIONPAY:
-                type = PaymentFactory.PAY_TYPE_UNIONPAY;
-                break;
+                return PaymentFactory.PAY_TYPE_UNIONPAY;
         }
-        return type;
+        throw new IllegalArgumentException("payType:[" + payType + "] not support!");
     }
 }

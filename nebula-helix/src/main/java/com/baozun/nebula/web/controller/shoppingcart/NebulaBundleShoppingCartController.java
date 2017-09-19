@@ -37,6 +37,7 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ImmediatelyBuyShoppingCartLineCommandListFactory;
 import com.baozun.nebula.web.controller.shoppingcart.form.BundleImmediatelyBuyForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ImmediatelyBuyBundleFormValidator;
 
 /**
@@ -98,7 +99,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
         //            return toNebulaReturnResult(shoppingcartResult);
         //        }
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(bundleImmediatelyBuyForm,request);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(bundleImmediatelyBuyForm, request);
         String key = saveToAccessor(shoppingCartLineCommandList, request);
 
         String checkoutUrl = getImmediatelyBuyCheckoutUrl(key, request);
@@ -119,7 +120,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
      */
     private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult){
         DefaultReturnResult result = new DefaultReturnResult();
-        if (shoppingcartResult != null){
+        if (ShoppingcartResultUtil.isNotSuccess(shoppingcartResult)){
             result.setResult(false);
 
             String messageStr = getMessage(shoppingcartResult.toString());

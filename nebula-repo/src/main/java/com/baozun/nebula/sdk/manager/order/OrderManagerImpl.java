@@ -16,12 +16,15 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -31,6 +34,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
+import com.baozun.nebula.command.cms.CmsModuleInstanceVersionCommand;
+import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.dao.freight.DistributionModeDao;
 import com.baozun.nebula.dao.payment.PayInfoDao;
@@ -71,9 +76,12 @@ import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
 import com.baozun.nebula.sdk.manager.SdkSecretManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.utils.cache.GuavaAbstractLoadingCache;
 import com.feilong.core.Validator;
+import com.google.common.base.Optional;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toList;
 
 import loxia.dao.Page;
@@ -168,6 +176,8 @@ public class OrderManagerImpl implements OrderManager{
 
     @Autowired
     private SdkOrderLinePackInfoManager sdkOrderLinePackInfoManager;
+    
+    private SdkOrderDao orderDao;
 
     //---------------------------------------------------------------
 
@@ -203,6 +213,7 @@ public class OrderManagerImpl implements OrderManager{
      * @return
      * @since 5.3.2.18
      */
+    //TODO type值的方案 很挫
     private SalesOrderCommand pack(SalesOrderCommand salesOrderCommand,Integer type){
         if (null == salesOrderCommand){
             return null;
@@ -218,26 +229,26 @@ public class OrderManagerImpl implements OrderManager{
 
         //---------------------------------------------------------------
         // 订单支付信息
-        LOGGER.debug("begin load order:[{}] pay info~~", code);
+        LOGGER.trace("begin load pay info ,order:[{}]~~", code);
         List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
-        LOGGER.debug("end load order:[{}] pay info~~", code);
+        LOGGER.debug("end load pay info,order:[{}]~~", code);
 
         //---------------------------------------------------------------
         // 订单行信息
-        LOGGER.debug("begin load order:[{}] order lines info~~", code);
+        LOGGER.trace("begin load order lines info,order:[{}]~~", code);
         List<OrderLineCommand> orderLineCommandList = sdkOrderLineDao.findOrderDetailListByOrderIds(toList(salesOrderCommand.getId()));
         for (OrderLineCommand orderLineCommand : orderLineCommandList){
             List<SkuProperty> propList = sdkSkuManager.getSkuPros(orderLineCommand.getSaleProperty());
             orderLineCommand.setSkuPropertys(propList);
         }
 
-        LOGGER.debug("end load order:[{}] order lines info~~", code);
+        LOGGER.debug("end load order lines info,order:[{}]~~", code);
 
         //---------------------------------------------------------------
         // 订单行促销
-        LOGGER.debug("begin load order:[{}] promotion info~~", code);
+        LOGGER.trace("begin load promotion info order:[{}] ~~", code);
         List<OrderPromotionCommand> orderPrm = sdkOrderPromotionDao.findOrderProInfoByOrderId(salesOrderCommand.getId(), 1);
-        LOGGER.debug("end load order:[{}] promotion info~~", code);
+        LOGGER.debug("end load promotion info order:[{}] ~~", code);
         //---------------------------------------------------------------
 
         salesOrderCommand.setPayInfo(payInfos);
@@ -282,8 +293,13 @@ public class OrderManagerImpl implements OrderManager{
                     orderLineList.add(line);
                     // 属性list
                     String properties = line.getSaleProperty();
-                    List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-                    line.setSkuPropertys(propList);
+                    try {
+						List<SkuProperty>  propList = cache.getValue(properties).get();
+						line.setSkuPropertys(propList);
+					} catch (ExecutionException e) {
+					}
+                  /*  List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
+                    line.setSkuPropertys(propList);*/
                 }
             }
             order.setOrderLines(orderLineList);
@@ -321,8 +337,12 @@ public class OrderManagerImpl implements OrderManager{
                         orderLineList.add(line);
                         // 属性list
                         String properties = line.getSaleProperty();
-                        List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-                        line.setSkuPropertys(propList);
+						try {
+							List<SkuProperty>  propList = cache.getValue(properties).get();
+							line.setSkuPropertys(propList);
+						} catch (ExecutionException e) {
+						}
+						//sdkSkuManager.getSkuPros(properties);
                     }
                 }
                 order.setOrderLines(orderLineList);
@@ -330,6 +350,17 @@ public class OrderManagerImpl implements OrderManager{
         }
         return salesOrderPage;
     }
+    
+    /**
+	 * 启用10分钟缓存
+	 */
+	private GuavaAbstractLoadingCache<String, Optional<List<SkuProperty>>> cache = new GuavaAbstractLoadingCache<String, Optional<List<SkuProperty>>>(
+			100, 600) {
+		@Override
+		protected Optional<List<SkuProperty>> fetchData(String key) {
+			return Optional.fromNullable(sdkSkuManager.getSkuPros(key));
+		}
+	};
 
     /*
      * (non-Javadoc)
@@ -518,45 +549,77 @@ public class OrderManagerImpl implements OrderManager{
     /**
      * Send email.
      *
-     * @param code
+     * @param soCode
      *            the code
      * @param emailTemplete
      *            the email templete
      */
-    private void sendEmail(String code,String emailTemplete){
-
-        SalesOrderCommand salesOrderCommand = findOrderByCode(code, 1);
+    private void sendEmail(String soCode,String emailTemplete){
+        SalesOrderCommand salesOrderCommand = findOrderByCode(soCode, 1);
 
         MemberPersonalData memberPersonalData = null;
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getMemberId())){
-            memberPersonalData = sdkMemberManager.findMemberPersonData(salesOrderCommand.getMemberId());
+        Long memberId = salesOrderCommand.getMemberId();
+        if (isNotNullOrEmpty(memberId)){
+            LOGGER.debug("salesOrderCommand 's memberid is not null,will load memberPersonalData by memberid:[{}]", memberId);
+            memberPersonalData = sdkMemberManager.findMemberPersonData(memberId);
         }
 
-        String nickName = "";
-
-        String email = salesOrderCommand.getEmail();
-
-        if (null != memberPersonalData){
-            nickName = memberPersonalData.getNickname();
-            if (Validator.isNullOrEmpty(email)){
-                email = memberPersonalData.getEmail();
-            }
-        }
-
-        if (Validator.isNullOrEmpty(email)){
+        //---------------------------------------------------------------------
+        String email = buildEmail(salesOrderCommand, memberPersonalData);
+        if (isNullOrEmpty(email)){
+            LOGGER.debug("email is null or empty,don't need send email");
             return;
         }
 
-        if (Validator.isNullOrEmpty(nickName))
-            nickName = salesOrderCommand.getMemberName();
-
-        // 游客用收货人
-        if (Validator.isNullOrEmpty(nickName)){
-            nickName = salesOrderCommand.getName();
-        }
+        String nickName = buildNickName(salesOrderCommand, memberPersonalData);
 
         Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMap(emailTemplete, salesOrderCommand, nickName);
         sdkOrderEmailManager.sendEmail(emailTemplete, email, dataMap);
+    }
+
+    /**
+     * @param salesOrderCommand
+     * @param memberPersonalData
+     * @return
+     * @since 5.3.2.20
+     */
+    private String buildNickName(SalesOrderCommand salesOrderCommand,MemberPersonalData memberPersonalData){
+        String nickName = "";
+        if (null != memberPersonalData){
+            nickName = memberPersonalData.getNickname();
+        }
+        //---------------------------------------------------------------------
+        if (isNullOrEmpty(nickName)){
+            nickName = salesOrderCommand.getMemberName();
+        }
+
+        // 游客用收货人
+        if (isNullOrEmpty(nickName)){
+            nickName = salesOrderCommand.getName();
+        }
+        return nickName;
+    }
+
+    /**
+     * @param salesOrderCommand
+     * @param memberPersonalData
+     * @return
+     * @since 5.3.2.20
+     */
+    private String buildEmail(SalesOrderCommand salesOrderCommand,MemberPersonalData memberPersonalData){
+        String email = salesOrderCommand.getEmail();//t_so_consignee email
+        if (null != memberPersonalData){
+            if (isNullOrEmpty(email)){
+                LOGGER.debug("salesOrderCommand's email is null or empty");
+                email = memberPersonalData.getEmail();//T_MEM_PERSONAL_DATA email
+            }
+        }
+
+        //---------------------------------------------------------------------
+        if (isNullOrEmpty(email)){
+            return EMPTY;
+        }
+        return email;
     }
 
     /*
@@ -973,4 +1036,5 @@ public class OrderManagerImpl implements OrderManager{
     private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
         sdkSecretManager.decrypt(salesOrderCommand, new String[] { "name", "buyerName", "country", "province", "city", "area", "town", "address", "postcode", "tel", "buyerTel", "mobile", "email" });
     }
+
 }

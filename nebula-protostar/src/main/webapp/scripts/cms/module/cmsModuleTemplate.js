@@ -217,6 +217,10 @@ $j(document).ready(function() {
 		 $j("#tableList").data().uiLoxiasimpletable.options.currentPage=1;
 		 refreshData();
 	});  
+	
+	$j("#q_sl_nameForLike").bind('keypress',function(event){
+		  $(".func-button.search").trigger("click");
+    });
 	//执行批量删除
 	$j(".button.delete.batch").click(function() {
 		confirmDelete(null);

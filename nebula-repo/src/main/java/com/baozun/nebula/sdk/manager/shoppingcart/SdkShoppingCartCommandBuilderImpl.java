@@ -480,4 +480,50 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         });
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ShoppingCartCommand buildShoppingCartCommandWithoutPromotion(Long memberId,List<ShoppingCartLineCommand> shoppingCartLineCommandList,CalcFreightCommand calcFreightCommand,List<String> coupons,Set<String> memberComIds){
+        
+        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLines can't be null/empty!");
+
+        //*******包装shoppingCartLineCommandList数据信息.********************************************
+        packShoppingCartLineCommandList(shoppingCartLineCommandList);
+        //**************************************************************************************
+
+        Map<Long, Long> lineIdAndShopIdMapList = CollectionsUtil.getPropertyValueMap(shoppingCartLineCommandList, "id", "shopId");
+
+        //*******************************************************************************************************
+        List<ShoppingCartLineCommand> chooseLinesShoppingCartLineCommandList = new ArrayList<>();// 被选中的购物车行
+        List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList = new ArrayList<>();// 未选中的购物车行
+        // 判断是否是被选中的购物车行
+        splitByCalcLevel(shoppingCartLineCommandList, chooseLinesShoppingCartLineCommandList, noChooseShoppingCartLineCommandList);
+
+        //*******since 5.3.2.7********************************************************
+        if (null != choosedShoppingCartLineCommandListPacker){
+            choosedShoppingCartLineCommandListPacker.packChoosedShoppingCartLineCommandList(chooseLinesShoppingCartLineCommandList, calcFreightCommand,coupons);
+        }
+
+        // 封装购物车的基本信息
+        UserDetails userDetails = buildUserDetails(memberId, memberComIds);
+        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(userDetails, coupons, chooseLinesShoppingCartLineCommandList);
+
+        // 设置分店铺的购物车
+        Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = buildShopCartByShopIdMap(shoppingCartCommand);
+        shoppingCartCommand.setShoppingCartByShopIdMap(shopIdAndShoppingCartCommandMap);
+
+        /**
+         * 不执行活动
+         */
+        
+        //***************************************************************************************
+        //XXX feilong what's this?
+        doWithNoChoose(noChooseShoppingCartLineCommandList, shoppingCartCommand, shopIdAndShoppingCartCommandMap);
+
+        //************************************************************************************************
+        doWithRebuildShoppingCartLineCommands(shoppingCartCommand, noChooseShoppingCartLineCommandList, lineIdAndShopIdMapList, shopIdAndShoppingCartCommandMap);
+
+        return shoppingCartCommand;
+    }
+    
+
 }

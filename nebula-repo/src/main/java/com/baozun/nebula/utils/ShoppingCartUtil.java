@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -36,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineQuantityExtractor;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.lang.ObjectUtil;
@@ -66,6 +66,8 @@ public final class ShoppingCartUtil{
         //see 《Effective Java》 2nd
         throw new AssertionError("No " + getClass().getName() + " instances for you!");
     }
+
+    //---------------------------------------------------------------------
 
     /**
      * 计算应付金额.
@@ -112,8 +114,8 @@ public final class ShoppingCartUtil{
         BigDecimal lineSubTotalAmt = NumberUtil.getMultiplyValue(quantity, salePrice, 2).subtract(discount);
         BigDecimal subTotalAmt = lineSubTotalAmt.compareTo(ZERO) < 0 ? ZERO : lineSubTotalAmt;
 
-        String message = "salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}*{}-{}={}]";
-        LOGGER.debug(message, salePrice, quantity, discount, salePrice, quantity, discount, subTotalAmt);
+        String message = "line:[{}],salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}*{}-{}={}]";
+        LOGGER.debug(message, shoppingCartLineCommand.getId(), salePrice, quantity, discount, salePrice, quantity, discount, subTotalAmt);
         return subTotalAmt;
     }
 
@@ -127,7 +129,7 @@ public final class ShoppingCartUtil{
     public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         // 主賣品(剔除 促銷行 贈品)
         Predicate<ShoppingCartLineCommand> andPredicate = PredicateUtils.andPredicate(//
-                        BeanPredicateUtil.equalPredicate("captionLine", false), 
+                        BeanPredicateUtil.equalPredicate("captionLine", false),
                         BeanPredicateUtil.equalPredicate("gift", false));
         return CollectionsUtil.select(shoppingCartLineCommandList, andPredicate);
     }
@@ -143,23 +145,22 @@ public final class ShoppingCartUtil{
      */
     public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandListWithCheckStatus(List<ShoppingCartLineCommand> shoppingCartLineCommandList,boolean checkStatus){
         // 主賣品(剔除 促銷行 贈品)
-        Predicate<ShoppingCartLineCommand> allPredicate = PredicateUtils.<ShoppingCartLineCommand> allPredicate(
-                        BeanPredicateUtil.equalPredicate("captionLine", false),
-                        BeanPredicateUtil.equalPredicate("gift", false),
-                        BeanPredicateUtil.equalPredicate("settlementState", checkStatus ? 1 : 0));
+        Predicate<ShoppingCartLineCommand> allPredicate = PredicateUtils
+                        .<ShoppingCartLineCommand> allPredicate(BeanPredicateUtil.equalPredicate("captionLine", false), BeanPredicateUtil.equalPredicate("gift", false), BeanPredicateUtil.equalPredicate("settlementState", checkStatus ? 1 : 0));
         return CollectionsUtil.select(shoppingCartLineCommandList, allPredicate);
     }
 
     /**
-     * 计算整单商品数量.
+     * 统计传入的 <code>shoppingCartLineCommandList</code> ,里面购买的商品数量.
+     * @param <T>
      *
      * @param shoppingCartLineCommandList
      *            the shopping cart lines
-     * @return 如果 <code>shoppingCartLineCommandList</code> 是null或者empty,返回0<br>
-     *         否则累加 每个元素的 quantity属性之和
-     * @see com.feilong.core.util.AggregateUtil#sum(java.util.Collection, String)
+     * @return 如果 <code>shoppingCartLineCommandList</code> 是null或者empty,返回 <b>0</b><br>
+     *         否则累加每个元素的 quantity 属性 之和
+     * @see com.feilong.core.util.AggregateUtil#sum(Iterable, String)
      */
-    public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+    public static <T extends ShoppingCartLineQuantityExtractor> int getSumQuantity(Iterable<T> shoppingCartLineCommandList){
         return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : AggregateUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
     }
 

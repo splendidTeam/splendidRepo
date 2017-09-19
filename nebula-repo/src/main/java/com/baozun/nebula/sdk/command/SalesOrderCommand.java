@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.OnLinePaymentCancelCommand;
 import com.baozun.nebula.command.OnLinePaymentCommand;
 import com.baozun.nebula.model.BaseModel;
@@ -37,9 +36,6 @@ public class SalesOrderCommand extends BaseModel{
 
     /** The Constant serialVersionUID. */
     private static final long           serialVersionUID = 4539781027280506601L;
-    
-    //5.3.2.18 客户端识别码规定绑定名称
-    public static final String CLIENT_IDENTIFICATION_MECHANISMS = SalesOrderCommand.class.getName()+"clientIdentificationMechanisms";
 
     /** PK. */
     private Long                        id;

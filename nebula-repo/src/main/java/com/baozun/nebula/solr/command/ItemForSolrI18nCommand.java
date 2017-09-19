@@ -319,6 +319,7 @@ public class ItemForSolrI18nCommand implements Serializable {
 	private List<String>	navigationTree;
 	
 	
+	
 	/**
 	 * 渠道
 	 */
@@ -329,7 +330,12 @@ public class ItemForSolrI18nCommand implements Serializable {
 	@Field
 	private Double salesVolume;
 	
-
+	/**
+     * 动态排序字段，用于扩展默认排序以外的排序
+     */
+    @Field("dynamic_sort_*")
+    private Map<String, Long> dynamicSortMap;
+    
 	public Long getId() {
 		return id;
 	}
@@ -790,11 +796,25 @@ public class ItemForSolrI18nCommand implements Serializable {
 	public void setNavigationTree(List<String> navigationTree) {
 		this.navigationTree = navigationTree;
 	}
+
 	public Double getSalesVolume(){
 		return salesVolume;
 	}
 	public void setSalesVolume(Double salesVolume){
 		this.salesVolume = salesVolume;
 	}
-	
+
+    /**
+     * @return the dynamicSortMap
+     */
+    public Map<String, Long> getDynamicSortMap(){
+        return dynamicSortMap;
+    }
+
+    /**
+     * @param dynamicSortMap the dynamicSortMap to set
+     */
+    public void setDynamicSortMap(Map<String, Long> dynamicSortMap){
+        this.dynamicSortMap = dynamicSortMap;
+    }
 }

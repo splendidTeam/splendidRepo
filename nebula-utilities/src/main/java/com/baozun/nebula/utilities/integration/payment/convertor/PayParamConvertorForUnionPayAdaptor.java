@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.integration.payment.adaptor.BasePayParamCommandAdaptor;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
 import com.feilong.core.Validator;
@@ -14,9 +13,6 @@ import com.unionpay.acp.sdk.UnionPayBase;
 
 public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAdaptor{
 	
-	public PayParamConvertorForUnionPayAdaptor (){
-		SDKConfig.getConfig().loadProperties(ProfileConfigUtil.findCommonPro("config/unionpay.properties"));
-	}
 	
 	/**
 	 * 重要：联调测试时请仔细阅读注释！

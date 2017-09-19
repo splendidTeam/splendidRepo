@@ -23,6 +23,7 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResultUtil;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 
 /**
@@ -52,6 +53,6 @@ public class DefaultNomalStatusShoppingCartLinePredicate implements NomalStatusS
 
         //公共校验
         ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, shoppingCartLineCommand.getQuantity());
-        return null == commonValidateShoppingcartResult;
+        return ShoppingcartResultUtil.isSuccess(commonValidateShoppingcartResult);
     }
 }

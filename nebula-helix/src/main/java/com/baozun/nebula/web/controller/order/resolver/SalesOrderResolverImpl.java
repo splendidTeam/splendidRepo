@@ -24,9 +24,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,17 +37,14 @@ import com.baozun.nebula.constants.MetaInfoConstants;
 import com.baozun.nebula.manager.salesorder.SalesOrderManager;
 import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
-import com.baozun.nebula.model.salesorder.PayInfoLog;
-import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
-import com.baozun.nebula.sdk.manager.SdkPaymentManager;
-import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.order.NebulaOrderCreateController;
 import com.baozun.nebula.web.controller.order.form.InvoiceInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.PaymentInfoSubForm;
@@ -80,17 +75,9 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
     @Autowired
     private SalesOrderManager salesOrderManager;
 
-    /** The sdk payment manager. */
-    @Autowired
-    private SdkPaymentManager sdkPaymentManager;
-
-    /** The order manager. */
-    @Autowired
-    private OrderManager orderManager;
-
     /** The sales order source resolver. */
-    @Autowired
-    private SalesOrderSourceResolver salesOrderSourceResolver;
+    @Autowired(required = false)
+    private SalesOrderSourceResolver salesOrderSourceResolver = new DefaultSalesOrderSourceResolver();
 
     /*
      * (non-Javadoc)
@@ -199,11 +186,11 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         salesOrderCommand.setBuyerTel(shippingInfoSubForm.getBuyerTel());
         salesOrderCommand.setRemarks(Arrays.asList(shippingInfoSubForm.getRemark()));
         //5.3.2.18增加对客户端识别码属性设置
-        salesOrderCommand.setClientIdentificationMechanisms((String)request.getAttribute(SalesOrderCommand.CLIENT_IDENTIFICATION_MECHANISMS));
+        salesOrderCommand.setClientIdentificationMechanisms((String) request.getAttribute(NebulaOrderCreateController.CLIENT_IDENTIFICATION_MECHANISMS));
     }
 
     /**
-     * 设置收获信息.
+     * 设置收货信息.
      *
      * @param salesOrderCommand
      *            the sales order command
@@ -313,19 +300,4 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         return null;
     }
 
-    /**
-     * 通過支付流水號查詢訂單.
-     *
-     * @param subOrdinate
-     *            the sub ordinate
-     * @return the sales order command
-     */
-    @Override
-    public SalesOrderCommand getSalesOrderCommand(String subOrdinate){
-        Map<String, Object> paraMap = new HashMap<String, Object>();
-        paraMap.put("subOrdinate", subOrdinate);
-        List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-
-        return orderManager.findOrderById(payInfoLogs.get(0).getOrderId(), SalesOrder.SALES_ORDER_STATUS_NEW);
-    }
 }
