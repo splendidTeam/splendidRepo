@@ -44,11 +44,8 @@
 						o.MODIFY_TIME as modifyTime,
 						o.TRANS_CODE as transCode,
 					    o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
-<<<<<<< HEAD
 					    o.TAXPAYER_ID  as taxPayerId,
-=======
 					    o.lang as lang,
->>>>>>> refs/tags/5.3.2.28tag
 						sc.NAME,
 						sc.buyer_name as buyerName,
 						sc.buyer_tel as buyerTel,
