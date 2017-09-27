@@ -833,11 +833,8 @@
 					o.ACCOUNT_BANK_NUMBER as accountBankNumber,
 					o.REMARK,
 					o.CREATE_TIME as createTime,
-<<<<<<< HEAD
 					o.TAXPAYER_ID  as taxPayerId,
-=======
 					o.MODIFY_TIME as modifyTime,
->>>>>>> refs/tags/5.3.2.28tag
 					sc.NAME,
 					sc.ORDER_ID,
 					sc.COUNTRY,
